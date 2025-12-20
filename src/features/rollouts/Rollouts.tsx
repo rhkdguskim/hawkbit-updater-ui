@@ -1,8 +1,15 @@
 import React from 'react';
-import { Typography } from 'antd';
+import { Routes, Route } from 'react-router-dom';
+import RolloutList from './RolloutList';
+import RolloutDetail from './RolloutDetail';
 
 const Rollouts: React.FC = () => {
-    return <Typography.Title level={2}>Rollouts Management</Typography.Title>;
+    return (
+        <Routes>
+            <Route index element={<RolloutList />} />
+            <Route path=":rolloutId" element={<RolloutDetail />} />
+        </Routes>
+    );
 };
 
 export default Rollouts;
