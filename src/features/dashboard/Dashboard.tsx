@@ -10,6 +10,8 @@ import styled from 'styled-components';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useGetTargets } from '@/api/generated/targets/targets';
 import { useGetActions } from '@/api/generated/actions/actions';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { Navigate } from 'react-router-dom';
 
 const { Title } = Typography;
 
@@ -28,16 +30,23 @@ const ChartCard = styled(Card)`
 const COLORS = ['#52c41a', '#ff4d4f', '#1890ff', '#faad14'];
 
 const Dashboard: React.FC = () => {
-    // Fetch All Targets (calculate Online/Offline client-side)
+    const { role } = useAuthStore();
+
+    // Redirect if not authenticated
+    if (!role) {
+        return <Navigate to="/login" replace />;
+    }
+
+    // Fetch All Targets (calculate Online/Offline client-side) - 10s polling
     const { data: targetsData, isLoading: targetsLoading, isError: targetsError } = useGetTargets(
         { limit: 100 },
-        { query: { refetchInterval: 30000 } }
+        { query: { refetchInterval: 10000 } }
     );
 
-    // Fetch Actions for Success Rate and Chart
+    // Fetch Actions for Success Rate and Chart - 10s polling
     const { data: actionsData, isLoading: actionsLoading, isError: actionsError } = useGetActions(
         { limit: 100 },
-        { query: { refetchInterval: 30000 } }
+        { query: { refetchInterval: 10000 } }
     );
 
     // Calculate Online/Offline counts from targets list

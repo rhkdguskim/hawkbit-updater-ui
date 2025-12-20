@@ -125,10 +125,10 @@ Management API를 통해서만 동작한다.
 
 ### Acceptance Criteria
 
-* [ ] 카드/차트 독립 로딩
-* [ ] 실패 시 Skeleton UI
-* [ ] 10초 Polling + Backoff
-* [ ] 권한 없는 사용자 접근 불가
+* [x] 카드/차트 독립 로딩
+* [x] 실패 시 Skeleton UI
+* [x] 10초 Polling + Backoff
+* [x] 권한 없는 사용자 접근 불가
 
 ---
 
@@ -148,9 +148,9 @@ Management API를 통해서만 동작한다.
 
 **AC**
 
-* [ ] Server Paging 필수
-* [ ] 필터 변경 시 offset 초기화
-* [ ] 403 시 버튼 숨김
+* [x] Server Paging 필수
+* [x] 필터 변경 시 offset 초기화
+* [x] 403 시 버튼 숨김
 
 ---
 
@@ -175,9 +175,9 @@ Management API를 통해서만 동작한다.
 
 **AC**
 
-* [ ] 탭 Lazy Load
-* [ ] Action 클릭 시 상세 이동
-* [ ] 404 안전 복귀
+* [x] 탭 Lazy Load
+* [x] Action 클릭 시 상세 이동
+* [x] 404 안전 복귀
 
 ---
 
@@ -197,9 +197,9 @@ Management API를 통해서만 동작한다.
 
 **AC**
 
-* [ ] 삭제 Confirm
-* [ ] 409 재시도 UX
-* [ ] Assign 권한 체크
+* [x] 삭제 Confirm
+* [x] 409 재시도 UX
+* [x] Assign 권한 체크
 
 ---
 
