@@ -201,5 +201,20 @@
         "unassignTags": "Remove Tags",
         "tagAssignSuccess": "Tags assigned to {{count}} distribution set(s)",
         "tagUnassignSuccess": "Tags removed from {{count}} distribution set(s)"
+    },
+    "dsTypesAndTags": {
+        "title": "Distribution Set Types & Tags"
+    },
+    "smTypesAndTags": {
+        "title": "Software Module Types"
+    },
+    "dsTypes": {
+        "title": "Types"
+    },
+    "dsTags": {
+        "title": "Tags"
+    },
+    "smTypes": {
+        "title": "Types"
     }
 }

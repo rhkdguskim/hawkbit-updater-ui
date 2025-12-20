@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import {
-    Typography,
-    Card,
     Table,
     Button,
     Space,
@@ -9,8 +7,7 @@ import {
     Popconfirm,
     Tag,
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ColumnsType } from 'antd/es/table';
@@ -24,26 +21,9 @@ import {
 import type { MgmtTargetType, MgmtTargetTypeRequestBodyPost, MgmtTargetTypeRequestBodyPut } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import TargetTypeDialog from './TargetTypeDialog';
-import styled from 'styled-components';
 
-const { Title } = Typography;
-
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-`;
-
-const HeaderRow = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-`;
 
 const TargetTypeList: React.FC = () => {
-    const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
@@ -178,16 +158,8 @@ const TargetTypeList: React.FC = () => {
     ];
 
     return (
-        <PageContainer>
-            <HeaderRow>
-                <Space>
-                    <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/targets')}>
-                        {t('detail.backToTargets')}
-                    </Button>
-                    <Title level={2} style={{ margin: 0 }}>
-                        {t('typeManagement.title')}
-                    </Title>
-                </Space>
+        <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
                 {isAdmin && (
                     <Button
                         type="primary"
@@ -200,24 +172,22 @@ const TargetTypeList: React.FC = () => {
                         {t('typeManagement.add')}
                     </Button>
                 )}
-            </HeaderRow>
+            </div>
 
-            <Card>
-                <Table<MgmtTargetType>
-                    columns={columns}
-                    dataSource={data?.content || []}
-                    rowKey="id"
-                    loading={isLoading}
-                    pagination={{
-                        current: pagination.current,
-                        pageSize: pagination.pageSize,
-                        total: data?.total || 0,
-                        showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50'],
-                        onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
-                    }}
-                />
-            </Card>
+            <Table<MgmtTargetType>
+                columns={columns}
+                dataSource={data?.content || []}
+                rowKey="id"
+                loading={isLoading}
+                pagination={{
+                    current: pagination.current,
+                    pageSize: pagination.pageSize,
+                    total: data?.total || 0,
+                    showSizeChanger: true,
+                    pageSizeOptions: ['10', '20', '50'],
+                    onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
+                }}
+            />
 
             <TargetTypeDialog
                 open={dialogOpen}
@@ -230,7 +200,7 @@ const TargetTypeList: React.FC = () => {
                     setEditingType(null);
                 }}
             />
-        </PageContainer>
+        </>
     );
 };
 

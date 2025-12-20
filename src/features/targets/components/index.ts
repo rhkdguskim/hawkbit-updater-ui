@@ -6,3 +6,5 @@ export { default as TargetFormModal } from './TargetFormModal';
 export { default as MetadataFormModal } from './MetadataFormModal';
 export { default as DeleteMetadataModal } from './DeleteMetadataModal';
 export type { AssignType } from './AssignDSModal';
+export { default as BulkAssignTagsModal } from './BulkAssignTagsModal';
+export { default as BulkAssignTypeModal } from './BulkAssignTypeModal';

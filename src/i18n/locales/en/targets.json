@@ -196,6 +196,9 @@
         "deleteSuccess": "Target tag deleted successfully.",
         "deleteConfirm": "Are you sure you want to delete this target tag?"
     },
+    "tagsAndTypes": {
+        "title": "Tags & Types"
+    },
     "bulkAssign": {
         "title": "Bulk Assignment",
         "selectTargets": "Select Targets",

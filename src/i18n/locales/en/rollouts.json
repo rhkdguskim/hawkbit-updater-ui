@@ -106,9 +106,10 @@
         "targetFilter": {
             "title": "Target Filter",
             "filterQuery": "Target Filter Query (FIQL)",
-            "filterPlaceholder": "e.g., name==device* or leave empty for all targets",
+            "filterPlaceholder": "e.g., name==device*",
             "preview": "Preview Targets",
-            "targetCount": "Matching Targets: {{count}}"
+            "targetCount": "Matching Targets: {{count}}",
+            "required": "Please enter a target filter query (FIQL)."
         },
         "groupSettings": {
             "title": "Group Settings",

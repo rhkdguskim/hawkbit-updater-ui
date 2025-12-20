@@ -201,5 +201,20 @@
         "unassignTags": "태그 제거",
         "tagAssignSuccess": "{{count}}개 배포 세트에 태그가 할당되었습니다",
         "tagUnassignSuccess": "{{count}}개 배포 세트에서 태그가 제거되었습니다"
+    },
+    "dsTypesAndTags": {
+        "title": "배포 세트 유형 & 태그"
+    },
+    "smTypesAndTags": {
+        "title": "소프트웨어 모듈 유형"
+    },
+    "dsTypes": {
+        "title": "유형"
+    },
+    "dsTags": {
+        "title": "태그"
+    },
+    "smTypes": {
+        "title": "유형"
     }
 }

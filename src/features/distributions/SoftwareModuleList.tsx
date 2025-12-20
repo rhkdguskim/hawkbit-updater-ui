@@ -27,6 +27,8 @@ const SoftwareModuleList: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
 
+    const [selectedModuleIds, setSelectedModuleIds] = useState<number[]>([]);
+
     // Calculate offset for API
     const offset = (pagination.current - 1) * pagination.pageSize;
 
@@ -48,6 +50,7 @@ const SoftwareModuleList: React.FC = () => {
             onSuccess: () => {
                 message.success(t('messages.deleteModuleSuccess'));
                 refetch();
+                setSelectedModuleIds(ids => ids.filter(id => id !== deleteMutation.variables?.softwareModuleId)); // Optimistic update or just refetch
             },
             onError: (error) => {
                 message.error((error as Error).message || t('messages.deleteModuleError'));
@@ -63,6 +66,28 @@ const SoftwareModuleList: React.FC = () => {
             okType: 'danger',
             cancelText: t('common:actions.cancel'),
             onOk: () => deleteMutation.mutate({ softwareModuleId: id }),
+        });
+    };
+
+    const handleBulkDelete = () => {
+        Modal.confirm({
+            title: t('messages.bulkDeleteModuleConfirmTitle', { count: selectedModuleIds.length }),
+            content: t('messages.bulkDeleteModuleConfirmDesc'),
+            okText: t('actions.delete'),
+            okType: 'danger',
+            cancelText: t('common:actions.cancel'),
+            onOk: async () => {
+                // Execute deletes sequentially or parallel
+                // Since hooks are involved, better to just iterate calls if possible or use a service function.
+                // React Query mutation variable is single. We can iterate mutateAsync.
+                // But we need to use mutation object inside loop? No, use mutateAsync.
+                for (const id of selectedModuleIds) {
+                    await deleteMutation.mutateAsync({ softwareModuleId: id }).catch(() => { });
+                }
+                setSelectedModuleIds([]);
+                refetch();
+                message.success(t('messages.bulkDeleteModuleSuccess'));
+            },
         });
     };
 
@@ -126,6 +151,7 @@ const SoftwareModuleList: React.FC = () => {
             dataIndex: 'description',
             key: 'description',
             ellipsis: true,
+            width: '20%',
         },
         {
             title: t('list.columns.lastModified'),
@@ -173,6 +199,14 @@ const SoftwareModuleList: React.FC = () => {
                 canAdd={isAdmin}
                 loading={isLoading}
             />
+            {selectedModuleIds.length > 0 && isAdmin && (
+                <Space style={{ marginBottom: 16 }}>
+                    <span>{t('list.selectedCount', { count: selectedModuleIds.length })}</span>
+                    <Button danger onClick={handleBulkDelete} icon={<DeleteOutlined />}>
+                        {t('actions.deleteSelected')}
+                    </Button>
+                </Space>
+            )}
             <Table
                 columns={columns}
                 dataSource={data?.content || []}
@@ -184,6 +218,10 @@ const SoftwareModuleList: React.FC = () => {
                 }}
                 loading={isLoading}
                 onChange={handleTableChange}
+                rowSelection={{
+                    selectedRowKeys: selectedModuleIds,
+                    onChange: (keys) => setSelectedModuleIds(keys as number[]),
+                }}
             />
             <CreateSoftwareModuleModal
                 visible={isCreateModalVisible}

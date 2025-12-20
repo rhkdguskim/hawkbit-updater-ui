@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Typography } from 'antd';
+import { Row, Col } from 'antd';
 import {
     DesktopOutlined,
     CheckCircleOutlined,
@@ -18,8 +18,12 @@ import { KPICard } from './components/KPICard';
 import { ActiveRolloutCard } from './components/ActiveRolloutCard';
 import { FailureChart } from './components/FailureChart';
 import { VersionTreemap } from './components/VersionTreemap';
-
-const { Title } = Typography;
+import { DeviceStatusChart } from './components/DeviceStatusChart';
+import { RolloutStatusCard } from './components/RolloutStatusCard';
+import { ActionFunnelChart } from './components/ActionFunnelChart';
+import { DelayedActionTable } from './components/DelayedActionTable';
+import { PendingApprovalList } from './components/PendingApprovalList';
+import { TargetTypeCoverage } from './components/TargetTypeCoverage';
 
 const Dashboard: React.FC = () => {
     const { t } = useTranslation('dashboard');
@@ -36,7 +40,7 @@ const Dashboard: React.FC = () => {
         { query: { refetchInterval: 10000 } }
     );
 
-    // Fetch Actions for Success Rate and FailureChart
+    // Fetch Actions for Success Rate, FailureChart, and Funnel
     const { data: actionsData, isLoading: actionsLoading } = useGetActions(
         { limit: 100 },
         { query: { refetchInterval: 10000 } }
@@ -69,10 +73,7 @@ const Dashboard: React.FC = () => {
     }, targetsLoading || actionsLoading);
 
     return (
-        <div style={{ padding: '24px', maxWidth: '1600px', margin: '0 auto' }}>
-            <Title level={3} style={{ marginBottom: 24, fontWeight: 700 }}>
-                {t('pageTitle')}
-            </Title>
+        <div style={{ padding: '24px', width: '100%', height: '100%' }}>
 
             {/* Row 1: KPI Cards */}
             <Row gutter={[24, 24]}>
@@ -119,26 +120,64 @@ const Dashboard: React.FC = () => {
                 </Col>
             </Row>
 
-            {/* Row 2: Active Rollout & Failure Analysis */}
+            {/* Row 2: Status & Overview */}
             <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-                <Col xs={24} lg={10} xl={8}>
+                <Col xs={24} lg={8}>
+                    <DeviceStatusChart
+                        total={totalTargets}
+                        onlineCount={onlineCount}
+                        offlineCount={offlineCount}
+                        loading={targetsLoading}
+                    />
+                </Col>
+                <Col xs={24} lg={16}>
+                    <RolloutStatusCard />
+                </Col>
+            </Row>
+
+            {/* Row 3: Active Operations */}
+            <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
+                <Col xs={24} lg={12}>
                     <ActiveRolloutCard />
                 </Col>
-                <Col xs={24} lg={14} xl={16}>
-                    <FailureChart
+                <Col xs={24} lg={12}>
+                    <ActionFunnelChart
                         actions={actionsData?.content || []}
                         loading={actionsLoading}
                     />
                 </Col>
             </Row>
 
-            {/* Row 3: Version/Status Map */}
+            {/* Row 4: Analysis & History */}
             <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-                <Col span={24}>
+                <Col xs={24} lg={14}>
+                    <FailureChart
+                        actions={actionsData?.content || []}
+                        loading={actionsLoading}
+                    />
+                </Col>
+                <Col xs={24} lg={10}>
                     <VersionTreemap
                         targets={targetsData?.content || []}
                         loading={targetsLoading}
                     />
+                </Col>
+            </Row>
+
+            {/* Row 5: Action Monitoring (Phase 2) */}
+            <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
+                <Col xs={24} lg={14}>
+                    <DelayedActionTable />
+                </Col>
+                <Col xs={24} lg={10}>
+                    <PendingApprovalList />
+                </Col>
+            </Row>
+
+            {/* Row 6: Advanced Analytics (Phase 3) */}
+            <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
+                <Col xs={24} lg={12}>
+                    <TargetTypeCoverage />
                 </Col>
             </Row>
         </div>

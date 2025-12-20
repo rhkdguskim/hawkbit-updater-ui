@@ -15,6 +15,8 @@ import { format } from 'date-fns';
 
 import { useTranslation } from 'react-i18next';
 
+import BulkManageSetTagsModal from './components/BulkManageSetTagsModal';
+
 const DistributionSetList: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
     const navigate = useNavigate();
@@ -26,6 +28,10 @@ const DistributionSetList: React.FC = () => {
     const [sort, setSort] = useState<string>('');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+
+    // Bulk Action State
+    const [selectedSetIds, setSelectedSetIds] = useState<number[]>([]);
+    const [bulkTagsModalOpen, setBulkTagsModalOpen] = useState(false);
 
     // Calculate offset for API
     const offset = (pagination.current - 1) * pagination.pageSize;
@@ -177,6 +183,18 @@ const DistributionSetList: React.FC = () => {
                 canAdd={isAdmin}
                 loading={isLoading}
             />
+
+            <Space style={{ marginBottom: 16 }}>
+                {selectedSetIds.length > 0 && (
+                    <>
+                        <span>{t('list.selectedCount', { count: selectedSetIds.length })}</span>
+                        <Button onClick={() => setBulkTagsModalOpen(true)}>
+                            {t('bulkAssignment.manageTags')}
+                        </Button>
+                    </>
+                )}
+            </Space>
+
             <Table
                 columns={columns}
                 dataSource={data?.content || []}
@@ -188,12 +206,26 @@ const DistributionSetList: React.FC = () => {
                 }}
                 loading={isLoading}
                 onChange={handleTableChange}
+                rowSelection={{
+                    selectedRowKeys: selectedSetIds,
+                    onChange: (keys) => setSelectedSetIds(keys as number[]),
+                }}
             />
             <CreateDistributionSetModal
                 visible={isCreateModalVisible}
                 onCancel={() => setIsCreateModalVisible(false)}
                 onSuccess={() => {
                     setIsCreateModalVisible(false);
+                    refetch();
+                }}
+            />
+            <BulkManageSetTagsModal
+                open={bulkTagsModalOpen}
+                setIds={selectedSetIds}
+                onCancel={() => setBulkTagsModalOpen(false)}
+                onSuccess={() => {
+                    setBulkTagsModalOpen(false);
+                    setSelectedSetIds([]);
                     refetch();
                 }}
             />

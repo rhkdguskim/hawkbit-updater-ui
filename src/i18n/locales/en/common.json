@@ -20,7 +20,9 @@
         "deployment": "Deployment",
         "list": "List",
         "types": "Types",
-        "tags": "Tags"
+        "tags": "Tags",
+        "tagsAndTypes": "Tags & Types",
+        "typesAndTags": "Types & Tags"
     },
     "actions": {
         "save": "Save",

@@ -106,9 +106,10 @@
         "targetFilter": {
             "title": "대상 필터",
             "filterQuery": "대상 필터 쿼리 (FIQL)",
-            "filterPlaceholder": "예: name==device* 또는 전체 대상은 비워두세요",
+            "filterPlaceholder": "예: name==device*",
             "preview": "대상 미리보기",
-            "targetCount": "일치하는 대상: {{count}}개"
+            "targetCount": "일치하는 대상: {{count}}개",
+            "required": "대상 필터(FIQL)를 입력해주세요."
         },
         "groupSettings": {
             "title": "그룹 설정",

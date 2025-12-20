@@ -20,7 +20,9 @@
         "deployment": "배포 관리",
         "list": "목록",
         "types": "유형",
-        "tags": "태그"
+        "tags": "태그",
+        "tagsAndTypes": "태그 & 유형",
+        "typesAndTags": "유형 & 태그"
     },
     "actions": {
         "save": "저장",

@@ -143,16 +143,7 @@ const ActionList: React.FC = () => {
     return (
         <div style={{ padding: 24 }}>
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Title level={2} style={{ margin: 0 }}>{t('pageTitle')}</Title>
-                    <Button
-                        icon={<ReloadOutlined />}
-                        onClick={() => refetch()}
-                        loading={isLoading}
-                    >
-                        {t('refresh')}
-                    </Button>
-                </div>
+                <Title level={2} style={{ margin: 0 }}>{t('pageTitle')}</Title>
 
                 <Card>
                     <Space style={{ marginBottom: 16 }} wrap>
@@ -184,6 +175,13 @@ const ActionList: React.FC = () => {
                             setStatusFilter([]);
                         }}>
                             {t('filter.clearFilters')}
+                        </Button>
+                        <Button
+                            icon={<ReloadOutlined />}
+                            onClick={() => refetch()}
+                            loading={isLoading}
+                        >
+                            {t('refresh')}
                         </Button>
                     </Space>
 

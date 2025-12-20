@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import {
-    Typography,
-    Card,
     Table,
     Button,
     Space,
@@ -9,8 +7,7 @@ import {
     Popconfirm,
     Tag,
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ColumnsType } from 'antd/es/table';
@@ -24,9 +21,8 @@ import {
 import type { MgmtTag } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import TargetTagDialog from './TargetTagDialog';
-import styled from 'styled-components';
 
-const { Title } = Typography;
+
 
 interface MgmtTagRequestBodyPost {
     name: string;
@@ -34,22 +30,7 @@ interface MgmtTagRequestBodyPost {
     colour?: string;
 }
 
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-`;
-
-const HeaderRow = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-`;
-
 const TargetTagList: React.FC = () => {
-    const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
@@ -190,16 +171,8 @@ const TargetTagList: React.FC = () => {
     ];
 
     return (
-        <PageContainer>
-            <HeaderRow>
-                <Space>
-                    <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/targets')}>
-                        {t('detail.backToTargets')}
-                    </Button>
-                    <Title level={2} style={{ margin: 0 }}>
-                        {t('tagManagement.title')}
-                    </Title>
-                </Space>
+        <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
                 <Button
                     type="primary"
                     icon={<PlusOutlined />}
@@ -210,24 +183,22 @@ const TargetTagList: React.FC = () => {
                 >
                     {t('tagManagement.add')}
                 </Button>
-            </HeaderRow>
+            </div>
 
-            <Card>
-                <Table<MgmtTag>
-                    columns={columns}
-                    dataSource={data?.content || []}
-                    rowKey="id"
-                    loading={isLoading}
-                    pagination={{
-                        current: pagination.current,
-                        pageSize: pagination.pageSize,
-                        total: data?.total || 0,
-                        showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50'],
-                        onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
-                    }}
-                />
-            </Card>
+            <Table<MgmtTag>
+                columns={columns}
+                dataSource={data?.content || []}
+                rowKey="id"
+                loading={isLoading}
+                pagination={{
+                    current: pagination.current,
+                    pageSize: pagination.pageSize,
+                    total: data?.total || 0,
+                    showSizeChanger: true,
+                    pageSizeOptions: ['10', '20', '50'],
+                    onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
+                }}
+            />
 
             <TargetTagDialog
                 open={dialogOpen}
@@ -240,7 +211,7 @@ const TargetTagList: React.FC = () => {
                     setEditingTag(null);
                 }}
             />
-        </PageContainer>
+        </>
     );
 };
 

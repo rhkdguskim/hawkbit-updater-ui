@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Card, Tag, Tooltip, Space, Button, message, Modal, Typography } from 'antd';
+import { Table, Tag, Tooltip, Space, Button, message, Modal } from 'antd';
 import type { TableProps } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import {
@@ -12,7 +12,7 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import DistributionSetTypeDialog from './DistributionSetTypeDialog';
 
-const { Title } = Typography;
+
 
 const DistributionSetTypeList: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
@@ -152,11 +152,8 @@ const DistributionSetTypeList: React.FC = () => {
     ];
 
     return (
-        <Card>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-                <Title level={4} style={{ margin: 0 }}>
-                    {t('typeManagement.dsTypeTitle')}
-                </Title>
+        <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
                 <Space>
                     <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>
                         {t('common:actions.refresh')}
@@ -186,7 +183,7 @@ const DistributionSetTypeList: React.FC = () => {
                 onClose={handleDialogClose}
                 onSuccess={handleDialogSuccess}
             />
-        </Card>
+        </>
     );
 };
 

@@ -22,7 +22,7 @@ const App: React.FC = () => {
           <Route path="targets/*" element={<Targets />} />
           <Route path="distributions/*" element={<Distributions />} />
           <Route path="actions/*" element={<Actions />} />
-          <Route path="rollouts" element={<Rollouts />} />
+          <Route path="rollouts/*" element={<Rollouts />} />
           <Route path="system/config" element={<Configuration />} />
         </Route>
       </Route>

@@ -148,6 +148,10 @@ const RolloutWizard: React.FC = () => {
             }
             setCurrentStep(currentStep + 1);
         } else if (currentStep === 2) {
+            if (!formData.targetFilterQuery?.trim()) {
+                message.warning(t('wizard.targetFilter.required'));
+                return;
+            }
             setCurrentStep(currentStep + 1);
         } else if (currentStep === 3) {
             try {
@@ -165,12 +169,18 @@ const RolloutWizard: React.FC = () => {
     };
 
     const handleCreate = () => {
+        if (!formData.targetFilterQuery?.trim()) {
+            message.warning(t('wizard.targetFilter.required'));
+            setCurrentStep(2);
+            return;
+        }
+
         createMutation.mutate({
             data: {
                 name: formData.name,
                 description: formData.description || undefined,
                 distributionSetId: formData.distributionSetId,
-                targetFilterQuery: formData.targetFilterQuery || undefined,
+                targetFilterQuery: formData.targetFilterQuery.trim(),
                 amountGroups: formData.amountGroups,
                 successCondition: {
                     condition: 'THRESHOLD',

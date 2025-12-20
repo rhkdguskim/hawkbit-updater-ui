@@ -37,5 +37,46 @@
     "empty": {
         "noDevices": "No registered devices",
         "noActions": "No registered actions"
+    },
+    "rolloutStatus": {
+        "title": "Rollout Status",
+        "ready": "Ready",
+        "running": "Running",
+        "waitingApproval": "Waiting Approval",
+        "error": "Error",
+        "approveAll": "Approve All"
+    },
+    "deviceStatus": {
+        "title": "Device Status",
+        "online": "Online",
+        "offline": "Offline"
+    },
+    "actionFunnel": {
+        "title": "Action Pipeline",
+        "pending": "Pending",
+        "running": "Running",
+        "finished": "Finished"
+    },
+    "delayedActions": {
+        "title": "Delayed Actions (>10m/30m)",
+        "target": "Target",
+        "distribution": "Distribution",
+        "forceType": "Force Type",
+        "elapsed": "Elapsed",
+        "noDelayed": "No delayed actions being monitored"
+    },
+    "pendingApprovals": {
+        "title": "Pending Approvals",
+        "rollout": "Rollout",
+        "groups": "Groups",
+        "approve": "Approve",
+        "noApprovals": "No pending approvals"
+    },
+    "targetTypeCoverage": {
+        "title": "Target Type Coverage",
+        "type": "Target Type",
+        "count": "Count",
+        "percentage": "Percentage",
+        "noTypes": "No target types found"
     }
 }

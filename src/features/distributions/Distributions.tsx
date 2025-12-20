@@ -6,9 +6,9 @@ import DistributionSetList from './DistributionSetList';
 import SoftwareModuleList from './SoftwareModuleList';
 import SoftwareModuleDetail from './SoftwareModuleDetail';
 import DistributionSetDetail from './DistributionSetDetail';
-import { DistributionSetTypeList, SoftwareModuleTypeList } from './types';
-import { DistributionSetTagList } from './tags';
-import { DistributionSetBulkAssignment } from './bulk';
+import DSTypesAndTags from './DSTypesAndTags';
+import SMTypesAndTags from './SMTypesAndTags';
+
 import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
@@ -42,11 +42,9 @@ const Distributions: React.FC = () => {
             <Routes>
                 <Route index element={<Navigate to="sets" replace />} />
                 <Route path="sets" element={<DistributionSetList />} />
-                <Route path="sets/bulk-assign" element={<DistributionSetBulkAssignment />} />
                 <Route path="modules" element={<SoftwareModuleList />} />
-                <Route path="ds-types" element={<DistributionSetTypeList />} />
-                <Route path="ds-tags" element={<DistributionSetTagList />} />
-                <Route path="sm-types" element={<SoftwareModuleTypeList />} />
+                <Route path="ds-types-tags" element={<DSTypesAndTags />} />
+                <Route path="sm-types" element={<SMTypesAndTags />} />
                 <Route path="sets/:id" element={<DistributionSetDetail />} />
                 <Route path="modules/:id" element={<SoftwareModuleDetail />} />
                 <Route path="*" element={<Navigate to="sets" replace />} />
@@ -56,4 +54,3 @@ const Distributions: React.FC = () => {
 };
 
 export default Distributions;
-

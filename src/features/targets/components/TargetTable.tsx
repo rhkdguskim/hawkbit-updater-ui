@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table, Tag, Space, Button, Tooltip, Typography } from 'antd';
-import type { TableProps, TablePaginationConfig } from 'antd';
+import type { TableProps } from 'antd';
 import {
     EyeOutlined,
     DeleteOutlined,
@@ -9,8 +9,8 @@ import {
     SyncOutlined,
     ExclamationCircleOutlined,
 } from '@ant-design/icons';
-import type { MgmtTarget } from '@/api/generated/model';
-import type { SorterResult } from 'antd/es/table/interface';
+import type { MgmtTarget, MgmtTag, MgmtTargetType } from '@/api/generated/model';
+
 import dayjs from 'dayjs';
 
 const { Text } = Typography;
@@ -30,10 +30,16 @@ interface TargetTableProps {
     onView: (target: MgmtTarget) => void;
     onDelete: (target: MgmtTarget) => void;
     canDelete: boolean;
+    rowSelection?: TableProps<MgmtTarget>['rowSelection'];
+    // Filter props
+    availableTags?: MgmtTag[];
+    availableTypes?: MgmtTargetType[];
+    onFilterChange?: (filters: { tagName?: string; typeName?: string }) => void;
 }
 
 import { useTranslation } from 'react-i18next';
 import { TargetTagsCell } from './TargetTagsCell';
+import { TargetTypeCell } from './TargetTypeCell';
 
 const TargetTable: React.FC<TargetTableProps> = ({
     data,
@@ -45,6 +51,10 @@ const TargetTable: React.FC<TargetTableProps> = ({
     onView,
     onDelete,
     canDelete,
+    rowSelection,
+    availableTags,
+    availableTypes,
+    onFilterChange,
 }) => {
     const { t } = useTranslation('targets');
 
@@ -97,18 +107,23 @@ const TargetTable: React.FC<TargetTableProps> = ({
             title: t('table.targetType'),
             dataIndex: 'targetTypeName',
             key: 'targetTypeName',
-            width: 140,
-            render: (typeName: string | undefined) =>
-                typeName ? (
-                    <Tag color="blue">{typeName}</Tag>
-                ) : (
-                    <Text type="secondary">-</Text>
-                ),
+            width: 160,
+            filters: availableTypes?.map(type => ({ text: type.name || '', value: type.name || '' })),
+            filterMultiple: false,
+            render: (_, record) => (
+                <TargetTypeCell
+                    controllerId={record.controllerId!}
+                    currentTypeId={record.targetType}
+                    currentTypeName={record.targetTypeName}
+                />
+            ),
         },
         {
             title: t('table.tags'),
             key: 'tags',
             width: 200,
+            filters: availableTags?.map(tag => ({ text: tag.name || '', value: tag.name || '' })),
+            filterMultiple: false,
             render: (_, record) => <TargetTagsCell controllerId={record.controllerId!} />,
         },
         {
@@ -163,10 +178,10 @@ const TargetTable: React.FC<TargetTableProps> = ({
         },
     ];
 
-    const handleTableChange = (
-        paginationConfig: TablePaginationConfig,
-        _filters: Record<string, unknown>,
-        sorter: SorterResult<MgmtTarget> | SorterResult<MgmtTarget>[]
+    const handleTableChange: TableProps<MgmtTarget>['onChange'] = (
+        paginationConfig,
+        filters,
+        sorter
     ) => {
         // Handle pagination
         if (paginationConfig.current && paginationConfig.pageSize) {
@@ -180,6 +195,16 @@ const TargetTable: React.FC<TargetTableProps> = ({
             onSortChange(sortResult.field as string, order);
         } else if (sortResult?.field && !sortResult.order) {
             onSortChange(sortResult.field as string, null);
+        }
+
+        // Handle filters
+        if (onFilterChange) {
+            const tagFilter = filters['tags'];
+            const typeFilter = filters['targetTypeName'];
+            onFilterChange({
+                tagName: tagFilter && tagFilter.length > 0 ? tagFilter[0] as string : undefined,
+                typeName: typeFilter && typeFilter.length > 0 ? typeFilter[0] as string : undefined,
+            });
         }
     };
 
@@ -200,6 +225,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
             onChange={handleTableChange}
             scroll={{ x: 1000 }}
             size="middle"
+            rowSelection={rowSelection}
         />
     );
 };

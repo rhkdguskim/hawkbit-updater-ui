@@ -1,7 +1,6 @@
 import React from 'react';
 import { Layout, theme } from 'antd';
 import { Outlet } from 'react-router-dom';
-import Sidebar from './Sidebar';
 import AppHeader from './AppHeader';
 import styled from 'styled-components';
 
@@ -39,21 +38,20 @@ const StyledContent = styled(Content) <{ $bg: string; $radius: number }>`
 `;
 
 const MainLayout: React.FC = () => {
-    const {
-        token: { colorBgContainer, borderRadiusLG },
-    } = theme.useToken();
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
 
-    return (
-        <StyledLayout>
-            <Sidebar />
-            <ContentLayout>
-                <AppHeader />
-                <StyledContent $bg={colorBgContainer} $radius={borderRadiusLG}>
-                    <Outlet />
-                </StyledContent>
-            </ContentLayout>
-        </StyledLayout>
-    );
+  return (
+    <StyledLayout>
+      <ContentLayout>
+        <AppHeader />
+        <StyledContent $bg={colorBgContainer} $radius={borderRadiusLG}>
+          <Outlet />
+        </StyledContent>
+      </ContentLayout>
+    </StyledLayout>
+  );
 };
 
 export default MainLayout;

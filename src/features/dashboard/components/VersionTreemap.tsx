@@ -15,9 +15,14 @@ const StyledCard = styled(Card)`
     height: 100%;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    .ant-card-body {
+        padding: 24px;
+        height: 100%;
+    }
 `;
 
-const COLORS = ['#8889DD', '#9597E4', '#8DC77B', '#A5D297', '#E2CF45', '#F8C12D'];
+const COLORS = ['#8884d8', '#83a6ed', '#8dd1e1', '#82ca9d', '#a4de6c', '#d0ed57', '#ffc658'];
 
 export const VersionTreemap: React.FC<VersionTreemapProps> = ({ targets, loading }) => {
     const { t } = useTranslation('dashboard');
@@ -25,26 +30,31 @@ export const VersionTreemap: React.FC<VersionTreemapProps> = ({ targets, loading
 
     if (loading) return <StyledCard loading />;
 
-    // Group by updateStatus
+    // Group by version
     const processData = () => {
+        if (!targets || targets.length === 0) return [];
+
         const groups: Record<string, number> = {};
         targets.forEach(t => {
-            const status = t.updateStatus || 'unknown';
-            groups[status] = (groups[status] || 0) + 1;
+            // Target address usually contains info about current stack or we can use installedDS
+            // For hawkBit, version is often in metadata or we extract from installedDS link
+            // Using a simple proxy: extract last part of address or use 'unknown'
+            const version = t.address?.split('/').pop() || 'Unknown';
+            groups[version] = (groups[version] || 0) + 1;
         });
 
         // Format for Treemap
-        return Object.entries(groups).map(([status, size]) => ({
-            name: t(`status.${status}`, status),
-            status,
+        return Object.entries(groups).map(([version, size]) => ({
+            name: version,
+            version,
             size
-        }));
+        })).sort((a, b) => b.size - a.size);
     };
 
     const data = processData();
 
     const CustomizedContent = (props: any) => {
-        const { x, y, width, height, index, name, value } = props;
+        const { x, y, width, height, index, name, size } = props;
 
         return (
             <g>
@@ -60,16 +70,17 @@ export const VersionTreemap: React.FC<VersionTreemapProps> = ({ targets, loading
                         strokeOpacity: 1,
                     }}
                 />
-                {width > 50 && height > 30 ? (
+                {width > 60 && height > 40 ? (
                     <text
                         x={x + width / 2}
                         y={y + height / 2}
                         textAnchor="middle"
                         fill="#fff"
-                        fontSize={14}
+                        fontSize={12}
+                        fontWeight={600}
                         dominantBaseline="middle"
                     >
-                        {name} ({value})
+                        {name} ({size})
                     </text>
                 ) : null}
             </g>
@@ -77,11 +88,11 @@ export const VersionTreemap: React.FC<VersionTreemapProps> = ({ targets, loading
     };
 
     return (
-        <StyledCard title={t('charts.versionMap', 'Status Distribution')}>
-            {targets.length === 0 ? (
-                <Empty description={t('empty.noDevices', 'No devices')} />
+        <StyledCard title={t('charts.versionDistribution', 'Version Distribution')}>
+            {data.length === 0 ? (
+                <Empty description={t('empty.noData', 'No data')} />
             ) : (
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={250}>
                     <Treemap
                         data={data}
                         dataKey="size"
@@ -90,13 +101,13 @@ export const VersionTreemap: React.FC<VersionTreemapProps> = ({ targets, loading
                         fill="#8884d8"
                         content={<CustomizedContent />}
                         onClick={(node: any) => {
-                            if (node && node.status) {
-                                navigate(`/targets?q=updateStatus==${node.status}`);
-                            }
+                            // If we had a version filter, it would go here
+                            // navigate(`/targets?q=version==${node.version}`);
                         }}
-                        style={{ cursor: 'pointer' }}
                     >
-                        <Tooltip />
+                        <Tooltip
+                            formatter={(value: number) => [`${value} Targets`, 'Count']}
+                        />
                     </Treemap>
                 </ResponsiveContainer>
             )}

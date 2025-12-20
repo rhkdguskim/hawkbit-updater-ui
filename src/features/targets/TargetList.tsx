@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Typography, Card, message, Alert, Select, Space } from 'antd';
+import { Typography, Card, message, Alert, Space } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     TargetTable,
@@ -7,8 +7,11 @@ import {
     DeleteTargetModal,
     TargetFormModal,
     AssignDSModal,
+    BulkAssignTagsModal,
+    BulkAssignTypeModal,
 } from './components';
 import type { AssignType } from './components';
+import { Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import {
     useGetTargets,
@@ -23,8 +26,8 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { useGetTargetTags } from '@/api/generated/target-tags/target-tags';
-import { useGetFilters } from '@/api/generated/target-filter-queries/target-filter-queries';
-import type { MgmtTag, MgmtTargetFilterQuery } from '@/api/generated/model';
+import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
+import type { MgmtTag, MgmtTargetType } from '@/api/generated/model';
 
 const { Title } = Typography;
 
@@ -57,8 +60,11 @@ const TargetList: React.FC = () => {
         const params = new URLSearchParams(location.search);
         return params.get('q') || '';
     });
-    const [selectedTagId, setSelectedTagId] = useState<number | undefined>(undefined);
-    const [selectedFilterId, setSelectedFilterId] = useState<number | undefined>(undefined);
+    const [selectedTagName, setSelectedTagName] = useState<string | undefined>(undefined);
+    const [selectedTypeName, setSelectedTypeName] = useState<string | undefined>(undefined);
+    const [selectedTargetIds, setSelectedTargetIds] = useState<string[]>([]);
+    const [bulkTagsModalOpen, setBulkTagsModalOpen] = useState(false);
+    const [bulkTypeModalOpen, setBulkTypeModalOpen] = useState(false);
 
     // Modal States
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -82,20 +88,17 @@ const TargetList: React.FC = () => {
     // FR-06: Target Tags
     const { data: tagsData } = useGetTargetTags({ limit: 100 });
 
-    // FR-07: Saved Filters
-    const { data: filtersData } = useGetFilters({ limit: 100 });
+    // Get target types for filters
+    const { data: typesData } = useGetTargetTypes({ limit: 100 });
 
-    // Get selected filter query
-    const selectedFilter = filtersData?.content?.find((f: MgmtTargetFilterQuery) => f.id === selectedFilterId);
-
-    // Build search query combining manual search, tag filter, and saved filter
+    // Build search query combining manual search, tag filter, type filter
     const buildFinalQuery = useCallback(() => {
         const queries: string[] = [];
         if (searchQuery) queries.push(searchQuery);
-        if (selectedTagId) queries.push(`tag.id==${selectedTagId}`);
-        if (selectedFilter?.query) queries.push(selectedFilter.query);
+        if (selectedTagName) queries.push(`tag.name==${selectedTagName}`);
+        if (selectedTypeName) queries.push(`targettype.name==${selectedTypeName}`);
         return queries.length > 0 ? queries.join(';') : undefined;
-    }, [searchQuery, selectedTagId, selectedFilter]);
+    }, [searchQuery, selectedTagName, selectedTypeName]);
 
     // API Queries
     const {
@@ -268,37 +271,19 @@ const TargetList: React.FC = () => {
                     loading={targetsLoading}
                 />
 
-                {/* FR-06 & FR-07: Tag and Saved Filter Selectors */}
-                <Space style={{ marginTop: 16, marginBottom: 16 }} wrap>
-                    <Select
-                        placeholder={t('list.filterByTag')}
-                        allowClear
-                        style={{ width: 180 }}
-                        value={selectedTagId}
-                        onChange={(val) => {
-                            setSelectedTagId(val);
-                            setPagination(prev => ({ ...prev, current: 1 }));
-                        }}
-                        options={(tagsData?.content as MgmtTag[] || []).map((tag: MgmtTag) => ({
-                            value: tag.id,
-                            label: tag.name,
-                        }))}
-                    />
-                    <Select
-                        placeholder={t('list.savedFilters')}
-                        allowClear
-                        style={{ width: 220 }}
-                        value={selectedFilterId}
-                        onChange={(val) => {
-                            setSelectedFilterId(val);
-                            setPagination(prev => ({ ...prev, current: 1 }));
-                        }}
-                        options={(filtersData?.content as MgmtTargetFilterQuery[] || []).map((f: MgmtTargetFilterQuery) => ({
-                            value: f.id,
-                            label: f.name,
-                        }))}
-                    />
-                </Space>
+                {selectedTargetIds.length > 0 && (
+                    <Space style={{ marginTop: 16, marginBottom: 16 }} wrap>
+                        <span style={{ marginRight: 8 }}>
+                            {t('list.selectedCount', { count: selectedTargetIds.length })}
+                        </span>
+                        <Button onClick={() => setBulkTagsModalOpen(true)}>
+                            {t('bulkAssign.assignTag')}
+                        </Button>
+                        <Button onClick={() => setBulkTypeModalOpen(true)}>
+                            {t('bulkAssign.assignType')}
+                        </Button>
+                    </Space>
+                )}
 
                 <TargetTable
                     data={targetsData?.content || []}
@@ -310,8 +295,41 @@ const TargetList: React.FC = () => {
                     onView={handleViewTarget}
                     onDelete={handleDeleteClick}
                     canDelete={isAdmin}
+                    rowSelection={{
+                        selectedRowKeys: selectedTargetIds,
+                        onChange: (keys: React.Key[]) => setSelectedTargetIds(keys as string[]),
+                    }}
+                    availableTags={(tagsData?.content as MgmtTag[]) || []}
+                    availableTypes={(typesData?.content as MgmtTargetType[]) || []}
+                    onFilterChange={(filters) => {
+                        setSelectedTagName(filters.tagName);
+                        setSelectedTypeName(filters.typeName);
+                        setPagination(prev => ({ ...prev, current: 1 }));
+                    }}
                 />
             </Card>
+
+            <BulkAssignTagsModal
+                open={bulkTagsModalOpen}
+                targetIds={selectedTargetIds}
+                onCancel={() => setBulkTagsModalOpen(false)}
+                onSuccess={() => {
+                    setBulkTagsModalOpen(false);
+                    setSelectedTargetIds([]); // Clear selection after success
+                    queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
+                }}
+            />
+
+            <BulkAssignTypeModal
+                open={bulkTypeModalOpen}
+                targetIds={selectedTargetIds}
+                onCancel={() => setBulkTypeModalOpen(false)}
+                onSuccess={() => {
+                    setBulkTypeModalOpen(false);
+                    setSelectedTargetIds([]); // Clear selection after success
+                    queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
+                }}
+            />
 
             {/* Delete Modal */}
             <DeleteTargetModal

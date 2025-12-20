@@ -196,6 +196,9 @@
         "deleteSuccess": "타겟 태그가 삭제되었습니다.",
         "deleteConfirm": "정말로 이 타겟 태그를 삭제하시겠습니까?"
     },
+    "tagsAndTypes": {
+        "title": "태그 & 유형"
+    },
     "bulkAssign": {
         "title": "일괄 할당",
         "selectTargets": "타겟 선택",
