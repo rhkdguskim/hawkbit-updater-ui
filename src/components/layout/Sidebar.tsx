@@ -49,6 +49,11 @@ const Sidebar: React.FC = () => {
                     label: 'Distributions',
                 },
                 {
+                    key: '/actions',
+                    icon: <MdRocketLaunch />,
+                    label: 'Actions',
+                },
+                {
                     key: '/rollouts',
                     icon: <MdRocketLaunch />,
                     label: 'Rollouts',
