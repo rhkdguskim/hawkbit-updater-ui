@@ -140,6 +140,8 @@ Management API를 통해서만 동작한다.
 * Paging / Sorting
 * 상태 아이콘
 
+**UI Route**: `/targets`
+
 **API**
 
 * `GET /rest/v1/targets`
@@ -159,12 +161,17 @@ Management API를 통해서만 동작한다.
 * Installed Distribution Sets
 * Action History
 
+**UI Route**: `/targets/:id`
+
 **API**
 
-* `/rest/v1/targets/{id}`
-* `/installedDS`
-* `/actions`
-* `/metadata/*`
+* `GET /rest/v1/targets/{targetId}`
+* `GET /rest/v1/targets/{targetId}/attributes`
+* `GET /rest/v1/targets/{targetId}/installedDS`
+* `GET /rest/v1/targets/{targetId}/assignedDS`
+* `GET /rest/v1/targets/{targetId}/actions`
+* `GET /rest/v1/targets/{targetId}/metadata`
+* `GET /rest/v1/targets/{targetId}/tags`
 
 **AC**
 
@@ -179,12 +186,14 @@ Management API를 통해서만 동작한다.
 * Create / Update / Delete
 * Distribution Set Assign
 
+**UI Routes**: `/targets/new`, `/targets/:id/edit`
+
 **API**
 
-* `POST /targets`
-* `PUT /targets/{id}`
-* `DELETE /targets/{id}`
-* `POST /targets/{id}/assignedDS`
+* `POST /rest/v1/targets`
+* `PUT /rest/v1/targets/{targetId}`
+* `DELETE /rest/v1/targets/{targetId}`
+* `POST /rest/v1/targets/{targetId}/assignedDS`
 
 **AC**
 

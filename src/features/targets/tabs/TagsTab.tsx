@@ -1,0 +1,56 @@
+import React from 'react';
+import { Tag, Typography, Skeleton, Empty, Space, Card, Row, Col } from 'antd';
+import { TagOutlined } from '@ant-design/icons';
+import type { MgmtTag } from '@/api/generated/model';
+
+const { Text } = Typography;
+
+interface TagsTabProps {
+    data: MgmtTag[] | null | undefined;
+    loading: boolean;
+}
+
+const TagsTab: React.FC<TagsTabProps> = ({ data, loading }) => {
+    if (loading) {
+        return <Skeleton active paragraph={{ rows: 4 }} />;
+    }
+
+    if (!data || data.length === 0) {
+        return <Empty description="No tags assigned to this target" />;
+    }
+
+    return (
+        <Row gutter={[16, 16]}>
+            {data.map((tag) => (
+                <Col key={tag.id} xs={24} sm={12} md={8} lg={6}>
+                    <Card
+                        size="small"
+                        style={{
+                            borderLeft: `4px solid ${tag.colour || '#1890ff'}`,
+                        }}
+                    >
+                        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                            <Space>
+                                <TagOutlined style={{ color: tag.colour || '#1890ff' }} />
+                                <Text strong>{tag.name}</Text>
+                            </Space>
+                            {tag.description && (
+                                <Text type="secondary" style={{ fontSize: 12 }}>
+                                    {tag.description}
+                                </Text>
+                            )}
+                            <Tag
+                                color={tag.colour || 'default'}
+                                style={{ marginTop: 8 }}
+                            >
+                                ID: {tag.id}
+                            </Tag>
+                        </Space>
+                    </Card>
+                </Col>
+            ))}
+        </Row>
+    );
+};
+
+export default TagsTab;

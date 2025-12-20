@@ -1,0 +1,88 @@
+{
+    "title": "Target Management",
+    "list": {
+        "title": "Target List",
+        "addTarget": "Add Target",
+        "searchPlaceholder": "Enter search term"
+    },
+    "detail": {
+        "title": "Target Details",
+        "tabs": {
+            "overview": "Overview",
+            "actions": "Actions",
+            "attributes": "Attributes",
+            "distribution": "Distribution Sets",
+            "metadata": "Metadata",
+            "tags": "Tags",
+            "autoConfirm": "AutoConfirm"
+        }
+    },
+    "table": {
+        "controllerId": "Controller ID",
+        "name": "Name",
+        "status": "Status",
+        "updateStatus": "Update Status",
+        "installedDS": "Installed DS",
+        "lastModified": "Last Modified"
+    },
+    "form": {
+        "controllerId": "Controller ID",
+        "controllerIdPlaceholder": "Enter unique controller ID",
+        "controllerIdHelp": "Controller ID cannot be changed after creation.",
+        "name": "Name",
+        "namePlaceholder": "Enter display name (optional)",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter description (optional)"
+    },
+    "modal": {
+        "createTitle": "Add New Target",
+        "editTitle": "Edit Target",
+        "deleteTitle": "Delete Target",
+        "deleteConfirm": "Are you sure you want to delete target '{{name}}'? All associated data will be removed."
+    },
+    "messages": {
+        "createSuccess": "Target created successfully.",
+        "updateSuccess": "Target updated successfully.",
+        "deleteSuccess": "Target deleted successfully.",
+        "assignSuccess": "Distribution Set assigned successfully.",
+        "notFound": "Target not found."
+    },
+    "assign": {
+        "title": "Assign Distribution Set",
+        "selectDS": "Select Distribution Set",
+        "assignType": "Assignment Type",
+        "soft": "Soft",
+        "softDesc": "Device will be updated when convenient.",
+        "forced": "Forced",
+        "forcedDesc": "Device will be updated immediately.",
+        "downloadOnly": "Download Only",
+        "downloadOnlyDesc": "Only download, do not install.",
+        "forcedWarning": "Forced assignment requires Admin privileges."
+    },
+    "autoConfirm": {
+        "title": "AutoConfirm",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "enabledDesc": "All actions will be automatically confirmed without manual intervention.",
+        "disabledDesc": "Actions require manual confirmation before execution.",
+        "activate": "Activate AutoConfirm",
+        "deactivate": "Deactivate AutoConfirm",
+        "activatedSuccess": "AutoConfirm activated.",
+        "deactivatedSuccess": "AutoConfirm deactivated."
+    },
+    "overview": {
+        "status": "Status",
+        "updateStatus": "Update Status",
+        "lastPoll": "Last Poll",
+        "nextPoll": "Next Poll",
+        "never": "Never",
+        "address": "Address",
+        "securityToken": "Security Token",
+        "created": "Created",
+        "lastModified": "Last Modified",
+        "requestAttributes": "Request Attributes",
+        "requested": "Requested",
+        "notRequested": "Not Requested",
+        "targetType": "Target Type"
+    }
+}

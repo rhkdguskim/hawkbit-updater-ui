@@ -18,7 +18,7 @@ const App: React.FC = () => {
       <Route element={<AuthGuard />}>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="targets" element={<Targets />} />
+          <Route path="targets/*" element={<Targets />} />
           <Route path="distributions" element={<Distributions />} />
           <Route path="rollouts" element={<Rollouts />} />
           <Route path="system/config" element={<Configuration />} />

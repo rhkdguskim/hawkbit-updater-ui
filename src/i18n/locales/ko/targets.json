@@ -1,0 +1,88 @@
+{
+    "title": "타겟 관리",
+    "list": {
+        "title": "타겟 목록",
+        "addTarget": "타겟 추가",
+        "searchPlaceholder": "검색어를 입력하세요"
+    },
+    "detail": {
+        "title": "타겟 상세",
+        "tabs": {
+            "overview": "개요",
+            "actions": "액션",
+            "attributes": "속성",
+            "distribution": "배포 세트",
+            "metadata": "메타데이터",
+            "tags": "태그",
+            "autoConfirm": "자동 확인"
+        }
+    },
+    "table": {
+        "controllerId": "컨트롤러 ID",
+        "name": "이름",
+        "status": "상태",
+        "updateStatus": "업데이트 상태",
+        "installedDS": "설치된 배포 세트",
+        "lastModified": "최종 수정일"
+    },
+    "form": {
+        "controllerId": "컨트롤러 ID",
+        "controllerIdPlaceholder": "고유한 컨트롤러 ID 입력",
+        "controllerIdHelp": "컨트롤러 ID는 생성 후 변경할 수 없습니다.",
+        "name": "이름",
+        "namePlaceholder": "표시 이름 입력 (선택)",
+        "description": "설명",
+        "descriptionPlaceholder": "설명 입력 (선택)"
+    },
+    "modal": {
+        "createTitle": "새 타겟 추가",
+        "editTitle": "타겟 편집",
+        "deleteTitle": "타겟 삭제",
+        "deleteConfirm": "정말로 타겟 '{{name}}'을(를) 삭제하시겠습니까? 관련된 모든 데이터가 함께 삭제됩니다."
+    },
+    "messages": {
+        "createSuccess": "타겟이 생성되었습니다.",
+        "updateSuccess": "타겟이 업데이트되었습니다.",
+        "deleteSuccess": "타겟이 삭제되었습니다.",
+        "assignSuccess": "배포 세트가 할당되었습니다.",
+        "notFound": "타겟을 찾을 수 없습니다."
+    },
+    "assign": {
+        "title": "배포 세트 할당",
+        "selectDS": "배포 세트 선택",
+        "assignType": "할당 유형",
+        "soft": "소프트",
+        "softDesc": "디바이스가 편리할 때 업데이트됩니다.",
+        "forced": "강제",
+        "forcedDesc": "디바이스가 즉시 업데이트됩니다.",
+        "downloadOnly": "다운로드만",
+        "downloadOnlyDesc": "다운로드만 하고 설치하지 않습니다.",
+        "forcedWarning": "강제 할당은 관리자 권한이 필요합니다."
+    },
+    "autoConfirm": {
+        "title": "자동 확인",
+        "enabled": "활성화됨",
+        "disabled": "비활성화됨",
+        "enabledDesc": "모든 액션이 수동 개입 없이 자동으로 확인됩니다.",
+        "disabledDesc": "액션 실행 전에 수동 확인이 필요합니다.",
+        "activate": "자동 확인 활성화",
+        "deactivate": "자동 확인 비활성화",
+        "activatedSuccess": "자동 확인이 활성화되었습니다.",
+        "deactivatedSuccess": "자동 확인이 비활성화되었습니다."
+    },
+    "overview": {
+        "status": "상태",
+        "updateStatus": "업데이트 상태",
+        "lastPoll": "마지막 폴링",
+        "nextPoll": "다음 폴링",
+        "never": "없음",
+        "address": "주소",
+        "securityToken": "보안 토큰",
+        "created": "생성일",
+        "lastModified": "최종 수정일",
+        "requestAttributes": "속성 요청",
+        "requested": "요청됨",
+        "notRequested": "요청되지 않음",
+        "targetType": "타겟 유형"
+    }
+}

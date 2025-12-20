@@ -1,0 +1,73 @@
+{
+    "appName": "hawkBit Updater",
+    "nav": {
+        "dashboard": "Dashboard",
+        "targets": "Targets",
+        "distributions": "Distribution Sets",
+        "rollouts": "Rollouts",
+        "system": "System Settings",
+        "configuration": "Configuration"
+    },
+    "actions": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "add": "Add",
+        "refresh": "Refresh",
+        "search": "Search",
+        "confirm": "Confirm",
+        "back": "Back",
+        "close": "Close",
+        "submit": "Submit",
+        "reset": "Reset",
+        "apply": "Apply",
+        "view": "View",
+        "assign": "Assign"
+    },
+    "status": {
+        "online": "Online",
+        "offline": "Offline",
+        "pending": "Pending",
+        "running": "Running",
+        "finished": "Finished",
+        "error": "Error",
+        "canceled": "Canceled",
+        "inSync": "In Sync",
+        "unknown": "Unknown"
+    },
+    "messages": {
+        "success": "Operation completed successfully.",
+        "error": "An error occurred.",
+        "loading": "Loading...",
+        "noData": "No data available.",
+        "confirmDelete": "Are you sure you want to delete?",
+        "notFound": "Not found.",
+        "unauthorized": "Authentication required.",
+        "forbidden": "Access denied.",
+        "conflict": "Conflict occurred. Please refresh and try again."
+    },
+    "settings": {
+        "language": "Language",
+        "theme": "Theme",
+        "lightMode": "Light Mode",
+        "darkMode": "Dark Mode",
+        "systemMode": "System",
+        "account": "Account",
+        "logout": "Logout"
+    },
+    "pagination": {
+        "total": "{{from}}-{{to}} of {{total}}",
+        "itemsPerPage": "Items per page"
+    },
+    "table": {
+        "actions": "Actions",
+        "noResults": "No results found."
+    },
+    "form": {
+        "required": "This field is required.",
+        "invalidFormat": "Invalid format.",
+        "maxLength": "Maximum {{max}} characters allowed."
+    }
+}

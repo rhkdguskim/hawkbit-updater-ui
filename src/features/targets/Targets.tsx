@@ -1,8 +1,16 @@
 import React from 'react';
-import { Typography } from 'antd';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import TargetList from './TargetList';
+import TargetDetail from './TargetDetail';
 
 const Targets: React.FC = () => {
-    return <Typography.Title level={2}>Targets Management</Typography.Title>;
+    return (
+        <Routes>
+            <Route index element={<TargetList />} />
+            <Route path=":id" element={<TargetDetail />} />
+            <Route path="*" element={<Navigate to="/targets" replace />} />
+        </Routes>
+    );
 };
 
 export default Targets;
