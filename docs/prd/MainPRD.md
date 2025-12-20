@@ -277,9 +277,9 @@ Management API를 통해서만 동작한다.
 
 ### AC
 
-* [ ] Read-only
-* [ ] Admin 전용
-* [ ] 실패 시 에러 표시
+* [x] Read-only
+* [x] Admin 전용
+* [x] 실패 시 에러 표시
 
 ---
 
