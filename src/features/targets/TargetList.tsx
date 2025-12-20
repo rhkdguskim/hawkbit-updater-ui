@@ -46,7 +46,7 @@ const TargetList: React.FC = () => {
 
     // Pagination & Sorting State
     const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
-    const [sort, setSort] = useState<string>('lastModifiedAt:DESC');
+    const [sort, setSort] = useState<string>('');
     const [searchQuery, setSearchQuery] = useState<string>('');
 
     // Modal States
@@ -68,7 +68,7 @@ const TargetList: React.FC = () => {
     } = useGetTargets({
         offset,
         limit: pagination.pageSize,
-        sort,
+        sort: sort || undefined,
         q: searchQuery || undefined,
     });
 
@@ -138,7 +138,7 @@ const TargetList: React.FC = () => {
         if (order) {
             setSort(`${field}:${order}`);
         } else {
-            setSort('lastModifiedAt:DESC');
+            setSort('');
         }
     }, []);
 

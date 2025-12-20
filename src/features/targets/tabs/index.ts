@@ -5,3 +5,4 @@ export { default as MetadataTab } from './MetadataTab';
 export { default as DistributionSetTab } from './DistributionSetTab';
 export { default as TagsTab } from './TagsTab';
 export { default as AutoConfirmTab } from './AutoConfirmTab';
+export { default as TargetTypeTab } from './TargetTypeTab';

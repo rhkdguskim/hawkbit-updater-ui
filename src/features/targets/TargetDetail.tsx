@@ -25,11 +25,14 @@ import {
     DistributionSetTab,
     TagsTab,
     AutoConfirmTab,
+    TargetTypeTab,
 } from './tabs';
 import {
     DeleteTargetModal,
     TargetFormModal,
     AssignDSModal,
+    MetadataFormModal,
+    DeleteMetadataModal,
 } from './components';
 import type { AssignType } from './components';
 import {
@@ -46,10 +49,16 @@ import {
     usePostAssignedDistributionSet,
     useActivateAutoConfirm,
     useDeactivateAutoConfirm,
+    useCreateMetadata,
+    useUpdateMetadata,
+    useDeleteMetadata,
+    useAssignTargetType,
+    useUnassignTargetType,
     getGetTargetQueryKey,
+    getGetMetadataQueryKey,
 } from '@/api/generated/targets/targets';
 import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
-import type { MgmtDistributionSetAssignment, MgmtDistributionSetAssignments } from '@/api/generated/model';
+import type { MgmtDistributionSetAssignment, MgmtDistributionSetAssignments, MgmtMetadata } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
@@ -91,6 +100,13 @@ const TargetDetail: React.FC = () => {
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [assignModalOpen, setAssignModalOpen] = useState(false);
 
+    // Metadata Modal States
+    const [metadataFormOpen, setMetadataFormOpen] = useState(false);
+    const [metadataFormMode, setMetadataFormMode] = useState<'create' | 'edit'>('create');
+    const [metadataToEdit, setMetadataToEdit] = useState<MgmtMetadata | null>(null);
+    const [deleteMetadataOpen, setDeleteMetadataOpen] = useState(false);
+    const [metadataToDelete, setMetadataToDelete] = useState<MgmtMetadata | null>(null);
+
     // API Queries - Lazy loading based on active tab
     const {
         data: targetData,
@@ -104,7 +120,7 @@ const TargetDetail: React.FC = () => {
 
     const { data: actionsData, isLoading: actionsLoading } = useGetActionHistory(
         targetId!,
-        { limit: 50, sort: 'id:DESC' },
+        { limit: 50 },
         { query: { enabled: !!targetId && activeTab === 'actions' } }
     );
 
@@ -201,6 +217,73 @@ const TargetDetail: React.FC = () => {
         },
     });
 
+    // Metadata Mutations
+    const createMetadataMutation = useCreateMetadata({
+        mutation: {
+            onSuccess: () => {
+                message.success('Metadata created successfully');
+                setMetadataFormOpen(false);
+                queryClient.invalidateQueries({ queryKey: getGetMetadataQueryKey(targetId) });
+            },
+            onError: (error) => {
+                message.error((error as Error).message || 'Failed to create metadata');
+            },
+        },
+    });
+
+    const updateMetadataMutation = useUpdateMetadata({
+        mutation: {
+            onSuccess: () => {
+                message.success('Metadata updated successfully');
+                setMetadataFormOpen(false);
+                setMetadataToEdit(null);
+                queryClient.invalidateQueries({ queryKey: getGetMetadataQueryKey(targetId) });
+            },
+            onError: (error) => {
+                message.error((error as Error).message || 'Failed to update metadata');
+            },
+        },
+    });
+
+    const deleteMetadataMutation = useDeleteMetadata({
+        mutation: {
+            onSuccess: () => {
+                message.success('Metadata deleted successfully');
+                setDeleteMetadataOpen(false);
+                setMetadataToDelete(null);
+                queryClient.invalidateQueries({ queryKey: getGetMetadataQueryKey(targetId) });
+            },
+            onError: (error) => {
+                message.error((error as Error).message || 'Failed to delete metadata');
+            },
+        },
+    });
+
+    // Target Type Mutations
+    const assignTargetTypeMutation = useAssignTargetType({
+        mutation: {
+            onSuccess: () => {
+                message.success('Target type assigned successfully');
+                queryClient.invalidateQueries({ queryKey: getGetTargetQueryKey(targetId) });
+            },
+            onError: (error) => {
+                message.error((error as Error).message || 'Failed to assign target type');
+            },
+        },
+    });
+
+    const unassignTargetTypeMutation = useUnassignTargetType({
+        mutation: {
+            onSuccess: () => {
+                message.success('Target type removed successfully');
+                queryClient.invalidateQueries({ queryKey: getGetTargetQueryKey(targetId) });
+            },
+            onError: (error) => {
+                message.error((error as Error).message || 'Failed to remove target type');
+            },
+        },
+    });
+
     // Handlers
     const handleUpdateTarget = useCallback(
         (values: { name?: string; description?: string }) => {
@@ -251,6 +334,72 @@ const TargetDetail: React.FC = () => {
             deactivateAutoConfirmMutation.mutate({ targetId });
         }
     }, [targetId, deactivateAutoConfirmMutation]);
+
+    // Metadata Handlers
+    const handleAddMetadata = useCallback(() => {
+        setMetadataFormMode('create');
+        setMetadataToEdit(null);
+        setMetadataFormOpen(true);
+    }, []);
+
+    const handleEditMetadata = useCallback((metadata: MgmtMetadata) => {
+        setMetadataFormMode('edit');
+        setMetadataToEdit(metadata);
+        setMetadataFormOpen(true);
+    }, []);
+
+    const handleDeleteMetadataClick = useCallback((metadata: MgmtMetadata) => {
+        setMetadataToDelete(metadata);
+        setDeleteMetadataOpen(true);
+    }, []);
+
+    const handleMetadataSubmit = useCallback(
+        (values: { key: string; value: string }) => {
+            if (!targetId) return;
+
+            if (metadataFormMode === 'create') {
+                createMetadataMutation.mutate({
+                    targetId,
+                    data: [{ key: values.key, value: values.value }],
+                });
+            } else if (metadataToEdit) {
+                updateMetadataMutation.mutate({
+                    targetId,
+                    metadataKey: metadataToEdit.key,
+                    data: { value: values.value },
+                });
+            }
+        },
+        [targetId, metadataFormMode, metadataToEdit, createMetadataMutation, updateMetadataMutation]
+    );
+
+    const handleConfirmDeleteMetadata = useCallback(() => {
+        if (targetId && metadataToDelete) {
+            deleteMetadataMutation.mutate({
+                targetId,
+                metadataKey: metadataToDelete.key,
+            });
+        }
+    }, [targetId, metadataToDelete, deleteMetadataMutation]);
+
+    // Target Type Handlers
+    const handleAssignTargetType = useCallback(
+        (targetTypeId: number) => {
+            if (targetId) {
+                assignTargetTypeMutation.mutate({
+                    targetId,
+                    data: { id: targetTypeId },
+                });
+            }
+        },
+        [targetId, assignTargetTypeMutation]
+    );
+
+    const handleUnassignTargetType = useCallback(() => {
+        if (targetId) {
+            unassignTargetTypeMutation.mutate({ targetId });
+        }
+    }, [targetId, unassignTargetTypeMutation]);
 
     // Error State
     if (targetError) {
@@ -318,6 +467,9 @@ const TargetDetail: React.FC = () => {
                     data={metadataData}
                     loading={metadataLoading}
                     canEdit={isAdmin}
+                    onAdd={handleAddMetadata}
+                    onEdit={handleEditMetadata}
+                    onDelete={handleDeleteMetadataClick}
                 />
             ),
         },
@@ -341,6 +493,23 @@ const TargetDetail: React.FC = () => {
                             actionLoading={
                                 activateAutoConfirmMutation.isPending ||
                                 deactivateAutoConfirmMutation.isPending
+                            }
+                        />
+                    ),
+                },
+                {
+                    key: 'targettype',
+                    label: 'Target Type',
+                    children: (
+                        <TargetTypeTab
+                            target={targetData}
+                            loading={targetLoading}
+                            canEdit={isAdmin}
+                            onAssign={handleAssignTargetType}
+                            onUnassign={handleUnassignTargetType}
+                            actionLoading={
+                                assignTargetTypeMutation.isPending ||
+                                unassignTargetTypeMutation.isPending
                             }
                         />
                     ),
@@ -448,6 +617,30 @@ const TargetDetail: React.FC = () => {
                 canForced={isAdmin}
                 onConfirm={handleAssignDS}
                 onCancel={() => setAssignModalOpen(false)}
+            />
+
+            {/* Metadata Modals */}
+            <MetadataFormModal
+                open={metadataFormOpen}
+                mode={metadataFormMode}
+                metadata={metadataToEdit}
+                loading={createMetadataMutation.isPending || updateMetadataMutation.isPending}
+                onSubmit={handleMetadataSubmit}
+                onCancel={() => {
+                    setMetadataFormOpen(false);
+                    setMetadataToEdit(null);
+                }}
+            />
+
+            <DeleteMetadataModal
+                open={deleteMetadataOpen}
+                metadata={metadataToDelete}
+                loading={deleteMetadataMutation.isPending}
+                onConfirm={handleConfirmDeleteMetadata}
+                onCancel={() => {
+                    setDeleteMetadataOpen(false);
+                    setMetadataToDelete(null);
+                }}
             />
         </PageContainer>
     );

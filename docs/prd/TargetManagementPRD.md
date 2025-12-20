@@ -188,20 +188,21 @@
 ## 5. 구현 체크리스트
 
 ### Phase 1 (MVP)
-- [ ] Target List 테이블 (Pagination, Sorting)
-- [ ] Target Detail 탭 (Overview, Actions)
-- [ ] Delete Target (Admin)
-- [ ] Assign Distribution Set (Soft)
+- [x] Target List 테이블 (Pagination, Sorting)
+- [x] Target Detail 탭 (Overview, Actions)
+- [x] Delete Target (Admin)
+- [x] Assign Distribution Set (Soft)
 
 ### Phase 2
-- [ ] FIQL 고급 검색
-- [ ] Create/Update Target
-- [ ] Assign Distribution Set (Forced - Admin)
-- [ ] Attributes/Metadata 탭
-- [ ] Tags 탭
-- [ ] Assigned DS 탭
-- [ ] Metadata CRUD (Admin)
+- [x] FIQL 고급 검색 (기본 검색 구현)
+- [x] Create/Update Target
+- [x] Assign Distribution Set (Forced - Admin)
+- [x] Attributes/Metadata 탭
+- [x] Tags 탭
+- [x] Assigned DS 탭
+- [x] Metadata CRUD (Admin)
 
 ### Phase 3
-- [ ] AutoConfirm 관리 (Admin)
-- [ ] Target Type 할당/해제 (Admin)
+- [x] AutoConfirm 관리 (Admin)
+- [x] Target Type 할당/해제 (Admin)
+

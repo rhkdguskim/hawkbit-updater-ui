@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Typography, Skeleton, Empty, Button, Space, Tooltip, Tag } from 'antd';
+import { Table, Typography, Skeleton, Empty, Button, Space, Tooltip } from 'antd';
 import type { TableProps } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import type { PagedListMgmtMetadata, MgmtMetadata } from '@/api/generated/model';
@@ -38,7 +38,7 @@ const MetadataTab: React.FC<MetadataTabProps> = ({
             title: 'Key',
             dataIndex: 'key',
             key: 'key',
-            width: 200,
+            width: 250,
             render: (text: string) => <Text strong>{text}</Text>,
         },
         {
@@ -49,17 +49,6 @@ const MetadataTab: React.FC<MetadataTabProps> = ({
                 <Text copyable style={{ wordBreak: 'break-all' }}>
                     {text || '-'}
                 </Text>
-            ),
-        },
-        {
-            title: 'Visible to Target',
-            dataIndex: 'targetVisible',
-            key: 'targetVisible',
-            width: 140,
-            render: (visible: boolean) => (
-                <Tag color={visible ? 'green' : 'default'}>
-                    {visible ? 'Yes' : 'No'}
-                </Tag>
             ),
         },
     ];
