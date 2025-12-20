@@ -7,6 +7,7 @@ import {
     MdInventory,
     MdRocketLaunch,
     MdPlayArrow,
+    MdAssignment,
 } from 'react-icons/md';
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -163,6 +164,7 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
         if (path.startsWith('/distributions')) return ['distributions-menu'];
         if (path.startsWith('/actions')) return ['/actions'];
         if (path.startsWith('/rollouts')) return ['/rollouts'];
+        if (path.startsWith('/jobs')) return ['/jobs'];
         return [];
     };
 
@@ -243,6 +245,12 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
             icon: <MdRocketLaunch />,
             label: t('nav.rollouts'),
             onClick: () => navigate('/rollouts'),
+        },
+        {
+            key: '/jobs',
+            icon: <MdAssignment />,
+            label: t('nav.jobs'),
+            onClick: () => navigate('/jobs'),
         },
     ];
 

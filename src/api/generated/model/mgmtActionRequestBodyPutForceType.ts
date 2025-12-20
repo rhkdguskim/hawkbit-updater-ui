@@ -10,7 +10,7 @@
 export type MgmtActionRequestBodyPutForceType = typeof MgmtActionRequestBodyPutForceType[keyof typeof MgmtActionRequestBodyPutForceType];
 
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export const MgmtActionRequestBodyPutForceType = {
   soft: 'soft',
   forced: 'forced',

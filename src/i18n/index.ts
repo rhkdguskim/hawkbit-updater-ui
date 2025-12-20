@@ -11,6 +11,7 @@ import koRollouts from './locales/ko/rollouts.json';
 import koDashboard from './locales/ko/dashboard.json';
 import koSystem from './locales/ko/system.json';
 import koActions from './locales/ko/actions.json';
+import koJobs from './locales/ko/jobs.json';
 
 // English translations
 import enCommon from './locales/en/common.json';
@@ -21,6 +22,7 @@ import enRollouts from './locales/en/rollouts.json';
 import enDashboard from './locales/en/dashboard.json';
 import enSystem from './locales/en/system.json';
 import enActions from './locales/en/actions.json';
+import enJobs from './locales/en/jobs.json';
 
 const resources = {
     ko: {
@@ -32,6 +34,7 @@ const resources = {
         dashboard: koDashboard,
         system: koSystem,
         actions: koActions,
+        jobs: koJobs,
     },
     en: {
         common: enCommon,
@@ -42,6 +45,7 @@ const resources = {
         dashboard: enDashboard,
         system: enSystem,
         actions: enActions,
+        jobs: enJobs,
     },
 };
 
@@ -52,7 +56,7 @@ i18n
         resources,
         fallbackLng: 'en',
         defaultNS: 'common',
-        ns: ['common', 'targets', 'auth', 'distributions', 'rollouts', 'dashboard', 'system', 'actions'],
+        ns: ['common', 'targets', 'auth', 'distributions', 'rollouts', 'dashboard', 'system', 'actions', 'jobs'],
         interpolation: {
             escapeValue: false, // React already escapes values
         },
@@ -64,4 +68,3 @@ i18n
     });
 
 export default i18n;
-

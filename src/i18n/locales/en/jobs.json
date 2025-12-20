@@ -1,0 +1,60 @@
+{
+    "title": "Job Management",
+    "tree": {
+        "actions": "Actions",
+        "rollouts": "Rollouts",
+        "createAction": "Create Action",
+        "createRollout": "Create Rollout",
+        "empty": "No jobs available",
+        "refresh": "Refresh"
+    },
+    "detail": {
+        "placeholder": "Select an Action or Rollout from the tree to view details.",
+        "actionTitle": "Action #{id}",
+        "rolloutTitle": "Rollout #{id}",
+        "target": "Target",
+        "distribution": "Distribution Set",
+        "status": "Status",
+        "forceType": "Force Type",
+        "createdAt": "Created At",
+        "lastModified": "Last Modified",
+        "description": "Description",
+        "targetFilter": "Target Filter",
+        "totalTargets": "Total Targets",
+        "deployGroups": "Deploy Groups"
+    },
+    "actions": {
+        "force": "Force",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "deny": "Deny",
+        "openDetail": "Open Detail"
+    },
+    "rollouts": {
+        "start": "Start",
+        "pause": "Pause",
+        "resume": "Resume",
+        "approve": "Approve",
+        "deny": "Deny"
+    },
+    "createAction": {
+        "title": "Create Action",
+        "controllerId": "Target Controller ID",
+        "distributionSet": "Distribution Set",
+        "assignType": "Assign Type",
+        "submit": "Create",
+        "cancel": "Cancel",
+        "success": "Action created successfully",
+        "controllerPlaceholder": "Enter target controller ID"
+    },
+    "messages": {
+        "actionSelect": "Please select an action.",
+        "rolloutSelect": "Please select a rollout.",
+        "forceSuccess": "Action forced successfully",
+        "cancelSuccess": "Action cancelled successfully",
+        "confirmSuccess": "Action confirmed",
+        "denySuccess": "Action denied",
+        "rolloutActionSuccess": "Rollout operation completed",
+        "rolloutActionError": "Failed to update rollout"
+    }
+}

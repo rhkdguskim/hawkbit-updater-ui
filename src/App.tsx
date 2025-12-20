@@ -6,6 +6,7 @@ import Targets from '@/features/targets/Targets';
 import Distributions from '@/features/distributions/Distributions';
 import Actions from '@/features/actions/Actions';
 import Rollouts from '@/features/rollouts/Rollouts';
+import JobManagement from '@/features/jobs/JobManagement';
 import Configuration from '@/features/system/Configuration';
 import LoginPage from '@/features/auth/LoginPage';
 import AuthGuard from '@/features/auth/AuthGuard';
@@ -23,6 +24,7 @@ const App: React.FC = () => {
           <Route path="distributions/*" element={<Distributions />} />
           <Route path="actions/*" element={<Actions />} />
           <Route path="rollouts/*" element={<Rollouts />} />
+          <Route path="jobs" element={<JobManagement />} />
           <Route path="system/config" element={<Configuration />} />
         </Route>
       </Route>

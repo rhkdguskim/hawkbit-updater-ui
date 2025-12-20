@@ -9,8 +9,12 @@
             "description": "설명",
             "completeness": "완전성",
             "lastModified": "최종 수정일",
+            "tags": "태그",
             "actions": "액션"
         },
+        "editTags": "태그 편집",
+        "addTag": "태그 추가",
+        "selectTags": "태그 선택",
         "addSet": "배포 세트 추가",
         "addModule": "소프트웨어 모듈 추가",
         "refresh": "새로고침",
@@ -187,6 +191,7 @@
         "deleteConfirmDesc": "정말로 이 태그를 삭제하시겠습니까?"
     },
     "bulkAssignment": {
+        "title": "일괄 할당",
         "pageTitle": "일괄 할당 - 배포 세트",
         "instruction": "배포 세트를 선택하고 태그를 할당하거나 제거하세요",
         "selectedSets": "선택됨: {{count}}개 배포 세트",

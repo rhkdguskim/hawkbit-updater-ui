@@ -10,8 +10,10 @@ import {
 import type { MgmtDistributionSet } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import DistributionSearchBar from './components/DistributionSearchBar';
-import CreateDistributionSetModal from './components/CreateDistributionSetModal';
+import AdvancedDSBuilderModal from './components/AdvancedDSBuilderModal';
 import { format } from 'date-fns';
+import { TagOutlined } from '@ant-design/icons';
+import { DistributionSetTagsCell } from './components/DistributionSetTagsCell';
 
 import { useTranslation } from 'react-i18next';
 
@@ -138,6 +140,12 @@ const DistributionSetList: React.FC = () => {
             ),
         },
         {
+            title: t('list.columns.tags'),
+            key: 'tags',
+            width: 200,
+            render: (_, record) => <DistributionSetTagsCell distributionSetId={record.id} />,
+        },
+        {
             title: t('list.columns.lastModified'),
             dataIndex: 'lastModifiedAt',
             key: 'lastModifiedAt',
@@ -185,6 +193,12 @@ const DistributionSetList: React.FC = () => {
             />
 
             <Space style={{ marginBottom: 16 }}>
+                <Button
+                    icon={<TagOutlined />}
+                    onClick={() => navigate('/distributions/sets/bulk-assign')}
+                >
+                    {t('bulkAssignment.title') || 'Bulk Assignment'}
+                </Button>
                 {selectedSetIds.length > 0 && (
                     <>
                         <span>{t('list.selectedCount', { count: selectedSetIds.length })}</span>
@@ -211,7 +225,7 @@ const DistributionSetList: React.FC = () => {
                     onChange: (keys) => setSelectedSetIds(keys as number[]),
                 }}
             />
-            <CreateDistributionSetModal
+            <AdvancedDSBuilderModal
                 visible={isCreateModalVisible}
                 onCancel={() => setIsCreateModalVisible(false)}
                 onSuccess={() => {

@@ -13,7 +13,7 @@
 export type MgmtActionConfirmationRequestBodyPutConfirmation = typeof MgmtActionConfirmationRequestBodyPutConfirmation[keyof typeof MgmtActionConfirmationRequestBodyPutConfirmation];
 
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export const MgmtActionConfirmationRequestBodyPutConfirmation = {
   confirmed: 'confirmed',
   denied: 'denied',

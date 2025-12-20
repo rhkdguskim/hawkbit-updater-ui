@@ -1,18 +1,27 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Descriptions, Tabs, Table, Button, message, Space, Tag } from 'antd';
-import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons';
+import { Card, Descriptions, Tabs, Table, Button, message, Space, Tag, Modal } from 'antd';
+import {
+    ArrowLeftOutlined,
+    PlusOutlined,
+    StopOutlined,
+    CopyOutlined
+} from '@ant-design/icons';
 import {
     useGetDistributionSet,
     useGetAssignedSoftwareModules,
     useAssignSoftwareModules,
+    useInvalidateDistributionSet,
+    useCreateDistributionSets,
 } from '@/api/generated/distribution-sets/distribution-sets';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { format } from 'date-fns';
 import AssignModuleModal from './components/AssignModuleModal';
 import SetMetadataTab from './components/SetMetadataTab';
 import SetTagsTab from './components/SetTagsTab';
-import type { MgmtSoftwareModuleAssignment, MgmtSoftwareModule } from '@/api/generated/model';
+import SetStatisticsTab from './components/SetStatisticsTab';
+import SetTargetsTab from './components/SetTargetsTab';
+import type { MgmtSoftwareModuleAssignment, MgmtSoftwareModule, MgmtDistributionSetRequestBodyPost } from '@/api/generated/model';
 import type { TableProps } from 'antd';
 
 import { useTranslation } from 'react-i18next';
@@ -54,6 +63,65 @@ const DistributionSetDetail: React.FC = () => {
     const handleAssignModules = (moduleIds: number[]) => {
         const assignments: MgmtSoftwareModuleAssignment[] = moduleIds.map((id) => ({ id }));
         assignMutation.mutate({ distributionSetId, data: assignments });
+    };
+
+    // Invalidate Mutation
+    const invalidateMutation = useInvalidateDistributionSet({
+        mutation: {
+            onSuccess: () => {
+                message.success(t('messages.invalidateSuccess') || 'Distribution set invalidated successfully');
+                navigate('/distributions/sets');
+            },
+            onError: (error) => {
+                message.error((error as Error).message || 'Failed to invalidate distribution set');
+            }
+        }
+    });
+
+    const handleInvalidate = () => {
+        Modal.confirm({
+            title: t('messages.invalidateConfirmTitle') || 'Invalidate Distribution Set',
+            content: t('messages.invalidateConfirmDesc') || 'Once invalidated, this set cannot be used for new deployments. This action is permanent.',
+            okText: t('actions.invalidate') || 'Invalidate',
+            okType: 'danger',
+            onOk: () => invalidateMutation.mutate({
+                distributionSetId,
+                data: {
+                    actionCancelationType: 'soft',
+                    cancelRollouts: true
+                }
+            })
+        });
+    };
+
+    // Clone Logic (Manual)
+    const createDsMutation = useCreateDistributionSets();
+
+    const handleClone = async () => {
+        if (!setData) return;
+        try {
+            const newName = `${setData.name}_copy`;
+            const payload: MgmtDistributionSetRequestBodyPost = {
+                name: newName,
+                version: `${setData.version}_clone`,
+                type: setData.type,
+                description: setData.description,
+                requiredMigrationStep: setData.requiredMigrationStep,
+            };
+
+            const response = await createDsMutation.mutateAsync({ data: [payload] });
+            const newDsId = response[0]?.id;
+
+            if (newDsId && assignedModulesData?.content) {
+                const moduleIds = assignedModulesData.content.map(m => ({ id: m.id }));
+                await assignMutation.mutateAsync({ distributionSetId: newDsId, data: moduleIds });
+            }
+
+            message.success(t('messages.cloneSuccess') || 'Distribution set cloned successfully');
+            navigate(`/distributions/sets/${newDsId}`);
+        } catch (error) {
+            message.error('Failed to clone distribution set');
+        }
     };
 
     const overviewTab = (
@@ -134,8 +202,6 @@ const DistributionSetDetail: React.FC = () => {
                 onCancel={() => setIsAssignModalVisible(false)}
                 onAssign={handleAssignModules}
                 isAssigning={assignMutation.isPending}
-                // Exclude already assigned modules to prevent duplicates if necessary,
-                // though backend might handle it.
                 excludedModuleIds={assignedModulesData?.content?.map((m) => m.id).filter((id): id is number => id !== undefined) || []}
             />
         </div>
@@ -144,10 +210,31 @@ const DistributionSetDetail: React.FC = () => {
     return (
         <Card
             title={
-                <Space>
-                    <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/distributions/sets')} type="text" />
-                    {setData?.name} <Tag color="blue">{setData?.version}</Tag>
-                </Space>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                    <Space>
+                        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/distributions/sets')} type="text" />
+                        {setData?.name} <Tag color="blue">{setData?.version}</Tag>
+                    </Space>
+                    {isAdmin && (
+                        <Space>
+                            <Button
+                                icon={<CopyOutlined />}
+                                onClick={handleClone}
+                                loading={createDsMutation.isPending}
+                            >
+                                {t('actions.clone') || 'Clone'}
+                            </Button>
+                            <Button
+                                danger
+                                icon={<StopOutlined />}
+                                onClick={handleInvalidate}
+                                loading={invalidateMutation.isPending}
+                            >
+                                {t('actions.invalidate') || 'Invalidate'}
+                            </Button>
+                        </Space>
+                    )}
+                </div>
             }
             loading={isSetLoading}
         >
@@ -159,6 +246,8 @@ const DistributionSetDetail: React.FC = () => {
                     { key: 'modules', label: t('detail.assignedModules'), children: modulesTab },
                     { key: 'metadata', label: t('detail.metadata'), children: <SetMetadataTab distributionSetId={distributionSetId} isAdmin={isAdmin} /> },
                     { key: 'tags', label: t('detail.tags'), children: <SetTagsTab distributionSetId={distributionSetId} isAdmin={isAdmin} /> },
+                    { key: 'statistics', label: t('detail.statistics') || 'Statistics', children: <SetStatisticsTab distributionSetId={distributionSetId} /> },
+                    { key: 'targets', label: t('detail.targets') || 'Targets', children: <SetTargetsTab distributionSetId={distributionSetId} /> },
                 ]}
             />
         </Card>

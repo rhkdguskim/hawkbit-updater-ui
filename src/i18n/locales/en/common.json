@@ -15,6 +15,7 @@
         "smTypes": "Module Type Management",
         "actions": "Actions",
         "rollouts": "Rollouts",
+        "jobs": "Jobs",
         "system": "System",
         "configuration": "Configuration",
         "deployment": "Deployment",

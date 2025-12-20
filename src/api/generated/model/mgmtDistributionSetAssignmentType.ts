@@ -13,7 +13,7 @@
 export type MgmtDistributionSetAssignmentType = typeof MgmtDistributionSetAssignmentType[keyof typeof MgmtDistributionSetAssignmentType];
 
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export const MgmtDistributionSetAssignmentType = {
   soft: 'soft',
   forced: 'forced',

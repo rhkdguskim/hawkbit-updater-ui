@@ -10,11 +10,13 @@ artifact(파일) 업로드 및 메타데이터 관리도 포함된다.
 ## 2. 기능 상세 (Features)
 
 ### 2.1 FR-03-1: Software Module Management
+**UX Spec**: `docs/prd/SoftwareModuleUXPRD.md`
 
 #### 2.1.1 Software Module List
 - **UI Route**: `/software-modules`
 - **기능**:
   - Software Module 목록 조회 (Pagination, Sorting)
+  - **Grid/Card View Toggle** (시각적 자산 관리 모드)
   - 검색 (Name, Version, Type)
   - 생성/수정/삭제 (CRUD)
 - **컬럼**:
@@ -32,6 +34,8 @@ artifact(파일) 업로드 및 메타데이터 관리도 포함된다.
 #### 2.1.3 Artifact Upload
 - **기능**:
   - Software Module에 Artifact 파일 업로드
+  - **Smart Drop Zone** (시각적 드래그 앤 드롭 영역)
+  - **File Type Icons** (파일 확장자 자동 인식 아이콘)
   - Drag & Drop 지원
   - 여러 파일 동시 업로드 불가 (API 제약 사항 확인 필요, 통상 단일 파일)
 - **API**: `POST /rest/v1/softwaremodules/{id}/artifacts`
@@ -45,7 +49,7 @@ artifact(파일) 업로드 및 메타데이터 관리도 포함된다.
 - **기능**:
   - Distribution Set 목록 조회
   - 검색 (Name, Version, Type)
-  - 생성/수정/삭제 (CRUD)
+  - 생성 (Advanced Builder / Wizard 지원), 수정, 삭제
 - **컬럼**:
   - Name, Version, Type, Description, Required Migration Step
 - **API**: `GET /rest/v1/distributionsets`
@@ -66,6 +70,23 @@ artifact(파일) 업로드 및 메타데이터 관리도 포함된다.
 - **API**: 
   - 조회: `GET /rest/v1/distributionsets/{id}/assignedSM`
   - 할당: `POST /rest/v1/distributionsets/{id}/assignedSM`
+
+#### 2.2.4 Advanced Distribution Set Builder
+- **목표**: 배포 세트 생성과 동시에 필요한 Software Module들을 한 번에 구성하는 **One-Stop Creation** 경험 제공.
+- **UI Layout (2-Column Modal)**:
+  - **Left Column (Basic Info)**:
+    - Name, Version (필수)
+    - Description, Type (옵션)
+    - Required Migration Step (Boolean)
+  - **Right Column (Module Composition)**:
+    - **Module Selector**: 검색 및 필터링 가능한 Software Module 목록.
+    - **Tabs by Type**: OS, App, Firmware 등 모듈 타입별 탭 구분.
+    - **Selection**: 체크박스로 다중 선택 가능 (단, 동일 타입 중복 방지 로직 적용).
+    - **Preview**: 선택된 모듈 리스트 요약 표시.
+- **Logic (Batch API)**:
+  1. `POST /distributionsets` (기본 정보로 DS 생성)
+  2. 성공 시 반환된 ID로 `POST /distributionsets/{id}/assignedSM` 호출 (선택된 모듈 일괄 할당)
+  3. 실패 시 롤백(삭제) 또는 에러 알림.
 
 ---
 
@@ -101,6 +122,47 @@ artifact(파일) 업로드 및 메타데이터 관리도 포함된다.
 | Tag 할당/해제 | `GET /rest/v1/distributionsettags/{distributionsetTagId}/assigned`<br>`POST/DELETE /rest/v1/distributionsettags/{distributionsettagId}/assigned/{distributionsetId}` | 특정 Tag가 부착된 Distribution Set 목록 조회 및 편집. |
 
 > **UI 가이드**: Distribution Set Type 편집 화면에서 Mandatory/Optional Module Types를 시각적으로 편집하고, Tag는 Distribution Set 상세에서 Badges + AutoComplete로 관리한다. Rollout/Assignment 플로우에서는 Type/Tag 조합으로 빠르게 필터링할 수 있도록 한다.
+
+### 2.5 FR-03-4: Distribution Statistics & Monitoring
+
+#### 2.5.1 Distribution Set Statistics
+- **기능**: 특정 Distribution Set의 배포 성과 및 현황을 시각화한다.
+- **UI**: Distribution Set 상세 화면의 'Statistics' 탭.
+- **주요 지표**:
+  - **Deployment Success Rate**: 해당 DS가 포함된 액션들의 성공/실패 비율.
+  - **Rollout History**: 해당 DS를 사용한 과거/현재 Rollout 목록.
+  - **Target Distribution Scale**: 현재 해당 DS를 할당받은 대상 수 vs 실제 설치 완료된 대상 수.
+- **API**: 
+  - 기본 통계: `GET /rest/v1/distributionsets/{id}/statistics`
+  - 롤아웃 통계: `GET /rest/v1/distributionsets/{id}/statistics/rollouts`
+
+#### 2.5.2 Target Usage Visibility
+- **기능**: 해당 소프트웨어 버전을 실제로 사용 중인 기기 목록을 실시간으로 확인한다.
+- **UI**: Distribution Set 상세 화면의 'Targets' 탭 (Assigned / Installed 구분).
+- **API**: 
+  - 할당된 타겟: `GET /rest/v1/distributionsets/{id}/assignedTargets`
+  - 설치된 타겟: `GET /rest/v1/distributionsets/{id}/installedTargets`
+
+### 2.6 FR-03-5: Advanced Life-Cycle & Security
+
+#### 2.6.1 Distribution Set Invalidation
+- **기능**: 결함이 발견된 배포 세트를 즉시 무효화하여 추가 배포를 방지한다.
+- **Logic**: 무효화된 DS는 신규 Rollout이나 Assignment에서 선택할 수 없어야 한다.
+- **API**: `POST /rest/v1/distributionsets/{id}/invalidate`
+
+#### 2.6.2 Clone/Duplicate Functionality
+- **기능**: 기존 소프트웨어 모듈이나 배포 세트의 정보를 복사하여 새로운 버전을 빠르게 생성한다.
+- **UI**: 목록 또는 상세 페이지에 'Clone' 버튼 제공.
+
+#### 2.6.3 Artifact Integrity Verification
+- **기능**: 업로드된 파일의 무결성을 확인하기 위해 해시값을 표시하고 검증한다.
+- **UI**: Software Module Artifacts 목록에 MD5, SHA1, SHA256 해시값 컬럼 추가.
+- **Logic**: 다운로드 시 또는 서버 측 검증 결과 표시.
+
+#### 2.6.4 Software Module Usage Reference
+- **기능**: 특정 소프트웨어 모듈이 어떤 배포 세트들에 포함되어 있는지 역방향 조회 기능을 제공한다.
+- **UI**: Software Module 상세의 'Usage' 탭.
+- **목적**: 모듈 삭제 전 영향도 파악.
 
 ---
 
@@ -141,6 +203,11 @@ artifact(파일) 업로드 및 메타데이터 관리도 포함된다.
 | Manage DS Types | `POST/PUT/DELETE` | `/rest/v1/distributionsettypes` (Admin) |
 | Get DS Tags | `GET` | `/rest/v1/distributionsettags` |
 | Manage DS Tags | `POST/PUT/DELETE` | `/rest/v1/distributionsettags` |
+| Get DS Statistics | `GET` | `/rest/v1/distributionsets/{id}/statistics` |
+| Invalidate DS | `POST` | `/rest/v1/distributionsets/{id}/invalidate` |
+| List Assigned Targets | `GET` | `/rest/v1/distributionsets/{id}/assignedTargets` |
+| List Installed Targets | `GET` | `/rest/v1/distributionsets/{id}/installedTargets` |
+| Get SM Usage | `GET` | `/rest/v1/softwaremodules/{id}/distributionsets` (예상, API 확인 필요) |
 
 ---
 
@@ -184,6 +251,24 @@ artifact(파일) 업로드 및 메타데이터 관리도 포함된다.
   - [x] Bulk Assignment Page (Select Sets, Assign/Unassign Tags)
   - [x] Route: `/distributions/sets/bulk-assign`
   - [x] Sidebar: Distributions -> Distribution Sets -> Bulk Assign
-- [ ] Update Distribution Set List
-  - [ ] Add "Tags" column
-  - [ ] Link to Bulk Assignment
+- [x] Update Distribution Set List
+  - [x] Add "Tags" column
+  - [x] Link to Bulk Assignment
+
+### Phase 6 (Advanced Builder)
+- [x] Advanced Builder Modal UI (2-Column)
+- [x] Module Selection UI (Tabs & Search)
+- [x] Batch Creation Logic
+- [x] Validation Logic (Required Fields & Module Types)
+
+### Phase 7 (Monitoring & Visibility)
+- [x] Distribution Set Statistics API Integration
+- [x] Charts for Deployment Success/Failure in DS Detail
+- [x] Assigned/Installed Targets List in DS Detail
+- [x] Rollout History tab in DS Detail
+
+### Phase 8 (Advanced Life-Cycle)
+- [x] Invalidate Distribution Set Action
+- [x] Clone DS/SM Functionality
+- [x] Artifact Hash (MD5, SHA1, SHA256) Display
+- [x] Software Module Usage tab (referencing DS)

@@ -8,6 +8,7 @@ import SoftwareModuleDetail from './SoftwareModuleDetail';
 import DistributionSetDetail from './DistributionSetDetail';
 import DSTypesAndTags from './DSTypesAndTags';
 import SMTypesAndTags from './SMTypesAndTags';
+import DistributionBulkAssign from './DistributionBulkAssign';
 
 import { useTranslation } from 'react-i18next';
 
@@ -45,6 +46,7 @@ const Distributions: React.FC = () => {
                 <Route path="modules" element={<SoftwareModuleList />} />
                 <Route path="ds-types-tags" element={<DSTypesAndTags />} />
                 <Route path="sm-types" element={<SMTypesAndTags />} />
+                <Route path="sets/bulk-assign" element={<DistributionBulkAssign />} />
                 <Route path="sets/:id" element={<DistributionSetDetail />} />
                 <Route path="modules/:id" element={<SoftwareModuleDetail />} />
                 <Route path="*" element={<Navigate to="sets" replace />} />

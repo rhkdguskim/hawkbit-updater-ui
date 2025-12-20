@@ -9,8 +9,12 @@
             "description": "Description",
             "completeness": "Completeness",
             "lastModified": "Last Modified",
+            "tags": "Tags",
             "actions": "Actions"
         },
+        "editTags": "Edit Tags",
+        "addTag": "Add Tag",
+        "selectTags": "Select Tags",
         "addSet": "Add Distribution Set",
         "addModule": "Add Software Module",
         "refresh": "Refresh",
@@ -187,6 +191,7 @@
         "deleteConfirmDesc": "Are you sure you want to delete this tag?"
     },
     "bulkAssignment": {
+        "title": "Bulk Assignment",
         "pageTitle": "Bulk Assignment - Distribution Sets",
         "instruction": "Select distribution sets and assign or remove tags",
         "selectedSets": "Selected: {{count}} distribution set(s)",

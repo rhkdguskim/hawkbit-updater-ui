@@ -12,6 +12,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { format } from 'date-fns';
 import type { MgmtArtifact } from '@/api/generated/model';
 import ModuleMetadataTab from './components/ModuleMetadataTab';
+import ModuleUsageTab from './components/ModuleUsageTab';
 
 import { useTranslation } from 'react-i18next';
 
@@ -147,6 +148,7 @@ const SoftwareModuleDetail: React.FC = () => {
                             <Space direction="vertical" size="small">
                                 <Tag>MD5: {record.hashes?.md5?.substring(0, 8)}...</Tag>
                                 <Tag>SHA1: {record.hashes?.sha1?.substring(0, 8)}...</Tag>
+                                <Tag>SHA256: {record.hashes?.sha256?.substring(0, 8)}...</Tag>
                             </Space>
                         ),
                     },
@@ -198,6 +200,7 @@ const SoftwareModuleDetail: React.FC = () => {
                     { key: 'overview', label: t('detail.overview'), children: overviewTab },
                     { key: 'artifacts', label: t('detail.artifacts'), children: artifactsTab },
                     { key: 'metadata', label: t('detail.metadata'), children: <ModuleMetadataTab softwareModuleId={softwareModuleId} isAdmin={isAdmin} /> },
+                    { key: 'usage', label: t('detail.usage') || 'Usage Reference', children: <ModuleUsageTab softwareModuleId={softwareModuleId} /> },
                 ]}
             />
         </Card>
