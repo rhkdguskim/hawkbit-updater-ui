@@ -223,7 +223,7 @@ const Configuration: React.FC = () => {
         }
 
         try {
-            await updateMutation.mutateAsync({ data: changedValues });
+            await updateMutation.mutateAsync({ data: changedValues as Parameters<typeof updateMutation.mutateAsync>[0]['data'] });
             messageApi.success(t('messages.saveSuccess'));
             setIsEditMode(false);
             refetch();

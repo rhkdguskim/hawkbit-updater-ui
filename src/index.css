@@ -1,1 +1,473 @@
+/* Modern UI Global Styles */
 
+/* Import Google Fonts - Inter for English, Pretendard for Korean */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
+/* Root Variables */
+:root {
+    /* Typography */
+    --font-sans: 'Pretendard Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+
+    /* Animation durations */
+    --transition-fast: 0.15s;
+    --transition-normal: 0.25s;
+    --transition-slow: 0.35s;
+
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+    --gradient-info: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+    --gradient-sidebar: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+}
+
+/* Dark mode variables */
+[data-theme='dark'] {
+    --glass-bg: rgba(30, 30, 46, 0.8);
+    --glass-border: rgba(69, 71, 90, 0.5);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    --gradient-sidebar: linear-gradient(180deg, #0f0f1a 0%, #1e1e2e 50%, #262637 100%);
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    transition: background-color var(--transition-normal) ease;
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+}
+
+h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 1.875rem;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
+h5 {
+    font-size: 1.125rem;
+}
+
+h6 {
+    font-size: 1rem;
+}
+
+/* Code/Mono text */
+code,
+pre,
+.mono {
+    font-family: var(--font-mono);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.5);
+}
+
+/* Selection */
+::selection {
+    background: rgba(99, 102, 241, 0.3);
+    color: inherit;
+}
+
+/* Focus Styles */
+*:focus-visible {
+    outline: 2px solid rgba(99, 102, 241, 0.5);
+    outline-offset: 2px;
+}
+
+/* Smooth Transitions for Interactive Elements */
+a,
+button,
+input,
+select,
+textarea {
+    transition: all var(--transition-fast) ease;
+}
+
+/* AntD Component Enhancements */
+
+/* Override Ant Design font family */
+.ant-typography,
+.ant-btn,
+.ant-input,
+.ant-select,
+.ant-table,
+.ant-menu,
+.ant-card,
+.ant-modal,
+.ant-form,
+.ant-descriptions,
+.ant-statistic,
+.ant-tag,
+.ant-badge,
+.ant-tabs,
+.ant-breadcrumb {
+    font-family: var(--font-sans) !important;
+}
+
+/* Cards with hover effect */
+.ant-card {
+    transition: transform var(--transition-normal) ease,
+        box-shadow var(--transition-normal) ease;
+}
+
+.ant-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.15);
+}
+
+/* Disable hover effect for cards that shouldn't move */
+.ant-card.no-hover:hover {
+    transform: none;
+    box-shadow: inherit;
+}
+
+/* Table enhancements */
+.ant-table-wrapper {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.ant-table-thead>tr>th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+}
+
+.ant-table-tbody>tr {
+    transition: background-color var(--transition-fast) ease;
+}
+
+/* Button enhancements */
+.ant-btn {
+    font-weight: 500;
+    transition: all var(--transition-fast) ease;
+}
+
+.ant-btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+}
+
+.ant-btn-primary:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.4);
+}
+
+.ant-btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Tag enhancements */
+.ant-tag {
+    font-weight: 500;
+    border: none;
+}
+
+/* Badge pulse animation */
+.ant-badge-status-processing::after {
+    animation: antStatusProcessing 1.2s infinite ease-in-out;
+}
+
+/* Modal backdrop blur */
+.ant-modal-mask {
+    backdrop-filter: blur(4px);
+}
+
+/* Drawer with glassmorphism */
+.ant-drawer-content {
+    backdrop-filter: blur(20px);
+}
+
+/* Menu item active indicator */
+.ant-menu-dark .ant-menu-item-selected {
+    position: relative;
+}
+
+.ant-menu-dark .ant-menu-item-selected::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--gradient-primary);
+    border-radius: 0 4px 4px 0;
+}
+
+/* Sidebar enhancements */
+.ant-layout-sider {
+    background: var(--gradient-sidebar) !important;
+}
+
+.ant-menu-dark {
+    background: transparent !important;
+}
+
+.ant-menu-dark .ant-menu-item-group-title {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding-left: 24px;
+}
+
+/* Tooltip enhancements */
+.ant-tooltip-inner {
+    font-size: 13px;
+    padding: 8px 12px;
+}
+
+/* Notification enhancements */
+.ant-notification-notice {
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+}
+
+/* Message enhancements */
+.ant-message-notice-content {
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+}
+
+/* Stats card number styling */
+.ant-statistic-content-value {
+    font-weight: 700;
+    font-family: var(--font-sans) !important;
+}
+
+/* Progress bar gradient */
+.ant-progress-bg {
+    background: var(--gradient-primary) !important;
+}
+
+/* Skeleton loading animation */
+.ant-skeleton-element {
+    background: linear-gradient(90deg,
+            rgba(99, 102, 241, 0.1) 25%,
+            rgba(99, 102, 241, 0.2) 50%,
+            rgba(99, 102, 241, 0.1) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Spin with gradient */
+.ant-spin-dot-item {
+    background: var(--gradient-primary);
+}
+
+/* Tab enhancements */
+.ant-tabs-ink-bar {
+    background: var(--gradient-primary);
+}
+
+/* Switch enhancements */
+.ant-switch-checked {
+    background: var(--gradient-primary);
+}
+
+/* Steps enhancements */
+.ant-steps-item-finish .ant-steps-item-icon {
+    background: var(--gradient-success);
+    border-color: transparent;
+}
+
+.ant-steps-item-process .ant-steps-item-icon {
+    background: var(--gradient-primary);
+    border-color: transparent;
+}
+
+/* Page transition animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-transition {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Gradient text utility */
+.gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Glass card utility */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+/* Hover scale utility */
+.hover-scale {
+    transition: transform var(--transition-fast) ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.02);
+}
+
+/* Pulse animation for status indicators */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Status dot animations */
+.status-online::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    margin-right: 8px;
+    animation: pulse 2s infinite;
+}
+
+.status-offline::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #94a3b8;
+    margin-right: 8px;
+}
+
+/* Loading shimmer effect */
+.shimmer {
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Smooth page content */
+.ant-layout-content {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Logo styling in sidebar */
+.sidebar-logo {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Header styling */
+.ant-layout-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .ant-layout-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}

@@ -8,20 +8,95 @@ import {
     MdInventory,
     MdRocketLaunch,
     MdSettings,
+    MdPlayArrow,
 } from 'react-icons/md';
 import styled from 'styled-components';
 
 const { Sider } = Layout;
+
+const StyledSider = styled(Sider)`
+  .ant-layout-sider-children {
+    display: flex;
+    flex-direction: column;
+  }
+`;
 
 const LogoContainer = styled.div`
   height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 1.2rem;
-  font-weight: bold;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(129, 140, 248, 0.4);
+  }
+  
+  .logo-text {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+`;
+
+const StyledMenu = styled(Menu)`
+  flex: 1;
+  border: none !important;
+  padding: 12px 8px;
+  
+  .ant-menu-item {
+    margin: 4px 0 !important;
+    border-radius: 10px !important;
+    height: 44px !important;
+    line-height: 44px !important;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .ant-menu-item-icon {
+      font-size: 20px !important;
+    }
+  }
+  
+  .ant-menu-item-selected {
+    background: linear-gradient(135deg, rgba(129, 140, 248, 0.3) 0%, rgba(167, 139, 250, 0.2) 100%) !important;
+    box-shadow: 0 4px 12px rgba(129, 140, 248, 0.15);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 24px;
+      background: linear-gradient(180deg, #818cf8 0%, #a78bfa 100%);
+      border-radius: 0 4px 4px 0;
+    }
+  }
+  
+  .ant-menu-item-group-title {
+    color: rgba(255, 255, 255, 0.45) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    padding: 16px 16px 8px !important;
+  }
 `;
 
 const Sidebar: React.FC = () => {
@@ -52,7 +127,7 @@ const Sidebar: React.FC = () => {
                 },
                 {
                     key: '/actions',
-                    icon: <MdRocketLaunch />,
+                    icon: <MdPlayArrow />,
                     label: t('nav.actions'),
                 },
                 {
@@ -77,13 +152,18 @@ const Sidebar: React.FC = () => {
     ];
 
     return (
-        <Sider
+        <StyledSider
             breakpoint="lg"
             collapsedWidth="0"
-            width={250}
+            width={260}
         >
-            <LogoContainer>Updater UI</LogoContainer>
-            <Menu
+            <LogoContainer>
+                <div className="logo-icon">
+                    <MdRocketLaunch />
+                </div>
+                <span className="logo-text">Updater UI</span>
+            </LogoContainer>
+            <StyledMenu
                 theme="dark"
                 mode="inline"
                 selectedKeys={[location.pathname]}
@@ -91,7 +171,7 @@ const Sidebar: React.FC = () => {
                 items={menuItems}
                 onClick={({ key }) => navigate(key)}
             />
-        </Sider>
+        </StyledSider>
     );
 };
 

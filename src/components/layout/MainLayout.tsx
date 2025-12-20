@@ -9,13 +9,33 @@ const { Content } = Layout;
 
 const StyledLayout = styled(Layout)`
   min-height: 100vh;
+  background: transparent;
 `;
 
-const StyledContent = styled(Content)`
-  margin: 24px 16px;
-  padding: 24px;
-  min-height: 280px;
-  border-radius: 8px;
+const ContentLayout = styled(Layout)`
+  transition: background-color 0.3s ease;
+`;
+
+const StyledContent = styled(Content) <{ $bg: string; $radius: number }>`
+  margin: 24px;
+  padding: 28px;
+  min-height: calc(100vh - 64px - 48px);
+  background: ${(props) => props.$bg};
+  border-radius: ${(props) => props.$radius}px;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.4s ease-out;
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 `;
 
 const MainLayout: React.FC = () => {
@@ -26,17 +46,12 @@ const MainLayout: React.FC = () => {
     return (
         <StyledLayout>
             <Sidebar />
-            <Layout>
+            <ContentLayout>
                 <AppHeader />
-                <StyledContent
-                    style={{
-                        background: colorBgContainer,
-                        borderRadius: borderRadiusLG,
-                    }}
-                >
+                <StyledContent $bg={colorBgContainer} $radius={borderRadiusLG}>
                     <Outlet />
                 </StyledContent>
-            </Layout>
+            </ContentLayout>
         </StyledLayout>
     );
 };
