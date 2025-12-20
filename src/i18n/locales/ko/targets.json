@@ -34,6 +34,7 @@
         "actions": "액션",
         "id": "ID",
         "type": "유형",
+        "targetType": "타겟 유형",
         "forceType": "강제 유형",
         "started": "시작일"
     },
@@ -169,5 +170,43 @@
         "assignTitle": "타겟 유형 할당",
         "removeTitle": "타겟 유형 제거",
         "removeConfirm": "정말로 이 타겟에서 타겟 유형 '{{name}}'을(를) 제거하시겠습니까?"
+    },
+    "typeManagement": {
+        "title": "타겟 유형 관리",
+        "add": "타겟 유형 추가",
+        "key": "키",
+        "keyPlaceholder": "고유한 키 입력",
+        "colour": "색상",
+        "createTitle": "타겟 유형 생성",
+        "editTitle": "타겟 유형 편집",
+        "createSuccess": "타겟 유형이 생성되었습니다.",
+        "updateSuccess": "타겟 유형이 업데이트되었습니다.",
+        "deleteSuccess": "타겟 유형이 삭제되었습니다.",
+        "deleteConfirm": "정말로 이 타겟 유형을 삭제하시겠습니까?"
+    },
+    "tagManagement": {
+        "title": "타겟 태그 관리",
+        "add": "타겟 태그 추가",
+        "colour": "색상",
+        "createTitle": "타겟 태그 생성",
+        "editTitle": "타겟 태그 편집",
+        "createSuccess": "타겟 태그가 생성되었습니다.",
+        "updateSuccess": "타겟 태그가 업데이트되었습니다.",
+        "deleteSuccess": "타겟 태그가 삭제되었습니다.",
+        "deleteConfirm": "정말로 이 타겟 태그를 삭제하시겠습니까?"
+    },
+    "bulkAssign": {
+        "title": "일괄 할당",
+        "selectTargets": "타겟 선택",
+        "selectedCount": "{{count}}개 타겟 선택됨",
+        "selectBoth": "타겟과 할당 옵션을 선택해주세요.",
+        "assignTag": "태그 할당",
+        "selectTag": "태그 선택",
+        "assignTagButton": "선택한 타겟에 태그 할당",
+        "tagAssignSuccess": "{{count}}개 타겟에 태그가 할당되었습니다.",
+        "assignType": "유형 할당",
+        "selectType": "유형 선택",
+        "assignTypeButton": "선택한 타겟에 유형 할당",
+        "typeAssignSuccess": "{{count}}개 타겟에 유형이 할당되었습니다."
     }
 }

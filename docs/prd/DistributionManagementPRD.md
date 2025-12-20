@@ -69,6 +69,41 @@ artifact(파일) 업로드 및 메타데이터 관리도 포함된다.
 
 ---
 
+### 2.3 FR-03-3: Distribution Metadata Management
+
+#### 2.3.1 Distribution Set Type Management (Admin Only)
+- **UI Route**: `/distributions/types` (설정/관리 메뉴)
+- **개요**: Distribution Set의 구조와 필수 모듈 조합을 정의한다.
+- **기능**:
+  - 목록 조회, 생성, 상세, 수정, 삭제
+  - 생성 시 `key`, `name` 필수 입력
+- **API**: `/rest/v1/distributionsettypes`
+
+#### 2.3.2 Distribution Set Tag Management
+- **UI Route**: `/distributions/tags` (설정/관리 메뉴)
+- **개요**: Distribution Set의 릴리즈 상태나 용도를 라벨링한다.
+- **기능**:
+  - 목록 조회, 생성, 수정(색상 등), 삭제
+  - Distribution Set 상세에서 할당/해제 가능
+- **API**: `/rest/v1/distributionsettags`
+
+### 2.4 Distribution Set Type & Tag Reference (OpenAPI 기반)
+
+| 항목 | 핵심 API | 설명 |
+| --- | --- | --- |
+| Distribution Set Type 목록/생성 | `GET/POST /rest/v1/distributionsettypes` | 업데이트 패키지 구조 정의. 생성 시 `name`, `description`, `link` 등 입력. |
+| Distribution Set Type 상세/수정/삭제 | `GET/PUT/DELETE /rest/v1/distributionsettypes/{distributionSetTypeId}` | Admin 전용, 해당 타입을 사용하는 Distribution Set 존재 시 삭제 제한. |
+| Mandatory Module Types 관리 | `GET /rest/v1/distributionsettypes/{distributionSetTypeId}/mandatorymoduletypes`<br>`POST/DELETE /rest/v1/distributionsettypes/{distributionSetTypeId}/mandatorymoduletypes/{softwareModuleTypeId}` | 필수 Software Module Type 구성. UI에서 체크리스트 제공. |
+| Optional Module Types 관리 | `GET /rest/v1/distributionsettypes/{distributionSetTypeId}/optionalmoduletypes`<br>`POST/DELETE /rest/v1/distributionsettypes/{distributionSetTypeId}/optionalmoduletypes/{softwareModuleTypeId}` | 선택 모듈 정의. |
+| Target Type 호환성 | `GET /rest/v1/targettypes/{targetTypeId}/compatibledistributionsettypes` | Target Management PRD와 연동, Distribution Set Type 생성 시 목표 Target Type 리스트 제공. |
+| Distribution Set Tag 목록/생성 | `GET/POST /rest/v1/distributionsettags` | 안정성/배포 상태 라벨 정의. |
+| Distribution Set Tag 수정/삭제 | `PUT/DELETE /rest/v1/distributionsettags/{distributionsetTagId}` | 메타데이터 변경 및 제거. |
+| Tag 할당/해제 | `GET /rest/v1/distributionsettags/{distributionsetTagId}/assigned`<br>`POST/DELETE /rest/v1/distributionsettags/{distributionsettagId}/assigned/{distributionsetId}` | 특정 Tag가 부착된 Distribution Set 목록 조회 및 편집. |
+
+> **UI 가이드**: Distribution Set Type 편집 화면에서 Mandatory/Optional Module Types를 시각적으로 편집하고, Tag는 Distribution Set 상세에서 Badges + AutoComplete로 관리한다. Rollout/Assignment 플로우에서는 Type/Tag 조합으로 빠르게 필터링할 수 있도록 한다.
+
+---
+
 ## 3. 권한 매트릭스 (Permission Matrix)
 
 | Action | Admin | Operator |
@@ -102,6 +137,10 @@ artifact(파일) 업로드 및 메타데이터 관리도 포함된다.
 | Create Module | `POST` | `/rest/v1/softwaremodules` |
 | Upload Artifact | `POST` | `/rest/v1/softwaremodules/{id}/artifacts` |
 | Assign SM to DS | `POST` | `/rest/v1/distributionsets/{id}/assignedSM` |
+| Get DS Types | `GET` | `/rest/v1/distributionsettypes` |
+| Manage DS Types | `POST/PUT/DELETE` | `/rest/v1/distributionsettypes` (Admin) |
+| Get DS Tags | `GET` | `/rest/v1/distributionsettags` |
+| Manage DS Tags | `POST/PUT/DELETE` | `/rest/v1/distributionsettags` |
 
 ---
 

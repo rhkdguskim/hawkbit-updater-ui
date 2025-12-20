@@ -33,8 +33,7 @@ interface TargetTableProps {
 }
 
 import { useTranslation } from 'react-i18next';
-
-// ... (imports)
+import { TargetTagsCell } from './TargetTagsCell';
 
 const TargetTable: React.FC<TargetTableProps> = ({
     data,
@@ -79,6 +78,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
             dataIndex: 'controllerId',
             key: 'controllerId',
             sorter: true,
+            width: 180,
             render: (text: string) => (
                 <Text strong copyable={{ text }}>
                     {text}
@@ -94,39 +94,50 @@ const TargetTable: React.FC<TargetTableProps> = ({
             render: (text: string) => text || <Text type="secondary">-</Text>,
         },
         {
+            title: t('table.targetType'),
+            dataIndex: 'targetTypeName',
+            key: 'targetTypeName',
+            width: 140,
+            render: (typeName: string | undefined) =>
+                typeName ? (
+                    <Tag color="blue">{typeName}</Tag>
+                ) : (
+                    <Text type="secondary">-</Text>
+                ),
+        },
+        {
+            title: t('table.tags'),
+            key: 'tags',
+            width: 200,
+            render: (_, record) => <TargetTagsCell controllerId={record.controllerId!} />,
+        },
+        {
             title: t('table.status'),
             key: 'status',
-            width: 100,
+            width: 90,
             render: (_, record) => getOnlineStatusTag(record.pollStatus),
         },
+
         {
             title: t('table.updateStatus'),
             dataIndex: 'updateStatus',
             key: 'updateStatus',
-            width: 130,
+            width: 120,
             render: (status: string) => getUpdateStatusTag(status),
-        },
-        {
-            title: t('table.installedDS'),
-            dataIndex: 'installedAt',
-            key: 'installedAt',
-            ellipsis: true,
-            render: (value: number | undefined) =>
-                value ? dayjs(value).format('YYYY-MM-DD HH:mm') : <Text type="secondary">-</Text>,
         },
         {
             title: t('table.lastModified'),
             dataIndex: 'lastModifiedAt',
             key: 'lastModifiedAt',
             sorter: true,
-            width: 160,
+            width: 150,
             render: (value: number | undefined) =>
                 value ? dayjs(value).format('YYYY-MM-DD HH:mm') : <Text type="secondary">-</Text>,
         },
         {
             title: t('table.actions'),
             key: 'actions',
-            width: 120,
+            width: 100,
             fixed: 'right',
             render: (_, record) => (
                 <Space size="small">

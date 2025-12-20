@@ -34,6 +34,7 @@
         "actions": "Actions",
         "id": "ID",
         "type": "Type",
+        "targetType": "Target Type",
         "forceType": "Force Type",
         "started": "Started"
     },
@@ -169,5 +170,43 @@
         "assignTitle": "Assign Target Type",
         "removeTitle": "Remove Target Type",
         "removeConfirm": "Are you sure you want to remove the target type '{{name}}' from this target?"
+    },
+    "typeManagement": {
+        "title": "Target Type Management",
+        "add": "Add Target Type",
+        "key": "Key",
+        "keyPlaceholder": "Enter unique key",
+        "colour": "Colour",
+        "createTitle": "Create Target Type",
+        "editTitle": "Edit Target Type",
+        "createSuccess": "Target type created successfully.",
+        "updateSuccess": "Target type updated successfully.",
+        "deleteSuccess": "Target type deleted successfully.",
+        "deleteConfirm": "Are you sure you want to delete this target type?"
+    },
+    "tagManagement": {
+        "title": "Target Tag Management",
+        "add": "Add Target Tag",
+        "colour": "Colour",
+        "createTitle": "Create Target Tag",
+        "editTitle": "Edit Target Tag",
+        "createSuccess": "Target tag created successfully.",
+        "updateSuccess": "Target tag updated successfully.",
+        "deleteSuccess": "Target tag deleted successfully.",
+        "deleteConfirm": "Are you sure you want to delete this target tag?"
+    },
+    "bulkAssign": {
+        "title": "Bulk Assignment",
+        "selectTargets": "Select Targets",
+        "selectedCount": "{{count}} targets selected",
+        "selectBoth": "Please select targets and an assignment option.",
+        "assignTag": "Assign Tag",
+        "selectTag": "Select a tag",
+        "assignTagButton": "Assign Tag to Selected",
+        "tagAssignSuccess": "Tag assigned to {{count}} targets.",
+        "assignType": "Assign Type",
+        "selectType": "Select a type",
+        "assignTypeButton": "Assign Type to Selected",
+        "typeAssignSuccess": "Type assigned to {{count}} targets."
     }
 }

@@ -3,12 +3,12 @@ import { Layout, Menu, type MenuProps } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-    MdDashboard,
-    MdDevices,
-    MdInventory,
-    MdRocketLaunch,
-    MdSettings,
-    MdPlayArrow,
+  MdDashboard,
+  MdDevices,
+  MdInventory,
+  MdRocketLaunch,
+  MdSettings,
+  MdPlayArrow,
 } from 'react-icons/md';
 import styled from 'styled-components';
 
@@ -100,79 +100,129 @@ const StyledMenu = styled(Menu)`
 `;
 
 const Sidebar: React.FC = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { t } = useTranslation('common');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { t } = useTranslation('common');
 
-    const menuItems: MenuProps['items'] = [
+  const menuItems: MenuProps['items'] = [
+    {
+      key: '/',
+      icon: <MdDashboard />,
+      label: t('nav.dashboard'),
+    },
+    {
+      key: 'deployment',
+      label: t('nav.deployment'),
+      type: 'group',
+      children: [
         {
-            key: '/',
-            icon: <MdDashboard />,
-            label: t('nav.dashboard'),
+          key: 'targets-submenu',
+          icon: <MdDevices />,
+          label: t('nav.targets'),
+          children: [
+            {
+              key: 'target-list-submenu',
+              label: t('nav.targetList'),
+              children: [
+                {
+                  key: '/targets',
+                  label: t('nav.viewList'),
+                },
+                {
+                  key: '/targets/bulk-assign',
+                  label: t('nav.bulkAssign'),
+                },
+              ],
+            },
+            {
+              key: '/targets/tags',
+              label: t('nav.targetTags'),
+            },
+            {
+              key: '/targets/types',
+              label: t('nav.targetTypes'),
+            },
+          ],
         },
         {
-            key: 'deployment',
-            label: t('nav.deployment'),
-            type: 'group',
-            children: [
-                {
-                    key: '/targets',
-                    icon: <MdDevices />,
-                    label: t('nav.targets'),
-                },
-                {
-                    key: '/distributions',
-                    icon: <MdInventory />,
-                    label: t('nav.distributions'),
-                },
-                {
-                    key: '/actions',
-                    icon: <MdPlayArrow />,
-                    label: t('nav.actions'),
-                },
-                {
-                    key: '/rollouts',
-                    icon: <MdRocketLaunch />,
-                    label: t('nav.rollouts'),
-                },
-            ],
+          key: '/distributions',
+          icon: <MdInventory />,
+          label: t('nav.distributions'),
         },
         {
-            key: 'system',
-            label: t('nav.system'),
-            type: 'group',
-            children: [
-                {
-                    key: '/system/config',
-                    icon: <MdSettings />,
-                    label: t('nav.configuration'),
-                },
-            ],
+          key: '/actions',
+          icon: <MdPlayArrow />,
+          label: t('nav.actions'),
         },
-    ];
+        {
+          key: '/rollouts',
+          icon: <MdRocketLaunch />,
+          label: t('nav.rollouts'),
+        },
+      ],
+    },
+    {
+      key: 'system',
+      label: t('nav.system'),
+      type: 'group',
+      children: [
+        {
+          key: '/system/config',
+          icon: <MdSettings />,
+          label: t('nav.configuration'),
+        },
+      ],
+    },
+  ];
 
-    return (
-        <StyledSider
-            breakpoint="lg"
-            collapsedWidth="0"
-            width={260}
-        >
-            <LogoContainer>
-                <div className="logo-icon">
-                    <MdRocketLaunch />
-                </div>
-                <span className="logo-text">Updater UI</span>
-            </LogoContainer>
-            <StyledMenu
-                theme="dark"
-                mode="inline"
-                selectedKeys={[location.pathname]}
-                defaultOpenKeys={['deployment', 'system']}
-                items={menuItems}
-                onClick={({ key }) => navigate(key)}
-            />
-        </StyledSider>
-    );
+  // Get selected keys based on current path
+  const getSelectedKeys = () => {
+    const path = location.pathname;
+    if (path === '/targets' || path === '/targets/') return ['/targets'];
+    if (path.startsWith('/targets/tags')) return ['/targets/tags'];
+    if (path.startsWith('/targets/types')) return ['/targets/types'];
+    if (path.startsWith('/targets/bulk-assign')) return ['/targets/bulk-assign'];
+    if (path.startsWith('/targets/')) return ['/targets']; // Detail pages
+    return [path];
+  };
+
+  // Get open keys for sub-menus
+  const getOpenKeys = () => {
+    const path = location.pathname;
+    // Always keep main sections open
+    const openKeys = ['deployment', 'system'];
+
+    if (path.startsWith('/targets')) {
+      openKeys.push('targets-submenu');
+      if (path === '/targets' || path === '/targets/' || path.startsWith('/targets/bulk-assign') || (path.startsWith('/targets/') && !path.startsWith('/targets/tags') && !path.startsWith('/targets/types'))) {
+        openKeys.push('target-list-submenu');
+      }
+    }
+    return openKeys;
+  };
+
+  return (
+    <StyledSider
+      breakpoint="lg"
+      collapsedWidth="0"
+      width={260}
+    >
+      <LogoContainer>
+        <div className="logo-icon">
+          <MdRocketLaunch />
+        </div>
+        <span className="logo-text">Updater UI</span>
+      </LogoContainer>
+      <StyledMenu
+        theme="dark"
+        mode="inline"
+        selectedKeys={getSelectedKeys()}
+        defaultOpenKeys={getOpenKeys()}
+        items={menuItems}
+        onClick={({ key }) => navigate(key)}
+      />
+    </StyledSider>
+  );
 };
 
 export default Sidebar;

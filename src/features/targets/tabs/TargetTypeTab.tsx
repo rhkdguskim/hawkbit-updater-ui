@@ -13,7 +13,7 @@ import {
     message,
 } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import type { MgmtTarget, MgmtTargetType } from '@/api/generated/model';
+import type { MgmtTarget } from '@/api/generated/model';
 import {
     useGetTargetTypes,
 } from '@/api/generated/target-types/target-types';
@@ -55,7 +55,10 @@ const TargetTypeTab: React.FC<TargetTypeTabProps> = ({
         return <Skeleton active paragraph={{ rows: 4 }} />;
     }
 
-    const currentType = target?.targetType as (MgmtTargetType & { name?: string }) | undefined;
+    // Use targetType (ID) and targetTypeName from MgmtTarget
+    const hasType = target?.targetType !== undefined && target?.targetType !== null;
+    const currentTypeId = target?.targetType;
+    const currentTypeName = target?.targetTypeName;
 
     const handleAssign = () => {
         if (selectedTypeId) {
@@ -75,23 +78,20 @@ const TargetTypeTab: React.FC<TargetTypeTabProps> = ({
     return (
         <>
             <Card>
-                {currentType ? (
+                {hasType ? (
                     <>
                         <Space direction="vertical" size="large" style={{ width: '100%' }}>
                             <Space align="center">
                                 <Title level={5} style={{ margin: 0 }}>{t('targetType.current')}</Title>
-                                <Tag color="blue">{currentType.name}</Tag>
+                                <Tag color="blue">{currentTypeName}</Tag>
                             </Space>
 
                             <Descriptions column={1} bordered size="small">
                                 <Descriptions.Item label="ID">
-                                    {currentType.id}
+                                    {currentTypeId}
                                 </Descriptions.Item>
                                 <Descriptions.Item label={t('table.name')}>
-                                    {currentType.name || '-'}
-                                </Descriptions.Item>
-                                <Descriptions.Item label={t('form.description')}>
-                                    {currentType.description || '-'}
+                                    {currentTypeName || '-'}
                                 </Descriptions.Item>
                             </Descriptions>
 
@@ -181,7 +181,7 @@ const TargetTypeTab: React.FC<TargetTypeTabProps> = ({
                 confirmLoading={actionLoading}
             >
                 <p>
-                    {t('targetType.removeConfirm', { name: currentType?.name })}
+                    {t('targetType.removeConfirm', { name: currentTypeName })}
                 </p>
             </Modal>
         </>

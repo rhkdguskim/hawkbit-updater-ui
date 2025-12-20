@@ -106,6 +106,30 @@ Management API를 통해서만 동작한다.
 
 ---
 
+### D-05 Target Type , Target Tag
+
+| 구분 | Target Type | Target Tag |
+| :--- | :--- | :--- |
+| **정의** | 디바이스(장비)의 **종류/모델/플랫폼** 정의 | Target에 붙이는 **라벨(속성)** |
+| **개수** | **1개** (필수, 고정적) | **N개** (선택, 유동적) |
+| **목적** | 호환성 제어 (Distribution Set Type과 매핑) | 그룹핑, 필터링, 운영 편의성, Rollout 조건 |
+| **변경** | 거의 없음 (HW 교체 수준) | 빈번함 (상태/위치/정책 변경) |
+| **예시** | `Gateway-V1`, `Industrial-PC` | `seoul-office`, `test-group`, `v1.2` |
+
+---
+
+### D-06 Distribution Set Type, Distribution Set Tag
+
+| 구분 | Distribution Set Type | Distribution Set Tag |
+| :--- | :--- | :--- |
+| **정의** | 업데이트 패키지의 **구조/형식** 정의 | Distribution Set에 붙이는 **라벨** |
+| **개수** | **1개** (필수, 생성 시 지정) | **N개** (선택) |
+| **목적** | Target Type과의 **호환성 보장**, 구조 표준화 | 관리/운영 목적의 분류 (Release, Stability 등) |
+| **변경** | 변경 불가 (구조적 정의) | 빈번함 |
+| **예시** | `Full-OS-Update`, `App-Hotfix` | `stable`, `rc-1`, `deprecated` |
+
+---
+
 ## 5. 기능 요구사항 (Functional Requirements)
 
 ---
@@ -146,6 +170,12 @@ Management API를 통해서만 동작한다.
 * FIQL 검색
 * Paging / Sorting
 * 상태 아이콘
+* Target Type 표시
+
+**Data Structure**
+
+* Target Type: 1:1 (필수)
+* Target Tags: N:M (선택)
 
 **UI Route**: `/targets`
 
@@ -227,7 +257,13 @@ Management API를 통해서만 동작한다.
 
 * CRUD
 * Assigned SM 관리
-* Type / Tag 조회(Read-only)
+* Assigned SM 관리
+* Type / Tag 조회 및 관리
+
+**Data Structure**
+
+* DS Type: 1:1
+* DS Tags: N:M
 
 **API**
 
@@ -291,7 +327,7 @@ Management API를 통해서만 동작한다.
 
 ---
 
-## FR-06 Target Tags (Read-only)
+## FR-06 Target Tag Management
 
 * Tag 목록 조회
 * Target Detail 표시
