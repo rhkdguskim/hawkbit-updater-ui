@@ -1,7 +1,6 @@
 import axios, { type AxiosRequestConfig } from 'axios';
 
 export const AXIOS_INSTANCE = axios.create({
-    baseURL: '/rest/v1',
     headers: {
         'Content-Type': 'application/json',
     },

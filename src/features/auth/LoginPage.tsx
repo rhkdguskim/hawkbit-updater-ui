@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const Container = styled.div`
   display: flex;
