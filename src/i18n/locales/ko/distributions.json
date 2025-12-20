@@ -1,9 +1,5 @@
 {
     "pageTitle": "배포 관리",
-    "tabs": {
-        "sets": "배포 세트",
-        "modules": "소프트웨어 모듈"
-    },
     "list": {
         "columns": {
             "name": "이름",
@@ -140,5 +136,70 @@
             "name": "태그 이름",
             "description": "설명"
         }
+    },
+    "typeManagement": {
+        "dsTypeTitle": "배포 세트 유형",
+        "smTypeTitle": "소프트웨어 모듈 유형",
+        "addType": "유형 추가",
+        "editType": "유형 수정",
+        "columns": {
+            "name": "이름",
+            "key": "키",
+            "description": "설명",
+            "colour": "색상",
+            "lastModified": "최종 수정일",
+            "maxAssignments": "최대 할당 수"
+        },
+        "namePlaceholder": "유형 이름을 입력하세요",
+        "keyPlaceholder": "고유 키를 입력하세요",
+        "descriptionPlaceholder": "설명을 입력하세요",
+        "nameRequired": "이름은 필수입니다",
+        "keyRequired": "키는 필수입니다",
+        "createSuccess": "유형이 성공적으로 생성되었습니다.",
+        "createError": "유형 생성에 실패했습니다.",
+        "updateSuccess": "유형이 성공적으로 수정되었습니다.",
+        "updateError": "유형 수정에 실패했습니다.",
+        "deleteSuccess": "유형이 성공적으로 삭제되었습니다.",
+        "deleteError": "유형 삭제에 실패했습니다.",
+        "deleteConfirmTitle": "유형 삭제",
+        "deleteConfirmDesc": "정말로 이 유형을 삭제하시겠습니까?"
+    },
+    "tagManagement": {
+        "dsTagTitle": "배포 세트 태그",
+        "addTag": "태그 추가",
+        "editTag": "태그 수정",
+        "columns": {
+            "name": "이름",
+            "description": "설명",
+            "colour": "색상",
+            "lastModified": "최종 수정일"
+        },
+        "namePlaceholder": "태그 이름을 입력하세요",
+        "descriptionPlaceholder": "설명을 입력하세요",
+        "nameRequired": "이름은 필수입니다",
+        "createSuccess": "태그가 성공적으로 생성되었습니다.",
+        "createError": "태그 생성에 실패했습니다.",
+        "updateSuccess": "태그가 성공적으로 수정되었습니다.",
+        "updateError": "태그 수정에 실패했습니다.",
+        "deleteSuccess": "태그가 성공적으로 삭제되었습니다.",
+        "deleteError": "태그 삭제에 실패했습니다.",
+        "deleteConfirmTitle": "태그 삭제",
+        "deleteConfirmDesc": "정말로 이 태그를 삭제하시겠습니까?"
+    },
+    "bulkAssignment": {
+        "pageTitle": "일괄 할당 - 배포 세트",
+        "instruction": "배포 세트를 선택하고 태그를 할당하거나 제거하세요",
+        "selectedSets": "선택됨: {{count}}개 배포 세트",
+        "tagAssignment": "태그 할당",
+        "assignMode": "모드",
+        "assign": "태그 할당",
+        "unassign": "태그 제거",
+        "selectTags": "태그 선택",
+        "selectTagsPlaceholder": "할당하거나 제거할 태그를 선택하세요",
+        "selectBoth": "배포 세트와 태그를 선택해주세요",
+        "assignTags": "태그 할당",
+        "unassignTags": "태그 제거",
+        "tagAssignSuccess": "{{count}}개 배포 세트에 태그가 할당되었습니다",
+        "tagUnassignSuccess": "{{count}}개 배포 세트에서 태그가 제거되었습니다"
     }
 }

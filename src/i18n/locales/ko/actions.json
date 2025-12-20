@@ -9,6 +9,10 @@
         "forceType": "강제 유형",
         "actions": "액션"
     },
+    "forceTypes": {
+        "soft": "소프트",
+        "hard": "하드"
+    },
     "filter": {
         "searchPlaceholder": "대상으로 검색...",
         "statusPlaceholder": "상태로 필터",

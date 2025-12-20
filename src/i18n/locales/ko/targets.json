@@ -35,6 +35,7 @@
         "id": "ID",
         "type": "유형",
         "targetType": "타겟 유형",
+        "tags": "태그",
         "forceType": "강제 유형",
         "started": "시작일"
     },

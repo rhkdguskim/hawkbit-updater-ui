@@ -163,3 +163,27 @@ artifact(파일) 업로드 및 메타데이터 관리도 포함된다.
 - [x] Drag & Drop Upload UI 개선
 - [x] Metadata CRUD
 - [x] Tag Management
+
+### Phase 4 (Type Management)
+- [x] Distribution Set Type Management
+  - [x] DS Type List (CRUD)
+  - [x] DS Type Dialog (Create/Edit)
+  - [x] Route: `/distributions/ds-types`
+- [x] Software Module Type Management
+  - [x] SM Type List (CRUD)
+  - [x] SM Type Dialog (Create/Edit)
+  - [x] Route: `/distributions/sm-types`
+- [x] i18n 번역 추가
+- [x] 사이드바 네비게이션 추가
+### Phase 5 (Tags & Bulk Operations)
+- [x] Distribution Set Tags Management
+  - [x] Tag List (CRUD)
+  - [x] Route: `/distributions/ds-tags`
+  - [x] Sidebar: Distributions -> Distribution Sets -> Tags
+- [x] Distribution Set Bulk Assignment
+  - [x] Bulk Assignment Page (Select Sets, Assign/Unassign Tags)
+  - [x] Route: `/distributions/sets/bulk-assign`
+  - [x] Sidebar: Distributions -> Distribution Sets -> Bulk Assign
+- [ ] Update Distribution Set List
+  - [ ] Add "Tags" column
+  - [ ] Link to Bulk Assignment

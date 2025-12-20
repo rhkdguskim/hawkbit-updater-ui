@@ -9,11 +9,18 @@
         "targetTypes": "Type Management",
         "bulkAssign": "Bulk Assignment",
         "distributions": "Distributions",
+        "distributionSets": "Distribution Sets",
+        "softwareModules": "Software Modules",
+        "dsTypes": "DS Type Management",
+        "smTypes": "Module Type Management",
         "actions": "Actions",
         "rollouts": "Rollouts",
         "system": "System",
         "configuration": "Configuration",
-        "deployment": "Deployment"
+        "deployment": "Deployment",
+        "list": "List",
+        "types": "Types",
+        "tags": "Tags"
     },
     "actions": {
         "save": "Save",

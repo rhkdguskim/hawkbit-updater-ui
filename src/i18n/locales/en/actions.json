@@ -9,6 +9,10 @@
         "forceType": "Force Type",
         "actions": "Actions"
     },
+    "forceTypes": {
+        "soft": "Soft",
+        "hard": "Hard"
+    },
     "filter": {
         "searchPlaceholder": "Search by target...",
         "statusPlaceholder": "Filter by status",

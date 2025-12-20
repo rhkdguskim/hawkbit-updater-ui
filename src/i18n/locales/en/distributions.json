@@ -1,9 +1,5 @@
 {
     "pageTitle": "Distributions Management",
-    "tabs": {
-        "sets": "Distribution Sets",
-        "modules": "Software Modules"
-    },
     "list": {
         "columns": {
             "name": "Name",
@@ -140,5 +136,70 @@
             "name": "Tag Name",
             "description": "Description"
         }
+    },
+    "typeManagement": {
+        "dsTypeTitle": "Distribution Set Types",
+        "smTypeTitle": "Software Module Types",
+        "addType": "Add Type",
+        "editType": "Edit Type",
+        "columns": {
+            "name": "Name",
+            "key": "Key",
+            "description": "Description",
+            "colour": "Colour",
+            "lastModified": "Last Modified",
+            "maxAssignments": "Max Assignments"
+        },
+        "namePlaceholder": "Enter type name",
+        "keyPlaceholder": "Enter unique key",
+        "descriptionPlaceholder": "Enter description",
+        "nameRequired": "Name is required",
+        "keyRequired": "Key is required",
+        "createSuccess": "Type created successfully",
+        "createError": "Failed to create type",
+        "updateSuccess": "Type updated successfully",
+        "updateError": "Failed to update type",
+        "deleteSuccess": "Type deleted successfully",
+        "deleteError": "Failed to delete type",
+        "deleteConfirmTitle": "Delete Type",
+        "deleteConfirmDesc": "Are you sure you want to delete this type?"
+    },
+    "tagManagement": {
+        "dsTagTitle": "Distribution Set Tags",
+        "addTag": "Add Tag",
+        "editTag": "Edit Tag",
+        "columns": {
+            "name": "Name",
+            "description": "Description",
+            "colour": "Colour",
+            "lastModified": "Last Modified"
+        },
+        "namePlaceholder": "Enter tag name",
+        "descriptionPlaceholder": "Enter description",
+        "nameRequired": "Name is required",
+        "createSuccess": "Tag created successfully",
+        "createError": "Failed to create tag",
+        "updateSuccess": "Tag updated successfully",
+        "updateError": "Failed to update tag",
+        "deleteSuccess": "Tag deleted successfully",
+        "deleteError": "Failed to delete tag",
+        "deleteConfirmTitle": "Delete Tag",
+        "deleteConfirmDesc": "Are you sure you want to delete this tag?"
+    },
+    "bulkAssignment": {
+        "pageTitle": "Bulk Assignment - Distribution Sets",
+        "instruction": "Select distribution sets and assign or remove tags",
+        "selectedSets": "Selected: {{count}} distribution set(s)",
+        "tagAssignment": "Tag Assignment",
+        "assignMode": "Mode",
+        "assign": "Assign Tags",
+        "unassign": "Remove Tags",
+        "selectTags": "Select Tags",
+        "selectTagsPlaceholder": "Choose tags to assign or remove",
+        "selectBoth": "Please select distribution sets and tags",
+        "assignTags": "Assign Tags",
+        "unassignTags": "Remove Tags",
+        "tagAssignSuccess": "Tags assigned to {{count}} distribution set(s)",
+        "tagUnassignSuccess": "Tags removed from {{count}} distribution set(s)"
     }
 }

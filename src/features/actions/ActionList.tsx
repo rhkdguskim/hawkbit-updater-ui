@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Table, Tag, Space, Button, Select, Typography, Input } from 'antd';
-import { ReloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { Card, Table, Tag, Space, Button, Select, Typography, Input, Tooltip } from 'antd';
+import { ReloadOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useGetActions } from '@/api/generated/actions/actions';
 import type { MgmtAction } from '@/api/generated/model';
@@ -101,18 +101,20 @@ const ActionList: React.FC = () => {
             dataIndex: 'forceType',
             key: 'forceType',
             width: 100,
+            render: (text: string) => text ? t(`forceTypes.${text}`) : '-',
         },
         {
             title: t('columns.actions'),
             key: 'actions',
             width: 100,
             render: (_, record) => (
-                <Button
-                    type="link"
-                    onClick={() => navigate(`/actions/${record.id}`)}
-                >
-                    {t('actions.view')}
-                </Button>
+                <Tooltip title={t('actions.view')}>
+                    <Button
+                        type="text"
+                        icon={<EyeOutlined />}
+                        onClick={() => navigate(`/actions/${record.id}`)}
+                    />
+                </Tooltip>
             ),
         },
     ];

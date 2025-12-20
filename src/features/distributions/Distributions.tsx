@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Typography, Tabs } from 'antd';
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { Typography } from 'antd';
 import styled from 'styled-components';
 import DistributionSetList from './DistributionSetList';
 import SoftwareModuleList from './SoftwareModuleList';
 import SoftwareModuleDetail from './SoftwareModuleDetail';
 import DistributionSetDetail from './DistributionSetDetail';
+import { DistributionSetTypeList, SoftwareModuleTypeList } from './types';
+import { DistributionSetTagList } from './tags';
+import { DistributionSetBulkAssignment } from './bulk';
 import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
@@ -27,23 +30,6 @@ const HeaderRow = styled.div`
 
 const Distributions: React.FC = () => {
     const { t } = useTranslation('distributions');
-    const location = useLocation();
-    const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('sets');
-
-    // Update active tab based on URL
-    useEffect(() => {
-        if (location.pathname.includes('/distributions/modules')) {
-            setActiveTab('modules');
-        } else {
-            setActiveTab('sets');
-        }
-    }, [location]);
-
-    const handleTabChange = (key: string) => {
-        setActiveTab(key);
-        navigate(`/distributions/${key}`);
-    };
 
     return (
         <PageContainer>
@@ -53,26 +39,14 @@ const Distributions: React.FC = () => {
                 </Title>
             </HeaderRow>
 
-            <Tabs
-                activeKey={activeTab}
-                onChange={handleTabChange}
-                items={[
-                    {
-                        key: 'sets',
-                        label: t('tabs.sets'),
-                    },
-                    {
-                        key: 'modules',
-                        label: t('tabs.modules'),
-                    },
-                ]}
-            />
-
             <Routes>
                 <Route index element={<Navigate to="sets" replace />} />
                 <Route path="sets" element={<DistributionSetList />} />
+                <Route path="sets/bulk-assign" element={<DistributionSetBulkAssignment />} />
                 <Route path="modules" element={<SoftwareModuleList />} />
-                {/* Details routes will be added in Phase 2 */}
+                <Route path="ds-types" element={<DistributionSetTypeList />} />
+                <Route path="ds-tags" element={<DistributionSetTagList />} />
+                <Route path="sm-types" element={<SoftwareModuleTypeList />} />
                 <Route path="sets/:id" element={<DistributionSetDetail />} />
                 <Route path="modules/:id" element={<SoftwareModuleDetail />} />
                 <Route path="*" element={<Navigate to="sets" replace />} />
@@ -82,3 +56,4 @@ const Distributions: React.FC = () => {
 };
 
 export default Distributions;
+

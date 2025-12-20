@@ -145,9 +145,47 @@ const Sidebar: React.FC = () => {
           ],
         },
         {
-          key: '/distributions',
+          key: 'distributions-submenu',
           icon: <MdInventory />,
           label: t('nav.distributions'),
+          children: [
+            {
+              key: 'distribution-sets-submenu',
+              label: t('nav.distributionSets'),
+              children: [
+                {
+                  key: '/distributions/sets',
+                  label: t('nav.list'),
+                },
+                {
+                  key: '/distributions/ds-types',
+                  label: t('nav.types'),
+                },
+                {
+                  key: '/distributions/ds-tags',
+                  label: t('nav.tags'),
+                },
+                {
+                  key: '/distributions/sets/bulk-assign',
+                  label: t('nav.bulkAssign'),
+                },
+              ],
+            },
+            {
+              key: 'software-modules-submenu',
+              label: t('nav.softwareModules'),
+              children: [
+                {
+                  key: '/distributions/modules',
+                  label: t('nav.list'),
+                },
+                {
+                  key: '/distributions/sm-types',
+                  label: t('nav.types'),
+                },
+              ],
+            },
+          ],
         },
         {
           key: '/actions',
@@ -183,6 +221,14 @@ const Sidebar: React.FC = () => {
     if (path.startsWith('/targets/types')) return ['/targets/types'];
     if (path.startsWith('/targets/bulk-assign')) return ['/targets/bulk-assign'];
     if (path.startsWith('/targets/')) return ['/targets']; // Detail pages
+
+    if (path.startsWith('/distributions/ds-tags')) return ['/distributions/ds-tags'];
+    if (path.startsWith('/distributions/ds-types')) return ['/distributions/ds-types'];
+    if (path.startsWith('/distributions/sm-types')) return ['/distributions/sm-types'];
+    if (path.startsWith('/distributions/sets/bulk-assign')) return ['/distributions/sets/bulk-assign'];
+    if (path.startsWith('/distributions/modules')) return ['/distributions/modules'];
+    if (path.startsWith('/distributions')) return ['/distributions/sets'];
+
     return [path];
   };
 
@@ -198,6 +244,17 @@ const Sidebar: React.FC = () => {
         openKeys.push('target-list-submenu');
       }
     }
+
+    if (path.startsWith('/distributions')) {
+      openKeys.push('distributions-submenu');
+      if (path.startsWith('/distributions/sets') || path.startsWith('/distributions/ds-types') || path.startsWith('/distributions/ds-tags')) {
+        openKeys.push('distribution-sets-submenu');
+      }
+      if (path.startsWith('/distributions/modules') || path.startsWith('/distributions/sm-types')) {
+        openKeys.push('software-modules-submenu');
+      }
+    }
+
     return openKeys;
   };
 
