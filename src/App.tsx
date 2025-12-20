@@ -6,17 +6,25 @@ import Targets from '@/features/targets/Targets';
 import Distributions from '@/features/distributions/Distributions';
 import Rollouts from '@/features/rollouts/Rollouts';
 import Configuration from '@/features/system/Configuration';
+import LoginPage from '@/features/auth/LoginPage';
+import AuthGuard from '@/features/auth/AuthGuard';
 
 const App: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<MainLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="targets" element={<Targets />} />
-        <Route path="distributions" element={<Distributions />} />
-        <Route path="rollouts" element={<Rollouts />} />
-        <Route path="system/config" element={<Configuration />} />
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Protected Routes */}
+      <Route element={<AuthGuard />}>
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="targets" element={<Targets />} />
+          <Route path="distributions" element={<Distributions />} />
+          <Route path="rollouts" element={<Rollouts />} />
+          <Route path="system/config" element={<Configuration />} />
+        </Route>
       </Route>
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

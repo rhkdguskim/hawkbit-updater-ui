@@ -26,10 +26,27 @@ export const axiosInstance = <T>(
     return promise;
 };
 
+import { useAuthStore } from '@/stores/useAuthStore';
+
+// Request Interceptor
+AXIOS_INSTANCE.interceptors.request.use(
+    (config) => {
+        const token = useAuthStore.getState().token;
+        if (token) {
+            config.headers.Authorization = `Basic ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
 AXIOS_INSTANCE.interceptors.response.use(
     (response) => response,
     (error) => {
-        // Handle global errors here
+        if (error.response?.status === 401) {
+            useAuthStore.getState().logout();
+            // Optional: redirect to login if not already handled by AuthGuard
+        }
         return Promise.reject(error);
     }
 );

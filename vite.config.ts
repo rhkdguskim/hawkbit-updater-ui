@@ -13,9 +13,17 @@ export default defineConfig({
   server: {
     proxy: {
       '/rest': {
-        target: 'http://localhost:8081', // Replace with actual hawkBit server URL
+        target: 'http://localhost:8081',
         changeOrigin: true,
         secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('proxyRes', (proxyRes, _req, _res) => {
+            if (proxyRes.statusCode === 401) {
+              // Remove WWW-Authenticate header to prevent browser popup
+              delete proxyRes.headers['www-authenticate'];
+            }
+          });
+        },
       },
     },
   },

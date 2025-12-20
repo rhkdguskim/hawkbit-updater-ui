@@ -1,8 +1,9 @@
 import React from 'react';
-import { Layout, theme, Avatar, Space, Typography } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { Layout, theme, Avatar, Space, Typography, Dropdown } from 'antd';
+import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -35,6 +36,13 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
         token: { colorBgContainer },
     } = theme.useToken();
     const location = useLocation();
+    const { user, role, logout } = useAuthStore();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
 
     const getPageTitle = () => {
         const path = location.pathname;
@@ -44,6 +52,17 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
         if (path.startsWith('/rollouts')) return 'Rollouts';
         if (path.startsWith('/system')) return 'System Configuration';
         return '';
+    };
+
+    const userMenu = {
+        items: [
+            {
+                key: 'logout',
+                label: 'Logout',
+                icon: <LogoutOutlined />,
+                onClick: handleLogout,
+            },
+        ],
     };
 
     return (
@@ -56,9 +75,10 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
 
             <HeaderRight>
                 <Space size="middle">
-                    {/* Theme Toggle Placeholder */}
-                    <Text strong>Admin</Text>
-                    <Avatar icon={<UserOutlined />} />
+                    <Text strong>{user} ({role})</Text>
+                    <Dropdown menu={userMenu} placement="bottomRight" arrow>
+                        <Avatar icon={<UserOutlined />} style={{ cursor: 'pointer' }} />
+                    </Dropdown>
                 </Space>
             </HeaderRight>
         </StyledHeader>
