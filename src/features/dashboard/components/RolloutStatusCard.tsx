@@ -85,7 +85,7 @@ export const RolloutStatusCard: React.FC = () => {
                             title={t('rolloutStatus.ready')}
                             value={readyCount}
                             prefix={<ClockCircleOutlined style={{ color: '#8c8c8c' }} />}
-                            valueStyle={{ fontSize: '1.5rem', fontWeight: 600 }}
+                            styles={{ content: { fontSize: '1.5rem', fontWeight: 600 } }}
                         />
                     </StatusItem>
                 </Col>
@@ -95,7 +95,7 @@ export const RolloutStatusCard: React.FC = () => {
                             title={t('rolloutStatus.running')}
                             value={runningCount}
                             prefix={<SyncOutlined spin style={{ color: '#1890ff' }} />}
-                            valueStyle={{ fontSize: '1.5rem', fontWeight: 600, color: '#1890ff' }}
+                            styles={{ content: { fontSize: '1.5rem', fontWeight: 600, color: '#1890ff' } }}
                         />
                     </StatusItem>
                 </Col>
@@ -107,7 +107,7 @@ export const RolloutStatusCard: React.FC = () => {
                                     title={t('rolloutStatus.waitingApproval')}
                                     value={waitingCount}
                                     prefix={<SafetyCertificateOutlined style={{ color: '#faad14' }} />}
-                                    valueStyle={{ fontSize: '1.5rem', fontWeight: 600, color: '#faad14' }}
+                                    styles={{ content: { fontSize: '1.5rem', fontWeight: 600, color: '#faad14' } }}
                                 />
                             </StatusItem>
                         </Badge>
@@ -117,7 +117,7 @@ export const RolloutStatusCard: React.FC = () => {
                                 title={t('rolloutStatus.waitingApproval')}
                                 value={0}
                                 prefix={<SafetyCertificateOutlined style={{ color: '#d9d9d9' }} />}
-                                valueStyle={{ fontSize: '1.5rem', fontWeight: 600, color: '#d9d9d9' }}
+                                styles={{ content: { fontSize: '1.5rem', fontWeight: 600, color: '#d9d9d9' } }}
                             />
                         </StatusItem>
                     )}
@@ -128,7 +128,7 @@ export const RolloutStatusCard: React.FC = () => {
                             title={t('rolloutStatus.stopped')}
                             value={stoppedCount}
                             prefix={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
-                            valueStyle={{ fontSize: '1.5rem', fontWeight: 600, color: '#ff4d4f' }}
+                            styles={{ content: { fontSize: '1.5rem', fontWeight: 600, color: '#ff4d4f' } }}
                         />
                     </StatusItem>
                 </Col>

@@ -40,43 +40,43 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
 
             <Row gutter={[16, 16]}>
                 <Col span={6}>
-                    <Card bordered={false} style={{ background: '#f6ffed' }}>
+                    <Card variant="borderless" style={{ background: '#f6ffed' }}>
                         <Statistic
                             title="Active Rollouts"
                             value={totalRollouts}
                             prefix={<SyncOutlined spin={totalRollouts > 0} />}
-                            valueStyle={{ color: '#52c41a' }}
+                            styles={{ content: { color: '#52c41a' } }}
                         />
                     </Card>
                 </Col>
                 <Col span={6}>
-                    <Card bordered={false} style={{ background: '#e6f7ff' }}>
+                    <Card variant="borderless" style={{ background: '#e6f7ff' }}>
                         <Statistic
                             title="Total Actions"
                             value={totalActions}
                             prefix={<ClockCircleOutlined />}
-                            valueStyle={{ color: '#1890ff' }}
+                            styles={{ content: { color: '#1890ff' } }}
                         />
                     </Card>
                 </Col>
                 <Col span={6}>
-                    <Card bordered={false} style={{ background: '#f9f0ff' }}>
+                    <Card variant="borderless" style={{ background: '#f9f0ff' }}>
                         <Statistic
                             title="Auto Assignments"
                             value={data.totalAutoAssignments || 0}
                             prefix={<GlobalOutlined />}
-                            valueStyle={{ color: '#722ed1' }}
+                            styles={{ content: { color: '#722ed1' } }}
                         />
                     </Card>
                 </Col>
                 <Col span={6}>
-                    <Card bordered={false} style={{ background: '#fff7e6' }}>
+                    <Card variant="borderless" style={{ background: '#fff7e6' }}>
                         <Statistic
                             title="Success Rate"
                             value={successRate}
                             suffix="%"
                             prefix={<CheckCircleOutlined />}
-                            valueStyle={{ color: '#fa8c16' }}
+                            styles={{ content: { color: '#fa8c16' } }}
                         />
                     </Card>
                 </Col>

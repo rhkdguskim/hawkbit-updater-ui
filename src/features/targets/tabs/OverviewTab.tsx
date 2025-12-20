@@ -54,7 +54,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ target, loading }) => {
                         <Statistic
                             title={t('overview.status')}
                             value={isOnline ? t('status.online') : t('status.offline')}
-                            valueStyle={{ color: isOnline ? '#52c41a' : '#ff4d4f' }}
+                            styles={{ content: { color: isOnline ? '#52c41a' : '#ff4d4f' } }}
                             prefix={isOnline ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
                         />
                     </StyledCard>

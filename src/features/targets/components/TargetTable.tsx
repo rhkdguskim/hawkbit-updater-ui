@@ -82,6 +82,16 @@ const TargetTable: React.FC<TargetTableProps> = ({
         );
     };
 
+    const getInstalledDsLabel = (record: MgmtTarget) => {
+        const link = record._links?.installedDS as unknown as
+            | { name?: string; href?: string }
+            | Array<{ name?: string; href?: string }>
+            | undefined;
+        if (!link) return undefined;
+        const resolved = Array.isArray(link) ? link[0] : link;
+        return resolved?.name || resolved?.href?.split('/').pop();
+    };
+
     const columns: TableProps<MgmtTarget>['columns'] = [
         {
             title: t('table.controllerId'),
@@ -101,7 +111,16 @@ const TargetTable: React.FC<TargetTableProps> = ({
             key: 'name',
             sorter: true,
             ellipsis: true,
-            render: (text: string) => text || <Text type="secondary">-</Text>,
+            render: (_: string, record) => (
+                <Space direction="vertical" size={0}>
+                    <Text strong>{record.name || <Text type="secondary">-</Text>}</Text>
+                    {record.ipAddress && (
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                            {t('table.ipAddress')}: {record.ipAddress}
+                        </Text>
+                    )}
+                </Space>
+            ),
         },
         {
             title: t('table.targetType'),
@@ -139,6 +158,44 @@ const TargetTable: React.FC<TargetTableProps> = ({
             key: 'updateStatus',
             width: 120,
             render: (status: string) => getUpdateStatusTag(status),
+        },
+        {
+            title: t('table.installedDS'),
+            key: 'installedDS',
+            width: 200,
+            render: (_, record) => {
+                const dsLabel = getInstalledDsLabel(record);
+                return (
+                    <Space direction="vertical" size={0}>
+                        <Text strong>{dsLabel || <Text type="secondary">-</Text>}</Text>
+                        {record.installedAt && (
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                                {dayjs(record.installedAt).format('YYYY-MM-DD HH:mm')}
+                            </Text>
+                        )}
+                    </Space>
+                );
+            },
+        },
+        {
+            title: t('table.lastControllerRequest'),
+            dataIndex: 'lastControllerRequestAt',
+            key: 'lastControllerRequestAt',
+            width: 160,
+            render: (value: number | undefined) =>
+                value ? dayjs(value).format('YYYY-MM-DD HH:mm') : <Text type="secondary">-</Text>,
+        },
+        {
+            title: t('table.autoConfirm'),
+            dataIndex: 'autoConfirmActive',
+            key: 'autoConfirmActive',
+            width: 120,
+            render: (value: boolean | undefined) =>
+                value ? (
+                    <Tag color="green">{t('autoConfirm.enabled')}</Tag>
+                ) : (
+                    <Tag>{t('autoConfirm.disabled')}</Tag>
+                ),
         },
         {
             title: t('table.lastModified'),

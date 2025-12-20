@@ -6,7 +6,20 @@
         "createAction": "액션 생성",
         "createRollout": "롤아웃 생성",
         "empty": "등록된 Job이 없습니다",
-        "refresh": "새로고침"
+        "refresh": "새로고침",
+        "search": "Job 검색..."
+    },
+    "dashboard": {
+        "title": "Job 대시보드",
+        "openActions": "진행 중인 액션",
+        "runningRollouts": "실행 중인 롤아웃",
+        "failedJobs": "실패한 작업",
+        "waitingApproval": "승인 대기 중"
+    },
+    "tabs": {
+        "overview": "개요",
+        "timeline": "타임라인",
+        "logs": "활동 로그"
     },
     "detail": {
         "placeholder": "좌측 트리에서 액션 또는 롤아웃을 선택하세요.",

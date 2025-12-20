@@ -36,7 +36,7 @@ interface TargetSearchBarProps {
     loading?: boolean;
 }
 
-type SearchField = 'controllerId' | 'name' | 'description';
+type SearchField = 'name' | 'description';
 
 import { useTranslation } from 'react-i18next';
 // ...
@@ -49,11 +49,10 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
     loading,
 }) => {
     const { t } = useTranslation('targets');
-    const [searchField, setSearchField] = useState<SearchField>('controllerId');
+    const [searchField, setSearchField] = useState<SearchField>('name');
     const [searchValue, setSearchValue] = useState('');
 
     const searchFieldOptions = [
-        { value: 'controllerId', label: t('search.fields.controllerId') },
         { value: 'name', label: t('search.fields.name') },
         { value: 'description', label: t('search.fields.description') },
     ];

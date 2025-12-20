@@ -27,9 +27,12 @@
     "table": {
         "controllerId": "Controller ID",
         "name": "Name",
+        "ipAddress": "IP",
         "status": "Status",
         "updateStatus": "Update Status",
         "installedDS": "Installed DS",
+        "lastControllerRequest": "Last Controller Request",
+        "autoConfirm": "Auto Confirm",
         "lastModified": "Last Modified",
         "actions": "Actions",
         "id": "ID",
@@ -126,7 +129,6 @@
     "search": {
         "placeholder": "Search by {{field}}",
         "fields": {
-            "controllerId": "Controller ID",
             "name": "Name",
             "description": "Description"
         }

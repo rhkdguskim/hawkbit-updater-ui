@@ -27,9 +27,12 @@
     "table": {
         "controllerId": "컨트롤러 ID",
         "name": "이름",
+        "ipAddress": "IP",
         "status": "상태",
         "updateStatus": "업데이트 상태",
         "installedDS": "설치된 배포 세트",
+        "lastControllerRequest": "마지막 컨트롤러 요청",
+        "autoConfirm": "자동 확인",
         "lastModified": "최종 수정일",
         "actions": "액션",
         "id": "ID",

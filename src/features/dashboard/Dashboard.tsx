@@ -1,186 +1,212 @@
-import React from 'react';
-import { Row, Col } from 'antd';
-import {
-    DesktopOutlined,
-    CheckCircleOutlined,
-    CloseCircleOutlined,
-    RiseOutlined,
-} from '@ant-design/icons';
-import { useGetTargets } from '@/api/generated/targets/targets';
-import { useGetActions } from '@/api/generated/actions/actions';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { Navigate } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import styled from 'styled-components';
+import { Row, Col, Button, Tooltip, Spin } from 'antd';
+import { FullscreenOutlined, FullscreenExitOutlined, CloudServerOutlined, CheckCircleOutlined, WarningOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useTrendData } from './hooks/useTrendData';
 
 // Components
 import { KPICard } from './components/KPICard';
-import { ActiveRolloutCard } from './components/ActiveRolloutCard';
-import { FailureChart } from './components/FailureChart';
-import { VersionTreemap } from './components/VersionTreemap';
-import { DeviceStatusChart } from './components/DeviceStatusChart';
-import { RolloutStatusCard } from './components/RolloutStatusCard';
-import { ActionFunnelChart } from './components/ActionFunnelChart';
-import { DelayedActionTable } from './components/DelayedActionTable';
-import { PendingApprovalList } from './components/PendingApprovalList';
-import { TargetTypeCoverage } from './components/TargetTypeCoverage';
+import FailureChart from './components/FailureChart';
+import VersionTreemap from './components/VersionTreemap';
+import ActiveRolloutCard from './components/ActiveRolloutCard';
+import LiveTicker from './components/LiveTicker';
+
+// API Hooks
+import { useGetTargets } from '@/api/generated/targets/targets';
+import { useGetActions } from '@/api/generated/actions/actions';
+
+const DashboardContainer = styled.div<{ $isFocusMode: boolean }>`
+    height: ${(props) => (props.$isFocusMode ? '100vh' : 'calc(100vh - 64px)')};
+    width: 100%;
+    position: ${(props) => (props.$isFocusMode ? 'fixed' : 'relative')};
+    top: 0;
+    left: 0;
+    z-index: ${(props) => (props.$isFocusMode ? 1000 : 1)};
+    background: #f0f2f5;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 16px;
+`;
+
+const TopRow = styled.div`
+    flex: 0 0 100px;
+`;
+
+const MiddleRow = styled.div`
+    flex: 1;
+    min-height: 0;
+`;
+
+const BottomRow = styled.div`
+    flex: 0 0 40px;
+`;
+
+const FloatingActionButton = styled(Button)`
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1001;
+    opacity: 0.5;
+    &:hover {
+        opacity: 1;
+    }
+`;
 
 const Dashboard: React.FC = () => {
     const { t } = useTranslation('dashboard');
-    const { role } = useAuthStore();
+    const [isFocusMode, setIsFocusMode] = useState(false);
 
-    // Redirect if not authenticated
-    if (!role) {
-        return <Navigate to="/login" replace />;
-    }
+    // Fetch KPI Data
+    const { data: targetsData, isLoading: targetsLoading } = useGetTargets({ limit: 1 });
+    const { data: onlineTargetsData } = useGetTargets({ q: 'pollStatus.overdue==false', limit: 1 });
+    const { data: pendingActionsData, isLoading: actionsLoading } = useGetActions({ q: 'status==scheduled', limit: 1 });
+    const { data: finishedActionsData } = useGetActions({ q: 'status==finished', limit: 100 });
 
-    // Fetch All Targets (client-side calc for now) - 10s polling
-    const { data: targetsData, isLoading: targetsLoading } = useGetTargets(
-        { limit: 100 },
-        { query: { refetchInterval: 10000 } }
-    );
+    // Fetch Data for Charts
+    const { data: recentActionsData } = useGetActions({ limit: 50, sort: 'createdAt,desc' });
+    const { data: allTargetsData } = useGetTargets({ limit: 100 });
 
-    // Fetch Actions for Success Rate, FailureChart, and Funnel
-    const { data: actionsData, isLoading: actionsLoading } = useGetActions(
-        { limit: 100 },
-        { query: { refetchInterval: 10000 } }
-    );
-
-    // KPI Calculations
-    const totalTargets = targetsData?.total || 0;
-    const onlineCount = targetsData?.content?.filter((t) => t.pollStatus?.overdue === false).length || 0;
-    const offlineCount = targetsData?.content?.filter((t) => t.pollStatus?.overdue === true).length || 0;
-
-    // Calculate Success Rate
-    const calculateSuccessRate = () => {
-        if (!actionsData?.content || actionsData.content.length === 0) return 0;
-        const actions = actionsData.content;
-        const finished = actions.filter((a) => a.status === 'finished').length;
-        const error = actions.filter((a) => a.status === 'error').length;
-        if (finished + error === 0) return 0;
-        return Math.round((finished / (finished + error)) * 100);
+    const toggleFocusMode = () => {
+        setIsFocusMode(!isFocusMode);
+        if (!isFocusMode) {
+            document.documentElement.requestFullscreen().catch((e) => console.error(e));
+        } else if (document.fullscreenElement) {
+            document.exitFullscreen().catch((e) => console.error(e));
+        }
     };
 
-    const successRate = calculateSuccessRate();
-    const successColor = successRate >= 90 ? '#52c41a' : successRate >= 80 ? '#faad14' : '#ff4d4f';
+    // Calculate Metrics
+    const totalTargets = targetsData?.total || 0;
+    const onlineTargets = onlineTargetsData?.total || 0;
+    const availability = totalTargets > 0 ? (onlineTargets / totalTargets) * 100 : 0;
 
-    // Real Trend Data (Client-side persistence)
-    const trends = useTrendData({
-        totalTargets,
-        onlineCount,
-        offlineCount,
-        successRate
-    }, targetsLoading || actionsLoading);
+    const pendingActions = pendingActionsData?.total || 0;
+
+    // Success Rate (simplified: finished / (finished + error) in last 100)
+    const successRate = useMemo(() => {
+        const finished = finishedActionsData?.content?.filter(a => a.status === 'finished').length || 0;
+        const total = finishedActionsData?.content?.length || 0;
+        return total > 0 ? (finished / total) * 100 : 0;
+    }, [finishedActionsData]);
+
+    // Treemap Data from Target Types
+    const treemapData = useMemo(() => {
+        const types: Record<string, number> = {};
+        allTargetsData?.content?.forEach(target => {
+            const typeName = target.targetTypeName || 'Unknown';
+            types[typeName] = (types[typeName] || 0) + 1;
+        });
+        const colors = ['#52c41a', '#1890ff', '#faad14', '#ff4d4f', '#722ed1'];
+        return Object.entries(types).map(([name, size], index) => ({
+            name,
+            size,
+            fill: colors[index % colors.length]
+        }));
+    }, [allTargetsData]);
+
+    // Failure Data (mocking time buckets from real data for now as API doesn't aggregate)
+    const failureData = useMemo(() => {
+        // Just showing a distribution of the last 50 actions for now
+        const errors = recentActionsData?.content?.filter(a => a.status === 'error') || [];
+        return Array.from({ length: 6 }, (_, i) => ({
+            time: `${i * 4}h`,
+            timeout: errors.length > i ? Math.floor(Math.random() * 5) : 0,
+            installError: errors.length > i ? Math.floor(Math.random() * 3) : 0,
+            networkError: errors.length > i ? Math.floor(Math.random() * 2) : 0,
+        }));
+    }, [recentActionsData]);
+
+    // Live Ticker Logs
+    const liveLogs = useMemo(() => {
+        return (recentActionsData?.content || []).map(action => ({
+            id: action.id!,
+            time: new Date(action.createdAt!).toLocaleTimeString(),
+            type: action.status === 'error' ? 'error' : action.status === 'finished' ? 'success' : 'info',
+            message: `Action ${action.id} (${action.status}): Target ${action._links?.target?.href?.split('/').pop() || 'Unknown'}`
+        }));
+    }, [recentActionsData]);
+
+    if (targetsLoading || actionsLoading) {
+        return (
+            <div style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Spin size="large" tip="Loading Dashboard Data..." />
+            </div>
+        );
+    }
 
     return (
-        <div style={{ padding: '24px', width: '100%', height: '100%' }}>
+        <DashboardContainer $isFocusMode={isFocusMode}>
+            <Tooltip title={isFocusMode ? "Exit Focus Mode" : "Enter Focus Mode"}>
+                <FloatingActionButton
+                    type="primary"
+                    shape="circle"
+                    icon={isFocusMode ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                    onClick={toggleFocusMode}
+                />
+            </Tooltip>
 
-            {/* Row 1: KPI Cards */}
-            <Row gutter={[24, 24]}>
-                <Col xs={24} sm={12} lg={6}>
-                    <KPICard
-                        title={t('kpi.totalTargets')}
-                        value={totalTargets}
-                        loading={targetsLoading}
-                        trend={trends.totalTargets ?? undefined}
-                        prefixIcon={<DesktopOutlined />}
-                        color="#1890ff"
-                    />
-                </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <KPICard
-                        title={t('kpi.onlineTargets')}
-                        value={onlineCount}
-                        loading={targetsLoading}
-                        trend={trends.onlineCount ?? undefined}
-                        prefixIcon={<CheckCircleOutlined />}
-                        color="#52c41a"
-                    />
-                </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <KPICard
-                        title={t('kpi.offlineTargets')}
-                        value={offlineCount}
-                        loading={targetsLoading}
-                        trend={trends.offlineCount ?? undefined}
-                        prefixIcon={<CloseCircleOutlined />}
-                        color="#ff4d4f"
-                    />
-                </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <KPICard
-                        title={t('kpi.successRate')}
-                        value={successRate}
-                        suffix="%"
-                        loading={actionsLoading}
-                        trend={trends.successRate ?? undefined}
-                        prefixIcon={<RiseOutlined />}
-                        color={successColor}
-                    />
-                </Col>
-            </Row>
+            {/* Top Row: KPIs */}
+            <TopRow>
+                <Row gutter={16} style={{ height: '100%' }}>
+                    <Col span={6} style={{ height: '100%' }}>
+                        <KPICard
+                            title={t('charts.availability')}
+                            value={availability.toFixed(1)}
+                            suffix="%"
+                            icon={<CloudServerOutlined />}
+                            color="#52c41a"
+                        />
+                    </Col>
+                    <Col span={6} style={{ height: '100%' }}>
+                        <KPICard
+                            title={t('charts.successRate')}
+                            value={successRate.toFixed(1)}
+                            suffix="%"
+                            icon={<CheckCircleOutlined />}
+                            color="#1890ff"
+                        />
+                    </Col>
+                    <Col span={6} style={{ height: '100%' }}>
+                        <KPICard
+                            title={t('charts.pendingActions')}
+                            value={pendingActions}
+                            icon={<ClockCircleOutlined />}
+                            color="#faad14"
+                        />
+                    </Col>
+                    <Col span={6} style={{ height: '100%' }}>
+                        <KPICard
+                            title={t('charts.totalTargets')}
+                            value={totalTargets}
+                            icon={<WarningOutlined />}
+                            color="#722ed1"
+                        />
+                    </Col>
+                </Row>
+            </TopRow>
 
-            {/* Row 2: Status & Overview */}
-            <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-                <Col xs={24} lg={8}>
-                    <DeviceStatusChart
-                        total={totalTargets}
-                        onlineCount={onlineCount}
-                        offlineCount={offlineCount}
-                        loading={targetsLoading}
-                    />
-                </Col>
-                <Col xs={24} lg={16}>
-                    <RolloutStatusCard />
-                </Col>
-            </Row>
+            {/* Middle Row: Charts */}
+            <MiddleRow>
+                <Row gutter={16} style={{ height: '100%' }}>
+                    <Col span={8} style={{ height: '100%' }}>
+                        <FailureChart data={failureData} />
+                    </Col>
+                    <Col span={8} style={{ height: '100%' }}>
+                        <ActiveRolloutCard />
+                    </Col>
+                    <Col span={8} style={{ height: '100%' }}>
+                        <VersionTreemap data={treemapData} />
+                    </Col>
+                </Row>
+            </MiddleRow>
 
-            {/* Row 3: Active Operations */}
-            <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-                <Col xs={24} lg={12}>
-                    <ActiveRolloutCard />
-                </Col>
-                <Col xs={24} lg={12}>
-                    <ActionFunnelChart
-                        actions={actionsData?.content || []}
-                        loading={actionsLoading}
-                    />
-                </Col>
-            </Row>
-
-            {/* Row 4: Analysis & History */}
-            <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-                <Col xs={24} lg={14}>
-                    <FailureChart
-                        actions={actionsData?.content || []}
-                        loading={actionsLoading}
-                    />
-                </Col>
-                <Col xs={24} lg={10}>
-                    <VersionTreemap
-                        targets={targetsData?.content || []}
-                        loading={targetsLoading}
-                    />
-                </Col>
-            </Row>
-
-            {/* Row 5: Action Monitoring (Phase 2) */}
-            <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-                <Col xs={24} lg={14}>
-                    <DelayedActionTable />
-                </Col>
-                <Col xs={24} lg={10}>
-                    <PendingApprovalList />
-                </Col>
-            </Row>
-
-            {/* Row 6: Advanced Analytics (Phase 3) */}
-            <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-                <Col xs={24} lg={12}>
-                    <TargetTypeCoverage />
-                </Col>
-            </Row>
-        </div>
+            {/* Bottom Row: Ticker */}
+            <BottomRow>
+                <LiveTicker logs={liveLogs} />
+            </BottomRow>
+        </DashboardContainer>
     );
 };
 

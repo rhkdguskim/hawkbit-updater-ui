@@ -6,7 +6,20 @@
         "createAction": "Create Action",
         "createRollout": "Create Rollout",
         "empty": "No jobs available",
-        "refresh": "Refresh"
+        "refresh": "Refresh",
+        "search": "Search jobs..."
+    },
+    "dashboard": {
+        "title": "Job Dashboard",
+        "openActions": "Open Actions",
+        "runningRollouts": "Running Rollouts",
+        "failedJobs": "Failed Jobs",
+        "waitingApproval": "Waiting Approval"
+    },
+    "tabs": {
+        "overview": "Overview",
+        "timeline": "Timeline",
+        "logs": "Activity Logs"
     },
     "detail": {
         "placeholder": "Select an Action or Rollout from the tree to view details.",

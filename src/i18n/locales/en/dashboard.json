@@ -11,14 +11,21 @@
         "deviceStatus": "Device Status",
         "actionStatus": "Action Status Distribution",
         "failureAnalysis": "Failure Analysis (24h)",
-        "versionMap": "Status Distribution Map",
+        "versionMap": "Firmware Version Map",
+        "availability": "Availability",
+        "successRate": "Success Rate (24h)",
+        "pendingActions": "Pending Actions",
+        "totalTargets": "Total Targets",
         "online": "Online",
         "offline": "Offline",
         "finished": "Finished",
         "error": "Error",
         "running": "Running",
         "pending": "Pending",
-        "count": "Count"
+        "count": "Count",
+        "timeout": "Timeout",
+        "installError": "Install Error",
+        "networkError": "Network Error"
     },
     "rollout": {
         "activeMonitor": "Active Rollout Monitor",

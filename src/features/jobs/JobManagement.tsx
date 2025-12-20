@@ -16,11 +16,18 @@ import {
     Input,
     Select,
     Radio,
+    Row,
+    Col,
 } from 'antd';
+const { Text } = Typography;
 import {
     PlusOutlined,
     ReloadOutlined,
     ArrowRightOutlined,
+    SearchOutlined,
+    SyncOutlined,
+    ExclamationCircleOutlined,
+    ClockCircleOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -35,6 +42,7 @@ import {
 import {
     useGetRollouts,
     useGetRollout,
+    getRolloutGroups,
     useStart,
     usePause,
     useResume,
@@ -44,14 +52,21 @@ import {
 import {
     useCancelAction,
     useUpdateAction,
-    useUpdateActionConfirmation,
     usePostAssignedDistributionSet,
+} from '@/api/generated/targets/targets';
+import {
+    useUpdateActionConfirmation,
 } from '@/api/generated/targets/targets';
 import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
 import type {
     MgmtDistributionSet,
     MgmtDistributionSetAssignment,
 } from '@/api/generated/model';
+import { KPICard } from '../dashboard/components/KPICard';
+import { DelayedActionTable } from '../dashboard/components/DelayedActionTable';
+import JobStatusTimeline from './components/JobStatusTimeline';
+import ActivityLogs from './components/ActivityLogs';
+import { Tabs } from 'antd';
 
 const LayoutWrapper = styled.div`
     display: flex;
@@ -67,6 +82,20 @@ const SidePanel = styled(Card)`
 const ContentPanel = styled(Card)`
     flex: 1;
     min-width: 320px;
+    .ant-card-body {
+        padding: 16px;
+    }
+`;
+
+const KPIContainer = styled.div`
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+`;
+
+const SearchWrapper = styled.div`
+    margin-bottom: 12px;
 `;
 
 type SelectedNode = {
@@ -190,14 +219,19 @@ const JobManagement: React.FC = () => {
     const { role } = useAuthStore();
     const [selectedNode, setSelectedNode] = useState<SelectedNode>(null);
     const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [treeSearchTerm, setTreeSearchTerm] = useState('');
+    const [activeDetailTab, setActiveDetailTab] = useState('overview');
+    const [rolloutGroups, setRolloutGroups] = useState<Record<number, any[]>>({});
 
     const {
         data: actionsData,
         isLoading: actionsLoading,
         refetch: refetchActions,
     } = useGetActions({
-        limit: 50,
+        limit: 100,
         sort: 'lastModifiedAt:DESC',
+    }, {
+        query: { refetchInterval: 10000 } // Poll every 10s
     });
 
     const {
@@ -205,8 +239,10 @@ const JobManagement: React.FC = () => {
         isLoading: rolloutsLoading,
         refetch: refetchRollouts,
     } = useGetRollouts({
-        limit: 50,
+        limit: 100,
         sort: 'createdAt:DESC',
+    }, {
+        query: { refetchInterval: 15000 } // Poll every 15s
     });
 
     const {
@@ -288,8 +324,58 @@ const JobManagement: React.FC = () => {
     const approveMutation = useApprove({ mutation: rolloutMutationOptions });
     const denyMutation = useDeny({ mutation: rolloutMutationOptions });
 
-    const treeData: TreeDataNode[] = useMemo(() => {
-        const actionNodes: TreeDataNode[] = (actionsData?.content || []).map((action) => ({
+    const fetchRolloutGroups = async (rolloutId: number) => {
+        try {
+            const data = await queryClient.fetchQuery({
+                queryKey: [`/rest/v1/rollouts/${rolloutId}/deploygroups`],
+                queryFn: () => getRolloutGroups(rolloutId),
+            });
+            setRolloutGroups(prev => ({ ...prev, [rolloutId]: data.content || [] }));
+        } catch (error) {
+            console.error('Failed to fetch rollout groups', error);
+        }
+    };
+
+    const onLoadData = async ({ key, children }: any) => {
+        if (children) return;
+        if (key.startsWith('rollout-')) {
+            const id = Number(key.replace('rollout-', ''));
+            await fetchRolloutGroups(id);
+        }
+    };
+
+    const handleConfirmAction = (confirmed: boolean) => {
+        if (!selectedNode || !actionDetail) return;
+        const targetId = extractTargetId(actionDetail._links?.target?.href);
+        if (!targetId) return;
+
+        confirmMutation.mutate({
+            targetId,
+            actionId: selectedNode.id,
+            data: {
+                confirmation: confirmed ? 'confirmed' : 'denied',
+            }
+        }, {
+            onSuccess: () => {
+                message.success(`Action ${confirmed ? 'confirmed' : 'denied'}`);
+                refetchActions();
+            },
+            onError: () => message.error('Failed to update confirmation')
+        });
+    };
+
+    const treeData = useMemo(() => {
+        const filteredActions = (actionsData?.content || []).filter(a =>
+            a.id?.toString().includes(treeSearchTerm) ||
+            a.status?.toLowerCase().includes(treeSearchTerm.toLowerCase())
+        );
+
+        const filteredRollouts = (rolloutsData?.content || []).filter(r =>
+            r.name.toLowerCase().includes(treeSearchTerm.toLowerCase()) ||
+            r.status?.toLowerCase().includes(treeSearchTerm.toLowerCase())
+        );
+
+        const actionNodes: TreeDataNode[] = filteredActions.map((action) => ({
             key: `action-${action.id}`,
             title: (
                 <Space size={6}>
@@ -302,7 +388,7 @@ const JobManagement: React.FC = () => {
             isLeaf: true,
         }));
 
-        const rolloutNodes: TreeDataNode[] = (rolloutsData?.content || []).map((rollout) => ({
+        const rolloutNodes: TreeDataNode[] = filteredRollouts.map((rollout) => ({
             key: `rollout-${rollout.id}`,
             title: (
                 <Space size={6}>
@@ -312,34 +398,55 @@ const JobManagement: React.FC = () => {
                     <span>{rollout.name}</span>
                 </Space>
             ),
-            isLeaf: true,
+            isLeaf: false, // Allow expanding to see groups
+            children: rolloutGroups[rollout.id!]?.map(group => ({
+                key: `group-${rollout.id}-${group.id}`,
+                title: (
+                    <Space size={4}>
+                        <Tag color="cyan">GROUP</Tag>
+                        <span>{group.name}</span>
+                        <Text type="secondary" style={{ fontSize: '11px' }}>
+                            ({group.successPercentage || 0}%)
+                        </Text>
+                    </Space>
+                ),
+                isLeaf: true,
+            })),
         }));
 
         return [
             {
                 key: 'actions-root',
-                title: `${t('tree.actions')} (${actionsData?.total || 0})`,
+                title: `${t('tree.actions')} (${filteredActions.length})`,
                 selectable: false,
                 children: actionNodes,
+                defaultExpanded: true,
             },
             {
                 key: 'rollouts-root',
-                title: `${t('tree.rollouts')} (${rolloutsData?.total || 0})`,
+                title: `${t('tree.rollouts')} (${filteredRollouts.length})`,
                 selectable: false,
                 children: rolloutNodes,
+                defaultExpanded: true,
             },
         ];
-    }, [actionsData, rolloutsData, t]);
+    }, [actionsData, rolloutsData, t, treeSearchTerm, rolloutGroups]);
 
     const handleSelect = (keys: React.Key[]) => {
         const key = keys[0]?.toString();
-        if (!key) return;
+        if (!key) {
+            setSelectedNode(null);
+            setActiveDetailTab('dashboard');
+            return;
+        }
         if (key.startsWith('action-')) {
             const id = Number(key.replace('action-', ''));
             setSelectedNode({ type: 'action', id });
+            setActiveDetailTab('overview');
         } else if (key.startsWith('rollout-')) {
             const id = Number(key.replace('rollout-', ''));
             setSelectedNode({ type: 'rollout', id });
+            setActiveDetailTab('overview');
         }
     };
 
@@ -378,15 +485,6 @@ const JobManagement: React.FC = () => {
             cancelMutation.mutate({ targetId, actionId });
         };
 
-        const handleConfirm = (confirmation: 'confirmed' | 'denied') => {
-            if (!targetId || !actionId) return;
-            confirmMutation.mutate({
-                targetId,
-                actionId,
-                data: { confirmation },
-            });
-        };
-
         return (
             <>
                 <Space style={{ marginBottom: 16 }}>
@@ -407,16 +505,27 @@ const JobManagement: React.FC = () => {
                     <Descriptions.Item label={t('detail.forceType')}>
                         {actionDetail.forceType || '-'}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t('detail.status')}>
-                        {actionDetail.status}
-                    </Descriptions.Item>
-                    <Descriptions.Item label={t('detail.createdAt')}>
-                        {actionDetail.createdAt ? dayjs(actionDetail.createdAt).format('YYYY-MM-DD HH:mm') : '-'}
-                    </Descriptions.Item>
-                    <Descriptions.Item label={t('detail.lastModified')}>
-                        {actionDetail.lastModifiedAt ? dayjs(actionDetail.lastModifiedAt).format('YYYY-MM-DD HH:mm') : '-'}
-                    </Descriptions.Item>
+                    <Descriptions.Item label={t('details.lastStatusCode')}>{actionDetail.lastStatusCode}</Descriptions.Item>
                 </Descriptions>
+
+                {actionDetail.status === 'waiting_for_confirmation' && (
+                    <div style={{ marginTop: 24, padding: 16, backgroundColor: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 8 }}>
+                        <Space direction="vertical" style={{ width: '100%' }}>
+                            <Text strong>Wait for confirmation</Text>
+                            <Text type="secondary">This action requires manual confirmation before proceeding.</Text>
+                            <Space style={{ marginTop: 8 }}>
+                                <Button type="primary" onClick={() => handleConfirmAction(true)}>Confirm</Button>
+                                <Button danger onClick={() => handleConfirmAction(false)}>Deny</Button>
+                            </Space>
+                        </Space>
+                    </div>
+                )}
+                <Descriptions.Item label={t('detail.createdAt')}>
+                    {actionDetail.createdAt ? dayjs(actionDetail.createdAt).format('YYYY-MM-DD HH:mm') : '-'}
+                </Descriptions.Item>
+                <Descriptions.Item label={t('detail.lastModified')}>
+                    {actionDetail.lastModifiedAt ? dayjs(actionDetail.lastModifiedAt).format('YYYY-MM-DD HH:mm') : '-'}
+                </Descriptions.Item>
                 <Space style={{ marginTop: 16 }} wrap>
                     <Button icon={<ArrowRightOutlined />} onClick={() => navigate(`/actions/${actionId}`)}>
                         {t('actions.openDetail')}
@@ -428,16 +537,6 @@ const JobManagement: React.FC = () => {
                             </Button>
                             <Button danger onClick={handleCancel} loading={cancelMutation.isPending}>
                                 {t('actions.cancel')}
-                            </Button>
-                        </>
-                    )}
-                    {actionDetail.status === 'wait_for_confirmation' && (
-                        <>
-                            <Button type="primary" onClick={() => handleConfirm('confirmed')} loading={confirmMutation.isPending}>
-                                {t('actions.confirm')}
-                            </Button>
-                            <Button danger onClick={() => handleConfirm('denied')} loading={confirmMutation.isPending}>
-                                {t('actions.deny')}
                             </Button>
                         </>
                     )}
@@ -566,6 +665,34 @@ const JobManagement: React.FC = () => {
             <Typography.Title level={3} style={{ marginBottom: 16 }}>
                 {t('title')}
             </Typography.Title>
+
+            <KPIContainer>
+                <KPICard
+                    title={t('dashboard.openActions')}
+                    value={(actionsData?.content || []).filter(a => a.status === 'running' || a.status === 'pending').length}
+                    icon={<SyncOutlined />}
+                    color="#1890ff"
+                />
+                <KPICard
+                    title={t('dashboard.runningRollouts')}
+                    value={(rolloutsData?.content || []).filter(r => r.status === 'running').length}
+                    icon={<SyncOutlined spin />}
+                    color="#52c41a"
+                />
+                <KPICard
+                    title={t('dashboard.waitingApproval')}
+                    value={(rolloutsData?.content || []).filter(r => r.status === 'waiting_for_approval').length}
+                    icon={<ClockCircleOutlined />}
+                    color="#faad14"
+                />
+                <KPICard
+                    title={t('dashboard.failedJobs')}
+                    value={(actionsData?.content || []).filter(a => a.status === 'error').length}
+                    icon={<ExclamationCircleOutlined />}
+                    color="#ff4d4f"
+                />
+            </KPIContainer>
+
             <LayoutWrapper>
                 <SidePanel
                     title={t('tree.actions')}
@@ -577,14 +704,24 @@ const JobManagement: React.FC = () => {
                         </Space>
                     }
                 >
+                    <SearchWrapper>
+                        <Input
+                            placeholder={t('tree.search')}
+                            prefix={<SearchOutlined />}
+                            onChange={(e) => setTreeSearchTerm(e.target.value)}
+                            allowClear
+                        />
+                    </SearchWrapper>
                     <Tree
                         treeData={treeData}
                         selectable
                         selectedKeys={selectedKeys}
                         onSelect={handleSelect}
+                        loadData={onLoadData}
                         showLine
                         switcherIcon={null}
-                        height={520}
+                        height={480}
+                        defaultExpandAll
                     />
                     <Space style={{ marginTop: 16, width: '100%' }} direction="vertical">
                         <Button type="primary" icon={<PlusOutlined />} block onClick={() => setCreateModalOpen(true)}>
@@ -597,7 +734,55 @@ const JobManagement: React.FC = () => {
                 </SidePanel>
 
                 <ContentPanel>
-                    {actionsLoading || rolloutsLoading ? <Spin /> : renderDetail()}
+                    {actionsLoading || rolloutsLoading ? <Spin /> : (
+                        <Tabs
+                            activeKey={activeDetailTab}
+                            onChange={setActiveDetailTab}
+                            items={[
+                                {
+                                    key: 'dashboard',
+                                    label: t('dashboard.title'),
+                                    children: (
+                                        <div style={{ marginTop: 16 }}>
+                                            <Row gutter={[16, 16]}>
+                                                <Col span={24}>
+                                                    <DelayedActionTable />
+                                                </Col>
+                                                <Col span={24}>
+                                                    <ActivityLogs />
+                                                </Col>
+                                            </Row>
+                                        </div>
+                                    )
+                                },
+                                {
+                                    key: 'overview',
+                                    label: t('tabs.overview'),
+                                    children: renderDetail(),
+                                    disabled: !selectedNode
+                                },
+                                {
+                                    key: 'timeline',
+                                    label: t('tabs.timeline'),
+                                    children: selectedNode?.type === 'action' ? (
+                                        <JobStatusTimeline
+                                            targetId={extractTargetId(actionDetail?._links?.target?.href)}
+                                            actionId={selectedNode.id}
+                                        />
+                                    ) : (
+                                        <Empty description="Timeline only available for Actions" />
+                                    ),
+                                    disabled: !selectedNode
+                                },
+                                {
+                                    key: 'logs',
+                                    label: t('tabs.logs'),
+                                    children: <ActivityLogs />,
+                                    disabled: !selectedNode
+                                }
+                            ]}
+                        />
+                    )}
                 </ContentPanel>
             </LayoutWrapper>
 
