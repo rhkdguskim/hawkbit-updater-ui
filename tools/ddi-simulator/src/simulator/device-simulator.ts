@@ -91,6 +91,7 @@ export class DeviceSimulator {
             const controllerBase = await this.client.getControllerBase();
 
             // Update polling interval from server if provided
+            /* Server polling interval override disabled to force faster simulation
             if (controllerBase.config?.polling?.sleep) {
                 const serverInterval = DdiClient.parsePollingInterval(controllerBase.config.polling.sleep);
                 if (serverInterval !== this.options.pollingInterval) {
@@ -98,6 +99,7 @@ export class DeviceSimulator {
                     this.options.pollingInterval = serverInterval;
                 }
             }
+            */
 
             // Check for pending actions
             const links = controllerBase._links || {};
