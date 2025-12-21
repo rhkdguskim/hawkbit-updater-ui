@@ -243,5 +243,39 @@
     },
     "smTypes": {
         "title": "Types"
+    },
+    "wizard": {
+        "step1Title": "Basic Info",
+        "step2Title": "Metadata",
+        "step3Title": "Artifacts",
+        "step4Title": "Review",
+        "dsStep2Title": "Assign Modules",
+        "optionalStep": "(Optional)",
+        "next": "Next",
+        "prev": "Previous",
+        "finish": "Create",
+        "add": "Add",
+        "duplicateKey": "This key already exists",
+        "noMetadata": "No metadata added",
+        "noArtifacts": "No artifacts added",
+        "artifactHint": "Drop files here or click to select",
+        "creatingModule": "Creating module...",
+        "addingMetadata": "Adding metadata...",
+        "uploadingArtifacts": "Uploading artifacts...",
+        "creatingSet": "Creating distribution set...",
+        "creatingModules": "Creating modules...",
+        "assigningModules": "Assigning modules...",
+        "noModulesExist": "No software modules available",
+        "createModuleHint": "You can create new modules below to assign to this distribution set.",
+        "selectExistingModules": "Select Existing Modules",
+        "newModulesToCreate": "New Modules to Create",
+        "addNewModule": "Create New Module",
+        "noNewModules": "No new modules to create",
+        "noModulesSelected": "No modules assigned",
+        "typeRequired": "Please select a type"
+    },
+    "values": {
+        "yes": "Yes",
+        "no": "No"
     }
 }

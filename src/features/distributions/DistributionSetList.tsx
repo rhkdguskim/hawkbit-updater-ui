@@ -10,7 +10,7 @@ import {
 import type { MgmtDistributionSet } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import DistributionSearchBar from './components/DistributionSearchBar';
-import AdvancedDSBuilderModal from './components/AdvancedDSBuilderModal';
+import CreateDistributionSetWizard from './components/CreateDistributionSetWizard';
 import { format } from 'date-fns';
 import { TagOutlined } from '@ant-design/icons';
 import { DistributionSetTagsCell } from './components/DistributionSetTagsCell';
@@ -225,7 +225,7 @@ const DistributionSetList: React.FC = () => {
                     onChange: (keys) => setSelectedSetIds(keys as number[]),
                 }}
             />
-            <AdvancedDSBuilderModal
+            <CreateDistributionSetWizard
                 visible={isCreateModalVisible}
                 onCancel={() => setIsCreateModalVisible(false)}
                 onSuccess={() => {

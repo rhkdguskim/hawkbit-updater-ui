@@ -12,7 +12,6 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { format } from 'date-fns';
 import type { MgmtArtifact } from '@/api/generated/model';
 import ModuleMetadataTab from './components/ModuleMetadataTab';
-import ModuleUsageTab from './components/ModuleUsageTab';
 
 import { useTranslation } from 'react-i18next';
 import type { RcFile } from 'antd/es/upload';
@@ -284,7 +283,6 @@ const SoftwareModuleDetail: React.FC = () => {
                     { key: 'overview', label: t('detail.overview'), children: overviewTab },
                     { key: 'artifacts', label: t('detail.artifacts'), children: artifactsTab },
                     { key: 'metadata', label: t('detail.metadata'), children: <ModuleMetadataTab softwareModuleId={softwareModuleId} isAdmin={isAdmin} /> },
-                    { key: 'usage', label: t('detail.usage') || 'Usage Reference', children: <ModuleUsageTab softwareModuleId={softwareModuleId} /> },
                 ]}
             />
         </Card>
