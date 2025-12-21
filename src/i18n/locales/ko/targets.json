@@ -97,13 +97,15 @@
     },
     "overview": {
         "title": "타겟 관리",
-        "subtitle": "기기 현황 개요 및 빠른 작업",
+        "subtitle": "기기 현황",
         "totalDevices": "전체 기기",
         "online": "온라인",
         "offline": "오프라인",
         "tagsTypes": "태그 & 유형",
         "viewAll": "전체 타겟 보기",
         "deviceStatus": "기기 상태",
+        "deviceStatusDistribution": "기기 상태 분포",
+        "recentActivity": "최근 기기 활동",
         "quickActions": "빠른 작업",
         "allDevices": "전체 기기",
         "manageTags": "태그 관리",
@@ -121,7 +123,8 @@
         "requestAttributes": "속성 요청",
         "requested": "요청됨",
         "notRequested": "요청되지 않음",
-        "targetType": "타겟 유형"
+        "targetType": "타겟 유형",
+        "awaitingConnection": "첫 접속 대기 중"
     },
     "status": {
         "inSync": "동기화됨",
@@ -129,7 +132,8 @@
         "error": "오류",
         "unknown": "알 수 없음",
         "online": "온라인",
-        "offline": "오프라인"
+        "offline": "오프라인",
+        "neverConnected": "미접속"
     },
     "actions": {
         "viewDetails": "상세 보기",

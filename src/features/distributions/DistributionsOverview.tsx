@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Card, Row, Col, Typography, Statistic, Button, Flex, Skeleton, Progress } from 'antd';
+import React from 'react';
+import { Card, Row, Col, Typography, Statistic, Button, Flex, Skeleton } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled, { keyframes } from 'styled-components';
@@ -10,9 +10,8 @@ import {
     BlockOutlined,
     ArrowRightOutlined,
     SettingOutlined,
-    RiseOutlined,
 } from '@ant-design/icons';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
 import { useGetSoftwareModules } from '@/api/generated/software-modules/software-modules';
@@ -229,20 +228,7 @@ const IconWrapper = styled.div<{ $bg?: string; $glow?: string }>`
     }
 `;
 
-const TrendBadge = styled.div<{ $positive?: boolean }>`
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    background: ${props => props.$positive
-        ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1))'
-        : 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(248, 113, 113, 0.1))'};
-    color: ${props => props.$positive ? '#059669' : '#dc2626'};
-    border: 1px solid ${props => props.$positive ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'};
-`;
+
 
 const LiveIndicator = styled.div`
     display: flex;
@@ -314,16 +300,10 @@ const DistributionsOverview: React.FC = () => {
     const typesCount = typesData?.total ?? 0;
 
     // Chart data
-    const pieData = useMemo(() => [
+    const pieData = [
         { name: 'Distribution Sets', value: dsCount || 1, color: COLORS.blue },
         { name: 'Software Modules', value: smCount || 1, color: COLORS.cyan },
-    ], [dsCount, smCount]);
-
-    const barData = useMemo(() =>
-        Array.from({ length: 7 }, (_, i) => ({
-            name: `Day ${i + 1}`,
-            value: Math.floor(Math.random() * 10) + 2
-        })), []);
+    ];
 
     const isLoading = loadingDS || loadingSM;
 
@@ -369,9 +349,7 @@ const DistributionsOverview: React.FC = () => {
                                             valueStyle={{ fontSize: 36, fontWeight: 700, lineHeight: 1 }}
                                         />
                                     </Flex>
-                                    <TrendBadge $positive style={{ marginTop: 12 }}>
-                                        <RiseOutlined /> +3 this month
-                                    </TrendBadge>
+
                                 </div>
                                 <IconWrapper $bg="rgba(59, 130, 246, 0.12)" $glow="rgba(59, 130, 246, 0.25)">
                                     <AppstoreOutlined style={{ color: COLORS.blue }} />
@@ -394,14 +372,7 @@ const DistributionsOverview: React.FC = () => {
                                             valueStyle={{ fontSize: 36, fontWeight: 700, color: COLORS.cyan, lineHeight: 1 }}
                                         />
                                     </Flex>
-                                    <Progress
-                                        percent={75}
-                                        size="small"
-                                        strokeColor={{ from: '#06b6d4', to: '#22d3ee' }}
-                                        trailColor="rgba(6, 182, 212, 0.15)"
-                                        style={{ marginTop: 12, width: '80%' }}
-                                        format={() => 'Active'}
-                                    />
+
                                 </div>
                                 <IconWrapper $bg="rgba(6, 182, 212, 0.12)" $glow="rgba(6, 182, 212, 0.25)">
                                     <CodeOutlined style={{ color: COLORS.cyan }} />
@@ -513,21 +484,7 @@ const DistributionsOverview: React.FC = () => {
                         )}
                     </ChartCard>
                 </Col>
-                <Col xs={24} lg={8}>
-                    <ChartCard title="Weekly Activity" $delay={6}>
-                        <ResponsiveContainer width="100%" height={180}>
-                            <BarChart data={barData} barCategoryGap="20%">
-                                <defs>
-                                    <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#6366f1" />
-                                        <stop offset="100%" stopColor="#8b5cf6" />
-                                    </linearGradient>
-                                </defs>
-                                <Bar dataKey="value" fill="url(#barGrad)" radius={[6, 6, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </ChartCard>
-                </Col>
+
                 <Col xs={24} lg={8}>
                     <ChartCard title={t('overview.quickActions', 'Quick Actions')} $delay={7}>
                         <Flex vertical gap={12}>

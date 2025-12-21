@@ -71,15 +71,17 @@ const TargetTable: React.FC<TargetTableProps> = ({
         }
     };
 
-    const getOnlineStatusTag = (pollStatus?: { overdue?: boolean }) => {
-        if (!pollStatus) {
-            return <Tag color="default">{t('status.unknown')}</Tag>;
+    const getOnlineStatusTag = (pollStatus?: { overdue?: boolean; lastRequestAt?: number }) => {
+        // 1. Never connected: no pollStatus or no lastRequestAt
+        if (!pollStatus || pollStatus.lastRequestAt === undefined) {
+            return <Tag color="default">{t('status.neverConnected')}</Tag>;
         }
-        return pollStatus.overdue ? (
-            <Tag color="red">{t('status.offline')}</Tag>
-        ) : (
-            <Tag color="green">{t('status.online')}</Tag>
-        );
+        // 2. Offline: overdue is true
+        if (pollStatus.overdue) {
+            return <Tag color="red">{t('status.offline')}</Tag>;
+        }
+        // 3. Online: overdue is false
+        return <Tag color="green">{t('status.online')}</Tag>;
     };
 
     const getInstalledDsLabel = (record: MgmtTarget) => {

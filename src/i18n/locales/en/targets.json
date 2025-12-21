@@ -96,6 +96,8 @@
         "deactivatedSuccess": "AutoConfirm deactivated."
     },
     "overview": {
+        "title": "Device Monitoring",
+        "subtitle": "Real-time device status overview",
         "status": "Status",
         "updateStatus": "Update Status",
         "lastPoll": "Last Poll",
@@ -108,7 +110,10 @@
         "requestAttributes": "Request Attributes",
         "requested": "Requested",
         "notRequested": "Not Requested",
-        "targetType": "Target Type"
+        "targetType": "Target Type",
+        "deviceStatusDistribution": "Device Status Distribution",
+        "recentActivity": "Recent Device Activity",
+        "awaitingConnection": "Awaiting first connection"
     },
     "status": {
         "inSync": "In Sync",
