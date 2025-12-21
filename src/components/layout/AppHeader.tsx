@@ -179,11 +179,17 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
             key: 'targets-menu',
             label: t('nav.targets'),
             icon: <MdDevices />,
+            onTitleClick: () => navigate('/targets'),
             children: [
                 {
-                    key: '/targets',
-                    label: t('nav.list'),
+                    key: '/targets/overview',
+                    label: t('nav.overview', '개요'),
                     onClick: () => navigate('/targets'),
+                },
+                {
+                    key: '/targets/list',
+                    label: t('nav.list'),
+                    onClick: () => navigate('/targets/list'),
                 },
                 {
                     key: '/targets/tags-types',
@@ -196,7 +202,13 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
             key: 'distributions-menu',
             label: t('nav.distributions'),
             icon: <MdInventory />,
+            onTitleClick: () => navigate('/distributions'),
             children: [
+                {
+                    key: '/distributions/overview',
+                    label: t('nav.overview', '개요'),
+                    onClick: () => navigate('/distributions'),
+                },
                 {
                     key: 'distribution-sets-group',
                     label: t('nav.distributionSets'),
@@ -238,10 +250,11 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
             key: '/jobs',
             icon: <MdAssignment />,
             label: t('nav.jobs'),
+            onTitleClick: () => navigate('/jobs'),
             children: [
                 {
                     key: '/jobs/dashboard',
-                    label: t('nav.dashboard'),
+                    label: t('nav.jobsOverview', '작업 관리'),
                     onClick: () => navigate('/jobs'),
                 },
                 {

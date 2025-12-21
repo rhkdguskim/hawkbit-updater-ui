@@ -3,12 +3,14 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import TargetList from './TargetList';
 import TargetDetail from './TargetDetail';
 import TagsAndTypes from './TagsAndTypes';
+import TargetsOverview from './TargetsOverview';
 
 
 const Targets: React.FC = () => {
     return (
         <Routes>
-            <Route index element={<TargetList />} />
+            <Route index element={<TargetsOverview />} />
+            <Route path="list" element={<TargetList />} />
             <Route path="tags-types" element={<TagsAndTypes />} />
             <Route path=":id" element={<TargetDetail />} />
             <Route path="*" element={<Navigate to="/targets" replace />} />
@@ -17,3 +19,4 @@ const Targets: React.FC = () => {
 };
 
 export default Targets;
+

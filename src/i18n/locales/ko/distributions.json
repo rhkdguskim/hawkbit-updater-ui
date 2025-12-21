@@ -1,5 +1,21 @@
 {
     "pageTitle": "배포 관리",
+    "overview": {
+        "title": "배포 관리",
+        "subtitle": "소프트웨어 배포 현황 개요 및 빠른 작업",
+        "distributionSets": "배포 세트",
+        "softwareModules": "소프트웨어 모듈",
+        "dsTags": "DS 태그",
+        "dsTypes": "DS 유형",
+        "viewSets": "배포 세트 보기",
+        "viewModules": "모듈 보기",
+        "assetDistribution": "자산 분포",
+        "quickActions": "빠른 작업",
+        "allSets": "전체 세트",
+        "allModules": "전체 모듈",
+        "manageTags": "태그 관리",
+        "bulkAssign": "일괄 할당"
+    },
     "list": {
         "title": "배포 세트",
         "columns": {

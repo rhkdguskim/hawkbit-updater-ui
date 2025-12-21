@@ -1,7 +1,21 @@
 {
     "pageTitle": "롤아웃",
+    "overview": {
+        "title": "롤아웃 관리",
+        "subtitle": "배포 롤아웃 현황 개요 및 모니터링",
+        "totalRollouts": "전체 롤아웃",
+        "running": "실행 중",
+        "finished": "완료",
+        "errorStopped": "오류/중지",
+        "createRollout": "롤아웃 생성",
+        "viewAll": "전체 보기",
+        "statusDistribution": "상태 분포",
+        "activeRollouts": "활성 롤아웃",
+        "noRollouts": "롤아웃이 없습니다",
+        "noActiveRollouts": "활성 롤아웃이 없습니다",
+        "createFirst": "첫 롤아웃 생성"
+    },
     "refresh": "새로고침",
-    "createRollout": "롤아웃 생성",
     "columns": {
         "id": "ID",
         "name": "이름",

@@ -3,11 +3,13 @@ import { Routes, Route } from 'react-router-dom';
 import RolloutList from './RolloutList';
 import RolloutDetail from './RolloutDetail';
 import RolloutWizard from './RolloutWizard';
+import RolloutsOverview from './RolloutsOverview';
 
 const Rollouts: React.FC = () => {
     return (
         <Routes>
-            <Route index element={<RolloutList />} />
+            <Route index element={<RolloutsOverview />} />
+            <Route path="list" element={<RolloutList />} />
             <Route path="create" element={<RolloutWizard />} />
             <Route path=":rolloutId" element={<RolloutDetail />} />
         </Routes>
@@ -15,4 +17,5 @@ const Rollouts: React.FC = () => {
 };
 
 export default Rollouts;
+
 

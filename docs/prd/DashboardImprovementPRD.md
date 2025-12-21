@@ -63,12 +63,32 @@
 
 ## 4. UI/UX 가이드라인
 
-### 4.1 Color Palette (Semantic)
-*   **Success:** `#52c41a` (Green)
-*   **Warning:** `#faad14` (Yellow/Orange)
-*   **Error:** `#ff4d4f` (Red)
-*   **Info/Action:** `#1890ff` (Blue)
-*   **Offline/Inactive:** `#bfbfbf` (Gray)
+### 4.1 Color Palette (Enterprise Design Tokens)
+
+**Status Colors (Semantic):**
+| Status | Light Mode | Dark Mode | CSS Variable |
+|--------|------------|-----------|--------------|
+| **Online/Success** | `#10b981` | `#34d399` | `--status-online` |
+| **Offline/Inactive** | `#94a3b8` | `#64748b` | `--status-offline` |
+| **Running/Progress** | `#3b82f6` | `#60a5fa` | `--status-running` |
+| **Pending/Warning** | `#f59e0b` | `#fbbf24` | `--status-pending` |
+| **Error/Critical** | `#ef4444` | `#f87171` | `--status-error` |
+| **Info/Action** | `#0ea5e9` | `#38bdf8` | `--status-info` |
+
+**Enterprise Gradients:**
+```css
+--gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+--gradient-premium: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+--gradient-aurora: linear-gradient(135deg, #00d4ff 0%, #7b2ff7 50%, #f107a3 100%);
+```
+
+**Shadow Depth System:**
+- `--shadow-xs`: Subtle elevation (buttons)
+- `--shadow-sm`: Default card shadow
+- `--shadow-md`: Hover state elevation
+- `--shadow-lg`: Modal/Dropdown elevation
+- `--shadow-xl`: Expanded card states
+- `--shadow-2xl`: Command palette/Overlay
 
 ### 4.2 Accessibility
 *   색상만으로 상태를 구분하지 않고, **아이콘(Icon)과 텍스트(Label)**를 병행 표기한다.
@@ -105,7 +125,9 @@
 
 ## 6. Acceptance Criteria
 
-- [ ] 브라우저 창 크기를 조절해도 **스크롤바가 생기지 않아야 한다** (반응형 리사이징).
-- [ ] Focus Mode 버튼 클릭 시 전체 화면으로 전환되어야 한다.
-- [ ] 하단 Ticker에 실시간(또는 최근) 로그가 흘러가야 한다.
-- [ ] 모든 차트는 영역을 벗어나지 않고 비율을 유지해야 한다.
+- [x] 브라우저 창 크기를 조절해도 **스크롤바가 생기지 않아야 한다** (반응형 리사이징).
+- [x] Focus Mode 버튼 클릭 시 전체 화면으로 전환되어야 한다.
+- [x] 하단 Ticker에 실시간(또는 최근) 로그가 흘러가야 한다.
+- [x] 모든 차트는 영역을 벗어나지 않고 비율을 유지해야 한다.
+- [x] KPI 카드에 Sparkline 및 Trend 인디케이터가 표시되어야 한다.
+- [x] 차트 컴포넌트에 Enterprise 그라디언트 스타일이 적용되어야 한다.

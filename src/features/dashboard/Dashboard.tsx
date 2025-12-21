@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { Button, Tooltip, Spin } from 'antd';
+import { Button, Tooltip, Spin, Typography, Flex } from 'antd';
 import {
     FullscreenOutlined,
     FullscreenExitOutlined,
@@ -7,14 +7,15 @@ import {
     CheckCircleOutlined,
     WarningOutlined,
     ClockCircleOutlined,
+    RiseOutlined,
+    FallOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 
 import {
-    KPICard,
     FailureChart,
     VersionTreemap,
     ActiveRolloutCard,
@@ -25,6 +26,35 @@ import { useGetTargets } from '@/api/generated/targets/targets';
 import { useGetActions } from '@/api/generated/actions/actions';
 import type { LiveTickerLog } from './components/LiveTicker';
 
+const { Title, Text } = Typography;
+
+// Premium animations
+const fadeInUp = keyframes`
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+`;
+
+const pulse = keyframes`
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+`;
+
+const float = keyframes`
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+`;
+
+const shimmer = keyframes`
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+`;
+
 const DashboardContainer = styled.div<{ $isFocusMode: boolean }>`
     height: ${(props) => (props.$isFocusMode ? '100vh' : 'calc(100vh - 64px)')};
     width: 100%;
@@ -32,29 +62,193 @@ const DashboardContainer = styled.div<{ $isFocusMode: boolean }>`
     top: 0;
     left: 0;
     z-index: ${(props) => (props.$isFocusMode ? 1000 : 1)};
-    background: ${(props) => (props.$isFocusMode ? '#0b1120' : '#f0f2f5')};
+    background: ${(props) => (props.$isFocusMode ? 'linear-gradient(135deg, #0b1120 0%, #1a1a2e 100%)' : 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)')};
     color: ${(props) => (props.$isFocusMode ? '#f8fafc' : 'inherit')};
-    padding: 16px;
+    padding: 20px;
     display: grid;
-    grid-template-rows: 120px 1fr 48px;
-    gap: 16px;
+    grid-template-rows: auto 120px 1fr 52px;
+    gap: 20px;
     overflow: hidden;
-    transition: background 0.3s ease;
+    transition: all 0.4s ease;
+    animation: ${fadeInUp} 0.5s ease-out;
 
     & .ant-card {
-        background: ${(props) => (props.$isFocusMode ? '#182747' : '#fff')};
+        background: ${(props) => (props.$isFocusMode ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.9)')};
+        backdrop-filter: blur(20px);
         color: ${(props) => (props.$isFocusMode ? '#f8fafc' : 'inherit')};
-        border: none;
+        border: ${(props) => (props.$isFocusMode ? '1px solid rgba(255, 255, 255, 0.08)' : 'none')};
         box-shadow: ${(props) =>
-            props.$isFocusMode ? '0 12px 30px rgba(8, 15, 40, 0.5)' : '0 6px 20px rgba(0, 0, 0, 0.08)'};
+        props.$isFocusMode
+            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+            : '0 4px 20px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6)'};
+        border-radius: 16px;
+    }
+`;
+
+const HeaderSection = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+`;
+
+const HeaderContent = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+`;
+
+const GradientTitle = styled(Title) <{ $isFocusMode?: boolean }>`
+    && {
+        margin: 0;
+        background: ${props => props.$isFocusMode
+        ? 'linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%)'
+        : 'linear-gradient(135deg, #1e293b 0%, #475569 100%)'};
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+`;
+
+const LiveIndicator = styled.div<{ $isFocusMode?: boolean }>`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: ${props => props.$isFocusMode
+        ? 'rgba(16, 185, 129, 0.15)'
+        : 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.05))'};
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #10b981;
+
+    &::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #10b981;
+        animation: ${pulse} 2s ease-in-out infinite;
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
     }
 `;
 
 const KPISection = styled.div`
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 16px;
     height: 100%;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+`;
+
+const EnterpriseKPICard = styled.div<{ $accentColor: string; $isFocusMode?: boolean; $delay?: number }>`
+    background: ${props => props.$isFocusMode
+        ? 'rgba(30, 41, 59, 0.8)'
+        : 'rgba(255, 255, 255, 0.95)'};
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: ${props => props.$isFocusMode
+        ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+        : '0 4px 20px rgba(0, 0, 0, 0.06)'};
+    animation: ${fadeInUp} 0.5s ease-out;
+    animation-delay: ${props => (props.$delay || 0) * 0.1}s;
+    animation-fill-mode: both;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: ${props => props.$accentColor};
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            45deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.1) 50%,
+            transparent 70%
+        );
+        transform: rotate(45deg);
+        transition: all 0.6s ease;
+        opacity: 0;
+    }
+
+    &:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: ${props => props.$isFocusMode
+        ? '0 16px 40px rgba(0, 0, 0, 0.4)'
+        : '0 16px 40px rgba(99, 102, 241, 0.15)'};
+
+        &::after {
+            opacity: 1;
+            animation: ${shimmer} 0.6s ease;
+        }
+    }
+`;
+
+const KPIValue = styled.div<{ $color?: string }>`
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1;
+    color: ${props => props.$color || 'inherit'};
+    margin-top: 8px;
+`;
+
+const KPISuffix = styled.span`
+    font-size: 20px;
+    font-weight: 500;
+    margin-left: 4px;
+    opacity: 0.7;
+`;
+
+const KPIIcon = styled.div<{ $bg: string; $glow?: string }>`
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: ${props => props.$bg};
+    font-size: 22px;
+    animation: ${float} 4s ease-in-out infinite;
+    box-shadow: 0 4px 12px ${props => props.$glow || 'rgba(0, 0, 0, 0.1)'};
+`;
+
+const TrendBadge = styled.div<{ $positive?: boolean }>`
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 12px;
+    background: ${props => props.$positive
+        ? 'rgba(16, 185, 129, 0.12)'
+        : 'rgba(239, 68, 68, 0.12)'};
+    color: ${props => props.$positive ? '#10b981' : '#ef4444'};
 `;
 
 const MiddleRow = styled.div`
@@ -64,27 +258,56 @@ const MiddleRow = styled.div`
     min-height: 0;
 
     @media (max-width: 1200px) {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     }
 
     & > * {
         min-height: 0;
+        border-radius: 20px !important;
     }
 `;
 
 const BottomRow = styled.div`
     min-height: 0;
+    
+    & > * {
+        border-radius: 20px !important;
+    }
 `;
 
-const FloatingActionButton = styled(Button)`
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    z-index: 1001;
-    opacity: 0.6;
-    &:hover {
-        opacity: 1;
+const FloatingActionButton = styled(Button) <{ $isFocusMode?: boolean }>`
+    && {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1001;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: ${props => props.$isFocusMode
+        ? 'rgba(99, 102, 241, 0.2)'
+        : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'};
+        border: ${props => props.$isFocusMode
+        ? '1px solid rgba(99, 102, 241, 0.3)'
+        : 'none'};
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        }
     }
+`;
+
+const LoadingContainer = styled.div`
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
 `;
 
 const Dashboard: React.FC = () => {
@@ -208,7 +431,7 @@ const Dashboard: React.FC = () => {
     }, [targetsData]);
 
     const versionTreemapData = useMemo(() => {
-        const palette = ['#5c67f2', '#38bdf8', '#f472b6', '#34d399', '#facc15'];
+        const palette = ['#6366f1', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b'];
         return Object.entries(versionDistribution)
             .map(([name, size], index) => ({
                 name,
@@ -261,9 +484,10 @@ const Dashboard: React.FC = () => {
 
     if (targetsLoading || actionsLoading) {
         return (
-            <div style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Spin size="large" tip="Loading Dashboard Data..." />
-            </div>
+            <LoadingContainer>
+                <Spin size="large" />
+                <Text type="secondary">Loading Dashboard Data...</Text>
+            </LoadingContainer>
         );
     }
 
@@ -272,47 +496,164 @@ const Dashboard: React.FC = () => {
             <Tooltip title={isFocusMode ? t('focus.exit') : t('focus.enter')}>
                 <FloatingActionButton
                     type="primary"
-                    shape="circle"
+                    $isFocusMode={isFocusMode}
                     icon={isFocusMode ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
                     onClick={toggleFocusMode}
                 />
             </Tooltip>
 
+            <HeaderSection>
+                <HeaderContent>
+                    <GradientTitle level={3} $isFocusMode={isFocusMode}>
+                        {t('title', 'Operations Dashboard')}
+                    </GradientTitle>
+                    <Text type="secondary" style={{ color: isFocusMode ? 'rgba(255,255,255,0.6)' : undefined }}>
+                        Real-time fleet monitoring and deployment insights
+                    </Text>
+                </HeaderContent>
+                <LiveIndicator $isFocusMode={isFocusMode}>
+                    Live Data • {totalTargets} devices
+                </LiveIndicator>
+            </HeaderSection>
+
             <KPISection>
-                <KPICard
-                    title={t('charts.availability')}
-                    value={availability.toFixed(1)}
-                    suffix="%"
-                    trend={availabilityTrend}
-                    color="#52c41a"
-                    icon={<CloudServerOutlined />}
-                    description={t('kpi.realtimeSample', { count: sampleSize })}
-                />
-                <KPICard
-                    title={t('charts.successRate')}
-                    value={successRate.toFixed(1)}
-                    suffix="%"
-                    trend={successRateTrend}
-                    color="#1890ff"
-                    icon={<CheckCircleOutlined />}
-                    description={t('kpi.window24h')}
-                />
-                <KPICard
-                    title={t('charts.pendingActions')}
-                    value={pendingActions}
-                    color="#faad14"
-                    icon={<ClockCircleOutlined />}
-                    description={t('kpi.window24h')}
-                />
-                <KPICard
-                    title={t('kpi.criticalErrors')}
-                    value={criticalErrorCount}
-                    color="#ff4d4f"
-                    icon={<WarningOutlined />}
-                    badgeLabel={criticalErrorCount > 0 ? t('kpi.alertBadge') : undefined}
-                    badgeColor="#ff7875"
-                    description={t('kpi.window24h')}
-                />
+                <EnterpriseKPICard
+                    $accentColor="linear-gradient(135deg, #10b981 0%, #34d399 100%)"
+                    $isFocusMode={isFocusMode}
+                    $delay={1}
+                    onClick={() => navigate('/targets')}
+                >
+                    <Flex justify="space-between" align="start">
+                        <div>
+                            <Text type="secondary" style={{
+                                fontSize: 11,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                                fontWeight: 600,
+                                color: isFocusMode ? 'rgba(255,255,255,0.6)' : undefined
+                            }}>
+                                {t('charts.availability')}
+                            </Text>
+                            <KPIValue $color="#10b981">
+                                {availability.toFixed(1)}<KPISuffix>%</KPISuffix>
+                            </KPIValue>
+                            {availabilityTrend !== undefined && (
+                                <TrendBadge $positive={availabilityTrend >= 0}>
+                                    {availabilityTrend >= 0 ? <RiseOutlined /> : <FallOutlined />}
+                                    {Math.abs(availabilityTrend).toFixed(1)}%
+                                </TrendBadge>
+                            )}
+                        </div>
+                        <KPIIcon $bg="rgba(16, 185, 129, 0.12)" $glow="rgba(16, 185, 129, 0.25)">
+                            <CloudServerOutlined style={{ color: '#10b981' }} />
+                        </KPIIcon>
+                    </Flex>
+                </EnterpriseKPICard>
+
+                <EnterpriseKPICard
+                    $accentColor="linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)"
+                    $isFocusMode={isFocusMode}
+                    $delay={2}
+                    onClick={() => navigate('/actions')}
+                >
+                    <Flex justify="space-between" align="start">
+                        <div>
+                            <Text type="secondary" style={{
+                                fontSize: 11,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                                fontWeight: 600,
+                                color: isFocusMode ? 'rgba(255,255,255,0.6)' : undefined
+                            }}>
+                                {t('charts.successRate')}
+                            </Text>
+                            <KPIValue $color="#3b82f6">
+                                {successRate.toFixed(1)}<KPISuffix>%</KPISuffix>
+                            </KPIValue>
+                            {successRateTrend !== undefined && (
+                                <TrendBadge $positive={successRateTrend >= 0}>
+                                    {successRateTrend >= 0 ? <RiseOutlined /> : <FallOutlined />}
+                                    {Math.abs(successRateTrend).toFixed(1)}%
+                                </TrendBadge>
+                            )}
+                        </div>
+                        <KPIIcon $bg="rgba(59, 130, 246, 0.12)" $glow="rgba(59, 130, 246, 0.25)">
+                            <CheckCircleOutlined style={{ color: '#3b82f6' }} />
+                        </KPIIcon>
+                    </Flex>
+                </EnterpriseKPICard>
+
+                <EnterpriseKPICard
+                    $accentColor="linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)"
+                    $isFocusMode={isFocusMode}
+                    $delay={3}
+                    onClick={() => navigate('/jobs')}
+                >
+                    <Flex justify="space-between" align="start">
+                        <div>
+                            <Text type="secondary" style={{
+                                fontSize: 11,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                                fontWeight: 600,
+                                color: isFocusMode ? 'rgba(255,255,255,0.6)' : undefined
+                            }}>
+                                {t('charts.pendingActions')}
+                            </Text>
+                            <KPIValue $color="#f59e0b">
+                                {pendingActions}
+                            </KPIValue>
+                            <Text type="secondary" style={{
+                                fontSize: 12,
+                                marginTop: 12,
+                                display: 'block',
+                                color: isFocusMode ? 'rgba(255,255,255,0.5)' : undefined
+                            }}>
+                                Last 24 hours
+                            </Text>
+                        </div>
+                        <KPIIcon $bg="rgba(245, 158, 11, 0.12)" $glow="rgba(245, 158, 11, 0.25)">
+                            <ClockCircleOutlined style={{ color: '#f59e0b' }} />
+                        </KPIIcon>
+                    </Flex>
+                </EnterpriseKPICard>
+
+                <EnterpriseKPICard
+                    $accentColor="linear-gradient(135deg, #ef4444 0%, #f87171 100%)"
+                    $isFocusMode={isFocusMode}
+                    $delay={4}
+                    onClick={() => navigate('/actions')}
+                >
+                    <Flex justify="space-between" align="start">
+                        <div>
+                            <Text type="secondary" style={{
+                                fontSize: 11,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                                fontWeight: 600,
+                                color: isFocusMode ? 'rgba(255,255,255,0.6)' : undefined
+                            }}>
+                                {t('kpi.criticalErrors')}
+                            </Text>
+                            <KPIValue $color="#ef4444">
+                                {criticalErrorCount}
+                            </KPIValue>
+                            {criticalErrorCount > 0 && (
+                                <TrendBadge $positive={false}>
+                                    <WarningOutlined /> Requires attention
+                                </TrendBadge>
+                            )}
+                            {criticalErrorCount === 0 && (
+                                <TrendBadge $positive>
+                                    <CheckCircleOutlined /> All clear
+                                </TrendBadge>
+                            )}
+                        </div>
+                        <KPIIcon $bg="rgba(239, 68, 68, 0.12)" $glow="rgba(239, 68, 68, 0.25)">
+                            <WarningOutlined style={{ color: '#ef4444' }} />
+                        </KPIIcon>
+                    </Flex>
+                </EnterpriseKPICard>
             </KPISection>
 
             <MiddleRow>
