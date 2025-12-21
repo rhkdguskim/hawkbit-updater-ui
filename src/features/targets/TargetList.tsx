@@ -35,6 +35,8 @@ const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 16px;
+    height: 100%;
+    overflow: hidden;
 `;
 
 const HeaderRow = styled.div`
@@ -262,7 +264,7 @@ const TargetList: React.FC = () => {
                 </Title>
             </HeaderRow>
 
-            <Card>
+            <Card style={{ flex: 1, overflow: 'auto' }}>
                 <TargetSearchBar
                     onSearch={handleSearch}
                     onRefresh={() => refetchTargets()}

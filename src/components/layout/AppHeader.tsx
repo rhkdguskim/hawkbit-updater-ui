@@ -104,12 +104,13 @@ const SettingsGroup = styled.div`
 const UserSection = styled.div`
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 6px 12px 6px 16px;
+    gap: 10px;
+    padding: 4px 8px 4px 12px;
     background: rgba(99, 102, 241, 0.06);
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
+    height: 40px;
     
     &:hover {
         background: rgba(99, 102, 241, 0.1);
@@ -135,7 +136,8 @@ const UserRole = styled(Text)`
 
 const StyledAvatar = styled(Avatar)`
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+    font-size: 14px;
 `;
 
 interface AppHeaderProps {
@@ -321,8 +323,8 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
                             <UserName>{user}</UserName>
                             <UserRole type="secondary">{role}</UserRole>
                         </UserInfo>
-                        <Badge dot status="success" offset={[-4, 28]}>
-                            <StyledAvatar icon={<UserOutlined />} size={36} />
+                        <Badge dot status="success" offset={[-2, 24]}>
+                            <StyledAvatar icon={<UserOutlined />} size={30} />
                         </Badge>
                     </UserSection>
                 </Dropdown>

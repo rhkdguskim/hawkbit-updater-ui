@@ -1,5 +1,27 @@
 {
     "pageTitle": "Distributions Management",
+    "overview": {
+        "title": "Distribution Management",
+        "subtitle": "Distribution sets and software modules overview",
+        "distributionSets": "Distribution Sets",
+        "softwareModules": "Software Modules",
+        "tags": "Tags",
+        "types": "Types",
+        "distributionByType": "Distribution by Type",
+        "recentSets": "Recent Distribution Sets",
+        "total": "total",
+        "typesLabel": "types"
+    },
+    "table": {
+        "name": "Name",
+        "version": "Version",
+        "type": "Type",
+        "complete": "Status"
+    },
+    "status": {
+        "complete": "Complete",
+        "incomplete": "Incomplete"
+    },
     "list": {
         "title": "Distribution Sets",
         "columns": {

@@ -1,10 +1,18 @@
 {
+    "title": "운영 대시보드",
+    "subtitle": "실시간 시스템 모니터링",
+    "refresh": "새로고침",
     "pageTitle": "운영 인텔리전스 보드",
     "kpi": {
         "totalTargets": "총 대상 기기",
         "onlineTargets": "온라인 상태",
         "offlineTargets": "오프라인 상태",
         "successRate": "최근 배포 성공률",
+        "availability": "가용성",
+        "pendingActions": "대기 중인 액션",
+        "errors": "오류",
+        "last24h": "최근 24시간",
+        "devices": "기기",
         "notAvailable": "N/A",
         "criticalErrors": "치명적 오류",
         "window24h": "최근 24시간 기준",
@@ -30,6 +38,19 @@
         "timeout": "시간 타임아웃",
         "installError": "설치 오류",
         "networkError": "네트워크 오류"
+    },
+    "chart": {
+        "deviceStatus": "기기 상태",
+        "total": "총",
+        "online": "온라인",
+        "offline": "오프라인"
+    },
+    "recentActions": {
+        "title": "최근 액션 (24시간)",
+        "target": "타겟",
+        "status": "상태",
+        "time": "시간",
+        "empty": "최근 액션이 없습니다"
     },
     "rollout": {
         "activeMonitor": "실시간 롤아웃 모니터",

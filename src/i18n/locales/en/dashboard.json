@@ -1,10 +1,18 @@
 {
+    "title": "Operations Dashboard",
+    "subtitle": "Real-time system monitoring",
+    "refresh": "Refresh",
     "pageTitle": "Dashboard Overview",
     "kpi": {
         "totalTargets": "Total Targets",
         "onlineTargets": "Online Targets",
         "offlineTargets": "Offline Targets",
         "successRate": "Success Rate (Recent)",
+        "availability": "Availability",
+        "pendingActions": "Pending Actions",
+        "errors": "Errors",
+        "last24h": "Last 24 hours",
+        "devices": "devices",
         "notAvailable": "N/A",
         "criticalErrors": "Critical Errors",
         "window24h": "Last 24h window",
@@ -30,6 +38,19 @@
         "timeout": "Timeout",
         "installError": "Install Error",
         "networkError": "Network Error"
+    },
+    "chart": {
+        "deviceStatus": "Device Status",
+        "total": "total",
+        "online": "Online",
+        "offline": "Offline"
+    },
+    "recentActions": {
+        "title": "Recent Actions (24h)",
+        "target": "Target",
+        "status": "Status",
+        "time": "Time",
+        "empty": "No recent actions"
     },
     "rollout": {
         "activeMonitor": "Active Rollout Monitor",

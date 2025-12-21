@@ -1,5 +1,29 @@
 {
-    "title": "Job 관리",
+    "title": "작업 관리",
+    "subtitle": "액션 및 롤아웃 개요",
+    "kpi": {
+        "running": "실행 중",
+        "pending": "대기 중",
+        "completed": "완료됨",
+        "activeRollouts": "활성 롤아웃",
+        "actions": "액션",
+        "awaitingAction": "액션 대기 중",
+        "last24h": "최근 24시간",
+        "errors": "오류"
+    },
+    "chart": {
+        "actionStatus": "액션 상태",
+        "total": "총",
+        "recentActions": "최근 액션",
+        "activeRollouts": "활성 롤아웃"
+    },
+    "table": {
+        "name": "이름",
+        "target": "타겟",
+        "status": "상태",
+        "time": "시간",
+        "progress": "진행률"
+    },
     "tree": {
         "actions": "액션",
         "rollouts": "롤아웃",
@@ -162,6 +186,7 @@
         "controllerPlaceholder": "타겟 컨트롤러 ID를 입력하세요"
     },
     "messages": {
+        "noActions": "최근 24시간 내 액션이 없습니다",
         "actionSelect": "액션을 선택하세요.",
         "rolloutSelect": "롤아웃을 선택하세요.",
         "forceSuccess": "액션을 강제 전환했습니다",

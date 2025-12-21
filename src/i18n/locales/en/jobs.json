@@ -1,5 +1,29 @@
 {
     "title": "Job Management",
+    "subtitle": "Actions and rollouts overview",
+    "kpi": {
+        "running": "Running",
+        "pending": "Pending",
+        "completed": "Completed",
+        "activeRollouts": "Active Rollouts",
+        "actions": "actions",
+        "awaitingAction": "awaiting action",
+        "last24h": "last 24h",
+        "errors": "errors"
+    },
+    "chart": {
+        "actionStatus": "Action Status",
+        "total": "total",
+        "recentActions": "Recent Actions",
+        "activeRollouts": "Active Rollouts"
+    },
+    "table": {
+        "name": "Name",
+        "target": "Target",
+        "status": "Status",
+        "time": "Time",
+        "progress": "Progress"
+    },
     "tree": {
         "actions": "Actions",
         "rollouts": "Rollouts",
@@ -162,6 +186,7 @@
         "controllerPlaceholder": "Enter target controller ID"
     },
     "messages": {
+        "noActions": "No actions in last 24h",
         "actionSelect": "Please select an action.",
         "rolloutSelect": "Please select a rollout.",
         "forceSuccess": "Action forced successfully",
