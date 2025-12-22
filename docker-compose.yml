@@ -3,7 +3,7 @@ services:
   hawkbit:
     image: hawkbit/hawkbit-update-server:latest
     container_name: hawkbit-server
-    platform: linux/amd64
+    #platform: linux/amd64
     ports:
       - "8081:8080" # Management API & UI & DDI
     environment:
@@ -24,6 +24,10 @@ services:
 
       # Demo mode
       - HAWKBIT_SERVER_DEMO_DATA_ENABLED=true
+
+      # Disable RabbitMQ (Not present in compose)
+      - SPRING_RABBITMQ_ENABLED=false
+      - HAWKBIT_DMF_RABBITMQ_ENABLED=false
     volumes:
       - hawkbit-data:/opt/hawkbit/data
     depends_on:

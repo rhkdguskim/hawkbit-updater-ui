@@ -156,6 +156,22 @@ const getActionStatusColor = (status?: string) => {
     return 'default';
 };
 
+const isActionErrored = (action: MgmtAction) => {
+    const status = action.status?.toLowerCase() || '';
+    const detail = action.detailStatus?.toLowerCase() || '';
+    const hasErrorStatus = status === 'error' || status === 'failed';
+    const hasErrorDetail = detail.includes('error') || detail.includes('failed');
+    const hasErrorCode = typeof action.lastStatusCode === 'number' && action.lastStatusCode >= 400;
+    return hasErrorStatus || hasErrorDetail || hasErrorCode;
+};
+
+const getActionDisplayStatus = (action: MgmtAction) => {
+    if (isActionErrored(action)) {
+        return 'error';
+    }
+    return action.status?.toLowerCase();
+};
+
 import { Spin } from 'antd';
 import { useGetAction1 } from '@/api/generated/actions/actions';
 
@@ -216,12 +232,11 @@ const Dashboard: React.FC = () => {
         a.createdAt && dayjs(a.createdAt).isAfter(dayjs().subtract(24, 'hour'))
     );
     const pendingCount = recentActions.filter(a =>
-        ['scheduled', 'pending', 'retrieving', 'running', 'waiting_for_confirmation'].includes(a.status?.toLowerCase() || '')
+        ['scheduled', 'pending', 'retrieving', 'running', 'waiting_for_confirmation'].includes(a.status?.toLowerCase() || '') &&
+        !isActionErrored(a)
     ).length;
-    const finishedCount = recentActions.filter(a => a.status?.toLowerCase() === 'finished').length;
-    const errorCount = recentActions.filter(a =>
-        ['error', 'failed'].includes(a.status?.toLowerCase() || '')
-    ).length;
+    const finishedCount = recentActions.filter(a => a.status?.toLowerCase() === 'finished' && !isActionErrored(a)).length;
+    const errorCount = recentActions.filter(isActionErrored).length;
     const successRate = finishedCount + errorCount > 0
         ? Math.round((finishedCount / (finishedCount + errorCount)) * 100)
         : null; // null when no data
@@ -281,11 +296,14 @@ const Dashboard: React.FC = () => {
             title: t('recentActions.status', 'Status'),
             key: 'status',
             width: 120,
-            render: (_: unknown, record: MgmtAction) => (
-                <Tag color={getActionStatusColor(record.status)}>
-                    {getStatusLabel(record.status)}
-                </Tag>
-            ),
+            render: (_: unknown, record: MgmtAction) => {
+                const displayStatus = getActionDisplayStatus(record);
+                return (
+                    <Tag color={getActionStatusColor(displayStatus)}>
+                        {getStatusLabel(displayStatus)}
+                    </Tag>
+                );
+            },
         },
         {
             title: t('recentActions.time', 'Time'),

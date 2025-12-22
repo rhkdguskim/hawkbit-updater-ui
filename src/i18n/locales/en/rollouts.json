@@ -1,5 +1,7 @@
 {
     "pageTitle": "Rollouts",
+    "subtitle": "Monitor rollout status and progress at a glance",
+    "empty": "No rollouts found",
     "overview": {
         "title": "Rollout Management",
         "subtitle": "Deployment rollout overview and monitoring",
@@ -24,6 +26,7 @@
         "status": "Status",
         "totalTargets": "Total Targets",
         "progress": "Progress",
+        "progressLabel": "{{percent}}% complete",
         "actions": "Actions"
     },
     "filter": {
@@ -40,7 +43,8 @@
         "clearFilters": "Clear Filters"
     },
     "pagination": {
-        "total": "Total {{count}} rollouts"
+        "total": "Total {{count}} rollouts",
+        "range": "{{start}}-{{end}} of {{total}} rollouts"
     },
     "actions": {
         "view": "View"
@@ -59,11 +63,14 @@
             "name": "Name",
             "status": "Status",
             "totalTargets": "Total Targets",
+            "finishedTargets": "Finished Targets",
+            "errorTargets": "Error Targets",
             "overallProgress": "Overall Progress",
             "createdAt": "Created At",
             "lastModified": "Last Modified",
             "description": "Description"
         },
+        "emptyGroups": "No deploy groups available",
         "controls": {
             "start": "Start",
             "startConfirm": "Start this rollout?",

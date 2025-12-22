@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Input, Space, Button, Select, Tooltip } from 'antd';
 import {
     SearchOutlined,
     ReloadOutlined,
     PlusOutlined,
     FilterOutlined,
+    BookOutlined,
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
@@ -36,9 +37,11 @@ interface TargetSearchBarProps {
     onAddTarget: () => void;
     canAddTarget: boolean;
     loading?: boolean;
+    onOpenSavedFilters?: () => void;
+    resetSignal?: number;
 }
 
-type SearchField = 'name' | 'description';
+type SearchField = 'name' | 'description' | 'controllerId';
 
 const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
     onSearch,
@@ -46,20 +49,34 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
     onAddTarget,
     canAddTarget,
     loading,
+    onOpenSavedFilters,
+    resetSignal,
 }) => {
     const { t } = useTranslation('targets');
     const [searchField, setSearchField] = useState<SearchField>('name');
     const [searchValue, setSearchValue] = useState('');
+    const manualSearchRef = useRef(false);
+    const debounceRef = useRef<number | undefined>(undefined);
 
     const searchFieldOptions = [
         { value: 'name', label: t('search.fields.name') },
         { value: 'description', label: t('search.fields.description') },
+        { value: 'controllerId', label: t('search.fields.controllerId') },
     ];
+
+    useEffect(() => {
+        if (resetSignal === undefined) {
+            return;
+        }
+        setSearchValue('');
+        setSearchField('name');
+    }, [resetSignal]);
 
     const handleSearch = (value: string) => {
         setSearchValue(value);
         // Use centralized FIQL utility
         const query = buildWildcardSearch(searchField, value);
+        manualSearchRef.current = true;
         onSearch(query);
     };
 
@@ -67,6 +84,28 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
         setSearchValue('');
         onSearch('');
     };
+
+    useEffect(() => {
+        if (manualSearchRef.current) {
+            manualSearchRef.current = false;
+            return;
+        }
+
+        if (debounceRef.current) {
+            window.clearTimeout(debounceRef.current);
+        }
+
+        debounceRef.current = window.setTimeout(() => {
+            const query = buildWildcardSearch(searchField, searchValue);
+            onSearch(query);
+        }, 400);
+
+        return () => {
+            if (debounceRef.current) {
+                window.clearTimeout(debounceRef.current);
+            }
+        };
+    }, [searchField, searchValue, onSearch]);
 
     return (
         <SearchContainer>
@@ -92,6 +131,11 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
             </SearchGroup>
 
             <ActionGroup>
+                {onOpenSavedFilters && (
+                    <Tooltip title={t('list.savedFilters')}>
+                        <Button icon={<BookOutlined />} onClick={onOpenSavedFilters} />
+                    </Tooltip>
+                )}
                 <Tooltip title={t('actions.refresh')}>
                     <Button
                         icon={<ReloadOutlined />}

@@ -16,6 +16,7 @@ import { DistributionSetTagsCell } from './components/DistributionSetTagsCell';
 
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { keepPreviousData } from '@tanstack/react-query';
 
 import BulkManageSetTagsModal from './components/BulkManageSetTagsModal';
 
@@ -25,6 +26,7 @@ const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 16px;
+    height: 100%;
 `;
 
 const HeaderRow = styled.div`
@@ -58,13 +60,23 @@ const DistributionSetList: React.FC = () => {
     const {
         data,
         isLoading,
+        isFetching,
         refetch,
-    } = useGetDistributionSets({
-        offset,
-        limit: pagination.pageSize,
-        sort: sort || undefined,
-        q: searchQuery || undefined,
-    });
+    } = useGetDistributionSets(
+        {
+            offset,
+            limit: pagination.pageSize,
+            sort: sort || undefined,
+            q: searchQuery || undefined,
+        },
+        {
+            query: {
+                placeholderData: keepPreviousData,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+            },
+        }
+    );
 
     // Delete Mutation
     const deleteMutation = useDeleteDistributionSet({
@@ -205,14 +217,17 @@ const DistributionSetList: React.FC = () => {
                 </Title>
             </HeaderRow>
 
-            <Card>
+            <Card
+                style={{ flex: 1, height: '100%', overflow: 'hidden' }}
+                styles={{ body: { height: '100%', display: 'flex', flexDirection: 'column' } }}
+            >
                 <DistributionSearchBar
                     type="set"
                     onSearch={handleSearch}
                     onRefresh={refetch}
                     onAdd={() => setIsCreateModalVisible(true)}
                     canAdd={isAdmin}
-                    loading={isLoading}
+                    loading={isLoading || isFetching}
                 />
 
                 {selectedSetIds.length > 0 && (
@@ -226,22 +241,26 @@ const DistributionSetList: React.FC = () => {
                     </Space>
                 )}
 
-                <Table
-                    columns={columns}
-                    dataSource={data?.content || []}
-                    rowKey="id"
-                    pagination={{
-                        ...pagination,
-                        total: data?.total || 0,
-                        showSizeChanger: true,
-                    }}
-                    loading={isLoading}
-                    onChange={handleTableChange}
-                    rowSelection={{
-                        selectedRowKeys: selectedSetIds,
-                        onChange: (keys) => setSelectedSetIds(keys as number[]),
-                    }}
-                />
+                <div style={{ flex: 1, minHeight: 0 }}>
+                    <Table
+                        columns={columns}
+                        dataSource={data?.content || []}
+                        rowKey="id"
+                        pagination={{
+                            ...pagination,
+                            total: data?.total || 0,
+                            showSizeChanger: true,
+                            position: ['topRight'],
+                        }}
+                        loading={isLoading || isFetching}
+                        onChange={handleTableChange}
+                        rowSelection={{
+                            selectedRowKeys: selectedSetIds,
+                            onChange: (keys) => setSelectedSetIds(keys as number[]),
+                        }}
+                        scroll={{ x: 1000, y: '100%' }}
+                    />
+                </div>
                 <CreateDistributionSetWizard
                     visible={isCreateModalVisible}
                     onCancel={() => setIsCreateModalVisible(false)}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Tag, Typography, Skeleton, Empty, Button, Space, Tooltip } from 'antd';
+import { Table, Tag, Typography, Skeleton, Empty, Button, Space, Tooltip, Modal, Timeline } from 'antd';
 import type { TableProps } from 'antd';
 import {
     CheckCircleOutlined,
@@ -12,13 +12,15 @@ import {
 } from '@ant-design/icons';
 import type { MgmtAction, PagedListMgmtAction } from '@/api/generated/model';
 import dayjs from 'dayjs';
+import { useState, useMemo } from 'react';
+import { useGetActionStatusList } from '@/api/generated/targets/targets';
 
 const { Text } = Typography;
 
 interface ActionsTabProps {
     data: PagedListMgmtAction | null | undefined;
     loading: boolean;
-    onViewAction: (action: MgmtAction) => void;
+    targetId: string;
     onCancelAction?: (action: MgmtAction) => void;
     onForceAction?: (action: MgmtAction) => void;
     canForce?: boolean;
@@ -49,13 +51,26 @@ import { useTranslation } from 'react-i18next';
 const ActionsTab: React.FC<ActionsTabProps> = ({
     data,
     loading,
-    onViewAction,
+    targetId,
     onCancelAction,
     onForceAction,
     canForce,
     canCancel,
 }) => {
     const { t } = useTranslation(['targets', 'actions', 'common']);
+    const [selectedAction, setSelectedAction] = useState<MgmtAction | null>(null);
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const { data: statusData, isLoading: statusLoading } = useGetActionStatusList(
+        targetId,
+        selectedAction?.id || 0,
+        undefined,
+        {
+            query: {
+                enabled: modalOpen && !!selectedAction?.id,
+            },
+        }
+    );
     if (loading) {
         return <Skeleton active paragraph={{ rows: 8 }} />;
     }
@@ -82,6 +97,23 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
                 {label}
             </Tag>
         );
+    };
+
+    const getStatusTone = (status?: string, code?: number) => {
+        const normalized = status?.toLowerCase() || '';
+        if (normalized.includes('error') || normalized.includes('failed') || (code && code >= 400)) {
+            return 'error';
+        }
+        if (normalized.includes('finished') || normalized.includes('success')) {
+            return 'success';
+        }
+        if (normalized.includes('running') || normalized.includes('processing') || normalized.includes('retrieving')) {
+            return 'processing';
+        }
+        if (normalized.includes('pending') || normalized.includes('waiting')) {
+            return 'warning';
+        }
+        return 'default';
     };
 
     const getForceTypeTag = (forceType?: string) => {
@@ -154,7 +186,10 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
                             <Button
                                 type="text"
                                 icon={<EyeOutlined />}
-                                onClick={() => onViewAction(record)}
+                                onClick={() => {
+                                    setSelectedAction(record);
+                                    setModalOpen(true);
+                                }}
                             />
                         </Tooltip>
                         {canForce && canBeForced && onForceAction && (
@@ -183,13 +218,69 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
     ];
 
     return (
-        <Table<MgmtAction>
-            columns={columns}
-            dataSource={data.content}
-            rowKey="id"
-            pagination={false}
-            size="middle"
-        />
+        <>
+            <Table<MgmtAction>
+                columns={columns}
+                dataSource={data.content}
+                rowKey="id"
+                pagination={false}
+                size="middle"
+            />
+            <Modal
+                title={t('actions:statusHistoryTitle')}
+                open={modalOpen}
+                onCancel={() => setModalOpen(false)}
+                footer={null}
+                destroyOnClose
+                width={640}
+            >
+                {selectedAction && (
+                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                        <Space>
+                            <Text strong>
+                                {t('actions:statusHistoryHeader', { id: selectedAction.id })}
+                            </Text>
+                            {getStatusTag(selectedAction.status)}
+                        </Space>
+                        {statusLoading ? (
+                            <Skeleton active paragraph={{ rows: 4 }} />
+                        ) : statusData?.content?.length ? (
+                            <Timeline
+                                items={[...statusData.content]
+                                    .sort((a, b) => (b.reportedAt || b.timestamp || 0) - (a.reportedAt || a.timestamp || 0))
+                                    .map((status) => ({
+                                        color: getStatusTone(status.type, status.code),
+                                        children: (
+                                            <Space direction="vertical" size={4}>
+                                                <Text strong>
+                                                    {status.type || t('common:status.unknown')}
+                                                </Text>
+                                                <Text type="secondary" style={{ fontSize: 12 }}>
+                                                    {status.reportedAt || status.timestamp
+                                                        ? dayjs(status.reportedAt || status.timestamp).format('YYYY-MM-DD HH:mm')
+                                                        : '-'}
+                                                </Text>
+                                                {status.code !== undefined && (
+                                                    <Tag>{t('actions:statusCode', { code: status.code })}</Tag>
+                                                )}
+                                                {status.messages?.length ? (
+                                                    <Space direction="vertical" size={2}>
+                                                        {status.messages.map((message, index) => (
+                                                            <Text key={`${status.id}-${index}`}>{message}</Text>
+                                                        ))}
+                                                    </Space>
+                                                ) : null}
+                                            </Space>
+                                        ),
+                                    }))}
+                            />
+                        ) : (
+                            <Empty description={t('actions:statusHistoryEmpty')} />
+                        )}
+                    </Space>
+                )}
+            </Modal>
+        </>
     );
 };
 

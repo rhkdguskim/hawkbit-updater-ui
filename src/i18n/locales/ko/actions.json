@@ -1,5 +1,6 @@
 {
     "pageTitle": "액션",
+    "subtitle": "디바이스 액션과 상태 변경을 한눈에 확인하세요",
     "refresh": "새로고침",
     "columns": {
         "id": "ID",
@@ -32,8 +33,13 @@
         "clearFilters": "필터 초기화"
     },
     "pagination": {
-        "total": "총 {{count}}개 액션"
+        "total": "총 {{count}}개 액션",
+        "range": "{{start}}-{{end}} / {{total}}개"
     },
+    "statusHistoryTitle": "액션 상태 이력",
+    "statusHistoryHeader": "액션 #{{id}}",
+    "statusHistoryEmpty": "상태 이력이 없습니다",
+    "statusCode": "상태 코드: {{code}}",
     "actions": {
         "view": "보기"
     },

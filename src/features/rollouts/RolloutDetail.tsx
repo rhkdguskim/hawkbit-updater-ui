@@ -13,6 +13,9 @@ import {
     Alert,
     Popconfirm,
     message,
+    Row,
+    Col,
+    Statistic,
 } from 'antd';
 import {
     ArrowLeftOutlined,
@@ -41,8 +44,46 @@ import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const { Title, Text } = Typography;
+
+const PageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+`;
+
+const HeaderRow = styled.div`
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+`;
+
+const TitleGroup = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+`;
+
+const StatusPill = styled(Tag)`
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+`;
+
+const ActionCard = styled(Card)`
+    border-radius: 14px;
+`;
+
+const SectionCard = styled(Card)`
+    border-radius: 14px;
+`;
 
 const getStatusColor = (status?: string) => {
     switch (status) {
@@ -257,6 +298,7 @@ const RolloutDetail: React.FC = () => {
     const totalTargets = rolloutData.totalTargets || 0;
     const statusPerTarget = rolloutData.totalTargetsPerStatus as Record<string, number> || {};
     const finishedTargets = statusPerTarget.finished || 0;
+    const errorTargets = statusPerTarget.error || 0;
     let overallProgress = totalTargets > 0 ? Math.round((finishedTargets / totalTargets) * 100) : 0;
 
     // If status is finished or error (stopped), show 100% or actual calculation?
@@ -324,10 +366,9 @@ const RolloutDetail: React.FC = () => {
     ];
 
     return (
-        <div style={{ padding: 24 }}>
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                {/* Header */}
-                <Space>
+        <PageContainer>
+            <HeaderRow>
+                <TitleGroup>
                     <Button
                         icon={<ArrowLeftOutlined />}
                         onClick={() => navigate('/rollouts')}
@@ -337,151 +378,158 @@ const RolloutDetail: React.FC = () => {
                     <Title level={2} style={{ margin: 0 }}>
                         {rolloutData.name}
                     </Title>
-                    <Tag color={getStatusColor(rolloutData.status)} style={{ fontSize: 14 }}>
+                    <StatusPill color={getStatusColor(rolloutData.status)}>
                         {getStatusLabel(rolloutData.status)}
-                    </Tag>
+                    </StatusPill>
+                </TitleGroup>
+                <Space wrap>
+                    {canStart && (
+                        <Popconfirm
+                            title={t('detail.controls.startConfirm')}
+                            onConfirm={handleStart}
+                        >
+                            <Button
+                                type="primary"
+                                icon={<PlayCircleOutlined />}
+                                loading={startMutation.isPending}
+                            >
+                                {t('detail.controls.start')}
+                            </Button>
+                        </Popconfirm>
+                    )}
+                    {canPause && (
+                        <Popconfirm
+                            title={t('detail.controls.pauseConfirm')}
+                            onConfirm={handlePause}
+                        >
+                            <Button
+                                icon={<PauseCircleOutlined />}
+                                loading={pauseMutation.isPending}
+                            >
+                                {t('detail.controls.pause')}
+                            </Button>
+                        </Popconfirm>
+                    )}
+                    {canResume && (
+                        <Button
+                            icon={<CaretRightOutlined />}
+                            onClick={handleResume}
+                            loading={resumeMutation.isPending}
+                        >
+                            {t('detail.controls.resume')}
+                        </Button>
+                    )}
+                    {canApprove && (
+                        <>
+                            <Button
+                                type="primary"
+                                icon={<CheckCircleOutlined />}
+                                onClick={handleApprove}
+                                loading={approveMutation.isPending}
+                            >
+                                {t('detail.controls.approve')}
+                            </Button>
+                            <Button
+                                danger
+                                icon={<CloseCircleOutlined />}
+                                onClick={handleDeny}
+                                loading={denyMutation.isPending}
+                            >
+                                {t('detail.controls.deny')}
+                            </Button>
+                        </>
+                    )}
+                    {canRetry && (
+                        <Popconfirm
+                            title={t('detail.controls.retryConfirm')}
+                            onConfirm={handleRetry}
+                        >
+                            <Button
+                                icon={<ReloadOutlined />}
+                                loading={retryMutation.isPending}
+                            >
+                                {t('detail.controls.retry')}
+                            </Button>
+                        </Popconfirm>
+                    )}
+                    {canDelete && (
+                        <Popconfirm
+                            title={t('detail.controls.deleteConfirm')}
+                            description={t('detail.controls.deleteDesc')}
+                            onConfirm={handleDelete}
+                        >
+                            <Button
+                                danger
+                                icon={<DeleteOutlined />}
+                                loading={deleteMutation.isPending}
+                            >
+                                {t('detail.controls.delete')}
+                            </Button>
+                        </Popconfirm>
+                    )}
                 </Space>
+            </HeaderRow>
 
-                {/* Rollout Controls (Admin Only) */}
-                {isAdmin && (
-                    <Card title={t('detail.controlsTitle')} size="small">
-                        <Space>
-                            {canStart && (
-                                <Popconfirm
-                                    title={t('detail.controls.startConfirm')}
-                                    onConfirm={handleStart}
-                                >
-                                    <Button
-                                        type="primary"
-                                        icon={<PlayCircleOutlined />}
-                                        loading={startMutation.isPending}
-                                    >
-                                        {t('detail.controls.start')}
-                                    </Button>
-                                </Popconfirm>
-                            )}
-                            {canPause && (
-                                <Popconfirm
-                                    title={t('detail.controls.pauseConfirm')}
-                                    onConfirm={handlePause}
-                                >
-                                    <Button
-                                        icon={<PauseCircleOutlined />}
-                                        loading={pauseMutation.isPending}
-                                    >
-                                        {t('detail.controls.pause')}
-                                    </Button>
-                                </Popconfirm>
-                            )}
-                            {canResume && (
-                                <Button
-                                    icon={<CaretRightOutlined />}
-                                    onClick={handleResume}
-                                    loading={resumeMutation.isPending}
-                                >
-                                    {t('detail.controls.resume')}
-                                </Button>
-                            )}
-                            {canApprove && (
-                                <>
-                                    <Button
-                                        type="primary"
-                                        icon={<CheckCircleOutlined />}
-                                        onClick={handleApprove}
-                                        loading={approveMutation.isPending}
-                                    >
-                                        {t('detail.controls.approve')}
-                                    </Button>
-                                    <Button
-                                        danger
-                                        icon={<CloseCircleOutlined />}
-                                        onClick={handleDeny}
-                                        loading={denyMutation.isPending}
-                                    >
-                                        {t('detail.controls.deny')}
-                                    </Button>
-                                </>
-                            )}
-                            {canRetry && (
-                                <Popconfirm
-                                    title={t('detail.controls.retryConfirm')}
-                                    onConfirm={handleRetry}
-                                >
-                                    <Button
-                                        icon={<ReloadOutlined />}
-                                        loading={retryMutation.isPending}
-                                    >
-                                        {t('detail.controls.retry')}
-                                    </Button>
-                                </Popconfirm>
-                            )}
-                            {canDelete && (
-                                <Popconfirm
-                                    title={t('detail.controls.deleteConfirm')}
-                                    description={t('detail.controls.deleteDesc')}
-                                    onConfirm={handleDelete}
-                                >
-                                    <Button
-                                        danger
-                                        icon={<DeleteOutlined />}
-                                        loading={deleteMutation.isPending}
-                                    >
-                                        {t('detail.controls.delete')}
-                                    </Button>
-                                </Popconfirm>
-                            )}
-                            {!canStart && !canPause && !canResume && !canApprove && !canRetry && !canDelete && (
-                                <Text type="secondary">{t('detail.noActions')}</Text>
-                            )}
-                        </Space>
-                    </Card>
-                )}
+            {isAdmin && !canStart && !canPause && !canResume && !canApprove && !canRetry && !canDelete && (
+                <ActionCard>
+                    <Text type="secondary">{t('detail.noActions')}</Text>
+                </ActionCard>
+            )}
 
-                {/* Overview */}
-                <Card title={t('detail.overviewTitle')}>
-                    <Descriptions bordered column={2}>
-                        <Descriptions.Item label={t('detail.labels.id')}>{rolloutData.id}</Descriptions.Item>
-                        <Descriptions.Item label={t('detail.labels.name')}>{rolloutData.name}</Descriptions.Item>
-                        <Descriptions.Item label={t('detail.labels.status')}>
-                            <Tag color={getStatusColor(rolloutData.status)}>
-                                {getStatusLabel(rolloutData.status)}
-                            </Tag>
-                        </Descriptions.Item>
-                        <Descriptions.Item label={t('detail.labels.totalTargets')}>
-                            {rolloutData.totalTargets}
-                        </Descriptions.Item>
-                        <Descriptions.Item label={t('detail.labels.overallProgress')} span={2}>
-                            <Progress percent={overallProgress} />
-                        </Descriptions.Item>
-                        <Descriptions.Item label={t('detail.labels.createdAt')}>
-                            {rolloutData.createdAt
-                                ? format(rolloutData.createdAt, 'yyyy-MM-dd HH:mm:ss')
-                                : '-'}
-                        </Descriptions.Item>
-                        <Descriptions.Item label={t('detail.labels.lastModified')}>
-                            {rolloutData.lastModifiedAt
-                                ? format(rolloutData.lastModifiedAt, 'yyyy-MM-dd HH:mm:ss')
-                                : '-'}
-                        </Descriptions.Item>
-                        {rolloutData.description && (
-                            <Descriptions.Item label={t('detail.labels.description')} span={2}>
-                                {rolloutData.description}
-                            </Descriptions.Item>
-                        )}
-                    </Descriptions>
-                </Card>
+            <SectionCard title={t('detail.overviewTitle')}>
+                <Row gutter={[16, 16]}>
+                    <Col xs={24} md={8}>
+                        <Statistic title={t('detail.labels.totalTargets')} value={totalTargets} />
+                    </Col>
+                    <Col xs={24} md={8}>
+                        <Statistic title={t('detail.labels.finishedTargets')} value={finishedTargets} />
+                    </Col>
+                    <Col xs={24} md={8}>
+                        <Statistic title={t('detail.labels.errorTargets')} value={errorTargets} />
+                    </Col>
+                </Row>
 
-                {/* Deploy Groups */}
-                <Card title={t('detail.deployGroupsTitle')} loading={groupsLoading}>
-                    <Table
-                        dataSource={groupsData?.content || []}
-                        columns={groupColumns}
-                        rowKey="id"
-                        pagination={false}
-                    />
-                </Card>
-            </Space>
-        </div>
+                <div style={{ marginTop: 16 }}>
+                    <Text type="secondary">{t('detail.labels.overallProgress')}</Text>
+                    <Progress percent={overallProgress} style={{ marginTop: 8 }} />
+                </div>
+
+                <Descriptions bordered column={2} style={{ marginTop: 16 }}>
+                    <Descriptions.Item label={t('detail.labels.id')}>{rolloutData.id}</Descriptions.Item>
+                    <Descriptions.Item label={t('detail.labels.name')}>{rolloutData.name}</Descriptions.Item>
+                    <Descriptions.Item label={t('detail.labels.status')}>
+                        <Tag color={getStatusColor(rolloutData.status)}>
+                            {getStatusLabel(rolloutData.status)}
+                        </Tag>
+                    </Descriptions.Item>
+                    <Descriptions.Item label={t('detail.labels.createdAt')}>
+                        {rolloutData.createdAt
+                            ? format(rolloutData.createdAt, 'yyyy-MM-dd HH:mm:ss')
+                            : '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label={t('detail.labels.lastModified')}>
+                        {rolloutData.lastModifiedAt
+                            ? format(rolloutData.lastModifiedAt, 'yyyy-MM-dd HH:mm:ss')
+                            : '-'}
+                    </Descriptions.Item>
+                    {rolloutData.description && (
+                        <Descriptions.Item label={t('detail.labels.description')} span={2}>
+                            {rolloutData.description}
+                        </Descriptions.Item>
+                    )}
+                </Descriptions>
+            </SectionCard>
+
+            <SectionCard title={t('detail.deployGroupsTitle')} loading={groupsLoading}>
+                <Table
+                    dataSource={groupsData?.content || []}
+                    columns={groupColumns}
+                    rowKey="id"
+                    pagination={false}
+                    locale={{ emptyText: t('detail.emptyGroups') }}
+                />
+            </SectionCard>
+        </PageContainer>
     );
 };
 

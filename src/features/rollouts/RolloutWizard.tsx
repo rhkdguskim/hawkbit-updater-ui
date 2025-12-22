@@ -18,6 +18,8 @@ import {
     Checkbox,
     Select,
     Radio,
+    Row,
+    Col,
 } from 'antd';
 import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -29,9 +31,42 @@ import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import type { MgmtDistributionSet } from '@/api/generated/model';
 import { useQueryClient } from '@tanstack/react-query';
 import type { RadioChangeEvent } from 'antd/es/radio';
+import styled from 'styled-components';
 
 const { Title } = Typography;
 const { TextArea } = Input;
+
+const PageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+`;
+
+const HeaderRow = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+`;
+
+const TitleGroup = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+`;
+
+const StepsCard = styled(Card)`
+    border-radius: 14px;
+`;
+
+const ActionsBar = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+`;
 
 interface WizardFormData {
     name: string;
@@ -604,42 +639,50 @@ const RolloutWizard: React.FC = () => {
     };
 
     return (
-        <div style={{ padding: 24 }}>
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                <Space>
+        <PageContainer>
+            <HeaderRow>
+                <TitleGroup>
                     <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/rollouts')}>
                         {t('detail.back')}
                     </Button>
                     <Title level={2} style={{ margin: 0 }}>
                         {t('wizard.title')}
                     </Title>
-                </Space>
+                </TitleGroup>
+            </HeaderRow>
 
-                <Steps current={currentStep} items={steps} />
-
-                {renderStepContent()}
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-                    {currentStep > 0 && (
-                        <Button onClick={handlePrev}>{t('wizard.buttons.previous')}</Button>
-                    )}
-                    {currentStep < steps.length - 1 && (
-                        <Button type="primary" onClick={handleNext}>
-                            {t('wizard.buttons.next')}
-                        </Button>
-                    )}
-                    {currentStep === steps.length - 1 && (
-                        <Button
-                            type="primary"
-                            onClick={handleCreate}
-                            loading={createMutation.isPending || startMutation.isPending}
-                        >
-                            {t('wizard.buttons.create')}
-                        </Button>
-                    )}
-                </div>
-            </Space>
-        </div>
+            <Row gutter={[16, 16]}>
+                <Col xs={24} md={7} lg={6}>
+                    <StepsCard>
+                        <Steps current={currentStep} items={steps} direction="vertical" size="small" />
+                    </StepsCard>
+                </Col>
+                <Col xs={24} md={17} lg={18}>
+                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                        {renderStepContent()}
+                        <ActionsBar>
+                            {currentStep > 0 && (
+                                <Button onClick={handlePrev}>{t('wizard.buttons.previous')}</Button>
+                            )}
+                            {currentStep < steps.length - 1 && (
+                                <Button type="primary" onClick={handleNext}>
+                                    {t('wizard.buttons.next')}
+                                </Button>
+                            )}
+                            {currentStep === steps.length - 1 && (
+                                <Button
+                                    type="primary"
+                                    onClick={handleCreate}
+                                    loading={createMutation.isPending || startMutation.isPending}
+                                >
+                                    {t('wizard.buttons.create')}
+                                </Button>
+                            )}
+                        </ActionsBar>
+                    </Space>
+                </Col>
+            </Row>
+        </PageContainer>
     );
 };
 

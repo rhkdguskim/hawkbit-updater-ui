@@ -3,6 +3,12 @@
     "list": {
         "title": "Target List",
         "addTarget": "Add Target",
+        "addType": "Add Type",
+        "addTag": "Add Tag",
+        "editType": "Edit Type",
+        "selectType": "Select type",
+        "editTags": "Edit Tags",
+        "selectTags": "Select tags",
         "searchPlaceholder": "Enter search term",
         "filterByTag": "Filter by Tag",
         "savedFilters": "Saved Filters"
@@ -41,7 +47,9 @@
         "tags": "Tags",
         "forceType": "Force Type",
         "started": "Started",
-        "devices": "devices"
+        "devices": "devices",
+        "empty": "No targets found",
+        "pagination": "{{start}}-{{end}} of {{total}} targets"
     },
     "form": {
         "controllerId": "Controller ID",
@@ -66,6 +74,9 @@
         "metadataCreateSuccess": "Metadata created successfully.",
         "metadataUpdateSuccess": "Metadata updated successfully.",
         "metadataDeleteSuccess": "Metadata deleted successfully.",
+        "typeUpdated": "Target type updated successfully.",
+        "typeRemoved": "Target type removed successfully.",
+        "tagsUpdated": "Target tags updated successfully.",
         "targetTypeAssigned": "Target type assigned successfully.",
         "targetTypeRemoved": "Target type removed successfully.",
         "notFound": "Target not found.",
@@ -81,9 +92,24 @@
         "softDesc": "Device will be updated when convenient.",
         "forced": "Forced",
         "forcedDesc": "Device will be updated immediately.",
+        "timeforced": "Time Forced",
+        "timeforcedDesc": "Device will be forced at a scheduled time.",
         "downloadOnly": "Download Only",
         "downloadOnlyDesc": "Only download, do not install.",
-        "forcedWarning": "Forced assignment requires Admin privileges."
+        "forcedWarning": "Forced assignment requires Admin privileges.",
+        "advancedOptions": "Advanced Options",
+        "advancedDesc": "Configure confirmation, weights, and maintenance windows.",
+        "confirmationRequired": "Confirmation Required",
+        "weight": "Assignment Weight",
+        "forcetime": "Force Time",
+        "forcetimeRequired": "Force time is required for time forced assignments.",
+        "forcetimePlaceholder": "Select date and time",
+        "maintenanceSchedule": "Maintenance Schedule (Cron)",
+        "maintenanceSchedulePlaceholder": "0 15 10 * * ?",
+        "maintenanceDuration": "Maintenance Duration",
+        "maintenanceDurationPlaceholder": "02:00:00",
+        "maintenanceTimezone": "Maintenance Timezone",
+        "maintenanceTimezonePlaceholder": "+02:00"
     },
     "autoConfirm": {
         "title": "AutoConfirm",
@@ -136,8 +162,16 @@
         "placeholder": "Search by {{field}}",
         "fields": {
             "name": "Name",
-            "description": "Description"
+            "description": "Description",
+            "controllerId": "Controller ID"
         }
+    },
+    "filters": {
+        "savedFilter": "Saved filter: {{name}}",
+        "query": "Search query",
+        "tag": "Tag: {{name}}",
+        "type": "Type: {{name}}",
+        "clearAll": "Clear all"
     },
     "attributes": {
         "key": "Key",
@@ -220,5 +254,63 @@
         "selectType": "Select a type",
         "assignTypeButton": "Assign Type to Selected",
         "typeAssignSuccess": "Type assigned to {{count}} targets."
+    },
+    "savedFilters": {
+        "title": "Saved Filters",
+        "create": "New Filter",
+        "edit": "Edit",
+        "delete": "Delete",
+        "apply": "Apply",
+        "close": "Close",
+        "empty": "No saved filters",
+        "active": "Saved filter applied: {{name}}",
+        "clear": "Clear",
+        "createTitle": "Create Saved Filter",
+        "editTitle": "Edit Saved Filter",
+        "deleteConfirmTitle": "Delete Saved Filter",
+        "deleteConfirmDesc": "Are you sure you want to delete this saved filter?",
+        "createSuccess": "Saved filter created successfully.",
+        "updateSuccess": "Saved filter updated successfully.",
+        "deleteSuccess": "Saved filter deleted successfully.",
+        "createError": "Failed to create saved filter.",
+        "updateError": "Failed to update saved filter.",
+        "deleteError": "Failed to delete saved filter.",
+        "fields": {
+            "name": "Name",
+            "query": "FIQL Query"
+        },
+        "placeholders": {
+            "name": "Enter filter name",
+            "query": "e.g., name==device*;tag.name==prod"
+        },
+        "validation": {
+            "name": "Name is required.",
+            "query": "Query is required."
+        },
+        "columns": {
+            "name": "Name",
+            "query": "Query",
+            "autoAssign": "Auto-Assign",
+            "updated": "Updated",
+            "actions": "Actions"
+        },
+        "autoAssignOnly": "Auto-assign only",
+        "autoAssign": {
+            "title": "Auto-Assign Distribution Set",
+            "distributionSet": "Distribution Set",
+            "distributionSetPlaceholder": "Select a distribution set",
+            "actionType": "Action Type",
+            "weight": "Action Weight",
+            "confirmationRequired": "Confirmation Required",
+            "loadMore": "Load more distribution sets",
+            "saveSuccess": "Auto-assign saved successfully.",
+            "saveError": "Failed to save auto-assign.",
+            "removeSuccess": "Auto-assign removed successfully.",
+            "removeError": "Failed to remove auto-assign.",
+            "validation": {
+                "distributionSet": "Distribution Set is required.",
+                "actionType": "Action Type is required."
+            }
+        }
     }
 }

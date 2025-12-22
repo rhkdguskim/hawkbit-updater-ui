@@ -27,6 +27,7 @@ const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 24px;
+    padding: 24px;
     animation: ${fadeIn} 0.4s ease-out;
 `;
 
@@ -154,6 +155,15 @@ const RolloutsOverview: React.FC = () => {
         { name: t('overview.errorStopped', 'Error'), value: errorCount, color: COLORS.error },
         { name: t('common:status.scheduled', 'Scheduled'), value: scheduledCount, color: COLORS.scheduled },
     ].filter(d => d.value > 0);
+
+    const getRolloutProgress = (rollout: { totalTargets?: number; totalTargetsPerStatus?: Record<string, number> }) => {
+        const total = rollout.totalTargets || 0;
+        const finished = rollout.totalTargetsPerStatus?.finished || 0;
+        if (!total) {
+            return 0;
+        }
+        return Math.round((finished / total) * 100);
+    };
 
     return (
         <PageContainer>
@@ -316,7 +326,7 @@ const RolloutsOverview: React.FC = () => {
                         title={t('overview.activeRollouts', 'Active Rollouts')}
                         extra={
                             <Button type="link" size="small" onClick={() => navigate('/rollouts/list')}>
-                                {t('overview.viewAll', 'View All')} →
+                                {t('overview.viewAll', 'View All')}
                             </Button>
                         }
                     >
@@ -359,7 +369,7 @@ const RolloutsOverview: React.FC = () => {
                                             </div>
                                             <Progress
                                                 type="circle"
-                                                percent={Math.round(((rollout as any).successCondition?.successPercentage || 0))}
+                                                percent={getRolloutProgress(rollout)}
                                                 size={48}
                                                 strokeColor={COLORS.running}
                                             />
@@ -376,3 +386,5 @@ const RolloutsOverview: React.FC = () => {
 };
 
 export default RolloutsOverview;
+
+

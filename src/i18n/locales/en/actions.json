@@ -1,5 +1,6 @@
 {
     "pageTitle": "Actions",
+    "subtitle": "Track device actions and status updates",
     "refresh": "Refresh",
     "columns": {
         "id": "ID",
@@ -32,8 +33,13 @@
         "clearFilters": "Clear Filters"
     },
     "pagination": {
-        "total": "Total {{count}} actions"
+        "total": "Total {{count}} actions",
+        "range": "{{start}}-{{end}} of {{total}} actions"
     },
+    "statusHistoryTitle": "Action Status History",
+    "statusHistoryHeader": "Action #{{id}}",
+    "statusHistoryEmpty": "No status history available",
+    "statusCode": "Status code: {{code}}",
     "actions": {
         "view": "View"
     },

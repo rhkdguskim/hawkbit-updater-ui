@@ -9,6 +9,7 @@ import {
     useDeleteArtifact,
 } from '@/api/generated/software-modules/software-modules';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { axiosInstance } from '@/api/axios-instance';
 import { format } from 'date-fns';
 import type { MgmtArtifact } from '@/api/generated/model';
 import ModuleMetadataTab from './components/ModuleMetadataTab';
@@ -142,6 +143,35 @@ const SoftwareModuleDetail: React.FC = () => {
         });
     };
 
+    const handleDownloadArtifact = async (artifact: MgmtArtifact) => {
+        if (!artifact.id) {
+            return;
+        }
+
+        const downloadUrl =
+            artifact._links?.download?.href ??
+            `/rest/v1/softwaremodules/${softwareModuleId}/artifacts/${artifact.id}/download`;
+        const filename = artifact.providedFilename || `artifact-${artifact.id}`;
+
+        try {
+            const blob = await axiosInstance<Blob>({
+                url: downloadUrl,
+                method: 'GET',
+                responseType: 'blob',
+            });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            message.error((error as Error).message || t('detail.downloadError'));
+        }
+    };
+
     const overviewTab = (
         <Descriptions bordered column={1}>
             <Descriptions.Item label={t('detail.labels.name')}>{moduleData?.name}</Descriptions.Item>
@@ -205,6 +235,7 @@ const SoftwareModuleDetail: React.FC = () => {
                 rowKey="id"
                 loading={isArtifactsLoading}
                 pagination={false}
+                scroll={{ y: 360 }}
                 columns={[
                     {
                         title: t('detail.artifactsColumns.filename'),
@@ -239,12 +270,11 @@ const SoftwareModuleDetail: React.FC = () => {
                         key: 'actions',
                         render: (_, record: MgmtArtifact) => (
                             <Space>
-                                <Tooltip title="Download">
+                                <Tooltip title={t('detail.download')}>
                                     <Button
                                         icon={<DownloadOutlined />}
                                         type="text"
-                                        // This is a placeholder as direct download link handling needs careful auth consideration
-                                        onClick={() => message.info(t('detail.downloadNotImplemented'))}
+                                        onClick={() => handleDownloadArtifact(record)}
                                     />
                                 </Tooltip>
                                 {isAdmin && record.id && (

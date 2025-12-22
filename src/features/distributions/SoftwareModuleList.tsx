@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { keepPreviousData } from '@tanstack/react-query';
 
 const { Title } = Typography;
 
@@ -22,6 +23,7 @@ const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 16px;
+    height: 100%;
 `;
 
 const HeaderRow = styled.div`
@@ -53,13 +55,23 @@ const SoftwareModuleList: React.FC = () => {
     const {
         data,
         isLoading,
+        isFetching,
         refetch,
-    } = useGetSoftwareModules({
-        offset,
-        limit: pagination.pageSize,
-        sort: sort || undefined,
-        q: searchQuery || undefined,
-    });
+    } = useGetSoftwareModules(
+        {
+            offset,
+            limit: pagination.pageSize,
+            sort: sort || undefined,
+            q: searchQuery || undefined,
+        },
+        {
+            query: {
+                placeholderData: keepPreviousData,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+            },
+        }
+    );
 
     // Delete Mutation
     const deleteMutation = useDeleteSoftwareModule({
@@ -214,14 +226,17 @@ const SoftwareModuleList: React.FC = () => {
                 </Title>
             </HeaderRow>
 
-            <Card>
+            <Card
+                style={{ flex: 1, height: '100%', overflow: 'hidden' }}
+                styles={{ body: { height: '100%', display: 'flex', flexDirection: 'column' } }}
+            >
                 <DistributionSearchBar
                     type="module"
                     onSearch={handleSearch}
                     onRefresh={refetch}
                     onAdd={() => setIsCreateModalVisible(true)}
                     canAdd={isAdmin}
-                    loading={isLoading}
+                    loading={isLoading || isFetching}
                 />
                 {selectedModuleIds.length > 0 && isAdmin && (
                     <Space style={{ marginTop: 16, marginBottom: 16 }} wrap>
@@ -233,22 +248,26 @@ const SoftwareModuleList: React.FC = () => {
                         </Button>
                     </Space>
                 )}
-                <Table
-                    columns={columns}
-                    dataSource={data?.content || []}
-                    rowKey="id"
-                    pagination={{
-                        ...pagination,
-                        total: data?.total || 0,
-                        showSizeChanger: true,
-                    }}
-                    loading={isLoading}
-                    onChange={handleTableChange}
-                    rowSelection={{
-                        selectedRowKeys: selectedModuleIds,
-                        onChange: (keys) => setSelectedModuleIds(keys as number[]),
-                    }}
-                />
+                <div style={{ flex: 1, minHeight: 0 }}>
+                    <Table
+                        columns={columns}
+                        dataSource={data?.content || []}
+                        rowKey="id"
+                        pagination={{
+                            ...pagination,
+                            total: data?.total || 0,
+                            showSizeChanger: true,
+                            position: ['topRight'],
+                        }}
+                        loading={isLoading || isFetching}
+                        onChange={handleTableChange}
+                        rowSelection={{
+                            selectedRowKeys: selectedModuleIds,
+                            onChange: (keys) => setSelectedModuleIds(keys as number[]),
+                        }}
+                        scroll={{ x: 1000, y: '100%' }}
+                    />
+                </div>
                 <CreateSoftwareModuleModal
                     visible={isCreateModalVisible}
                     onCancel={() => setIsCreateModalVisible(false)}

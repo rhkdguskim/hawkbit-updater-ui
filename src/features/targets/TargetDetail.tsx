@@ -34,7 +34,7 @@ import {
     MetadataFormModal,
     DeleteMetadataModal,
 } from './components';
-import type { AssignType } from './components';
+import type { AssignPayload } from './components';
 import {
     useGetTarget,
     useGetAttributes,
@@ -310,11 +310,15 @@ const TargetDetail: React.FC = () => {
     }, [targetId, deleteTargetMutation]);
 
     const handleAssignDS = useCallback(
-        (dsId: number, type: AssignType) => {
+        (payload: AssignPayload) => {
             if (targetId) {
                 const assignment: MgmtDistributionSetAssignment = {
-                    id: dsId,
-                    type: type as MgmtDistributionSetAssignment['type'],
+                    id: payload.dsId,
+                    type: payload.type as MgmtDistributionSetAssignment['type'],
+                    confirmationRequired: payload.confirmationRequired,
+                    weight: payload.weight,
+                    forcetime: payload.forcetime,
+                    maintenanceWindow: payload.maintenanceWindow,
                 };
                 assignDSMutation.mutate({
                     targetId,
@@ -435,9 +439,7 @@ const TargetDetail: React.FC = () => {
                 <ActionsTab
                     data={actionsData}
                     loading={actionsLoading}
-                    onViewAction={(action) =>
-                        navigate(`/targets/${targetId}/actions/${action.id}`)
-                    }
+                    targetId={targetId ?? ''}
                     canForce={isAdmin}
                     canCancel={isAdmin}
                 />

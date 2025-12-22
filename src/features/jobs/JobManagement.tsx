@@ -179,6 +179,22 @@ const getActionStatusColor = (status?: string) => {
     return 'default';
 };
 
+const isActionErrored = (action: MgmtAction) => {
+    const status = action.status?.toLowerCase() || '';
+    const detail = action.detailStatus?.toLowerCase() || '';
+    const hasErrorStatus = status === 'error' || status === 'failed';
+    const hasErrorDetail = detail.includes('error') || detail.includes('failed');
+    const hasErrorCode = typeof action.lastStatusCode === 'number' && action.lastStatusCode >= 400;
+    return hasErrorStatus || hasErrorDetail || hasErrorCode;
+};
+
+const getActionDisplayStatus = (action: MgmtAction) => {
+    if (isActionErrored(action)) {
+        return 'error';
+    }
+    return action.status?.toLowerCase();
+};
+
 const getRolloutStatusColor = (status?: string) => {
     const s = status?.toLowerCase();
     if (s === 'finished') return 'green';
@@ -212,17 +228,17 @@ const JobManagement: React.FC = () => {
     );
 
     const runningCount = recentActions.filter(a =>
-        ['running', 'retrieving'].includes(a.status?.toLowerCase() || '')
+        ['running', 'retrieving'].includes(a.status?.toLowerCase() || '') &&
+        !isActionErrored(a)
     ).length;
     const pendingCount = recentActions.filter(a =>
-        ['scheduled', 'pending', 'waiting_for_confirmation'].includes(a.status?.toLowerCase() || '')
+        ['scheduled', 'pending', 'waiting_for_confirmation'].includes(a.status?.toLowerCase() || '') &&
+        !isActionErrored(a)
     ).length;
     const finishedCount = recentActions.filter(a =>
-        a.status?.toLowerCase() === 'finished'
+        a.status?.toLowerCase() === 'finished' && !isActionErrored(a)
     ).length;
-    const errorCount = recentActions.filter(a =>
-        ['error', 'failed'].includes(a.status?.toLowerCase() || '')
-    ).length;
+    const errorCount = recentActions.filter(isActionErrored).length;
     const successRate = finishedCount + errorCount > 0
         ? Math.round((finishedCount / (finishedCount + errorCount)) * 100)
         : null;
@@ -307,11 +323,14 @@ const JobManagement: React.FC = () => {
             title: t('table.status', 'Status'),
             key: 'status',
             width: 120,
-            render: (_: unknown, record: MgmtAction) => (
-                <Tag color={getActionStatusColor(record.status)}>
-                    {getStatusLabel(record.status, t)}
-                </Tag>
-            ),
+            render: (_: unknown, record: MgmtAction) => {
+                const displayStatus = getActionDisplayStatus(record);
+                return (
+                    <Tag color={getActionStatusColor(displayStatus)}>
+                        {getStatusLabel(displayStatus, t)}
+                    </Tag>
+                );
+            },
         },
         {
             title: t('table.time', 'Time'),

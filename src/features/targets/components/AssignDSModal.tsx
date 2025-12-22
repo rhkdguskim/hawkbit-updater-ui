@@ -8,13 +8,19 @@ import {
     Alert,
     Typography,
     Divider,
+    Switch,
+    Input,
+    InputNumber,
+    DatePicker,
 } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import type { MgmtDistributionSet } from '@/api/generated/model';
+import type { MgmtMaintenanceWindowRequestBody } from '@/api/generated/model';
+import dayjs from 'dayjs';
 
 const { Text } = Typography;
 
-export type AssignType = 'soft' | 'forced' | 'downloadonly';
+export type AssignType = 'soft' | 'forced' | 'timeforced' | 'downloadonly';
 
 interface AssignDSModalProps {
     open: boolean;
@@ -23,12 +29,21 @@ interface AssignDSModalProps {
     loading: boolean;
     dsLoading?: boolean;
     canForced: boolean;
-    onConfirm: (dsId: number, type: AssignType) => void;
+    onConfirm: (payload: AssignPayload) => void;
     onCancel: () => void;
 }
 
 import { useTranslation } from 'react-i18next';
 // ...
+
+export interface AssignPayload {
+    dsId: number;
+    type: AssignType;
+    confirmationRequired?: boolean;
+    weight?: number;
+    forcetime?: number;
+    maintenanceWindow?: MgmtMaintenanceWindowRequestBody;
+}
 
 const AssignDSModal: React.FC<AssignDSModalProps> = ({
     open,
@@ -43,6 +58,7 @@ const AssignDSModal: React.FC<AssignDSModalProps> = ({
     const { t } = useTranslation(['targets', 'common']);
     const [form] = Form.useForm();
     const [selectedType, setSelectedType] = useState<AssignType>('soft');
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
     const assignTypeOptions = [
         {
@@ -56,6 +72,11 @@ const AssignDSModal: React.FC<AssignDSModalProps> = ({
             description: t('assign.forcedDesc'),
         },
         {
+            value: 'timeforced',
+            label: t('assign.timeforced'),
+            description: t('assign.timeforcedDesc'),
+        },
+        {
             value: 'downloadonly',
             label: t('assign.downloadOnly'),
             description: t('assign.downloadOnlyDesc'),
@@ -65,7 +86,23 @@ const AssignDSModal: React.FC<AssignDSModalProps> = ({
     const handleSubmit = async () => {
         try {
             const values = await form.validateFields();
-            onConfirm(values.distributionSetId, values.type);
+            const includeAdvanced = showAdvanced || values.type === 'timeforced';
+            const maintenanceWindow = includeAdvanced ? values.maintenanceWindow : undefined;
+            const hasMaintenanceWindow =
+                maintenanceWindow &&
+                (maintenanceWindow.schedule || maintenanceWindow.duration || maintenanceWindow.timezone);
+
+            onConfirm({
+                dsId: values.distributionSetId,
+                type: values.type,
+                confirmationRequired: includeAdvanced ? values.confirmationRequired : undefined,
+                weight: includeAdvanced ? values.weight : undefined,
+                forcetime:
+                    values.type === 'timeforced' && values.forcetime
+                        ? dayjs(values.forcetime).valueOf()
+                        : undefined,
+                maintenanceWindow: hasMaintenanceWindow ? maintenanceWindow : undefined,
+            });
         } catch {
             // Validation error
         }
@@ -76,9 +113,25 @@ const AssignDSModal: React.FC<AssignDSModalProps> = ({
         form.setFieldValue('type', value);
     };
 
+    const handleAdvancedToggle = (checked: boolean) => {
+        setShowAdvanced(checked);
+        if (!checked) {
+            form.setFieldsValue({
+                confirmationRequired: undefined,
+                weight: undefined,
+                forcetime: undefined,
+                maintenanceWindow: {
+                    schedule: undefined,
+                    duration: undefined,
+                    timezone: undefined,
+                },
+            });
+        }
+    };
+
     const filteredTypeOptions = canForced
         ? assignTypeOptions
-        : assignTypeOptions.filter((opt) => opt.value !== 'forced');
+        : assignTypeOptions.filter((opt) => opt.value !== 'forced' && opt.value !== 'timeforced');
 
     return (
         <Modal
@@ -160,6 +213,72 @@ const AssignDSModal: React.FC<AssignDSModalProps> = ({
                         }))}
                     />
                 </Form.Item>
+
+                <Divider />
+
+                <Form.Item label={t('assign.advancedOptions')}>
+                    <Space>
+                        <Switch checked={showAdvanced} onChange={handleAdvancedToggle} />
+                        <Text type="secondary">{t('assign.advancedDesc')}</Text>
+                    </Space>
+                </Form.Item>
+
+                {(showAdvanced || selectedType === 'timeforced') && (
+                    <>
+                        <Form.Item
+                            name="confirmationRequired"
+                            label={t('assign.confirmationRequired')}
+                            valuePropName="checked"
+                        >
+                            <Switch />
+                        </Form.Item>
+
+                        <Form.Item name="weight" label={t('assign.weight')}>
+                            <InputNumber min={1} max={1000} style={{ width: '100%' }} />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="forcetime"
+                            label={t('assign.forcetime')}
+                            dependencies={['type']}
+                            rules={[
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (getFieldValue('type') === 'timeforced' && !value) {
+                                            return Promise.reject(new Error(t('assign.forcetimeRequired')));
+                                        }
+                                        return Promise.resolve();
+                                    },
+                                }),
+                            ]}
+                        >
+                            <DatePicker
+                                showTime
+                                style={{ width: '100%' }}
+                                placeholder={t('assign.forcetimePlaceholder')}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            name={['maintenanceWindow', 'schedule']}
+                            label={t('assign.maintenanceSchedule')}
+                        >
+                            <Input placeholder={t('assign.maintenanceSchedulePlaceholder')} />
+                        </Form.Item>
+                        <Form.Item
+                            name={['maintenanceWindow', 'duration']}
+                            label={t('assign.maintenanceDuration')}
+                        >
+                            <Input placeholder={t('assign.maintenanceDurationPlaceholder')} />
+                        </Form.Item>
+                        <Form.Item
+                            name={['maintenanceWindow', 'timezone']}
+                            label={t('assign.maintenanceTimezone')}
+                        >
+                            <Input placeholder={t('assign.maintenanceTimezonePlaceholder')} />
+                        </Form.Item>
+                    </>
+                )}
 
                 {!canForced && (
                     <Alert

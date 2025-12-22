@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { Typography, Card, message, Alert, Space } from 'antd';
+import React, { useLayoutEffect, useRef, useState, useCallback } from 'react';
+import { Typography, Card, message, Alert, Space, Tag, Tooltip } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     TargetTable,
@@ -9,8 +9,9 @@ import {
     AssignDSModal,
     BulkAssignTagsModal,
     BulkAssignTypeModal,
+    SavedFiltersModal,
 } from './components';
-import type { AssignType } from './components';
+import type { AssignPayload } from './components';
 import { Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import {
@@ -23,7 +24,7 @@ import {
 import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
 import type { MgmtTarget, MgmtDistributionSetAssignments, MgmtDistributionSetAssignment } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { useGetTargetTags } from '@/api/generated/target-tags/target-tags';
 import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
@@ -67,6 +68,11 @@ const TargetList: React.FC = () => {
     const [selectedTargetIds, setSelectedTargetIds] = useState<string[]>([]);
     const [bulkTagsModalOpen, setBulkTagsModalOpen] = useState(false);
     const [bulkTypeModalOpen, setBulkTypeModalOpen] = useState(false);
+    const [savedFiltersOpen, setSavedFiltersOpen] = useState(false);
+    const [activeSavedFilter, setActiveSavedFilter] = useState<{ id?: number; name?: string; query: string } | null>(null);
+    const [searchResetSignal, setSearchResetSignal] = useState(0);
+    const tableContainerRef = useRef<HTMLDivElement | null>(null);
+    const [tableScrollY, setTableScrollY] = useState<number | undefined>(undefined);
 
     // Modal States
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -87,11 +93,33 @@ const TargetList: React.FC = () => {
     // Calculate offset for API
     const offset = (pagination.current - 1) * pagination.pageSize;
 
+    useLayoutEffect(() => {
+        if (!tableContainerRef.current) {
+            return;
+        }
+        const element = tableContainerRef.current;
+        const updateHeight = () => {
+            const height = element.getBoundingClientRect().height;
+            const scrollHeight = Math.max(240, Math.floor(height - 72));
+            setTableScrollY(scrollHeight);
+        };
+        updateHeight();
+        const observer = new ResizeObserver(updateHeight);
+        observer.observe(element);
+        return () => observer.disconnect();
+    }, []);
+
     // FR-06: Target Tags
-    const { data: tagsData } = useGetTargetTags({ limit: 100 });
+    const { data: tagsData } = useGetTargetTags(
+        { limit: 100 },
+        { query: { staleTime: 60000 } }
+    );
 
     // Get target types for filters
-    const { data: typesData } = useGetTargetTypes({ limit: 100 });
+    const { data: typesData } = useGetTargetTypes(
+        { limit: 100 },
+        { query: { staleTime: 60000 } }
+    );
 
     // Build search query combining manual search, tag filter, type filter
     const buildFinalQuery = useCallback(() => {
@@ -106,14 +134,24 @@ const TargetList: React.FC = () => {
     const {
         data: targetsData,
         isLoading: targetsLoading,
+        isFetching: targetsFetching,
         error: targetsError,
         refetch: refetchTargets,
-    } = useGetTargets({
-        offset,
-        limit: pagination.pageSize,
-        sort: sort || undefined,
-        q: buildFinalQuery(),
-    });
+    } = useGetTargets(
+        {
+            offset,
+            limit: pagination.pageSize,
+            sort: sort || undefined,
+            q: buildFinalQuery(),
+        },
+        {
+            query: {
+                placeholderData: keepPreviousData,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+            },
+        }
+    );
 
     const { data: dsData, isLoading: dsLoading } = useGetDistributionSets(
         { limit: 100 },
@@ -173,8 +211,11 @@ const TargetList: React.FC = () => {
     });
 
     // Handlers
-    const handlePaginationChange = useCallback((page: number, pageSize: number) => {
-        setPagination({ current: page, pageSize });
+    const handlePaginationChange = useCallback((page?: number, pageSize?: number) => {
+        setPagination((prev) => ({
+            current: page ?? prev.current,
+            pageSize: pageSize ?? prev.pageSize,
+        }));
     }, []);
 
     const handleSortChange = useCallback((field: string, order: 'ASC' | 'DESC' | null) => {
@@ -188,6 +229,7 @@ const TargetList: React.FC = () => {
     const handleSearch = useCallback((query: string) => {
         setSearchQuery(query);
         setPagination((prev) => ({ ...prev, current: 1 })); // Reset to first page
+        setActiveSavedFilter(null);
     }, []);
 
     const handleViewTarget = useCallback(
@@ -230,11 +272,15 @@ const TargetList: React.FC = () => {
     );
 
     const handleAssignDS = useCallback(
-        (dsId: number, type: AssignType) => {
+        (payload: AssignPayload) => {
             if (targetToAssign?.controllerId) {
                 const assignment: MgmtDistributionSetAssignment = {
-                    id: dsId,
-                    type: type as MgmtDistributionSetAssignment['type'],
+                    id: payload.dsId,
+                    type: payload.type as MgmtDistributionSetAssignment['type'],
+                    confirmationRequired: payload.confirmationRequired,
+                    weight: payload.weight,
+                    forcetime: payload.forcetime,
+                    maintenanceWindow: payload.maintenanceWindow,
                 };
                 assignDSMutation.mutate({
                     targetId: targetToAssign.controllerId,
@@ -264,14 +310,90 @@ const TargetList: React.FC = () => {
                 </Title>
             </HeaderRow>
 
-            <Card style={{ flex: 1, overflow: 'auto' }}>
+            <Card
+                style={{ flex: 1, height: '100%', overflow: 'hidden' }}
+                styles={{ body: { height: '100%', display: 'flex', flexDirection: 'column' } }}
+            >
                 <TargetSearchBar
                     onSearch={handleSearch}
                     onRefresh={() => refetchTargets()}
                     onAddTarget={handleAddTarget}
                     canAddTarget={isAdmin}
-                    loading={targetsLoading}
+                    loading={targetsLoading || targetsFetching}
+                    onOpenSavedFilters={() => setSavedFiltersOpen(true)}
+                    resetSignal={searchResetSignal}
                 />
+
+                {(activeSavedFilter || searchQuery || selectedTagName || selectedTypeName) && (
+                    <Space style={{ marginBottom: 16 }} wrap>
+                        {activeSavedFilter && (
+                            <Tag
+                                color="blue"
+                                closable
+                                onClose={() => {
+                                    setActiveSavedFilter(null);
+                                    setSearchQuery('');
+                                    setPagination((prev) => ({ ...prev, current: 1 }));
+                                    setSearchResetSignal((prev) => prev + 1);
+                                }}
+                            >
+                                {t('filters.savedFilter', { name: activeSavedFilter.name || activeSavedFilter.query })}
+                            </Tag>
+                        )}
+                        {!activeSavedFilter && searchQuery && (
+                            <Tooltip title={searchQuery}>
+                                <Tag
+                                    color="blue"
+                                    closable
+                                    onClose={() => {
+                                        setSearchQuery('');
+                                        setPagination((prev) => ({ ...prev, current: 1 }));
+                                        setSearchResetSignal((prev) => prev + 1);
+                                    }}
+                                >
+                                    {t('filters.query')}
+                                </Tag>
+                            </Tooltip>
+                        )}
+                        {selectedTagName && (
+                            <Tag
+                                color="gold"
+                                closable
+                                onClose={() => {
+                                    setSelectedTagName(undefined);
+                                    setPagination((prev) => ({ ...prev, current: 1 }));
+                                }}
+                            >
+                                {t('filters.tag', { name: selectedTagName })}
+                            </Tag>
+                        )}
+                        {selectedTypeName && (
+                            <Tag
+                                color="purple"
+                                closable
+                                onClose={() => {
+                                    setSelectedTypeName(undefined);
+                                    setPagination((prev) => ({ ...prev, current: 1 }));
+                                }}
+                            >
+                                {t('filters.type', { name: selectedTypeName })}
+                            </Tag>
+                        )}
+                        <Button
+                            size="small"
+                            onClick={() => {
+                                setActiveSavedFilter(null);
+                                setSearchQuery('');
+                                setSelectedTagName(undefined);
+                                setSelectedTypeName(undefined);
+                                setPagination((prev) => ({ ...prev, current: 1 }));
+                                setSearchResetSignal((prev) => prev + 1);
+                            }}
+                        >
+                            {t('filters.clearAll')}
+                        </Button>
+                    </Space>
+                )}
 
                 {selectedTargetIds.length > 0 && (
                     <Space style={{ marginTop: 16, marginBottom: 16 }} wrap>
@@ -287,28 +409,32 @@ const TargetList: React.FC = () => {
                     </Space>
                 )}
 
-                <TargetTable
-                    data={targetsData?.content || []}
-                    loading={targetsLoading}
-                    total={targetsData?.total || 0}
-                    pagination={pagination}
-                    onPaginationChange={handlePaginationChange}
-                    onSortChange={handleSortChange}
-                    onView={handleViewTarget}
-                    onDelete={handleDeleteClick}
-                    canDelete={isAdmin}
-                    rowSelection={{
-                        selectedRowKeys: selectedTargetIds,
-                        onChange: (keys: React.Key[]) => setSelectedTargetIds(keys as string[]),
-                    }}
-                    availableTags={(tagsData?.content as MgmtTag[]) || []}
-                    availableTypes={(typesData?.content as MgmtTargetType[]) || []}
-                    onFilterChange={(filters) => {
-                        setSelectedTagName(filters.tagName);
-                        setSelectedTypeName(filters.typeName);
-                        setPagination(prev => ({ ...prev, current: 1 }));
-                    }}
-                />
+                <div ref={tableContainerRef} style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                    <TargetTable
+                        data={targetsData?.content || []}
+                        loading={targetsLoading || targetsFetching}
+                        total={targetsData?.total || 0}
+                        pagination={pagination}
+                        scrollY={tableScrollY}
+                        onPaginationChange={handlePaginationChange}
+                        onSortChange={handleSortChange}
+                        onView={handleViewTarget}
+                        onDelete={handleDeleteClick}
+                        canDelete={isAdmin}
+                        rowSelection={{
+                            selectedRowKeys: selectedTargetIds,
+                            onChange: (keys: React.Key[]) => setSelectedTargetIds(keys as string[]),
+                        }}
+                        availableTags={(tagsData?.content as MgmtTag[]) || []}
+                        availableTypes={(typesData?.content as MgmtTargetType[]) || []}
+                        filters={{ tagName: selectedTagName, typeName: selectedTypeName }}
+                        onFilterChange={(filters) => {
+                            setSelectedTagName(filters.tagName);
+                            setSelectedTypeName(filters.typeName);
+                            setPagination(prev => ({ ...prev, current: 1 }));
+                        }}
+                    />
+                </div>
             </Card>
 
             <BulkAssignTagsModal
@@ -367,6 +493,23 @@ const TargetList: React.FC = () => {
                     setAssignModalOpen(false);
                     setTargetToAssign(null);
                 }}
+            />
+
+            <SavedFiltersModal
+                open={savedFiltersOpen}
+                canEdit={isAdmin}
+                onApply={(filter) => {
+                    setSearchQuery(filter.query || '');
+                    setActiveSavedFilter({
+                        id: filter.id,
+                        name: filter.name,
+                        query: filter.query || '',
+                    });
+                    setPagination((prev) => ({ ...prev, current: 1 }));
+                    setSearchResetSignal((prev) => prev + 1);
+                    setSavedFiltersOpen(false);
+                }}
+                onClose={() => setSavedFiltersOpen(false)}
             />
         </PageContainer>
     );

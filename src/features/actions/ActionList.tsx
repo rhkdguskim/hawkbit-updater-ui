@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Card, Table, Tag, Space, Button, Select, Typography, Input, Tooltip } from 'antd';
 import { ReloadOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -6,9 +6,27 @@ import { useGetActions } from '@/api/generated/actions/actions';
 import type { MgmtAction } from '@/api/generated/model';
 import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+import { keepPreviousData } from '@tanstack/react-query';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
+
+const PageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    padding: 24px;
+`;
+
+const HeaderRow = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+`;
 
 const getStatusColor = (status?: string) => {
     switch (status) {
@@ -29,6 +47,22 @@ const getStatusColor = (status?: string) => {
         default:
             return 'default';
     }
+};
+
+const isActionErrored = (action: MgmtAction) => {
+    const status = action.status?.toLowerCase() || '';
+    const detail = action.detailStatus?.toLowerCase() || '';
+    const hasErrorStatus = status === 'error' || status === 'failed';
+    const hasErrorDetail = detail.includes('error') || detail.includes('failed');
+    const hasErrorCode = typeof action.lastStatusCode === 'number' && action.lastStatusCode >= 400;
+    return hasErrorStatus || hasErrorDetail || hasErrorCode;
+};
+
+const getActionDisplayStatus = (action: MgmtAction) => {
+    if (isActionErrored(action)) {
+        return 'error';
+    }
+    return action.status;
 };
 
 const ActionList: React.FC = () => {
@@ -57,7 +91,7 @@ const ActionList: React.FC = () => {
     const hasRunningActions = (content?: MgmtAction[]) =>
         content?.some((a) => ['running', 'pending', 'canceling'].includes(a.status || ''));
 
-    const { data, isLoading, refetch } = useGetActions(
+    const { data, isLoading, isFetching, refetch } = useGetActions(
         {
             offset,
             limit: pagination.pageSize,
@@ -68,6 +102,9 @@ const ActionList: React.FC = () => {
                 refetchInterval: (query) => {
                     return hasRunningActions(query.state.data?.content) ? 5000 : false;
                 },
+                placeholderData: keepPreviousData,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
             },
         }
     );
@@ -96,11 +133,14 @@ const ActionList: React.FC = () => {
             dataIndex: 'status',
             key: 'status',
             width: 150,
-            render: (status: string) => (
-                <Tag color={getStatusColor(status)}>
-                    {getStatusLabel(status)}
-                </Tag>
-            ),
+            render: (_: string, record) => {
+                const displayStatus = getActionDisplayStatus(record);
+                return (
+                    <Tag color={getStatusColor(displayStatus)}>
+                        {getStatusLabel(displayStatus)}
+                    </Tag>
+                );
+            },
         },
         {
             title: t('columns.type'),
@@ -152,68 +192,89 @@ const ActionList: React.FC = () => {
         });
     };
 
+    const handleSearchChange = useCallback((value: string) => {
+        setSearchQuery(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    }, []);
+
+    const handleStatusChange = useCallback((value: string[]) => {
+        setStatusFilter(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    }, []);
+
     return (
-        <div style={{ padding: 24 }}>
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                <Title level={2} style={{ margin: 0 }}>{t('pageTitle')}</Title>
+        <PageContainer>
+            <HeaderRow>
+                <div>
+                    <Title level={2} style={{ margin: 0 }}>{t('pageTitle')}</Title>
+                    <Text type="secondary">{t('subtitle')}</Text>
+                </div>
+            </HeaderRow>
 
-                <Card>
-                    <Space style={{ marginBottom: 16 }} wrap>
-                        <Input
-                            placeholder={t('filter.searchPlaceholder')}
-                            prefix={<SearchOutlined />}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onPressEnter={() => refetch()}
-                            style={{ width: 200 }}
-                        />
-                        <Select
-                            mode="multiple"
-                            placeholder={t('filter.statusPlaceholder')}
-                            value={statusFilter}
-                            onChange={setStatusFilter}
-                            allowClear
-                            style={{ minWidth: 200 }}
-                        >
-                            <Option value="pending">{t('filter.pending')}</Option>
-                            <Option value="running">{t('filter.running')}</Option>
-                            <Option value="finished">{t('filter.finished')}</Option>
-                            <Option value="error">{t('filter.error')}</Option>
-                            <Option value="canceled">{t('filter.canceled')}</Option>
-                            <Option value="wait_for_confirmation">{t('filter.waitForConfirmation')}</Option>
-                        </Select>
-                        <Button onClick={() => {
-                            setSearchQuery('');
-                            setStatusFilter([]);
-                        }}>
-                            {t('filter.clearFilters')}
-                        </Button>
-                        <Button
-                            icon={<ReloadOutlined />}
-                            onClick={() => refetch()}
-                            loading={isLoading}
-                        >
-                            {t('refresh')}
-                        </Button>
-                    </Space>
+            <Card
+                style={{ flex: 1, height: '100%', overflow: 'hidden' }}
+                styles={{ body: { height: '100%', display: 'flex', flexDirection: 'column' } }}
+            >
+                <Space style={{ marginBottom: 16 }} wrap>
+                    <Input
+                        placeholder={t('filter.searchPlaceholder')}
+                        prefix={<SearchOutlined />}
+                        value={searchQuery}
+                        onChange={(e) => handleSearchChange(e.target.value)}
+                        style={{ width: 220 }}
+                        allowClear
+                    />
+                    <Select
+                        mode="multiple"
+                        placeholder={t('filter.statusPlaceholder')}
+                        value={statusFilter}
+                        onChange={handleStatusChange}
+                        allowClear
+                        style={{ minWidth: 220 }}
+                    >
+                        <Option value="pending">{t('filter.pending')}</Option>
+                        <Option value="running">{t('filter.running')}</Option>
+                        <Option value="finished">{t('filter.finished')}</Option>
+                        <Option value="error">{t('filter.error')}</Option>
+                        <Option value="canceled">{t('filter.canceled')}</Option>
+                        <Option value="wait_for_confirmation">{t('filter.waitForConfirmation')}</Option>
+                    </Select>
+                    <Button onClick={() => {
+                        setSearchQuery('');
+                        setStatusFilter([]);
+                        setPagination((prev) => ({ ...prev, current: 1 }));
+                    }}>
+                        {t('filter.clearFilters')}
+                    </Button>
+                    <Button
+                        icon={<ReloadOutlined />}
+                        onClick={() => refetch()}
+                        loading={isLoading || isFetching}
+                    >
+                        {t('refresh')}
+                    </Button>
+                </Space>
 
+                <div style={{ flex: 1, minHeight: 0 }}>
                     <Table
                         dataSource={data?.content || []}
                         columns={columns}
                         rowKey="id"
-                        loading={isLoading}
+                        loading={isLoading || isFetching}
                         pagination={{
                             current: pagination.current,
                             pageSize: pagination.pageSize,
                             total: data?.total || 0,
                             showSizeChanger: true,
-                            showTotal: (total) => t('pagination.total', { count: total }),
+                            showTotal: (total, range) => t('pagination.range', { start: range[0], end: range[1], total }),
+                            position: ['topRight'],
                         }}
                         onChange={handleTableChange}
+                        scroll={{ x: 1000, y: '100%' }}
                     />
-                </Card>
-            </Space>
-        </div>
+                </div>
+            </Card>
+        </PageContainer>
     );
 };
 

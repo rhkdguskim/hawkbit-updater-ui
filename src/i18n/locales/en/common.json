@@ -128,5 +128,8 @@
         "required": "This field is required.",
         "invalidFormat": "Invalid format.",
         "maxLength": "Maximum {{max}} characters allowed."
+    },
+    "validation": {
+        "required": "This field is required."
     }
 }

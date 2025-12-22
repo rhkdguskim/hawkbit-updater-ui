@@ -113,6 +113,8 @@
         "deleteArtifactError": "Failed to delete artifact",
         "deleteArtifactConfirmTitle": "Delete Artifact",
         "deleteArtifactConfirmDesc": "Are you sure you want to delete this artifact?",
+        "download": "Download",
+        "downloadError": "Failed to download artifact",
         "downloadNotImplemented": "Download not fully implemented",
         "dragDropTitle": "Click or drag file to this area to upload",
         "dragDropHint": "Drag and drop your artifact here.",

@@ -113,6 +113,8 @@
         "deleteArtifactError": "아티팩트 삭제에 실패했습니다.",
         "deleteArtifactConfirmTitle": "아티팩트 삭제",
         "deleteArtifactConfirmDesc": "정말로 이 아티팩트를 삭제하시겠습니까?",
+        "download": "다운로드",
+        "downloadError": "아티팩트 다운로드에 실패했습니다.",
         "downloadNotImplemented": "다운로드는 아직 완전히 구현되지 않았습니다.",
         "dragDropTitle": "이 영역을 클릭하거나 파일을 드래그하여 업로드하세요.",
         "dragDropHint": "아티팩트를 드래그하여 업로드하세요.",

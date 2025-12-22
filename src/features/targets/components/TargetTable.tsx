@@ -12,6 +12,7 @@ import {
 import type { MgmtTarget, MgmtTag, MgmtTargetType } from '@/api/generated/model';
 
 import dayjs from 'dayjs';
+import { Link } from 'react-router-dom';
 
 const { Text } = Typography;
 
@@ -25,6 +26,7 @@ interface TargetTableProps {
         current: number;
         pageSize: number;
     };
+    scrollY?: number;
     onPaginationChange: (page: number, pageSize: number) => void;
     onSortChange: (field: string, order: 'ASC' | 'DESC' | null) => void;
     onView: (target: MgmtTarget) => void;
@@ -35,6 +37,7 @@ interface TargetTableProps {
     availableTags?: MgmtTag[];
     availableTypes?: MgmtTargetType[];
     onFilterChange?: (filters: { tagName?: string; typeName?: string }) => void;
+    filters?: { tagName?: string; typeName?: string };
 }
 
 import { useTranslation } from 'react-i18next';
@@ -46,6 +49,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
     loading,
     total,
     pagination,
+    scrollY,
     onPaginationChange,
     onSortChange,
     onView,
@@ -55,6 +59,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
     availableTags,
     availableTypes,
     onFilterChange,
+    filters,
 }) => {
     const { t } = useTranslation('targets');
 
@@ -84,14 +89,16 @@ const TargetTable: React.FC<TargetTableProps> = ({
         return <Tag color="green">{t('status.online')}</Tag>;
     };
 
-    const getInstalledDsLabel = (record: MgmtTarget) => {
+    const getInstalledDsInfo = (record: MgmtTarget) => {
         const link = record._links?.installedDS as unknown as
-            | { name?: string; href?: string }
-            | Array<{ name?: string; href?: string }>
+            | { name?: string; title?: string; href?: string }
+            | Array<{ name?: string; title?: string; href?: string }>
             | undefined;
         if (!link) return undefined;
         const resolved = Array.isArray(link) ? link[0] : link;
-        return resolved?.name || resolved?.href?.split('/').pop();
+        const id = resolved?.href?.split('/').pop();
+        const label = resolved?.name || resolved?.title || id;
+        return id ? { id, label: label || id } : undefined;
     };
 
     const columns: TableProps<MgmtTarget>['columns'] = [
@@ -131,6 +138,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
             width: 160,
             filters: availableTypes?.map(type => ({ text: type.name || '', value: type.name || '' })),
             filterMultiple: false,
+            filteredValue: filters?.typeName ? [filters.typeName] : null,
             render: (_, record) => (
                 <TargetTypeCell
                     controllerId={record.controllerId!}
@@ -145,6 +153,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
             width: 200,
             filters: availableTags?.map(tag => ({ text: tag.name || '', value: tag.name || '' })),
             filterMultiple: false,
+            filteredValue: filters?.tagName ? [filters.tagName] : null,
             render: (_, record) => <TargetTagsCell controllerId={record.controllerId!} />,
         },
         {
@@ -166,10 +175,16 @@ const TargetTable: React.FC<TargetTableProps> = ({
             key: 'installedDS',
             width: 200,
             render: (_, record) => {
-                const dsLabel = getInstalledDsLabel(record);
+                const dsInfo = getInstalledDsInfo(record);
                 return (
                     <Space direction="vertical" size={0}>
-                        <Text strong>{dsLabel || <Text type="secondary">-</Text>}</Text>
+                        {dsInfo ? (
+                            <Link to={`/distributions/sets/${dsInfo.id}`}>
+                                <Text strong>{dsInfo.label}</Text>
+                            </Link>
+                        ) : (
+                            <Text type="secondary">-</Text>
+                        )}
                         {record.installedAt && (
                             <Text type="secondary" style={{ fontSize: 12 }}>
                                 {dayjs(record.installedAt).format('YYYY-MM-DD HH:mm')}
@@ -237,11 +252,17 @@ const TargetTable: React.FC<TargetTableProps> = ({
         },
     ];
 
+    const handlePaginationUpdate = (page?: number, pageSize?: number) => {
+        onPaginationChange(page, pageSize);
+    };
+
     const handleTableChange: TableProps<MgmtTarget>['onChange'] = (
-        _,
+        paginationConfig,
         filters,
         sorter
     ) => {
+        handlePaginationUpdate(paginationConfig.current, paginationConfig.pageSize);
+
         // Handle sorting
         const sortResult = Array.isArray(sorter) ? sorter[0] : sorter;
         if (sortResult?.field && sortResult.order) {
@@ -255,10 +276,15 @@ const TargetTable: React.FC<TargetTableProps> = ({
         if (onFilterChange) {
             const tagFilter = filters['tags'];
             const typeFilter = filters['targetTypeName'];
-            onFilterChange({
-                tagName: tagFilter && tagFilter.length > 0 ? tagFilter[0] as string : undefined,
-                typeName: typeFilter && typeFilter.length > 0 ? typeFilter[0] as string : undefined,
-            });
+            const nextTagName = tagFilter && tagFilter.length > 0 ? tagFilter[0] as string : undefined;
+            const nextTypeName = typeFilter && typeFilter.length > 0 ? typeFilter[0] as string : undefined;
+
+            if (nextTagName !== filters?.tagName || nextTypeName !== filters?.typeName) {
+                onFilterChange({
+                    tagName: nextTagName,
+                    typeName: nextTypeName,
+                });
+            }
         }
     };
 
@@ -268,18 +294,20 @@ const TargetTable: React.FC<TargetTableProps> = ({
             dataSource={data}
             loading={loading}
             rowKey="controllerId"
+            locale={{ emptyText: t('table.empty') }}
             pagination={{
                 current: pagination.current,
                 pageSize: pagination.pageSize,
                 total,
                 showSizeChanger: true,
                 pageSizeOptions: ['10', '20', '50'],
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} targets`,
-                onChange: (page, pageSize) => onPaginationChange(page, pageSize),
-                onShowSizeChange: (_current, size) => onPaginationChange(1, size),
+                showTotal: (total, range) => t('table.pagination', { start: range[0], end: range[1], total }),
+                onChange: (page, pageSize) => handlePaginationUpdate(page, pageSize),
+                onShowSizeChange: (_current, size) => handlePaginationUpdate(1, size),
+                position: ['topRight'],
             }}
             onChange={handleTableChange}
-            scroll={{ x: 1000 }}
+            scroll={scrollY ? { x: 1000, y: scrollY } : { x: 1000 }}
             size="middle"
             rowSelection={rowSelection}
         />
