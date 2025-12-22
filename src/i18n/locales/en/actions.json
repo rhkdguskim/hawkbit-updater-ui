@@ -36,12 +36,40 @@
         "total": "Total {{count}} actions",
         "range": "{{start}}-{{end}} of {{total}} actions"
     },
+    "summary": {
+        "total": "All actions",
+        "active": "Active / In progress",
+        "errors": "With errors",
+        "completed": "Completed"
+    },
     "statusHistoryTitle": "Action Status History",
     "statusHistoryHeader": "Action #{{id}}",
     "statusHistoryEmpty": "No status history available",
     "statusCode": "Status code: {{code}}",
+    "statusMessages": {
+        "updateFailedRollback": "Update failed, rollback performed",
+        "startingServices": "Starting services",
+        "updatingBinaries": "Updating binaries",
+        "downloadingArtifacts": "Downloading artifacts",
+        "verifyingServicesStopped": "Verifying services stopped",
+        "stoppingServices": "Stopping {{service}} services",
+        "creatingBackup": "Creating backup",
+        "startingUpdateProcess": "Starting update process",
+        "targetRetrieved": "Update Server: Target retrieved update action and should start now the download.",
+        "targetDownloads": "Update Server: Target downloads {{path}}",
+        "assignmentInitiated": "Assignment initiated by user '{{user}}'"
+    },
+    "statusHistoryFilter": "Filter",
+    "statusFilters": {
+        "all": "All",
+        "error": "Errors",
+        "download": "Downloads",
+        "system": "System"
+    },
     "actions": {
-        "view": "View"
+        "view": "View",
+        "addAction": "Add Action",
+        "addActionComingSoon": "Action creation will be available soon."
     },
     "detail": {
         "pageTitle": "Action Details",

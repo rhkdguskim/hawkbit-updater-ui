@@ -7,26 +7,12 @@ import type { MgmtRolloutResponseBody } from '@/api/generated/model';
 import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/useAuthStore';
-import styled from 'styled-components';
 import { keepPreviousData } from '@tanstack/react-query';
+import styled from 'styled-components';
+import { PageContainer, HeaderRow } from '@/components/layout/PageLayout';
+import { useServerTable } from '@/hooks/useServerTable';
 
 const { Title, Text } = Typography;
-
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 24px;
-    height: 100%;
-`;
-
-const HeaderRow = styled.div`
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-`;
 
 const HeaderMeta = styled.div`
     display: flex;
@@ -67,10 +53,15 @@ const RolloutList: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
-    const [statusFilter, setStatusFilter] = useState<string>('');
 
-    const offset = (pagination.current - 1) * pagination.pageSize;
+    const {
+        pagination,
+        offset,
+        handleTableChange,
+        resetPagination,
+    } = useServerTable<MgmtRolloutResponseBody>({ syncToUrl: true });
+
+    const [statusFilter, setStatusFilter] = useState<string>('');
 
     useEffect(() => {
         const statusParam = searchParams.get('status') || '';
@@ -180,17 +171,12 @@ const RolloutList: React.FC = () => {
         },
     ];
 
-    const handleTableChange: TableProps<MgmtRolloutResponseBody>['onChange'] = (paginationConfig) => {
-        setPagination({
-            current: paginationConfig.current || 1,
-            pageSize: paginationConfig.pageSize || 20,
-        });
-    };
+
 
     const handleStatusChange = (value?: string) => {
         const nextValue = value || '';
         setStatusFilter(nextValue);
-        setPagination((prev) => ({ ...prev, current: 1 }));
+        resetPagination();
         if (nextValue) {
             setSearchParams({ status: nextValue });
         } else {

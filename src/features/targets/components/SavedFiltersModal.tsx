@@ -289,7 +289,7 @@ const SavedFiltersModal: React.FC<SavedFiltersModalProps> = ({
                     </Space>
                 }
                 width={900}
-                destroyOnClose
+                destroyOnHidden
             >
                 <Space style={{ marginBottom: 12 }}>
                     <Switch checked={autoAssignOnly} onChange={setAutoAssignOnly} />
@@ -318,7 +318,7 @@ const SavedFiltersModal: React.FC<SavedFiltersModalProps> = ({
                 }}
                 onOk={handleSubmit}
                 confirmLoading={createMutation.isPending || updateMutation.isPending}
-                destroyOnClose
+                destroyOnHidden
             >
                 <Form form={form} layout="vertical">
                     <Form.Item

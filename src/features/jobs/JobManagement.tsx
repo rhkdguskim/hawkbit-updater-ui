@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Typography, Statistic, Button, Flex, Skeleton, Table, Tag, Progress, Spin } from 'antd';
+import { Card, Row, Col, Typography, Statistic, Button, Flex, Skeleton, Table, Tag, Progress } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -11,10 +11,12 @@ import {
     ExclamationCircleOutlined,
     SyncOutlined,
     ReloadOutlined,
+    CloseCircleOutlined,
+    StopOutlined,
 } from '@ant-design/icons';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
-import { useGetActions, useGetAction1 } from '@/api/generated/actions/actions';
+import { useGetActions } from '@/api/generated/actions/actions';
 import { useGetRollouts } from '@/api/generated/rollouts/rollouts';
 import type { MgmtAction, MgmtRolloutResponseBody } from '@/api/generated/model';
 import dayjs from 'dayjs';
@@ -24,24 +26,15 @@ dayjs.extend(relativeTime);
 
 const { Title, Text } = Typography;
 
-// Helper component to fetch distribution set info
-const DistributionCell = ({ actionId }: { actionId?: number }) => {
-    const navigate = useNavigate();
-    const { data, isLoading } = useGetAction1(actionId!, { query: { enabled: !!actionId } });
-
-    if (!actionId) return <Text>-</Text>;
-    if (isLoading) return <Spin size="small" />;
-
-    const href = data?._links?.distributionSet?.href || data?._links?.softwareModule?.href;
-    const dsId = href?.split('/').pop();
-
-    if (!dsId) return <Text>-</Text>;
-
-    return (
-        <a onClick={() => navigate(`/distributions/${dsId}`)} style={{ cursor: 'pointer' }}>
-            {dsId}
-        </a>
-    );
+const getDistributionLink = (record: MgmtAction) => {
+    const dsLink = record._links?.distributionset || record._links?.distributionSet;
+    const smLink = record._links?.softwaremodule || record._links?.softwareModule;
+    const link = dsLink || smLink;
+    const href = link?.href;
+    const id = href?.split('/').pop();
+    const label = link?.name || link?.title || id;
+    const basePath = dsLink ? '/distributions/sets' : smLink ? '/distributions/modules' : '';
+    return id && basePath ? { id, label, href: `${basePath}/${id}` } : null;
 };
 
 
@@ -195,6 +188,16 @@ const getActionDisplayStatus = (action: MgmtAction) => {
     return action.status?.toLowerCase();
 };
 
+const getActionStatusIcon = (status?: string) => {
+    const s = status?.toLowerCase();
+    if (s === 'finished') return <CheckCircleOutlined />;
+    if (s === 'error' || s === 'failed') return <CloseCircleOutlined />;
+    if (s === 'running' || s === 'retrieving') return <SyncOutlined spin />;
+    if (s === 'scheduled' || s === 'pending' || s === 'waiting_for_confirmation') return <ClockCircleOutlined />;
+    if (s === 'canceled' || s === 'canceling') return <StopOutlined />;
+    return <ClockCircleOutlined />;
+};
+
 const getRolloutStatusColor = (status?: string) => {
     const s = status?.toLowerCase();
     if (s === 'finished') return 'green';
@@ -315,9 +318,17 @@ const JobManagement: React.FC = () => {
         {
             title: t('table.distribution', 'Distribution'),
             key: 'distribution',
-            render: (_: unknown, record: MgmtAction) => (
-                <DistributionCell actionId={record.id} />
-            ),
+            render: (_: unknown, record: MgmtAction) => {
+                const link = getDistributionLink(record);
+                if (!link) {
+                    return '-';
+                }
+                return (
+                    <a onClick={() => navigate(link.href)} style={{ cursor: 'pointer' }}>
+                        {link.label}
+                    </a>
+                );
+            },
         },
         {
             title: t('table.status', 'Status'),
@@ -326,7 +337,7 @@ const JobManagement: React.FC = () => {
             render: (_: unknown, record: MgmtAction) => {
                 const displayStatus = getActionDisplayStatus(record);
                 return (
-                    <Tag color={getActionStatusColor(displayStatus)}>
+                    <Tag color={getActionStatusColor(displayStatus)} icon={getActionStatusIcon(displayStatus)}>
                         {getStatusLabel(displayStatus, t)}
                     </Tag>
                 );
@@ -620,7 +631,7 @@ const JobManagement: React.FC = () => {
                             loading={isLoading}
                             locale={{ emptyText: t('messages.noActions', 'No recent actions') }}
                             onRow={(record) => ({
-                                onClick: () => navigate(`/actions?q=id==${record.id}`),
+                                onClick: () => navigate(`/actions/${record.id}`),
                                 style: { cursor: 'pointer' }
                             })}
                         />

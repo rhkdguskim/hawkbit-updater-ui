@@ -50,7 +50,7 @@ const MetadataFormModal: React.FC<MetadataFormModalProps> = ({
             onOk={handleOk}
             onCancel={onCancel}
             confirmLoading={loading}
-            destroyOnClose
+            destroyOnHidden
         >
             <Form
                 form={form}

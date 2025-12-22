@@ -54,7 +54,7 @@ const TargetTypeDialog: React.FC<TargetTypeDialogProps> = ({
             onOk={handleOk}
             onCancel={onCancel}
             confirmLoading={loading}
-            destroyOnClose
+            destroyOnHidden
         >
             <Form form={form} layout="vertical">
                 <Form.Item

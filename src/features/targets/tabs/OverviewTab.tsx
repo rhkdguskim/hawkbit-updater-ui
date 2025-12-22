@@ -109,7 +109,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ target, loading }) => {
                 <Descriptions.Item label={t('table.name')}>
                     {target.name || <Text type="secondary">-</Text>}
                 </Descriptions.Item>
-                <Descriptions.Item label={t('form.description')} span={2}>
+                <Descriptions.Item label={t('form.description')}>
                     {target.description || <Text type="secondary">No description</Text>}
                 </Descriptions.Item>
                 <Descriptions.Item label={t('overview.address')}>

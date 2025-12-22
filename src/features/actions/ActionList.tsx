@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react';
-import { Card, Table, Tag, Space, Button, Select, Typography, Input, Tooltip } from 'antd';
-import { ReloadOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Card, Table, Tag, Space, Button, Select, Typography, Input, Tooltip, message } from 'antd';
+import { ReloadOutlined, SearchOutlined, EyeOutlined, CheckCircleOutlined, CloseCircleOutlined, SyncOutlined, ClockCircleOutlined, StopOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useGetActions } from '@/api/generated/actions/actions';
 import type { MgmtAction } from '@/api/generated/model';
@@ -28,6 +28,32 @@ const HeaderRow = styled.div`
     gap: 16px;
 `;
 
+const SummaryGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+`;
+
+const SummaryCard = styled(Card)`
+    border-radius: 12px;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+`;
+
+const FilterRow = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+`;
+
+const FilterGroup = styled(Space)`
+    flex-wrap: wrap;
+`;
+
 const getStatusColor = (status?: string) => {
     switch (status) {
         case 'finished':
@@ -49,6 +75,27 @@ const getStatusColor = (status?: string) => {
     }
 };
 
+const getStatusIcon = (status?: string) => {
+    switch (status) {
+        case 'finished':
+            return <CheckCircleOutlined />;
+        case 'error':
+            return <CloseCircleOutlined />;
+        case 'running':
+            return <SyncOutlined spin />;
+        case 'pending':
+        case 'wait_for_confirmation':
+        case 'waiting_for_confirmation':
+        case 'scheduled':
+            return <ClockCircleOutlined />;
+        case 'canceled':
+        case 'canceling':
+            return <StopOutlined />;
+        default:
+            return <ClockCircleOutlined />;
+    }
+};
+
 const isActionErrored = (action: MgmtAction) => {
     const status = action.status?.toLowerCase() || '';
     const detail = action.detailStatus?.toLowerCase() || '';
@@ -63,6 +110,11 @@ const getActionDisplayStatus = (action: MgmtAction) => {
         return 'error';
     }
     return action.status;
+};
+
+const isActiveStatus = (status?: string) => {
+    const normalized = status?.toLowerCase() || '';
+    return ['running', 'pending', 'canceling', 'wait_for_confirmation', 'waiting', 'scheduled'].includes(normalized);
 };
 
 const ActionList: React.FC = () => {
@@ -109,6 +161,48 @@ const ActionList: React.FC = () => {
         }
     );
 
+    const summaryCounts = useMemo(() => {
+        const content = data?.content || [];
+        const counts = {
+            total: data?.total ?? content.length,
+            active: 0,
+            errors: 0,
+            completed: 0,
+        };
+        content.forEach((action) => {
+            if (isActiveStatus(action.status)) {
+                counts.active += 1;
+            }
+            if (isActionErrored(action)) {
+                counts.errors += 1;
+            }
+            if ((action.status || '').toLowerCase() === 'finished') {
+                counts.completed += 1;
+            }
+        });
+        return counts;
+    }, [data?.content, data?.total]);
+
+    const summaryCards = useMemo(
+        () => [
+            { key: 'total', label: t('summary.total'), value: summaryCounts.total },
+            { key: 'active', label: t('summary.active'), value: summaryCounts.active },
+            { key: 'errors', label: t('summary.errors'), value: summaryCounts.errors },
+            { key: 'completed', label: t('summary.completed'), value: summaryCounts.completed },
+        ],
+        [summaryCounts, t]
+    );
+
+    const resetFilters = useCallback(() => {
+        setSearchQuery('');
+        setStatusFilter([]);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    }, []);
+
+    const handleAddAction = useCallback(() => {
+        message.info(t('actions:addActionComingSoon'));
+    }, [t]);
+
     const getStatusLabel = (status?: string) => {
         if (!status) return t('common:status.unknown', { defaultValue: 'UNKNOWN' });
         const key = status.toLowerCase();
@@ -136,7 +230,7 @@ const ActionList: React.FC = () => {
             render: (_: string, record) => {
                 const displayStatus = getActionDisplayStatus(record);
                 return (
-                    <Tag color={getStatusColor(displayStatus)}>
+                    <Tag color={getStatusColor(displayStatus)} icon={getStatusIcon(displayStatus)}>
                         {getStatusLabel(displayStatus)}
                     </Tag>
                 );
@@ -209,51 +303,65 @@ const ActionList: React.FC = () => {
                     <Title level={2} style={{ margin: 0 }}>{t('pageTitle')}</Title>
                     <Text type="secondary">{t('subtitle')}</Text>
                 </div>
+                <Button type="primary" icon={<PlusOutlined />} onClick={handleAddAction}>
+                    {t('actions:addAction')}
+                </Button>
             </HeaderRow>
 
             <Card
-                style={{ flex: 1, height: '100%', overflow: 'hidden' }}
-                styles={{ body: { height: '100%', display: 'flex', flexDirection: 'column' } }}
+                style={{ flex: 1, height: '100%' }}
+                bodyStyle={{ display: 'flex', flexDirection: 'column', gap: 16, height: '100%' }}
             >
-                <Space style={{ marginBottom: 16 }} wrap>
-                    <Input
-                        placeholder={t('filter.searchPlaceholder')}
-                        prefix={<SearchOutlined />}
-                        value={searchQuery}
-                        onChange={(e) => handleSearchChange(e.target.value)}
-                        style={{ width: 220 }}
-                        allowClear
-                    />
-                    <Select
-                        mode="multiple"
-                        placeholder={t('filter.statusPlaceholder')}
-                        value={statusFilter}
-                        onChange={handleStatusChange}
-                        allowClear
-                        style={{ minWidth: 220 }}
-                    >
-                        <Option value="pending">{t('filter.pending')}</Option>
-                        <Option value="running">{t('filter.running')}</Option>
-                        <Option value="finished">{t('filter.finished')}</Option>
-                        <Option value="error">{t('filter.error')}</Option>
-                        <Option value="canceled">{t('filter.canceled')}</Option>
-                        <Option value="wait_for_confirmation">{t('filter.waitForConfirmation')}</Option>
-                    </Select>
-                    <Button onClick={() => {
-                        setSearchQuery('');
-                        setStatusFilter([]);
-                        setPagination((prev) => ({ ...prev, current: 1 }));
-                    }}>
-                        {t('filter.clearFilters')}
-                    </Button>
-                    <Button
-                        icon={<ReloadOutlined />}
-                        onClick={() => refetch()}
-                        loading={isLoading || isFetching}
-                    >
-                        {t('refresh')}
-                    </Button>
-                </Space>
+                <SummaryGrid>
+                    {summaryCards.map((card) => (
+                        <SummaryCard key={card.key} bordered={false} bodyStyle={{ padding: '12px 16px' }}>
+                            <Text type="secondary">{card.label}</Text>
+                            <Title level={3} style={{ margin: 0 }}>
+                                {card.value}
+                            </Title>
+                        </SummaryCard>
+                    ))}
+                </SummaryGrid>
+
+                <FilterRow>
+                    <FilterGroup size="small" align="center">
+                        <Input
+                            placeholder={t('filter.searchPlaceholder')}
+                            prefix={<SearchOutlined />}
+                            value={searchQuery}
+                            onChange={(e) => handleSearchChange(e.target.value)}
+                            style={{ width: 220 }}
+                            allowClear
+                        />
+                        <Select
+                            mode="multiple"
+                            placeholder={t('filter.statusPlaceholder')}
+                            value={statusFilter}
+                            onChange={handleStatusChange}
+                            allowClear
+                            style={{ minWidth: 220 }}
+                        >
+                            <Option value="pending">{t('filter.pending')}</Option>
+                            <Option value="running">{t('filter.running')}</Option>
+                            <Option value="finished">{t('filter.finished')}</Option>
+                            <Option value="error">{t('filter.error')}</Option>
+                            <Option value="canceled">{t('filter.canceled')}</Option>
+                            <Option value="wait_for_confirmation">{t('filter.waitForConfirmation')}</Option>
+                        </Select>
+                    </FilterGroup>
+                    <FilterGroup size="small">
+                        <Button onClick={resetFilters} disabled={!searchQuery && statusFilter.length === 0}>
+                            {t('filter.clearFilters')}
+                        </Button>
+                        <Button
+                            icon={<ReloadOutlined />}
+                            onClick={() => refetch()}
+                            loading={isLoading || isFetching}
+                        >
+                            {t('refresh')}
+                        </Button>
+                    </FilterGroup>
+                </FilterRow>
 
                 <div style={{ flex: 1, minHeight: 0 }}>
                     <Table

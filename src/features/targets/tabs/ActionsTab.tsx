@@ -1,19 +1,27 @@
 import React from 'react';
-import { Table, Tag, Typography, Skeleton, Empty, Button, Space, Tooltip, Modal, Timeline } from 'antd';
+import { Table, Tag, Typography, Skeleton, Empty, Button, Space, Tooltip, Modal, Timeline, Radio, Badge } from 'antd';
 import type { TableProps } from 'antd';
 import {
     CheckCircleOutlined,
     CloseCircleOutlined,
     SyncOutlined,
     ClockCircleOutlined,
+    DownloadOutlined,
     EyeOutlined,
     StopOutlined,
     ThunderboltOutlined,
 } from '@ant-design/icons';
 import type { MgmtAction, PagedListMgmtAction } from '@/api/generated/model';
 import dayjs from 'dayjs';
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useGetActionStatusList } from '@/api/generated/targets/targets';
+import styled from 'styled-components';
+
+const Label = styled(Tag)`
+    background: rgba(59, 130, 246, 0.15);
+    color: #1d4ed8;
+    font-weight: 600;
+`;
 
 const { Text } = Typography;
 
@@ -60,6 +68,7 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
     const { t } = useTranslation(['targets', 'actions', 'common']);
     const [selectedAction, setSelectedAction] = useState<MgmtAction | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
+    const [historyFilter, setHistoryFilter] = useState<'all' | 'error' | 'download' | 'system'>('all');
 
     const { data: statusData, isLoading: statusLoading } = useGetActionStatusList(
         targetId,
@@ -67,17 +76,10 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
         undefined,
         {
             query: {
-                enabled: modalOpen && !!selectedAction?.id,
+                enabled: modalOpen && !!selectedAction?.id && !!targetId,
             },
         }
     );
-    if (loading) {
-        return <Skeleton active paragraph={{ rows: 8 }} />;
-    }
-
-    if (!data?.content?.length) {
-        return <Empty description={t('common:messages.noData')} />;
-    }
 
     const getStatusTag = (status?: string) => {
         const icon = getStatusIcon(status);
@@ -99,6 +101,14 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
         );
     };
 
+    const getStatusLabel = (status?: string) => {
+        if (!status) {
+            return t('common:status.unknown');
+        }
+        const key = status.toLowerCase();
+        return t(`common:status.${key}`, { defaultValue: status.toUpperCase() });
+    };
+
     const getStatusTone = (status?: string, code?: number) => {
         const normalized = status?.toLowerCase() || '';
         if (normalized.includes('error') || normalized.includes('failed') || (code && code >= 400)) {
@@ -115,6 +125,160 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
         }
         return 'default';
     };
+
+    const getTimelineCategory = (status: { type?: string; code?: number; messages?: string[] }) => {
+        const tone = getStatusTone(status.type, status.code);
+        if (tone === 'error') {
+            return 'error';
+        }
+        const type = status.type?.toLowerCase() || '';
+        const messages = status.messages?.join(' ').toLowerCase() || '';
+        if (type.includes('download') || messages.includes('download')) {
+            return 'download';
+        }
+        return 'system';
+    };
+
+    const getToneColor = (tone: string) => {
+        switch (tone) {
+            case 'error':
+                return '#ef4444';
+            case 'success':
+                return '#10b981';
+            case 'processing':
+                return '#3b82f6';
+            case 'warning':
+                return '#f59e0b';
+            default:
+                return '#94a3b8';
+        }
+    };
+
+    const getTimelineDot = (status: { type?: string; code?: number; messages?: string[] }) => {
+        const tone = getStatusTone(status.type, status.code);
+        const category = getTimelineCategory(status);
+        const color = getToneColor(tone);
+        const icon = category === 'download'
+            ? <DownloadOutlined />
+            : tone === 'error'
+                ? <CloseCircleOutlined />
+                : tone === 'success'
+                    ? <CheckCircleOutlined />
+                    : tone === 'processing'
+                        ? <SyncOutlined spin />
+                        : <ClockCircleOutlined />;
+        return (
+            <span
+                style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 999,
+                    background: `${color}1a`,
+                    color,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: `1px solid ${color}33`,
+                }}
+            >
+                {icon}
+            </span>
+        );
+    };
+
+    const translateStatusMessage = (message: string) => {
+        const trimmed = message.trim();
+        if (/^Update failed, rollback performed$/i.test(trimmed)) {
+            return t('actions:statusMessages.updateFailedRollback');
+        }
+        if (/^Starting services$/i.test(trimmed)) {
+            return t('actions:statusMessages.startingServices');
+        }
+        if (/^Updating binaries$/i.test(trimmed)) {
+            return t('actions:statusMessages.updatingBinaries');
+        }
+        if (/^Downloading artifacts$/i.test(trimmed)) {
+            return t('actions:statusMessages.downloadingArtifacts');
+        }
+        if (/^Verifying services stopped$/i.test(trimmed)) {
+            return t('actions:statusMessages.verifyingServicesStopped');
+        }
+        const stoppingMatch = trimmed.match(/^Stopping (.+) services$/i);
+        if (stoppingMatch) {
+            return t('actions:statusMessages.stoppingServices', { service: stoppingMatch[1] });
+        }
+        if (/^Creating backup$/i.test(trimmed)) {
+            return t('actions:statusMessages.creatingBackup');
+        }
+        if (/^Starting update process$/i.test(trimmed)) {
+            return t('actions:statusMessages.startingUpdateProcess');
+        }
+        if (/^Update Server: Target retrieved update action and should start now the download\.?$/i.test(trimmed)) {
+            return t('actions:statusMessages.targetRetrieved');
+        }
+        const downloadMatch = trimmed.match(/^Update Server: Target downloads (.+)$/i);
+        if (downloadMatch) {
+            return t('actions:statusMessages.targetDownloads', { path: downloadMatch[1] });
+        }
+        const assignMatch = trimmed.match(/^Assignment initiated by user ['"](.+)['"]$/i);
+        if (assignMatch) {
+            return t('actions:statusMessages.assignmentInitiated', { user: assignMatch[1] });
+        }
+        return message;
+    };
+
+    const timelineItems = useMemo(() => {
+        if (!statusData?.content?.length) {
+            return [];
+        }
+        return [...statusData.content]
+            .sort((a, b) => (b.reportedAt || b.timestamp || 0) - (a.reportedAt || a.timestamp || 0))
+            .filter((status) => {
+                if (historyFilter === 'all') {
+                    return true;
+                }
+                return getTimelineCategory(status) === historyFilter;
+            })
+            .map((status) => ({
+                color: getStatusTone(status.type, status.code),
+                dot: getTimelineDot(status),
+                children: (
+                    <Space direction="vertical" size={4}>
+                        <Text strong style={{ wordBreak: 'break-word' }}>{getStatusLabel(status.type)}</Text>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                            {status.reportedAt || status.timestamp
+                                ? dayjs(status.reportedAt || status.timestamp).format('YYYY-MM-DD HH:mm')
+                                : '-'}
+                        </Text>
+                        {status.code !== undefined && (
+                            <Tag>{t('actions:statusCode', { code: status.code })}</Tag>
+                        )}
+                        {status.messages?.length ? (
+                            <Space direction="vertical" size={2}>
+                                {status.messages.map((message, index) => (
+                                    <Text key={`${status.id}-${index}`} style={{ wordBreak: 'break-word' }}>
+                                        {translateStatusMessage(message)}
+                                    </Text>
+                                ))}
+                            </Space>
+                        ) : null}
+                    </Space>
+                ),
+            }));
+    }, [historyFilter, statusData?.content, t]);
+
+    const historyCounts = useMemo(() => {
+        const counts = { all: 0, error: 0, download: 0, system: 0 };
+        if (!statusData?.content?.length) {
+            return counts;
+        }
+        counts.all = statusData.content.length;
+        statusData.content.forEach((status) => {
+            const category = getTimelineCategory(status);
+            counts[category] += 1;
+        });
+        return counts;
+    }, [statusData?.content]);
 
     const getForceTypeTag = (forceType?: string) => {
         if (forceType === 'forced') {
@@ -217,6 +381,14 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
         },
     ];
 
+    if (loading) {
+        return <Skeleton active paragraph={{ rows: 8 }} />;
+    }
+
+    if (!data?.content?.length) {
+        return <Empty description={t('common:messages.noData')} />;
+    }
+
     return (
         <>
             <Table<MgmtAction>
@@ -227,55 +399,71 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
                 size="middle"
             />
             <Modal
-                title={t('actions:statusHistoryTitle')}
+                title={
+                    <Space align="center">
+                        <Text strong>{t('actions:statusHistoryTitle')}</Text>
+                        <Label color="blue">{selectedAction ? `#${selectedAction.id}` : ''}</Label>
+                    </Space>
+                }
                 open={modalOpen}
                 onCancel={() => setModalOpen(false)}
                 footer={null}
-                destroyOnClose
-                width={640}
+                destroyOnHidden
+                width={680}
+                bodyStyle={{ padding: 24 }}
             >
                 {selectedAction && (
                     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                        <Space>
-                            <Text strong>
-                                {t('actions:statusHistoryHeader', { id: selectedAction.id })}
-                            </Text>
-                            {getStatusTag(selectedAction.status)}
+                        <Space align="center" style={{ width: '100%', justifyContent: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
+                            <Space>
+                                {getStatusTag(selectedAction.status)}
+                                <Text type="secondary">{dayjs(selectedAction.createdAt).format('YYYY-MM-DD HH:mm')}</Text>
+                            </Space>
                         </Space>
                         {statusLoading ? (
                             <Skeleton active paragraph={{ rows: 4 }} />
-                        ) : statusData?.content?.length ? (
-                            <Timeline
-                                items={[...statusData.content]
-                                    .sort((a, b) => (b.reportedAt || b.timestamp || 0) - (a.reportedAt || a.timestamp || 0))
-                                    .map((status) => ({
-                                        color: getStatusTone(status.type, status.code),
-                                        children: (
-                                            <Space direction="vertical" size={4}>
-                                                <Text strong>
-                                                    {status.type || t('common:status.unknown')}
-                                                </Text>
-                                                <Text type="secondary" style={{ fontSize: 12 }}>
-                                                    {status.reportedAt || status.timestamp
-                                                        ? dayjs(status.reportedAt || status.timestamp).format('YYYY-MM-DD HH:mm')
-                                                        : '-'}
-                                                </Text>
-                                                {status.code !== undefined && (
-                                                    <Tag>{t('actions:statusCode', { code: status.code })}</Tag>
-                                                )}
-                                                {status.messages?.length ? (
-                                                    <Space direction="vertical" size={2}>
-                                                        {status.messages.map((message, index) => (
-                                                            <Text key={`${status.id}-${index}`}>{message}</Text>
-                                                        ))}
-                                                    </Space>
-                                                ) : null}
-                                            </Space>
-                                        ),
-                                    }))}
-                            />
                         ) : (
-                            <Empty description={t('actions:statusHistoryEmpty')} />
+                            <div style={{ maxHeight: 420, overflowY: 'auto', paddingRight: 4 }}>
+                                <Space align="center" direction="vertical" style={{ marginBottom: 12 }}>
+                                    <Text type="secondary">{t('actions:statusHistoryFilter')}</Text>
+                                    <Radio.Group
+                                        value={historyFilter}
+                                        onChange={(event) => setHistoryFilter(event.target.value)}
+                                        optionType="default"
+                                        size="small"
+                                    >
+                                        <Radio.Button value="all">
+                                            <Space align="center" size={4}>
+                                                {t('actions:statusFilters.all')}
+                                                <Badge count={historyCounts.all} size="small" />
+                                            </Space>
+                                        </Radio.Button>
+                                        <Radio.Button value="error">
+                                            <Space align="center" size={4}>
+                                                {t('actions:statusFilters.error')}
+                                                <Badge count={historyCounts.error} size="small" />
+                                            </Space>
+                                        </Radio.Button>
+                                        <Radio.Button value="download">
+                                            <Space align="center" size={4}>
+                                                {t('actions:statusFilters.download')}
+                                                <Badge count={historyCounts.download} size="small" />
+                                            </Space>
+                                        </Radio.Button>
+                                        <Radio.Button value="system">
+                                            <Space align="center" size={4}>
+                                                {t('actions:statusFilters.system')}
+                                                <Badge count={historyCounts.system} size="small" />
+                                            </Space>
+                                        </Radio.Button>
+                                    </Radio.Group>
+                                </Space>
+                                {timelineItems.length ? (
+                                    <Timeline items={timelineItems} />
+                                ) : (
+                                    <Empty description={t('actions:statusHistoryEmpty')} />
+                                )}
+                            </div>
                         )}
                     </Space>
                 )}

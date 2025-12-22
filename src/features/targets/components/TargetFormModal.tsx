@@ -45,7 +45,7 @@ const TargetFormModal: React.FC<TargetFormModalProps> = ({
             okText={isEdit ? t('common:actions.update') : t('common:actions.create')}
             okButtonProps={{ loading }}
             cancelButtonProps={{ disabled: loading }}
-            destroyOnClose
+            destroyOnHidden
             afterOpenChange={(open) => {
                 if (open && isEdit && target) {
                     form.setFieldsValue({

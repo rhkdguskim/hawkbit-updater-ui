@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Tag, Space, Button, Tooltip, Typography } from 'antd';
 import type { TableProps } from 'antd';
+import type { FilterValue } from 'antd/es/table/interface';
 import {
     EyeOutlined,
     DeleteOutlined,
@@ -27,7 +28,7 @@ interface TargetTableProps {
         pageSize: number;
     };
     scrollY?: number;
-    onPaginationChange: (page: number, pageSize: number) => void;
+    onPaginationChange: (page?: number, pageSize?: number) => void;
     onSortChange: (field: string, order: 'ASC' | 'DESC' | null) => void;
     onView: (target: MgmtTarget) => void;
     onDelete: (target: MgmtTarget) => void;
@@ -38,6 +39,7 @@ interface TargetTableProps {
     availableTypes?: MgmtTargetType[];
     onFilterChange?: (filters: { tagName?: string; typeName?: string }) => void;
     filters?: { tagName?: string; typeName?: string };
+    onChange?: TableProps<MgmtTarget>['onChange'];
 }
 
 import { useTranslation } from 'react-i18next';
@@ -60,6 +62,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
     availableTypes,
     onFilterChange,
     filters,
+    onChange,
 }) => {
     const { t } = useTranslation('targets');
 
@@ -99,6 +102,14 @@ const TargetTable: React.FC<TargetTableProps> = ({
         const id = resolved?.href?.split('/').pop();
         const label = resolved?.name || resolved?.title || id;
         return id ? { id, label: label || id } : undefined;
+    };
+
+    const extractFilterValue = (value: FilterValue | null | undefined) => {
+        if (!value) return undefined;
+        if (Array.isArray(value)) {
+            return value.length > 0 ? String(value[0]) : undefined;
+        }
+        return String(value);
     };
 
     const columns: TableProps<MgmtTarget>['columns'] = [
@@ -258,7 +269,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
 
     const handleTableChange: TableProps<MgmtTarget>['onChange'] = (
         paginationConfig,
-        filters,
+        tableFilters,
         sorter
     ) => {
         handlePaginationUpdate(paginationConfig.current, paginationConfig.pageSize);
@@ -274,12 +285,14 @@ const TargetTable: React.FC<TargetTableProps> = ({
 
         // Handle filters
         if (onFilterChange) {
-            const tagFilter = filters['tags'];
-            const typeFilter = filters['targetTypeName'];
-            const nextTagName = tagFilter && tagFilter.length > 0 ? tagFilter[0] as string : undefined;
-            const nextTypeName = typeFilter && typeFilter.length > 0 ? typeFilter[0] as string : undefined;
+            const nextTagName = extractFilterValue(tableFilters['tags']);
+            const nextTypeName = extractFilterValue(tableFilters['targetTypeName']);
+            const currentFilters = filters || {};
 
-            if (nextTagName !== filters?.tagName || nextTypeName !== filters?.typeName) {
+            if (
+                nextTagName !== currentFilters.tagName ||
+                nextTypeName !== currentFilters.typeName
+            ) {
                 onFilterChange({
                     tagName: nextTagName,
                     typeName: nextTypeName,
@@ -306,7 +319,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
                 onShowSizeChange: (_current, size) => handlePaginationUpdate(1, size),
                 position: ['topRight'],
             }}
-            onChange={handleTableChange}
+            onChange={onChange || handleTableChange}
             scroll={scrollY ? { x: 1000, y: scrollY } : { x: 1000 }}
             size="middle"
             rowSelection={rowSelection}

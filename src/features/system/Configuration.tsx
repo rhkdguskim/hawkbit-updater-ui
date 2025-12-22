@@ -31,6 +31,7 @@ import {
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { PageContainer, HeaderRow } from '@/components/layout/PageLayout';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -143,14 +144,37 @@ const Configuration: React.FC = () => {
         }
     }, [data]);
 
-    // Get all keys from data that exist in config groups
-    const configuredKeys = useMemo(() => {
-        const keys = new Set<string>();
-        CONFIG_GROUPS.forEach((group) => {
-            group.items.forEach((item) => keys.add(item.key));
-        });
-        return keys;
-    }, []);
+
+
+    // Calculate dynamic groups
+    const allGroups = useMemo(() => {
+        if (!data) return CONFIG_GROUPS;
+
+        const knownKeys = new Set(CONFIG_GROUPS.flatMap(g => g.items.map(i => i.key)));
+        const allKeys = Object.keys(data);
+        const unknownKeys = allKeys.filter(key => !knownKeys.has(key));
+
+        if (unknownKeys.length === 0) return CONFIG_GROUPS;
+
+        const unknownGroup: ConfigGroup = {
+            titleKey: 'groups.otherSettings',
+            descKey: 'groups.otherSettingsDesc',
+            items: unknownKeys.map(key => {
+                const value = (data as any)[key]?.value ?? (data as any)[key];
+                const type = typeof value === 'boolean' ? 'boolean'
+                    : typeof value === 'number' ? 'number'
+                        : Array.isArray(value) ? 'array'
+                            : 'string';
+                return {
+                    key,
+                    type,
+                    descKey: key // Use key as description if translation missing
+                } as ConfigItem;
+            })
+        };
+
+        return [...CONFIG_GROUPS, unknownGroup];
+    }, [data]);
 
     // Admin only access
     if (!isAdmin) {
@@ -212,7 +236,8 @@ const Configuration: React.FC = () => {
         const changedValues: Record<string, unknown> = {};
         Object.entries(editedValues).forEach(([key, value]) => {
             const originalValue = extractValue(data?.[key as keyof typeof data]);
-            if (JSON.stringify(value) !== JSON.stringify(originalValue) && configuredKeys.has(key)) {
+            // Allow saving if value changed (removed configuredKeys check to support dynamic keys)
+            if (JSON.stringify(value) !== JSON.stringify(originalValue)) {
                 changedValues[key] = value;
             }
         });
@@ -408,81 +433,74 @@ const Configuration: React.FC = () => {
     };
 
     return (
-        <div style={{ padding: 24 }}>
+        <PageContainer>
             {contextHolder}
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                {/* Header */}
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                        gap: 16,
-                    }}
-                >
-                    <Space>
-                        <Title level={2} style={{ margin: 0 }}>
-                            {t('pageTitle')}
-                        </Title>
-                        {isEditMode ? (
-                            <Tag color="orange">{t('editMode')}</Tag>
-                        ) : (
-                            <Tag color="blue">{t('readOnly')}</Tag>
-                        )}
-                    </Space>
-                    <Space>
-                        {isEditMode ? (
-                            <>
-                                <Button icon={<CloseOutlined />} onClick={handleCancel}>
-                                    {t('cancel')}
-                                </Button>
-                                <Button
-                                    type="primary"
-                                    icon={<SaveOutlined />}
-                                    onClick={handleSave}
-                                    loading={updateMutation.isPending}
-                                    disabled={Object.keys(validationErrors).length > 0}
-                                >
-                                    {updateMutation.isPending ? t('saving') : t('save')}
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <Button
-                                    icon={<ReloadOutlined />}
-                                    onClick={() => refetch()}
-                                    loading={isLoading}
-                                >
-                                    {t('refresh')}
-                                </Button>
-                                <Button
-                                    type="primary"
-                                    icon={<EditOutlined />}
-                                    onClick={() => setIsEditMode(true)}
-                                >
-                                    {t('edit')}
-                                </Button>
-                            </>
-                        )}
-                    </Space>
-                </div>
 
-                {/* Configuration Groups */}
+            <HeaderRow>
+                <Space direction="vertical" size={0}>
+                    <Title level={2} style={{ margin: 0 }}>
+                        {t('pageTitle')}
+                    </Title>
+                    <Space size={4}>
+                        {isEditMode ? (
+                            <Tag color="orange" style={{ margin: 0 }}>{t('editMode')}</Tag>
+                        ) : (
+                            <Tag color="blue" style={{ margin: 0 }}>{t('readOnly')}</Tag>
+                        )}
+                    </Space>
+                </Space>
+                <Space>
+                    {isEditMode ? (
+                        <>
+                            <Button icon={<CloseOutlined />} onClick={handleCancel}>
+                                {t('cancel')}
+                            </Button>
+                            <Button
+                                type="primary"
+                                icon={<SaveOutlined />}
+                                onClick={handleSave}
+                                loading={updateMutation.isPending}
+                                disabled={Object.keys(validationErrors).length > 0}
+                            >
+                                {updateMutation.isPending ? t('saving') : t('save')}
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button
+                                icon={<ReloadOutlined />}
+                                onClick={() => refetch()}
+                                loading={isLoading}
+                            >
+                                {t('refresh')}
+                            </Button>
+                            <Button
+                                type="primary"
+                                icon={<EditOutlined />}
+                                onClick={() => setIsEditMode(true)}
+                            >
+                                {t('edit')}
+                            </Button>
+                        </>
+                    )}
+                </Space>
+            </HeaderRow>
+
+            <div style={{ overflowY: 'auto', flex: 1 }}>
                 <Row gutter={[16, 16]}>
                     <Col xs={24} lg={12}>
-                        {CONFIG_GROUPS.filter((_, i) => i % 2 === 0).map((group, i) =>
+                        {allGroups.filter((_, i) => i % 2 === 0).map((group, i) =>
                             renderGroup(group, i * 2)
                         )}
                     </Col>
                     <Col xs={24} lg={12}>
-                        {CONFIG_GROUPS.filter((_, i) => i % 2 === 1).map((group, i) =>
+                        {allGroups.filter((_, i) => i % 2 === 1).map((group, i) =>
                             renderGroup(group, i * 2 + 1)
                         )}
                     </Col>
                 </Row>
-            </Space>
-        </div>
+            </div>
+        </PageContainer>
     );
 };
 

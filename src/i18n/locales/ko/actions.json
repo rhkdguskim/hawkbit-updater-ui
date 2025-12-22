@@ -36,12 +36,40 @@
         "total": "총 {{count}}개 액션",
         "range": "{{start}}-{{end}} / {{total}}개"
     },
+    "summary": {
+        "total": "전체 액션",
+        "active": "진행 중",
+        "errors": "오류 포함",
+        "completed": "완료됨"
+    },
     "statusHistoryTitle": "액션 상태 이력",
     "statusHistoryHeader": "액션 #{{id}}",
     "statusHistoryEmpty": "상태 이력이 없습니다",
     "statusCode": "상태 코드: {{code}}",
+    "statusMessages": {
+        "updateFailedRollback": "업데이트에 실패하여 롤백되었습니다",
+        "startingServices": "서비스를 시작하는 중",
+        "updatingBinaries": "바이너리 업데이트 중",
+        "downloadingArtifacts": "아티팩트 다운로드 중",
+        "verifyingServicesStopped": "서비스 중지 확인 중",
+        "stoppingServices": "{{service}} 서비스 중지 중",
+        "creatingBackup": "백업 생성 중",
+        "startingUpdateProcess": "업데이트 프로세스 시작",
+        "targetRetrieved": "업데이트 서버: 대상이 업데이트 액션을 수신했으며 다운로드를 시작합니다.",
+        "targetDownloads": "업데이트 서버: 대상이 다운로드 중 {{path}}",
+        "assignmentInitiated": "사용자 '{{user}}'가 할당을 시작했습니다"
+    },
+    "statusHistoryFilter": "필터",
+    "statusFilters": {
+        "all": "전체",
+        "error": "오류",
+        "download": "다운로드",
+        "system": "시스템"
+    },
     "actions": {
-        "view": "보기"
+        "view": "보기",
+        "addAction": "액션 추가",
+        "addActionComingSoon": "액션 생성 기능은 곧 제공됩니다."
     },
     "detail": {
         "pageTitle": "액션 상세",

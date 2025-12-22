@@ -98,7 +98,7 @@ const DistributionSetTypeDialog: React.FC<DistributionSetTypeDialogProps> = ({
             onOk={handleOk}
             onCancel={onClose}
             confirmLoading={createMutation.isPending || updateMutation.isPending}
-            destroyOnClose
+            destroyOnHidden
         >
             <Form form={form} layout="vertical">
                 <Form.Item

@@ -154,7 +154,7 @@ const AssignDSModal: React.FC<AssignDSModalProps> = ({
                 </Space>
             }
             width={500}
-            destroyOnClose
+            destroyOnHidden
         >
             <Form
                 form={form}

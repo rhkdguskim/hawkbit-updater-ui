@@ -1,6 +1,8 @@
 import React, { useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { Typography, Card, message, Alert, Space, Tag, Tooltip } from 'antd';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { PageContainer, HeaderRow } from '@/components/layout/PageLayout';
+import { useServerTable } from '@/hooks/useServerTable';
 import {
     TargetTable,
     TargetSearchBar,
@@ -25,44 +27,39 @@ import { useGetDistributionSets } from '@/api/generated/distribution-sets/distri
 import type { MgmtTarget, MgmtDistributionSetAssignments, MgmtDistributionSetAssignment } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
-import styled from 'styled-components';
 import { useGetTargetTags } from '@/api/generated/target-tags/target-tags';
 import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
-import type { MgmtTag, MgmtTargetType } from '@/api/generated/model';
+import { useGetFilters } from '@/api/generated/target-filter-queries/target-filter-queries';
+import type { MgmtTag, MgmtTargetType, MgmtTargetFilterQuery } from '@/api/generated/model';
 
-const { Title } = Typography;
+import { FilterOutlined } from '@ant-design/icons';
 
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    height: 100%;
-    overflow: hidden;
-`;
+const { Title, Text } = Typography;
 
-const HeaderRow = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-`;
+// Styled components removed in favor of PageLayout
+
 
 const TargetList: React.FC = () => {
     const navigate = useNavigate();
-    const location = useLocation();
     const queryClient = useQueryClient();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
     const { t } = useTranslation('targets');
 
-    // Pagination & Sorting State
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
-    const [sort, setSort] = useState<string>('');
-    const [searchQuery, setSearchQuery] = useState<string>(() => {
-        const params = new URLSearchParams(location.search);
-        return params.get('q') || '';
-    });
+    // Use Shared Hook
+    const {
+        pagination,
+        offset,
+        sort,
+        searchQuery,
+        setSearchQuery,
+        handleTableChange,
+        handleSearch,
+        resetPagination,
+        setPagination,
+    } = useServerTable<MgmtTarget>({ syncToUrl: true });
+
+    // Additional Filters
     const [selectedTagName, setSelectedTagName] = useState<string | undefined>(undefined);
     const [selectedTypeName, setSelectedTypeName] = useState<string | undefined>(undefined);
     const [selectedTargetIds, setSelectedTargetIds] = useState<string[]>([]);
@@ -81,17 +78,7 @@ const TargetList: React.FC = () => {
     const [assignModalOpen, setAssignModalOpen] = useState(false);
     const [targetToAssign, setTargetToAssign] = useState<MgmtTarget | null>(null);
 
-    // Sync URL query param to state
-    React.useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const q = params.get('q');
-        if (q !== null && q !== searchQuery) {
-            setSearchQuery(q);
-        }
-    }, [location.search]);
 
-    // Calculate offset for API
-    const offset = (pagination.current - 1) * pagination.pageSize;
 
     useLayoutEffect(() => {
         if (!tableContainerRef.current) {
@@ -104,6 +91,10 @@ const TargetList: React.FC = () => {
             setTableScrollY(scrollHeight);
         };
         updateHeight();
+        if (typeof ResizeObserver === 'undefined') {
+            window.addEventListener('resize', updateHeight);
+            return () => window.removeEventListener('resize', updateHeight);
+        }
         const observer = new ResizeObserver(updateHeight);
         observer.observe(element);
         return () => observer.disconnect();
@@ -114,6 +105,31 @@ const TargetList: React.FC = () => {
         { limit: 100 },
         { query: { staleTime: 60000 } }
     );
+
+    // Get saved filters for Quick Access
+    const { data: filtersData } = useGetFilters(
+        { limit: 20 },
+        { query: { staleTime: 60000 } }
+    );
+    const savedFilters = filtersData?.content || [];
+
+    const handleFilterSelect = (filter: MgmtTargetFilterQuery) => {
+        if (activeSavedFilter?.id === filter.id) {
+            // Deselect
+            setActiveSavedFilter(null);
+            setSearchQuery('');
+            setSearchResetSignal((prev) => prev + 1);
+        } else {
+            // Select
+            setActiveSavedFilter({
+                id: filter.id,
+                name: filter.name,
+                query: filter.query || '',
+            });
+            setSearchQuery(filter.query || '');
+        }
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
 
     // Get target types for filters
     const { data: typesData } = useGetTargetTypes(
@@ -211,26 +227,10 @@ const TargetList: React.FC = () => {
     });
 
     // Handlers
-    const handlePaginationChange = useCallback((page?: number, pageSize?: number) => {
-        setPagination((prev) => ({
-            current: page ?? prev.current,
-            pageSize: pageSize ?? prev.pageSize,
-        }));
-    }, []);
-
-    const handleSortChange = useCallback((field: string, order: 'ASC' | 'DESC' | null) => {
-        if (order) {
-            setSort(`${field}:${order}`);
-        } else {
-            setSort('');
-        }
-    }, []);
-
-    const handleSearch = useCallback((query: string) => {
-        setSearchQuery(query);
-        setPagination((prev) => ({ ...prev, current: 1 })); // Reset to first page
+    const handleSearchWrapper = useCallback((query: string) => {
+        handleSearch(query);
         setActiveSavedFilter(null);
-    }, []);
+    }, [handleSearch]);
 
     const handleViewTarget = useCallback(
         (target: MgmtTarget) => {
@@ -315,7 +315,7 @@ const TargetList: React.FC = () => {
                 styles={{ body: { height: '100%', display: 'flex', flexDirection: 'column' } }}
             >
                 <TargetSearchBar
-                    onSearch={handleSearch}
+                    onSearch={handleSearchWrapper}
                     onRefresh={() => refetchTargets()}
                     onAddTarget={handleAddTarget}
                     canAddTarget={isAdmin}
@@ -410,14 +410,47 @@ const TargetList: React.FC = () => {
                 )}
 
                 <div ref={tableContainerRef} style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                    {/* Saved Filters Quick Access */}
+                    <div style={{ padding: '0 2px', marginBottom: 16 }}>
+                        <Space wrap size={[8, 8]}>
+                            <Text type="secondary" style={{ fontSize: 13, marginRight: 4 }}>
+                                {t('quickFilters')}:
+                            </Text>
+                            {savedFilters.slice(0, 5).map(filter => (
+                                <Tag.CheckableTag
+                                    key={filter.id}
+                                    checked={activeSavedFilter?.id === filter.id}
+                                    onChange={() => handleFilterSelect(filter)}
+                                    style={{
+                                        border: '1px solid #d9d9d9',
+                                        padding: '2px 8px',
+                                        fontSize: 13
+                                    }}
+                                >
+                                    {filter.name}
+                                </Tag.CheckableTag>
+                            ))}
+                            <Button
+                                type="link"
+                                size="small"
+                                icon={<FilterOutlined />}
+                                onClick={() => setSavedFiltersOpen(true)}
+                                style={{ padding: 0, marginLeft: 8 }}
+                            >
+                                {t('manageFilters')}
+                            </Button>
+                        </Space>
+                    </div>
+
                     <TargetTable
                         data={targetsData?.content || []}
                         loading={targetsLoading || targetsFetching}
                         total={targetsData?.total || 0}
                         pagination={pagination}
                         scrollY={tableScrollY}
-                        onPaginationChange={handlePaginationChange}
-                        onSortChange={handleSortChange}
+                        onChange={handleTableChange}
+                        onPaginationChange={() => { }} // Handled by onChange
+                        onSortChange={() => { }} // Handled by onChange
                         onView={handleViewTarget}
                         onDelete={handleDeleteClick}
                         canDelete={isAdmin}
@@ -431,7 +464,7 @@ const TargetList: React.FC = () => {
                         onFilterChange={(filters) => {
                             setSelectedTagName(filters.tagName);
                             setSelectedTypeName(filters.typeName);
-                            setPagination(prev => ({ ...prev, current: 1 }));
+                            resetPagination();
                         }}
                     />
                 </div>

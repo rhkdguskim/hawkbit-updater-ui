@@ -15,27 +15,14 @@ import { format } from 'date-fns';
 import { DistributionSetTagsCell } from './components/DistributionSetTagsCell';
 
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import { keepPreviousData } from '@tanstack/react-query';
 
 import BulkManageSetTagsModal from './components/BulkManageSetTagsModal';
+import { PageContainer, HeaderRow } from '@/components/layout/PageLayout';
+import { useServerTable } from '@/hooks/useServerTable';
+
 
 const { Title } = Typography;
-
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    height: 100%;
-`;
-
-const HeaderRow = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-`;
 
 const DistributionSetList: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
@@ -43,18 +30,23 @@ const DistributionSetList: React.FC = () => {
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
 
-    // Pagination & Sorting State
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
-    const [sort, setSort] = useState<string>('');
-    const [searchQuery, setSearchQuery] = useState<string>('');
+    // Shared Hook
+    const {
+        pagination,
+        offset,
+        sort,
+        searchQuery,
+        handleTableChange,
+        handleSearch,
+    } = useServerTable<MgmtDistributionSet>({ syncToUrl: true });
+
     const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
 
     // Bulk Action State
     const [selectedSetIds, setSelectedSetIds] = useState<number[]>([]);
     const [bulkTagsModalOpen, setBulkTagsModalOpen] = useState(false);
 
-    // Calculate offset for API
-    const offset = (pagination.current - 1) * pagination.pageSize;
+
 
     // API Query
     const {
@@ -102,32 +94,11 @@ const DistributionSetList: React.FC = () => {
         });
     };
 
-    const handleSearch = useCallback((query: string) => {
-        setSearchQuery(query);
-        setPagination((prev) => ({ ...prev, current: 1 }));
-    }, []);
+    const handleSearchInternal = useCallback((query: string) => {
+        handleSearch(query);
+    }, [handleSearch]);
 
-    const handleTableChange: TableProps<MgmtDistributionSet>['onChange'] = (
-        newPagination,
-        _,
-        sorter
-    ) => {
-        setPagination((prev) => ({
-            ...prev,
-            current: newPagination.current || 1,
-            pageSize: newPagination.pageSize || 20,
-        }));
 
-        if (Array.isArray(sorter)) {
-            // Handle multiple sorters if needed
-        } else if (sorter.field && sorter.order) {
-            const field = sorter.field as string;
-            const order = sorter.order === 'ascend' ? 'ASC' : 'DESC';
-            setSort(`${field}:${order}`);
-        } else {
-            setSort('');
-        }
-    };
 
     const columns: TableProps<MgmtDistributionSet>['columns'] = [
         {
@@ -136,7 +107,7 @@ const DistributionSetList: React.FC = () => {
             key: 'name',
             sorter: true,
             render: (text, record) => (
-                <a onClick={() => navigate(`/distributions/sets/${record.id}`)}>{text}</a>
+                <a onClick={() => navigate(`/ distributions / sets / ${record.id} `)}>{text}</a>
             ),
         },
         {
@@ -191,7 +162,7 @@ const DistributionSetList: React.FC = () => {
                         <Button
                             type="text"
                             icon={<EyeOutlined />}
-                            onClick={() => navigate(`/distributions/sets/${record.id}`)}
+                            onClick={() => navigate(`/ distributions / sets / ${record.id} `)}
                         />
                     </Tooltip>
                     {isAdmin && (
@@ -223,7 +194,7 @@ const DistributionSetList: React.FC = () => {
             >
                 <DistributionSearchBar
                     type="set"
-                    onSearch={handleSearch}
+                    onSearch={handleSearchInternal}
                     onRefresh={refetch}
                     onAdd={() => setIsCreateModalVisible(true)}
                     canAdd={isAdmin}
