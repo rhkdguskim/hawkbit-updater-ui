@@ -200,8 +200,14 @@ const Dashboard: React.FC = () => {
     const { t } = useTranslation(['dashboard', 'common']);
     const navigate = useNavigate();
 
-    const { data: targetsData, isLoading: targetsLoading, refetch: refetchTargets } = useGetTargets({ limit: 500 });
-    const { data: actionsData, isLoading: actionsLoading, refetch: refetchActions } = useGetActions({ limit: 100 });
+    const { data: targetsData, isLoading: targetsLoading, refetch: refetchTargets } = useGetTargets(
+        { limit: 100 },
+        { query: { staleTime: 30000 } }
+    );
+    const { data: actionsData, isLoading: actionsLoading, refetch: refetchActions } = useGetActions(
+        { limit: 50 },
+        { query: { staleTime: 15000 } }
+    );
 
     const isLoading = targetsLoading || actionsLoading;
     const refetch = () => { refetchTargets(); refetchActions(); };

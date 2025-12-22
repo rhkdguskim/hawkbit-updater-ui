@@ -63,7 +63,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ target, loading }) => {
                     <StyledCard>
                         <Statistic
                             title={t('overview.updateStatus')}
-                            value={target.updateStatus ? t(`status.${target.updateStatus}`, { defaultValue: target.updateStatus }) : t('status.unknown')}
+                            value={target.updateStatus ? t(`common:status.${target.updateStatus}`, { defaultValue: target.updateStatus }) : t('status.unknown')}
                             prefix={<DesktopOutlined />}
                         />
                     </StyledCard>

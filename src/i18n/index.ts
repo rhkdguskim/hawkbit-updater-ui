@@ -1,6 +1,11 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 // Korean translations
 import koCommon from './locales/ko/common.json';
@@ -49,6 +54,11 @@ const resources = {
     },
 };
 
+// Sync dayjs locale with i18n language
+const syncDayjsLocale = (lng: string) => {
+    dayjs.locale(lng === 'ko' ? 'ko' : 'en');
+};
+
 i18n
     .use(LanguageDetector)
     .use(initReactI18next)
@@ -66,5 +76,11 @@ i18n
             lookupLocalStorage: 'updater-language',
         },
     });
+
+// Set initial dayjs locale
+syncDayjsLocale(i18n.language);
+
+// Listen for language changes
+i18n.on('languageChanged', syncDayjsLocale);
 
 export default i18n;

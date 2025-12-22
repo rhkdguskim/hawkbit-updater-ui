@@ -63,7 +63,8 @@
         "starting": "Starting",
         "stopped": "Stopped",
         "canceling": "Canceling",
-        "retrieving": "Retrieving"
+        "retrieving": "Retrieving",
+        "registered": "Registered"
     },
     "messages": {
         "success": "Operation completed successfully.",

@@ -63,7 +63,8 @@
         "starting": "시작 중",
         "stopped": "중지됨",
         "canceling": "취소 중",
-        "retrieving": "수신 중"
+        "retrieving": "수신 중",
+        "registered": "등록됨"
     },
     "messages": {
         "success": "성공적으로 처리되었습니다.",
