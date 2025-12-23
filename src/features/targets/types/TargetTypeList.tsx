@@ -255,6 +255,7 @@ const TargetTypeList: React.FC = () => {
                     pageSizeOptions: ['10', '20', '50'],
                     onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
                 }}
+                size="small"
             />
 
             <TargetTypeDialog

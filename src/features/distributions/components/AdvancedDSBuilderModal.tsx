@@ -206,7 +206,7 @@ const AdvancedDSBuilderModal: React.FC<AdvancedDSBuilderModalProps> = ({
                         />
 
                         {selectedModules.length > 0 && (
-                            <div style={{ background: '#f5f5f5', padding: '12px', borderRadius: '8px' }}>
+                            <div style={{ background: 'var(--ant-color-fill-alter, #f5f5f5)', padding: '12px', borderRadius: '8px' }}>
                                 <Text strong>{t('builder.selectionPreview')}</Text>
                                 <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                                     {selectedModules.map(m => (

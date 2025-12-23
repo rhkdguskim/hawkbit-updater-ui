@@ -35,6 +35,7 @@ export const DistributionSetTagsCell: React.FC<DistributionSetTagsCellProps> = (
         if (!allTags.length) return;
         setLoadingAssignments(true);
         const assigned: number[] = [];
+        const token = useAuthStore.getState().token;
 
         // This is inefficient but matching how hawkBit works for DS tags without a direct "tags per DS" endpoint
         // In a real high-perf scenario, we'd need a custom endpoint or better query support
@@ -43,7 +44,7 @@ export const DistributionSetTagsCell: React.FC<DistributionSetTagsCellProps> = (
                 if (!tag.id) return;
                 const response = await fetch(`/rest/v1/distributionsettags/${tag.id}/assigned?q=id==${distributionSetId}`, {
                     headers: {
-                        'Authorization': `Basic ${btoa('admin:admin')}`, // Fast-track for demo/dev
+                        'Authorization': `Basic ${token}`,
                     },
                 });
                 const data = await response.json();

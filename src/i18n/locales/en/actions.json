@@ -142,7 +142,8 @@
         "activeActions": "Active Actions",
         "recentActions": "Recent Actions (24h)",
         "noActiveActions": "No active actions",
-        "noRecentActions": "No recent actions"
+        "noRecentActions": "No recent actions",
+        "viewAllActions": "View All Actions"
     },
     "status": {
         "running": "Running",

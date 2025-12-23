@@ -230,6 +230,7 @@ const DistributionSetList: React.FC = () => {
                             onChange: (keys) => setSelectedSetIds(keys as number[]),
                         }}
                         scroll={{ x: 1000, y: '100%' }}
+                        size="small"
                     />
                 </div>
                 <CreateDistributionSetWizard

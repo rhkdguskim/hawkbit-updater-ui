@@ -53,13 +53,13 @@
         "total": "total",
         "online": "Online",
         "offline": "Offline",
-        "connectivityStatus": "Connectivity Status",
+        "connectivityStatus": "Target Connection Status",
         "deploymentRate": "Deployment Rate",
         "deploymentRateDesc": "Target completion rate",
         "targets": "targets",
         "rolloutStatus": "Rollout Status",
         "actionStatus": "Action Status (24h)",
-        "fragmentation": "Firmware Status"
+        "fragmentation": "Target Update Status"
     },
     "recentActions": {
         "title": "Recent Actions (24h)",
@@ -84,7 +84,14 @@
         "title": "Recent Device Activity"
     },
     "deviceGrid": {
-        "title": "Device Status Grid"
+        "title": "Device Status"
+    },
+    "activeUpdates": {
+        "title": "Active Updates",
+        "empty": "No active updates",
+        "noHistory": "No status history",
+        "expandHistory": "View History",
+        "statusHistory": "Status History"
     },
     "rollout": {
         "activeMonitor": "Active Rollout Monitor",

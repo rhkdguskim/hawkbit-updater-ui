@@ -17,7 +17,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 import { useGetActions } from '@/api/generated/actions/actions';
-import { AirportSlideList } from '@/components/common';
+import { AirportSlideList, ActiveUpdatesCard } from '@/components/common';
 import { ActionTimeline } from '@/components/common/ActionTimeline';
 import type { MgmtAction } from '@/api/generated/model';
 import {
@@ -159,6 +159,13 @@ const ActionsOverview: React.FC = () => {
                     <Text type="secondary" style={{ fontSize: 12 }}>
                         {t('common:updated', 'Updated')}: {lastUpdated}
                     </Text>
+                    <Button
+                        type="primary"
+                        onClick={() => navigate('/actions/list')}
+                        size="small"
+                    >
+                        {t('overview.viewAllActions', 'View All Actions')}
+                    </Button>
                     <Button
                         icon={<ReloadOutlined />}
                         onClick={() => refetch()}
@@ -355,46 +362,18 @@ const ActionsOverview: React.FC = () => {
                 >
                     {isLoading ? (
                         <Skeleton active paragraph={{ rows: 5 }} />
-                    ) : activeActions.length > 0 ? (
+                    ) : (
                         <div style={{ flex: 1, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                            <AirportSlideList
-                                items={activeActions}
-                                itemHeight={52}
-                                visibleCount={5}
-                                interval={3000}
-                                fullHeight={true}
-                                renderItem={(record: MgmtAction) => (
-                                    <ActivityItem
-                                        key={record.id}
-                                        onClick={() => navigate(`/actions/${record.id}`)}
-                                    >
-                                        <Flex align="center" gap={10} style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{
-                                                width: 32, height: 32, borderRadius: 8,
-                                                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%)',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                flexShrink: 0
-                                            }}>
-                                                {getStatusIcon(record.status)}
-                                            </div>
-                                            <Flex vertical gap={0} style={{ minWidth: 0 }}>
-                                                <Text strong style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                    {getTargetId(record)}
-                                                </Text>
-                                                <Text type="secondary" style={{ fontSize: 10 }}>
-                                                    {record.detailStatus || record.status || '-'}
-                                                </Text>
-                                            </Flex>
-                                        </Flex>
-                                        <ActionTimeline action={record} />
-                                    </ActivityItem>
-                                )}
+                            <ActiveUpdatesCard
+                                items={activeActions.map(action => ({
+                                    action,
+                                    controllerId: getTargetId(action),
+                                }))}
+                                isLoading={false}
+                                showHistory={true}
+                                emptyText={t('overview.noActiveActions', 'No active actions')}
                             />
                         </div>
-                    ) : (
-                        <Flex justify="center" align="center" style={{ flex: 1 }}>
-                            <Text type="secondary">{t('overview.noActiveActions', 'No active actions')}</Text>
-                        </Flex>
                     )}
                 </OverviewListCard>
 

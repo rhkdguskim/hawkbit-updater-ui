@@ -5,6 +5,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { useGetTargets } from '@/api/generated/targets/targets';
 import { useGetActions } from '@/api/generated/actions/actions';
 import { useGetRollouts } from '@/api/generated/rollouts/rollouts';
+import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import type { MgmtAction } from '@/api/generated/model';
 
 dayjs.extend(relativeTime);
@@ -25,6 +26,10 @@ export const useDashboardMetrics = () => {
         { limit: 100 },
         { query: { staleTime: 2000, refetchInterval: 2000 } }
     );
+    const { data: targetTypesData } = useGetTargetTypes(
+        { limit: 100 },
+        { query: { staleTime: 30000 } }
+    );
 
     const isLoading = targetsLoading || actionsLoading || rolloutsLoading;
     const refetch = () => { refetchTargets(); refetchActions(); refetchRollouts(); };
@@ -32,6 +37,17 @@ export const useDashboardMetrics = () => {
 
     const targets = targetsData?.content || [];
     const totalDevices = targetsData?.total ?? 0;
+
+    // Build target type name to color map
+    const targetTypeColorMap = useMemo(() => {
+        const map = new Map<string, string>();
+        targetTypesData?.content?.forEach(tt => {
+            if (tt.name && tt.colour) {
+                map.set(tt.name, tt.colour);
+            }
+        });
+        return map;
+    }, [targetTypesData]);
 
     // Helper Functions
     const isOverdueByExpectedTime = (pollStatus?: { nextExpectedRequestAt?: number }) => {
@@ -213,6 +229,9 @@ export const useDashboardMetrics = () => {
         // Lists
         recentDevices, // Keeping for backward compat if needed, but will likely remove usage
         recentActivities,
+
+        // Target Type Colors
+        targetTypeColorMap,
 
         // Helper
         isActionErrored,

@@ -1,20 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-    Card,
     Typography,
     Spin,
     Alert,
-    Tag,
     Space,
     Button,
     Switch,
     Input,
     InputNumber,
     Form,
-    Row,
-    Col,
     Tooltip,
     message,
+    Flex,
+    Select,
+    TimePicker,
 } from 'antd';
 import {
     ReloadOutlined,
@@ -23,6 +22,15 @@ import {
     CloseOutlined,
     InfoCircleOutlined,
     CheckCircleOutlined,
+    SyncOutlined,
+    SafetyCertificateOutlined,
+    RocketOutlined,
+    DatabaseOutlined,
+    CloudDownloadOutlined,
+    LinkOutlined,
+    SettingOutlined,
+    EyeOutlined,
+    EyeInvisibleOutlined,
 } from '@ant-design/icons';
 import {
     useGetTenantConfiguration,
@@ -31,9 +39,32 @@ import {
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { PageContainer, HeaderRow } from '@/components/layout/PageLayout';
+import dayjs from 'dayjs';
+import {
+    ConfigPageContainer,
+    ConfigHeader,
+    HeaderContent,
+    GradientTitle,
+    StatusIndicator,
+    ConfigGroupsContainer,
+    ConfigGroupCard,
+    GroupIconBadge,
+    ConfigItemRow,
+    ConfigItemLabel,
+    ConfigKeyText,
+    ConfigDescText,
+    ConfigItemValue,
+    BooleanTag,
+    ValueDisplay,
+    ArrayValueContainer,
+    ArrayTag,
+    EmptyValue,
+    NoItemsMessage,
+    GROUP_THEMES,
+} from './ConfigurationStyles';
+import type { GroupThemeKey } from './ConfigurationStyles';
 
-const { Title, Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 // Configuration group definitions
 interface ConfigItem {
@@ -45,6 +76,8 @@ interface ConfigItem {
 interface ConfigGroup {
     titleKey: string;
     descKey: string;
+    icon: React.ReactNode;
+    themeKey: GroupThemeKey;
     items: ConfigItem[];
 }
 
@@ -52,6 +85,8 @@ const CONFIG_GROUPS: ConfigGroup[] = [
     {
         titleKey: 'groups.pollingConnection',
         descKey: 'groups.pollingConnectionDesc',
+        icon: <SyncOutlined />,
+        themeKey: 'polling',
         items: [
             { key: 'pollingTime', type: 'time', descKey: 'descriptions.pollingTime' },
             { key: 'pollingOverdueTime', type: 'time', descKey: 'descriptions.pollingOverdueTime' },
@@ -62,6 +97,8 @@ const CONFIG_GROUPS: ConfigGroup[] = [
     {
         titleKey: 'groups.authSecurity',
         descKey: 'groups.authSecurityDesc',
+        icon: <SafetyCertificateOutlined />,
+        themeKey: 'auth',
         items: [
             { key: 'authentication.targettoken.enabled', type: 'boolean', descKey: 'descriptions.authTargetToken' },
             { key: 'authentication.gatewaytoken.enabled', type: 'boolean', descKey: 'descriptions.authGatewayToken' },
@@ -73,6 +110,8 @@ const CONFIG_GROUPS: ConfigGroup[] = [
     {
         titleKey: 'groups.rolloutPolicy',
         descKey: 'groups.rolloutPolicyDesc',
+        icon: <RocketOutlined />,
+        themeKey: 'rollout',
         items: [
             { key: 'rollout.approval.enabled', type: 'boolean', descKey: 'descriptions.rolloutApproval' },
             { key: 'user.confirmation.flow.enabled', type: 'boolean', descKey: 'descriptions.userConfirmationFlow' },
@@ -81,6 +120,8 @@ const CONFIG_GROUPS: ConfigGroup[] = [
     {
         titleKey: 'groups.repoMaintenance',
         descKey: 'groups.repoMaintenanceDesc',
+        icon: <DatabaseOutlined />,
+        themeKey: 'repo',
         items: [
             { key: 'repository.actions.autoclose.enabled', type: 'boolean', descKey: 'descriptions.actionsAutoclose' },
             { key: 'action.cleanup.enabled', type: 'boolean', descKey: 'descriptions.actionCleanupEnabled' },
@@ -92,6 +133,8 @@ const CONFIG_GROUPS: ConfigGroup[] = [
     {
         titleKey: 'groups.downloadSettings',
         descKey: 'groups.downloadSettingsDesc',
+        icon: <CloudDownloadOutlined />,
+        themeKey: 'download',
         items: [
             { key: 'anonymous.download.enabled', type: 'boolean', descKey: 'descriptions.anonymousDownload' },
         ],
@@ -99,6 +142,8 @@ const CONFIG_GROUPS: ConfigGroup[] = [
     {
         titleKey: 'groups.assignmentSettings',
         descKey: 'groups.assignmentSettingsDesc',
+        icon: <LinkOutlined />,
+        themeKey: 'assignment',
         items: [
             { key: 'multi.assignments.enabled', type: 'boolean', descKey: 'descriptions.multiAssignments' },
             { key: 'batch.assignments.enabled', type: 'boolean', descKey: 'descriptions.batchAssignments' },
@@ -144,9 +189,7 @@ const Configuration: React.FC = () => {
         }
     }, [data]);
 
-
-
-    // Calculate dynamic groups
+    // Calculate dynamic groups for unknown keys
     const allGroups = useMemo(() => {
         if (!data) return CONFIG_GROUPS;
 
@@ -159,8 +202,10 @@ const Configuration: React.FC = () => {
         const unknownGroup: ConfigGroup = {
             titleKey: 'groups.otherSettings',
             descKey: 'groups.otherSettingsDesc',
+            icon: <SettingOutlined />,
+            themeKey: 'other',
             items: unknownKeys.map(key => {
-                const value = (data as any)[key]?.value ?? (data as any)[key];
+                const value = (data as Record<string, { value?: unknown }>)[key]?.value ?? (data as Record<string, unknown>)[key];
                 const type = typeof value === 'boolean' ? 'boolean'
                     : typeof value === 'number' ? 'number'
                         : Array.isArray(value) ? 'array'
@@ -168,7 +213,7 @@ const Configuration: React.FC = () => {
                 return {
                     key,
                     type,
-                    descKey: key // Use key as description if translation missing
+                    descKey: key
                 } as ConfigItem;
             })
         };
@@ -183,9 +228,9 @@ const Configuration: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div style={{ padding: 24, textAlign: 'center' }}>
+            <Flex justify="center" align="center" style={{ height: '100%', minHeight: 300 }}>
                 <Spin size="large" />
-            </div>
+            </Flex>
         );
     }
 
@@ -236,7 +281,6 @@ const Configuration: React.FC = () => {
         const changedValues: Record<string, unknown> = {};
         Object.entries(editedValues).forEach(([key, value]) => {
             const originalValue = extractValue(data?.[key as keyof typeof data]);
-            // Allow saving if value changed (removed configuredKeys check to support dynamic keys)
             if (JSON.stringify(value) !== JSON.stringify(originalValue)) {
                 changedValues[key] = value;
             }
@@ -273,8 +317,86 @@ const Configuration: React.FC = () => {
     const renderValue = (item: ConfigItem): React.ReactNode => {
         const value = editedValues[item.key];
         const hasError = validationErrors[item.key];
+        const themeColor = GROUP_THEMES.polling.color;
+
+        // Action status options for selection
+        const ACTION_STATUS_OPTIONS = [
+            { label: 'canceled', value: 'canceled' },
+            { label: 'error', value: 'error' },
+            { label: 'finished', value: 'finished' },
+            { label: 'warning', value: 'warning' },
+        ];
+
+        // Check for special fields
+        const isActionStatusField = item.key === 'action.cleanup.actionStatus';
+        const isExpiryField = item.key === 'action.cleanup.actionExpiry';
+        const isSecurityTokenField = item.key === 'authentication.gatewaytoken.key';
+        const isTimeField = item.type === 'time';
 
         if (isEditMode) {
+            // Special: Action Status - Multi-select
+            if (isActionStatusField) {
+                return (
+                    <Select
+                        mode="multiple"
+                        style={{ width: 250 }}
+                        placeholder={t('placeholders.selectStatus', 'Select statuses')}
+                        value={Array.isArray(value) ? value : []}
+                        onChange={(vals) => handleValueChange(item.key, vals, item.type)}
+                        options={ACTION_STATUS_OPTIONS}
+                    />
+                );
+            }
+
+            // Special: Expiry Time - Duration with unit (show as days)
+            if (isExpiryField) {
+                const msValue = value as number || 0;
+                const daysValue = Math.floor(msValue / (1000 * 60 * 60 * 24));
+                return (
+                    <Space>
+                        <InputNumber
+                            value={daysValue}
+                            min={0}
+                            onChange={(val) => {
+                                const newMs = (val || 0) * 1000 * 60 * 60 * 24;
+                                handleValueChange(item.key, newMs, item.type);
+                            }}
+                            style={{ width: 100 }}
+                        />
+                        <span style={{ color: '#666', fontSize: 13 }}>{t('units.days', 'days')}</span>
+                    </Space>
+                );
+            }
+
+            // Special: Security Token - Password with toggle
+            if (isSecurityTokenField) {
+                return (
+                    <Input.Password
+                        value={String(value || '')}
+                        onChange={(e) => handleValueChange(item.key, e.target.value, item.type)}
+                        style={{ width: 280 }}
+                        placeholder="Enter security token..."
+                        iconRender={(visible) => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
+                    />
+                );
+            }
+
+            // Time fields - TimePicker
+            if (isTimeField) {
+                const timeValue = value ? dayjs(value as string, 'HH:mm:ss') : null;
+                return (
+                    <TimePicker
+                        value={timeValue}
+                        onChange={(time) => {
+                            const formatted = time ? time.format('HH:mm:ss') : '';
+                            handleValueChange(item.key, formatted, item.type);
+                        }}
+                        format="HH:mm:ss"
+                        style={{ width: 150 }}
+                    />
+                );
+            }
+
             switch (item.type) {
                 case 'boolean':
                     return (
@@ -283,6 +405,7 @@ const Configuration: React.FC = () => {
                             onChange={(checked) => handleValueChange(item.key, checked, item.type)}
                             checkedChildren={t('values.enabled')}
                             unCheckedChildren={t('values.disabled')}
+                            style={{ minWidth: 90 }}
                         />
                     );
                 case 'number':
@@ -295,21 +418,7 @@ const Configuration: React.FC = () => {
                             <InputNumber
                                 value={value as number}
                                 onChange={(val) => handleValueChange(item.key, val, item.type)}
-                                style={{ width: '100%' }}
-                            />
-                        </Form.Item>
-                    );
-                case 'time':
-                    return (
-                        <Form.Item
-                            validateStatus={hasError ? 'error' : undefined}
-                            help={hasError}
-                            style={{ margin: 0 }}
-                        >
-                            <Input
-                                value={value as string}
-                                onChange={(e) => handleValueChange(item.key, e.target.value, item.type)}
-                                placeholder="HH:mm:ss"
+                                style={{ width: 150 }}
                             />
                         </Form.Item>
                     );
@@ -325,6 +434,7 @@ const Configuration: React.FC = () => {
                                 )
                             }
                             placeholder={t('placeholders.array')}
+                            style={{ width: 200 }}
                         />
                     );
                 default:
@@ -332,123 +442,123 @@ const Configuration: React.FC = () => {
                         <Input
                             value={String(value || '')}
                             onChange={(e) => handleValueChange(item.key, e.target.value, item.type)}
+                            style={{ width: 200 }}
                         />
                     );
             }
         }
 
         // Read-only mode
+        // Special display for expiry field (show as days)
+        if (isExpiryField && typeof value === 'number') {
+            const days = Math.floor(value / (1000 * 60 * 60 * 24));
+            return <ValueDisplay style={{ borderColor: `${themeColor}30`, background: `${themeColor}10` }}>{days} {t('units.days', 'days')}</ValueDisplay>;
+        }
+
+        // Special display for security token (masked)
+        if (isSecurityTokenField && value) {
+            return <ValueDisplay style={{ borderColor: `${themeColor}30`, background: `${themeColor}10` }}>{'•'.repeat(12)}</ValueDisplay>;
+        }
+
         if (typeof value === 'boolean') {
             return (
-                <Tag color={value ? 'success' : 'default'} icon={value ? <CheckCircleOutlined /> : undefined}>
+                <BooleanTag $enabled={value}>
+                    {value && <CheckCircleOutlined />}
                     {value ? t('values.enabled') : t('values.disabled')}
-                </Tag>
+                </BooleanTag>
             );
         }
 
         if (value === null || value === undefined) {
-            return <Text type="secondary">-</Text>;
+            return <EmptyValue>-</EmptyValue>;
         }
 
         if (Array.isArray(value)) {
             return value.length > 0 ? (
-                <Space wrap>
+                <ArrayValueContainer>
                     {value.map((v, i) => (
-                        <Tag key={i}>{String(v)}</Tag>
+                        <ArrayTag key={i}>{String(v)}</ArrayTag>
                     ))}
-                </Space>
+                </ArrayValueContainer>
             ) : (
-                <Text type="secondary">-</Text>
+                <EmptyValue>-</EmptyValue>
             );
         }
 
-        return <Text code>{String(value)}</Text>;
+        return <ValueDisplay style={{ borderColor: `${themeColor}30`, background: `${themeColor}10` }}>{String(value)}</ValueDisplay>;
     };
 
-    const renderConfigItem = (item: ConfigItem) => {
+    const renderConfigItem = (item: ConfigItem, index: number) => {
         const exists = item.key in (data || {});
         if (!exists) return null;
 
         return (
-            <Row
-                key={item.key}
-                gutter={16}
-                align="middle"
-                style={{
-                    padding: '12px 0',
-                    borderBottom: '1px solid #f0f0f0',
-                }}
-            >
-                <Col xs={24} sm={24} md={10}>
-                    <Space direction="vertical" size={0}>
-                        <Text code style={{ fontSize: 12 }}>
-                            {item.key}
-                        </Text>
-                        <Text type="secondary" style={{ fontSize: 13 }}>
-                            {t(item.descKey)}
-                        </Text>
-                    </Space>
-                </Col>
-                <Col xs={24} sm={24} md={14}>
-                    <div style={{ marginTop: 8 }}>{renderValue(item)}</div>
-                </Col>
-            </Row>
+            <ConfigItemRow key={item.key} $delay={index}>
+                <ConfigItemLabel>
+                    <ConfigKeyText>{item.key}</ConfigKeyText>
+                    <ConfigDescText>{t(item.descKey)}</ConfigDescText>
+                </ConfigItemLabel>
+                <ConfigItemValue>
+                    {renderValue(item)}
+                </ConfigItemValue>
+            </ConfigItemRow>
         );
     };
 
     const renderGroup = (group: ConfigGroup, index: number) => {
         // Check if any item in group exists in data
-        const hasVisibleItems = group.items.some((item) => item.key in (data || {}));
-        if (!hasVisibleItems) return null;
+        const visibleItems = group.items.filter((item) => item.key in (data || {}));
+        if (visibleItems.length === 0) return null;
 
         return (
-            <Card
+            <ConfigGroupCard
                 key={index}
+                $themeKey={group.themeKey}
+                $delay={index}
                 title={
-                    <Space>
-                        <span>{t(group.titleKey)}</span>
+                    <Flex align="center" gap={12}>
+                        <GroupIconBadge $themeKey={group.themeKey}>
+                            {group.icon}
+                        </GroupIconBadge>
+                        <Flex vertical gap={0}>
+                            <span>{t(group.titleKey)}</span>
+                            <Text type="secondary" style={{ fontSize: 11, fontWeight: 400 }}>
+                                {visibleItems.length} {t('common:items', 'items')}
+                            </Text>
+                        </Flex>
                         <Tooltip title={t(group.descKey)}>
-                            <InfoCircleOutlined style={{ color: '#999' }} />
+                            <InfoCircleOutlined style={{ color: '#94a3b8', fontSize: 14 }} />
                         </Tooltip>
-                    </Space>
+                    </Flex>
                 }
-                style={{ marginBottom: 16 }}
-                styles={{
-                    header: {
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        color: 'white',
-                        borderRadius: '8px 8px 0 0',
-                    },
-                }}
-                headStyle={{
-                    color: 'white',
-                }}
             >
-                <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-                    {t(group.descKey)}
-                </Paragraph>
-                {group.items.map(renderConfigItem)}
-            </Card>
+                {visibleItems.length > 0 ? (
+                    visibleItems.map((item, i) => renderConfigItem(item, i))
+                ) : (
+                    <NoItemsMessage>{t('common:messages.noData', 'No items')}</NoItemsMessage>
+                )}
+            </ConfigGroupCard>
         );
     };
 
     return (
-        <PageContainer>
+        <ConfigPageContainer>
             {contextHolder}
 
-            <HeaderRow>
-                <Space direction="vertical" size={0}>
-                    <Title level={2} style={{ margin: 0 }}>
+            <ConfigHeader>
+                <HeaderContent>
+                    <GradientTitle level={3}>
                         {t('pageTitle')}
-                    </Title>
-                    <Space size={4}>
-                        {isEditMode ? (
-                            <Tag color="orange" style={{ margin: 0 }}>{t('editMode')}</Tag>
-                        ) : (
-                            <Tag color="blue" style={{ margin: 0 }}>{t('readOnly')}</Tag>
-                        )}
-                    </Space>
-                </Space>
+                    </GradientTitle>
+                    <Flex align="center" gap={12}>
+                        <Text type="secondary" style={{ fontSize: 13 }}>
+                            {t('subtitle', 'Manage your tenant configuration')}
+                        </Text>
+                        <StatusIndicator $isEdit={isEditMode}>
+                            {isEditMode ? t('editMode') : t('readOnly')}
+                        </StatusIndicator>
+                    </Flex>
+                </HeaderContent>
                 <Space>
                     {isEditMode ? (
                         <>
@@ -484,23 +594,12 @@ const Configuration: React.FC = () => {
                         </>
                     )}
                 </Space>
-            </HeaderRow>
+            </ConfigHeader>
 
-            <div style={{ overflowY: 'auto', flex: 1 }}>
-                <Row gutter={[16, 16]}>
-                    <Col xs={24} lg={12}>
-                        {allGroups.filter((_, i) => i % 2 === 0).map((group, i) =>
-                            renderGroup(group, i * 2)
-                        )}
-                    </Col>
-                    <Col xs={24} lg={12}>
-                        {allGroups.filter((_, i) => i % 2 === 1).map((group, i) =>
-                            renderGroup(group, i * 2 + 1)
-                        )}
-                    </Col>
-                </Row>
-            </div>
-        </PageContainer>
+            <ConfigGroupsContainer>
+                {allGroups.map((group, index) => renderGroup(group, index))}
+            </ConfigGroupsContainer>
+        </ConfigPageContainer>
     );
 };
 

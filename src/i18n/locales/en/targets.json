@@ -148,13 +148,15 @@
         "notRequested": "Not Requested",
         "targetType": "Target Type",
         "deviceStatusDistribution": "Device Status Distribution",
-        "connectivityStatus": "Connectivity Status",
+        "connectivityStatus": "Target Connection Status",
         "updateStatusDistribution": "Update Status",
         "totalDevices": "Total Devices",
         "recentActivity": "Recent Device Activity",
         "awaitingConnection": "Awaiting first connection",
         "percentOfDevices": "{{percent}}% of devices",
-        "noDescription": "No description"
+        "noDescription": "No description",
+        "deviceGrid": "Device Status",
+        "targetTypeDistribution": "Target Type Distribution"
     },
     "status": {
         "inSync": "In Sync",

@@ -20,10 +20,11 @@ import {
     Radio,
     Row,
     Col,
+    Flex,
 } from 'antd';
-import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useCreate, useStart } from '@/api/generated/rollouts/rollouts';
+import { useCreate, useStart, getRollout } from '@/api/generated/rollouts/rollouts';
 import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
 import { useGetTargets } from '@/api/generated/targets/targets';
 import { useGetTargetTags } from '@/api/generated/target-tags/target-tags';
@@ -152,7 +153,13 @@ const buildFiqlFromBuilder = (state: TargetFilterBuilderState) => {
     return clauses.join(';');
 };
 
-const RolloutWizard: React.FC = () => {
+interface RolloutWizardProps {
+    isModal?: boolean;
+    onClose?: () => void;
+    onSuccess?: (rolloutId: number) => void;
+}
+
+const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, onSuccess }) => {
     const { t } = useTranslation('rollouts');
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -168,6 +175,7 @@ const RolloutWizard: React.FC = () => {
         errorThreshold: 20,
         startImmediately: false,
     });
+
     const [filterMode, setFilterMode] = useState<'builder' | 'advanced'>('builder');
     const [builderState, setBuilderState] = useState<TargetFilterBuilderState>({
         allTargets: false,
@@ -198,31 +206,82 @@ const RolloutWizard: React.FC = () => {
     // Fetch distribution sets
     const { data: dsData, isLoading: dsLoading } = useGetDistributionSets({
         limit: 100,
+        q: 'type==os;type==software',
     });
 
     // Fetch target metadata for builder
     const { data: targetTagsData, isLoading: targetTagsLoading } = useGetTargetTags({ limit: 200 });
     const { data: targetTypesData, isLoading: targetTypesLoading } = useGetTargetTypes({ limit: 200 });
 
-    // Fetch target count for preview
-    const { data: targetPreviewData, isLoading: targetPreviewLoading, refetch: refetchTargets } = useGetTargets(
+    // Fetch targets for preview
+    const { data: targetPreviewData, refetch: refetchTargets, isLoading: previewLoading } = useGetTargets(
         {
+            q: formData.targetFilterQuery === 'controllerId==*' ? undefined : formData.targetFilterQuery,
             limit: 5,
-            q: formData.targetFilterQuery || undefined,
         },
-        { query: { enabled: false } }
+        {
+            query: {
+                enabled: false,
+            },
+        }
     );
 
     // Create mutation
     const createMutation = useCreate({
         mutation: {
-            onSuccess: (data) => {
+            onSuccess: async (data) => {
                 message.success(t('wizard.messages.createSuccess'));
                 queryClient.invalidateQueries();
-                if (formData.startImmediately && data.id) {
-                    startMutation.mutate({ rolloutId: data.id });
-                } else {
-                    navigate(`/rollouts/${data.id}`);
+
+                if (data.id) {
+                    const rolloutId = data.id;
+
+                    if (formData.startImmediately) {
+                        let attempts = 0;
+                        const maxAttempts = 15;
+
+                        const pollAndStart = async () => {
+                            try {
+                                const rollout = await getRollout(rolloutId);
+                                const status = rollout.status?.toLowerCase();
+
+                                if (status === 'ready') {
+                                    startMutation.mutate({ rolloutId });
+                                } else if (status === 'creating' && attempts < maxAttempts) {
+                                    attempts++;
+                                    setTimeout(pollAndStart, 1000);
+                                } else if (status === 'running') {
+                                    message.success(t('detail.messages.startSuccess'));
+                                    if (isModal && onSuccess) {
+                                        onSuccess(rolloutId);
+                                    } else {
+                                        navigate(`/rollouts/${rolloutId}`);
+                                    }
+                                } else {
+                                    message.warning(t('wizard.messages.cannotStartImmediately', 'Rollout created but cannot start immediately. Please start manually.'));
+                                    if (isModal && onSuccess) {
+                                        onSuccess(rolloutId);
+                                    } else {
+                                        navigate(`/rollouts/${rolloutId}`);
+                                    }
+                                }
+                            } catch {
+                                if (isModal && onSuccess) {
+                                    onSuccess(rolloutId);
+                                } else {
+                                    navigate(`/rollouts/${rolloutId}`);
+                                }
+                            }
+                        };
+
+                        setTimeout(pollAndStart, 500);
+                    } else {
+                        if (isModal && onSuccess) {
+                            onSuccess(rolloutId);
+                        } else {
+                            navigate(`/rollouts/${rolloutId}`);
+                        }
+                    }
                 }
             },
             onError: (err: unknown) => {
@@ -232,25 +291,15 @@ const RolloutWizard: React.FC = () => {
                     || error.response?.data?.exceptionClass
                     || error.message
                     || t('wizard.messages.createError');
-                const status = error.response?.status;
-
-                if (status === 403) {
-                    message.error(`Permission denied: You need CREATE_ROLLOUT permission. (${errorMessage})`);
-                } else if (status === 400) {
-                    message.error(`Bad request: ${errorMessage}`);
-                } else {
-                    message.error(errorMessage);
-                }
+                message.error(errorMessage);
             },
         },
     });
 
-    // Start mutation (for start immediately option)
     const startMutation = useStart({
         mutation: {
             onSuccess: () => {
                 message.success(t('detail.messages.startSuccess'));
-                navigate('/rollouts');
             },
             onError: () => {
                 message.error(t('detail.messages.startError'));
@@ -266,10 +315,6 @@ const RolloutWizard: React.FC = () => {
         { title: t('wizard.steps.review') },
     ];
 
-    const handlePreviewTargets = () => {
-        refetchTargets();
-    };
-
     const handleNext = async () => {
         if (currentStep === 0) {
             try {
@@ -277,7 +322,6 @@ const RolloutWizard: React.FC = () => {
                 setFormData((prev) => ({ ...prev, ...values }));
                 setCurrentStep(currentStep + 1);
             } catch {
-                // validation failed
             }
         } else if (currentStep === 1) {
             if (!formData.distributionSetId) {
@@ -286,12 +330,10 @@ const RolloutWizard: React.FC = () => {
             }
             setCurrentStep(currentStep + 1);
         } else if (currentStep === 2) {
-            // If neither allTargets is checked nor manual filter provided
             if (!builderState.allTargets && !formData.targetFilterQuery?.trim()) {
                 message.warning(t('wizard.targetFilter.required'));
                 return;
             }
-            // If allTargets is checked but no query was generated, set wildcard
             if (builderState.allTargets && !formData.targetFilterQuery?.trim()) {
                 setFormData((prev) => ({ ...prev, targetFilterQuery: 'controllerId==*' }));
             }
@@ -302,7 +344,6 @@ const RolloutWizard: React.FC = () => {
                 setFormData((prev) => ({ ...prev, ...values }));
                 setCurrentStep(currentStep + 1);
             } catch {
-                // validation failed
             }
         }
     };
@@ -349,9 +390,8 @@ const RolloutWizard: React.FC = () => {
         }));
     };
 
-    // Step 1: Basic Info
     const renderBasicInfoStep = () => (
-        <Card title={t('wizard.basicInfo.title')}>
+        <Card title={t('wizard.basicInfo.title')} style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}>
             <Form
                 form={basicInfoForm}
                 layout="vertical"
@@ -371,9 +411,8 @@ const RolloutWizard: React.FC = () => {
         </Card>
     );
 
-    // Step 2: Distribution Set Selection
     const renderDistributionSetStep = () => (
-        <Card title={t('wizard.distributionSet.title')}>
+        <Card title={t('wizard.distributionSet.title')} style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}>
             {formData.distributionSetId && (
                 <Alert
                     type="success"
@@ -399,7 +438,6 @@ const RolloutWizard: React.FC = () => {
                         },
                     }}
                     columns={[
-                        { title: t('wizard.distributionSet.columns.id'), dataIndex: 'id', width: 60 },
                         { title: t('wizard.distributionSet.columns.name'), dataIndex: 'name' },
                         { title: t('wizard.distributionSet.columns.version'), dataIndex: 'version', width: 100 },
                         {
@@ -414,15 +452,12 @@ const RolloutWizard: React.FC = () => {
         </Card>
     );
 
-    // Step 3: Target Filter
     const renderTargetFilterStep = () => {
         const previewTargets = targetPreviewData?.content || [];
-
-        // Helper to safe check if FIQL is empty or wildcard only
         const isEffectiveFilter = formData.targetFilterQuery && formData.targetFilterQuery !== 'controllerId==*';
 
         return (
-            <Card title={t('wizard.targetFilter.title')}>
+            <Card title={t('wizard.targetFilter.title')} style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}>
                 <Space style={{ marginBottom: 16 }} wrap>
                     <Button
                         type={filterMode === 'builder' ? 'primary' : 'default'}
@@ -436,58 +471,44 @@ const RolloutWizard: React.FC = () => {
                     >
                         {t('wizard.targetFilter.advancedMode')}
                     </Button>
-                    <Button onClick={handlePreviewTargets} loading={targetPreviewLoading || targetPreviewLoading} icon={<SearchOutlined />}>
-                        {t('wizard.targetFilter.preview')}
-                    </Button>
-                    {targetPreviewData && (
-                        <Tag color="blue">
-                            {t('wizard.targetFilter.targetCount', { count: targetPreviewData.total || 0 })}
-                        </Tag>
-                    )}
                 </Space>
+
                 {filterMode === 'builder' ? (
-                    <Form layout="vertical">
-                        <Form.Item>
-                            <Checkbox
-                                checked={builderState.allTargets}
-                                onChange={(e) => setBuilderState((prev) => ({
-                                    ...prev,
-                                    allTargets: e.target.checked,
-                                    // Clear other filters when all targets selected
-                                    ...(e.target.checked ? { tags: [], targetTypes: [], updateStatuses: [], pollingStatuses: [], controllerQuery: '', searchKeyword: '' } : {})
-                                }))}
-                            >
-                                <strong>{t('wizard.targetFilter.allTargets')}</strong>
-                            </Checkbox>
-                        </Form.Item>
-                        {!builderState.allTargets && (
-                            <>
-                                <Row gutter={16}>
+                    <div style={{ marginBottom: 24 }}>
+                        <Form layout="vertical">
+                            <Form.Item>
+                                <Checkbox
+                                    checked={builderState.allTargets}
+                                    onChange={(e) => setBuilderState(prev => ({ ...prev, allTargets: e.target.checked }))}
+                                >
+                                    <Text strong>{t('wizard.targetFilter.allTargets')}</Text>
+                                </Checkbox>
+                            </Form.Item>
+
+                            {!builderState.allTargets && (
+                                <Row gutter={[16, 16]}>
                                     <Col span={12}>
                                         <Form.Item label={t('wizard.targetFilter.tags')}>
                                             <Select
                                                 mode="multiple"
-                                                allowClear
-                                                loading={targetTagsLoading}
-                                                placeholder={t('wizard.targetFilter.tagsPlaceholder')}
+                                                placeholder={t('wizard.targetFilter.selectTags')}
                                                 value={builderState.tags}
-                                                onChange={(values: string[]) => setBuilderState((prev) => ({ ...prev, tags: values }))}
-                                                options={(targetTagsData?.content || []).map((tag) => ({
+                                                loading={targetTagsLoading}
+                                                onChange={(val) => setBuilderState(prev => ({ ...prev, tags: val }))}
+                                                options={(targetTagsData?.content || []).map(tag => ({
                                                     label: (
                                                         <Space>
                                                             {tag.colour && <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', backgroundColor: tag.colour }} />}
                                                             {tag.name}
                                                         </Space>
                                                     ),
-                                                    value: tag.name,
+                                                    value: tag.name
                                                 }))}
                                             />
                                             {builderState.tags.length > 1 && (
                                                 <Radio.Group
                                                     value={builderState.tagMode}
-                                                    onChange={(e: RadioChangeEvent) =>
-                                                        setBuilderState((prev) => ({ ...prev, tagMode: e.target.value as 'any' | 'all' }))
-                                                    }
+                                                    onChange={(e) => setBuilderState(prev => ({ ...prev, tagMode: e.target.value }))}
                                                     size="small"
                                                     style={{ marginTop: 8 }}
                                                 >
@@ -501,27 +522,16 @@ const RolloutWizard: React.FC = () => {
                                         <Form.Item label={t('wizard.targetFilter.targetTypes')}>
                                             <Select
                                                 mode="multiple"
-                                                allowClear
-                                                loading={targetTypesLoading}
-                                                placeholder={t('wizard.targetFilter.targetTypePlaceholder')}
+                                                placeholder={t('wizard.targetFilter.selectTypes')}
                                                 value={builderState.targetTypes}
-                                                onChange={(values: string[]) =>
-                                                    setBuilderState((prev) => ({ ...prev, targetTypes: values }))
-                                                }
-                                                options={(targetTypesData?.content || []).map((type) => ({
-                                                    label: type.name, // Display name
-                                                    value: type.name, // FIQL uses name? or key? documentation says name is common filter
-                                                }))}
+                                                loading={targetTypesLoading}
+                                                onChange={(val) => setBuilderState(prev => ({ ...prev, targetTypes: val }))}
+                                                options={(targetTypesData?.content || []).map(type => ({ label: type.name, value: type.name }))}
                                             />
                                             {builderState.targetTypes.length > 1 && (
                                                 <Radio.Group
                                                     value={builderState.targetTypeMode}
-                                                    onChange={(e: RadioChangeEvent) =>
-                                                        setBuilderState((prev) => ({
-                                                            ...prev,
-                                                            targetTypeMode: e.target.value as 'any' | 'all',
-                                                        }))
-                                                    }
+                                                    onChange={(e) => setBuilderState(prev => ({ ...prev, targetTypeMode: e.target.value }))}
                                                     size="small"
                                                     style={{ marginTop: 8 }}
                                                 >
@@ -531,55 +541,40 @@ const RolloutWizard: React.FC = () => {
                                             )}
                                         </Form.Item>
                                     </Col>
-                                </Row>
-
-                                <Row gutter={16}>
+                                    <Col span={12}>
+                                        <Form.Item label={t('wizard.targetFilter.pollingStatus')}>
+                                            <Checkbox.Group
+                                                value={builderState.pollingStatuses}
+                                                onChange={(val) => setBuilderState(prev => ({ ...prev, pollingStatuses: val as any[] }))}
+                                            >
+                                                <Space>
+                                                    <Checkbox value="online">{t('wizard.targetFilter.statusOnline')}</Checkbox>
+                                                    <Checkbox value="offline">{t('wizard.targetFilter.statusOffline')}</Checkbox>
+                                                </Space>
+                                            </Checkbox.Group>
+                                        </Form.Item>
+                                    </Col>
                                     <Col span={12}>
                                         <Form.Item label={t('wizard.targetFilter.updateStatus')}>
                                             <Select
                                                 mode="multiple"
-                                                allowClear
                                                 placeholder={t('wizard.targetFilter.updateStatusPlaceholder')}
                                                 value={builderState.updateStatuses}
-                                                onChange={(values: string[]) => setBuilderState(prev => ({ ...prev, updateStatuses: values }))}
+                                                onChange={(val) => setBuilderState(prev => ({ ...prev, updateStatuses: val }))}
                                                 options={[
                                                     { label: t('wizard.targetFilter.updateStatusInSync'), value: 'in_sync' },
                                                     { label: t('wizard.targetFilter.updateStatusPending'), value: 'pending' },
                                                     { label: t('wizard.targetFilter.updateStatusError'), value: 'error' },
-                                                    { label: t('wizard.targetFilter.updateStatusUnknown'), value: 'unknown' },
-                                                    { label: t('wizard.targetFilter.updateStatusRegistered'), value: 'registered' },
                                                 ]}
                                             />
                                         </Form.Item>
                                     </Col>
-                                    <Col span={12}>
-                                        <Form.Item label={t('wizard.targetFilter.pollingStatus')}>
-                                            <Checkbox.Group
-                                                options={[
-                                                    { label: t('wizard.targetFilter.statusOnline'), value: 'online' },
-                                                    { label: t('wizard.targetFilter.statusOffline'), value: 'offline' },
-                                                ]}
-                                                value={builderState.pollingStatuses}
-                                                onChange={(values) =>
-                                                    setBuilderState((prev) => ({
-                                                        ...prev,
-                                                        pollingStatuses: values as Array<'online' | 'offline'>,
-                                                    }))
-                                                }
-                                            />
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-
-                                <Row gutter={16}>
                                     <Col span={12}>
                                         <Form.Item label={t('wizard.targetFilter.controllerId')}>
                                             <Input
                                                 placeholder={t('wizard.targetFilter.controllerPlaceholder')}
                                                 value={builderState.controllerQuery}
-                                                onChange={(e) =>
-                                                    setBuilderState((prev) => ({ ...prev, controllerQuery: e.target.value }))
-                                                }
+                                                onChange={(e) => setBuilderState(prev => ({ ...prev, controllerQuery: e.target.value }))}
                                             />
                                         </Form.Item>
                                     </Col>
@@ -588,67 +583,54 @@ const RolloutWizard: React.FC = () => {
                                             <Input
                                                 placeholder={t('wizard.targetFilter.namePlaceholder')}
                                                 value={builderState.searchKeyword}
-                                                onChange={(e) =>
-                                                    setBuilderState((prev) => ({ ...prev, searchKeyword: e.target.value }))
-                                                }
+                                                onChange={(e) => setBuilderState(prev => ({ ...prev, searchKeyword: e.target.value }))}
                                             />
                                         </Form.Item>
                                     </Col>
                                 </Row>
-
-                                {isEffectiveFilter && (
-                                    <Alert
-                                        type="info"
-                                        showIcon
-                                        message={
-                                            <Space>
-                                                <strong>{t('wizard.targetFilter.currentFilter')}:</strong>
-                                                <Text code>{formData.targetFilterQuery}</Text>
-                                            </Space>
-                                        }
-                                    />
-                                )}
-                            </>)}
-                        <div style={{ marginTop: 16 }}>
-                            <Alert type="info" message={builderState.allTargets ? t('wizard.targetFilter.allTargetsHint') : t('wizard.targetFilter.builderHint')} />
-                        </div>
-                    </Form>
+                            )}
+                        </Form>
+                    </div>
                 ) : (
                     <Form layout="vertical">
                         <Form.Item label={t('wizard.targetFilter.filterQuery')}>
                             <TextArea
                                 rows={4}
                                 value={formData.targetFilterQuery}
-                                onChange={(e) =>
-                                    setFormData((prev) => ({ ...prev, targetFilterQuery: e.target.value }))
-                                }
+                                onChange={(e) => setFormData(prev => ({ ...prev, targetFilterQuery: e.target.value }))}
                                 placeholder={t('wizard.targetFilter.filterPlaceholder')}
                             />
                         </Form.Item>
-                        <Alert type="info" message={t('wizard.targetFilter.advancedHint')} />
                     </Form>
                 )}
-                {previewTargets.length > 0 && (
-                    <Table
-                        style={{ marginTop: 16 }}
-                        size="small"
-                        rowKey="controllerId"
-                        pagination={false}
-                        dataSource={previewTargets}
-                        columns={[
-                            { title: t('wizard.targetFilter.previewColumns.controllerId'), dataIndex: 'controllerId' },
-                            { title: t('wizard.targetFilter.previewColumns.name'), dataIndex: 'name' },
-                            { title: t('wizard.targetFilter.previewColumns.type'), dataIndex: 'targetTypeName' },
-                        ]}
-                    />
-                )}
+
+                <div style={{ borderTop: '1px solid var(--ant-color-border-secondary, #f0f0f0)', paddingTop: 16 }}>
+                    <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
+                        <Text strong>{t('wizard.targetFilter.preview')}</Text>
+                        <Button size="small" icon={<ReloadOutlined />} onClick={() => refetchTargets()} loading={previewLoading}>
+                            {t('common:refresh')}
+                        </Button>
+                    </Flex>
+                    {previewTargets.length > 0 && (
+                        <Table
+                            size="small"
+                            rowKey="controllerId"
+                            pagination={false}
+                            dataSource={previewTargets}
+                            columns={[
+                                { title: t('wizard.targetFilter.previewColumns.controllerId'), dataIndex: 'controllerId' },
+                                { title: t('wizard.targetFilter.previewColumns.name'), dataIndex: 'name' },
+                                { title: t('wizard.targetFilter.previewColumns.type'), dataIndex: 'targetTypeName' },
+                            ]}
+                        />
+                    )}
+                </div>
             </Card>
         );
     };
 
-    // Step 4: Group Settings
     const renderGroupSettingsStep = () => (
-        <Card title={t('wizard.groupSettings.title')}>
+        <Card title={t('wizard.groupSettings.title')} style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}>
             <Form
                 form={groupSettingsForm}
                 layout="vertical"
@@ -659,25 +641,13 @@ const RolloutWizard: React.FC = () => {
                     startImmediately: formData.startImmediately,
                 }}
             >
-                <Form.Item
-                    name="amountGroups"
-                    label={t('wizard.groupSettings.amountGroups')}
-                    rules={[{ required: true }]}
-                >
+                <Form.Item name="amountGroups" label={t('wizard.groupSettings.amountGroups')} rules={[{ required: true }]}>
                     <InputNumber min={1} max={100} style={{ width: '100%' }} />
                 </Form.Item>
-                <Form.Item
-                    name="successThreshold"
-                    label={t('wizard.groupSettings.successThreshold')}
-                    rules={[{ required: true }]}
-                >
+                <Form.Item name="successThreshold" label={t('wizard.groupSettings.successThreshold')} rules={[{ required: true }]}>
                     <InputNumber min={0} max={100} style={{ width: '100%' }} />
                 </Form.Item>
-                <Form.Item
-                    name="errorThreshold"
-                    label={t('wizard.groupSettings.errorThreshold')}
-                    rules={[{ required: true }]}
-                >
+                <Form.Item name="errorThreshold" label={t('wizard.groupSettings.errorThreshold')} rules={[{ required: true }]}>
                     <InputNumber min={0} max={100} style={{ width: '100%' }} />
                 </Form.Item>
                 <Form.Item name="startImmediately" valuePropName="checked">
@@ -687,47 +657,66 @@ const RolloutWizard: React.FC = () => {
         </Card>
     );
 
-    // Step 5: Review
     const renderReviewStep = () => (
-        <Card title={t('wizard.review.title')}>
-            <Descriptions bordered column={1}>
+        <Card title={t('wizard.review.title')} style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}>
+            <Descriptions bordered column={1} size="small">
                 <Descriptions.Item label={t('wizard.review.name')}>{formData.name}</Descriptions.Item>
-                <Descriptions.Item label={t('wizard.review.description')}>
-                    {formData.description || '-'}
-                </Descriptions.Item>
-                <Descriptions.Item label={t('wizard.review.distributionSet')}>
-                    {formData.distributionSetName}
-                </Descriptions.Item>
-                <Descriptions.Item label={t('wizard.review.targetFilter')}>
-                    {formData.targetFilterQuery || t('wizard.review.allTargets')}
-                </Descriptions.Item>
+                <Descriptions.Item label={t('wizard.review.description')}>{formData.description || '-'}</Descriptions.Item>
+                <Descriptions.Item label={t('wizard.review.distributionSet')}>{formData.distributionSetName}</Descriptions.Item>
+                <Descriptions.Item label={t('wizard.review.targetFilter')}>{formData.targetFilterQuery || t('wizard.review.allTargets')}</Descriptions.Item>
                 <Descriptions.Item label={t('wizard.review.groups')}>{formData.amountGroups}</Descriptions.Item>
-                <Descriptions.Item label={t('wizard.review.successThreshold')}>
-                    {formData.successThreshold}%
-                </Descriptions.Item>
-                <Descriptions.Item label={t('wizard.review.errorThreshold')}>
-                    {formData.errorThreshold}%
-                </Descriptions.Item>
+                <Descriptions.Item label={t('wizard.review.successThreshold')}>{formData.successThreshold}%</Descriptions.Item>
+                <Descriptions.Item label={t('wizard.review.errorThreshold')}>{formData.errorThreshold}%</Descriptions.Item>
             </Descriptions>
         </Card>
     );
 
     const renderStepContent = () => {
         switch (currentStep) {
-            case 0:
-                return renderBasicInfoStep();
-            case 1:
-                return renderDistributionSetStep();
-            case 2:
-                return renderTargetFilterStep();
-            case 3:
-                return renderGroupSettingsStep();
-            case 4:
-                return renderReviewStep();
-            default:
-                return null;
+            case 0: return renderBasicInfoStep();
+            case 1: return renderDistributionSetStep();
+            case 2: return renderTargetFilterStep();
+            case 3: return renderGroupSettingsStep();
+            case 4: return renderReviewStep();
+            default: return null;
         }
     };
+
+    const mainContent = (
+        <Row gutter={[16, 16]}>
+            <Col xs={24} md={7} lg={6}>
+                <StepsCard style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}>
+                    <Steps current={currentStep} items={steps} direction="vertical" size="small" />
+                </StepsCard>
+            </Col>
+            <Col xs={24} md={17} lg={18}>
+                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    {renderStepContent()}
+                    <ActionsBar>
+                        <Space>
+                            {currentStep > 0 && <Button onClick={handlePrev}>{t('wizard.buttons.previous')}</Button>}
+                            {currentStep < steps.length - 1 ? (
+                                <Button type="primary" onClick={handleNext}>{t('wizard.buttons.next')}</Button>
+                            ) : (
+                                <Button type="primary" onClick={handleCreate} loading={createMutation.isPending || startMutation.isPending}>
+                                    {t('wizard.buttons.create')}
+                                </Button>
+                            )}
+                            {isModal ? (
+                                <Button onClick={onClose}>{t('common:cancel')}</Button>
+                            ) : (
+                                <Button onClick={() => navigate('/rollouts')}>{t('common:cancel')}</Button>
+                            )}
+                        </Space>
+                    </ActionsBar>
+                </Space>
+            </Col>
+        </Row>
+    );
+
+    if (isModal) {
+        return <div style={{ padding: '24px' }}>{mainContent}</div>;
+    }
 
     return (
         <PageContainer>
@@ -736,43 +725,10 @@ const RolloutWizard: React.FC = () => {
                     <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/rollouts')}>
                         {t('detail.back')}
                     </Button>
-                    <Title level={2} style={{ margin: 0 }}>
-                        {t('wizard.title')}
-                    </Title>
+                    <Title level={2} style={{ margin: 0 }}>{t('wizard.title')}</Title>
                 </TitleGroup>
             </HeaderRow>
-
-            <Row gutter={[16, 16]}>
-                <Col xs={24} md={7} lg={6}>
-                    <StepsCard>
-                        <Steps current={currentStep} items={steps} direction="vertical" size="small" />
-                    </StepsCard>
-                </Col>
-                <Col xs={24} md={17} lg={18}>
-                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                        {renderStepContent()}
-                        <ActionsBar>
-                            {currentStep > 0 && (
-                                <Button onClick={handlePrev}>{t('wizard.buttons.previous')}</Button>
-                            )}
-                            {currentStep < steps.length - 1 && (
-                                <Button type="primary" onClick={handleNext}>
-                                    {t('wizard.buttons.next')}
-                                </Button>
-                            )}
-                            {currentStep === steps.length - 1 && (
-                                <Button
-                                    type="primary"
-                                    onClick={handleCreate}
-                                    loading={createMutation.isPending || startMutation.isPending}
-                                >
-                                    {t('wizard.buttons.create')}
-                                </Button>
-                            )}
-                        </ActionsBar>
-                    </Space>
-                </Col>
-            </Row>
+            {mainContent}
         </PageContainer>
     );
 };

@@ -2,6 +2,7 @@
     "pageTitle": "롤아웃",
     "subtitle": "롤아웃 상태와 진행 상황을 한눈에 확인하세요",
     "empty": "롤아웃이 없습니다",
+    "createRollout": "롤아웃 생성",
     "overview": {
         "title": "롤아웃 관리",
         "subtitle": "배포 롤아웃 현황 개요 및 모니터링",
@@ -21,7 +22,10 @@
         "rolloutsCount": "{{count}}개 롤아웃",
         "activeCount": "{{count}}개 활성",
         "completedCount": "{{count}}개 완료",
-        "targetsCount": "{{count}}개 타겟"
+        "targetsCount": "{{count}}개 타겟",
+        "recentFinished": "최근 완료",
+        "noFinishedRollouts": "완료된 롤아웃이 없습니다",
+        "summaryStatus": "상태 요약"
     },
     "refresh": "새로고침",
     "columns": {
@@ -208,7 +212,8 @@
         },
         "messages": {
             "createSuccess": "롤아웃이 성공적으로 생성되었습니다",
-            "createError": "롤아웃 생성에 실패했습니다"
+            "createError": "롤아웃 생성에 실패했습니다",
+            "cannotStartImmediately": "롤아웃이 생성되었지만 즉시 시작할 수 없습니다. 수동으로 시작해주세요."
         }
     }
 }

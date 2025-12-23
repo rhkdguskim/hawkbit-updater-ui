@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Skeleton, Flex, Typography } from 'antd';
-import { WifiOutlined } from '@ant-design/icons';
+import { ApiOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import { ChartCard, ChartLegendItem, COLORS, IconBadge } from '../DashboardStyles';
@@ -49,7 +49,7 @@ export const ConnectivityChart: React.FC<ConnectivityChartProps> = ({ isLoading,
             title={
                 <Flex align="center" gap={10}>
                     <IconBadge $theme="connectivity">
-                        <WifiOutlined />
+                        <ApiOutlined />
                     </IconBadge>
                     <Flex vertical gap={0}>
                         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('chart.connectivityStatus', 'Connectivity')}</span>

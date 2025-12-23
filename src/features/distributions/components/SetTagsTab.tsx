@@ -8,6 +8,7 @@ import {
     useUnassignDistributionSet,
 } from '@/api/generated/distribution-set-tags/distribution-set-tags';
 import type { MgmtTag } from '@/api/generated/model';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface SetTagsTabProps {
     distributionSetId: number;
@@ -19,6 +20,7 @@ const SetTagsTab: React.FC<SetTagsTabProps> = ({
     isAdmin,
 }) => {
     const { t } = useTranslation(['distributions', 'common']);
+    const token = useAuthStore((state) => state.token);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
 
@@ -39,7 +41,10 @@ const SetTagsTab: React.FC<SetTagsTabProps> = ({
     // Fetch assignments on mount
     React.useEffect(() => {
         const fetchAssignments = async () => {
-            if (!allTags.length) return;
+            if (!allTags.length) {
+                setLoadingAssignments(false);
+                return;
+            }
             setLoadingAssignments(true);
             const assigned: number[] = [];
             // This is a simplified approach - check if DS is in each tag's assigned list
@@ -49,7 +54,7 @@ const SetTagsTab: React.FC<SetTagsTabProps> = ({
                 try {
                     const response = await fetch(`/rest/v1/distributionsettags/${tag.id}/assigned?q=id==${distributionSetId}`, {
                         headers: {
-                            'Authorization': `Basic ${btoa('admin:admin')}`,
+                            'Authorization': `Basic ${token}`,
                         },
                     });
                     const data = await response.json();

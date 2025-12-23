@@ -1,8 +1,8 @@
 import React from 'react';
 import styled, { keyframes, css } from 'styled-components';
-import { Typography, Flex, Tooltip } from 'antd';
+import { Typography, Flex, Tooltip, Tag } from 'antd';
 import {
-    WifiOutlined,
+    ApiOutlined,
     CheckCircleFilled,
     SyncOutlined,
     CloseCircleFilled,
@@ -24,7 +24,7 @@ const fadeIn = keyframes`
 `;
 
 // Compact premium device card
-const DeviceCardWrapper = styled.div<{ $isOnline?: boolean; $updateStatus?: string }>`
+const DeviceCardWrapper = styled.div<{ $isOnline?: boolean; $updateStatus?: string; $targetTypeColor?: string }>`
     border-radius: 14px;
     background: ${props => {
         const status = props.$updateStatus?.toLowerCase();
@@ -57,6 +57,10 @@ const DeviceCardWrapper = styled.div<{ $isOnline?: boolean; $updateStatus?: stri
         width: 4px;
         height: 100%;
         background: ${props => {
+        // Prioritize target type color if available
+        if (props.$targetTypeColor) {
+            return `linear-gradient(180deg, ${props.$targetTypeColor} 0%, ${props.$targetTypeColor}cc 100%)`;
+        }
         const status = props.$updateStatus?.toLowerCase();
         if (status === 'pending') return 'linear-gradient(180deg, #3b82f6 0%, #2563eb 100%)';
         if (status === 'error') return 'linear-gradient(180deg, #ef4444 0%, #dc2626 100%)';
@@ -84,7 +88,7 @@ const DeviceCardWrapper = styled.div<{ $isOnline?: boolean; $updateStatus?: stri
     }
 `;
 
-const OnlineIndicator = styled.div<{ $isOnline: boolean }>`
+const OnlineIndicator = styled.div<{ $isOnline: boolean; $typeColor?: string }>`
     width: 24px;
     height: 24px;
     border-radius: 8px;
@@ -92,11 +96,19 @@ const OnlineIndicator = styled.div<{ $isOnline: boolean }>`
     align-items: center;
     justify-content: center;
     font-size: 12px;
-    background: ${props => props.$isOnline
-        ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-        : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'};
+    background: ${props => {
+        if (props.$typeColor) {
+            return `linear-gradient(135deg, ${props.$typeColor} 0%, ${props.$typeColor}cc 100%)`;
+        }
+        return props.$isOnline
+            ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+            : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+    }};
     color: white;
-    box-shadow: 0 2px 6px ${props => props.$isOnline ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'};
+    box-shadow: 0 2px 6px ${props => {
+        if (props.$typeColor) return `${props.$typeColor}40`;
+        return props.$isOnline ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)';
+    }};
     flex-shrink: 0;
 `;
 
@@ -164,6 +176,7 @@ interface DeviceCardProps {
     target: MgmtTarget;
     recentAction?: MgmtAction;
     delay?: number;
+    targetTypeColor?: string;
 }
 
 const getStatusIcon = (status?: string) => {
@@ -191,7 +204,7 @@ const getActionIcon = (status?: string) => {
     return <ClockCircleFilled />;
 };
 
-const DeviceCard: React.FC<DeviceCardProps> = ({ target, recentAction }) => {
+const DeviceCard: React.FC<DeviceCardProps> = ({ target, recentAction, targetTypeColor }) => {
     const { t } = useTranslation(['targets', 'common']);
     const navigate = useNavigate();
 
@@ -207,21 +220,38 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ target, recentAction }) => {
         <DeviceCardWrapper
             $isOnline={isOnline}
             $updateStatus={target.updateStatus}
+            $targetTypeColor={targetTypeColor}
             onClick={() => navigate(`/targets/${target.controllerId}`)}
         >
             <Flex vertical gap={10}>
                 {/* Header Row: Icon + Name + Online Badge */}
                 <Flex align="center" gap={10}>
-                    <OnlineIndicator $isOnline={isOnline}>
-                        <WifiOutlined />
+                    <OnlineIndicator $isOnline={isOnline} $typeColor={targetTypeColor}>
+                        <ApiOutlined />
                     </OnlineIndicator>
-                    <Flex vertical gap={0} style={{ flex: 1, minWidth: 0 }}>
+                    <Flex vertical gap={2} style={{ flex: 1, minWidth: 0 }}>
                         <Text strong ellipsis style={{ fontSize: 13, lineHeight: 1.2 }}>
                             {target.name || target.controllerId}
                         </Text>
-                        <Text type="secondary" style={{ fontSize: 11, fontFamily: 'monospace' }}>
-                            {target.ipAddress || target.address || '-'}
-                        </Text>
+                        <Flex align="center" gap={4} wrap="wrap">
+                            {target.targetTypeName && (
+                                <Tag
+                                    color={targetTypeColor}
+                                    style={{
+                                        margin: 0,
+                                        fontSize: 10,
+                                        padding: '0 4px',
+                                        lineHeight: '16px',
+                                        borderRadius: 4
+                                    }}
+                                >
+                                    {target.targetTypeName}
+                                </Tag>
+                            )}
+                            <Text type="secondary" style={{ fontSize: 10, fontFamily: 'monospace' }}>
+                                {target.ipAddress || target.address || ''}
+                            </Text>
+                        </Flex>
                     </Flex>
                 </Flex>
 

@@ -13,8 +13,11 @@ interface AuthState {
 }
 
 // Role Mapping Policy
+// Based on HawkBit server accounts:
+// - 'admin' user has full permissions → Admin role
+// - other users (e.g., 'readonly') → Operator role
 const getRole = (username: string): Role => {
-    if (username === 'mirero') return 'Admin';
+    if (username === 'admin') return 'Admin';
     return 'Operator';
 };
 

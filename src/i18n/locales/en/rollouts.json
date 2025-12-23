@@ -21,7 +21,10 @@
         "rolloutsCount": "{{count}} rollouts",
         "activeCount": "{{count}} active",
         "completedCount": "{{count}} completed",
-        "targetsCount": "{{count}} targets"
+        "targetsCount": "{{count}} targets",
+        "recentFinished": "Recent Finished",
+        "noFinishedRollouts": "No finished rollouts",
+        "summaryStatus": "Status Summary"
     },
     "refresh": "Refresh",
     "createRollout": "Create Rollout",
@@ -209,7 +212,8 @@
         },
         "messages": {
             "createSuccess": "Rollout created successfully",
-            "createError": "Failed to create rollout"
+            "createError": "Failed to create rollout",
+            "cannotStartImmediately": "Rollout created but cannot start immediately. Please start manually."
         }
     }
 }

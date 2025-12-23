@@ -1,5 +1,6 @@
 {
     "pageTitle": "System Configuration",
+    "subtitle": "Manage your tenant settings",
     "readOnly": "Read-only",
     "editMode": "Edit Mode",
     "refresh": "Refresh",

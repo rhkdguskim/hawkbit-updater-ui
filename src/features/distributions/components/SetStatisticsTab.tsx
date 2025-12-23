@@ -20,7 +20,7 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
     const { data, isLoading } = useGetStatisticsForDistributionSet(distributionSetId);
 
     if (isLoading) return <div style={{ textAlign: 'center', padding: '40px' }}><Spin size="large" /></div>;
-    if (!data) return <Empty description={t('detail.No statistics available')} />;
+    if (!data) return <Empty description={t('detail.noStatisticsAvailable')} />;
 
     // hawkBit Statistics properties:
     // data.rollouts (MgmtDistributionSetStatisticsRollouts)
@@ -35,14 +35,14 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
 
     return (
         <div style={{ padding: '16px' }}>
-            <Title level={4}>{t('detail.Monitoring')}</Title>
+            <Title level={4}>{t('detail.monitoring')}</Title>
             <Divider />
 
             <Row gutter={[16, 16]}>
                 <Col span={6}>
                     <Card variant="borderless" style={{ background: '#f6ffed' }}>
                         <Statistic
-                            title={t('detail.Active Rollouts')}
+                            title={t('detail.activeRollouts')}
                             value={totalRollouts}
                             prefix={<SyncOutlined spin={totalRollouts > 0} />}
                             styles={{ content: { color: '#52c41a' } }}
@@ -52,7 +52,7 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
                 <Col span={6}>
                     <Card variant="borderless" style={{ background: '#e6f7ff' }}>
                         <Statistic
-                            title={t('detail.Total Actions')}
+                            title={t('detail.totalActions')}
                             value={totalActions}
                             prefix={<ClockCircleOutlined />}
                             styles={{ content: { color: '#1890ff' } }}
@@ -62,7 +62,7 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
                 <Col span={6}>
                     <Card variant="borderless" style={{ background: '#f9f0ff' }}>
                         <Statistic
-                            title={t('detail.Auto Assignments')}
+                            title={t('detail.autoAssignments')}
                             value={data.totalAutoAssignments || 0}
                             prefix={<GlobalOutlined />}
                             styles={{ content: { color: '#722ed1' } }}
@@ -72,7 +72,7 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
                 <Col span={6}>
                     <Card variant="borderless" style={{ background: '#fff7e6' }}>
                         <Statistic
-                            title={t('detail.Success Rate')}
+                            title={t('detail.successRate')}
                             value={successRate}
                             suffix="%"
                             prefix={<CheckCircleOutlined />}
@@ -82,7 +82,7 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
                 </Col>
             </Row>
 
-            <Divider>{t('detail.Deployment Success Rate')}</Divider>
+            <Divider>{t('detail.deploymentSuccessRate')}</Divider>
             <Row gutter={24} align="middle">
                 <Col span={12}>
                     <div style={{ textAlign: 'center' }}>
@@ -95,14 +95,14 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
                             }}
                         />
                         <div style={{ marginTop: 8 }}>
-                            <Text strong>{t('detail.Overall Success Rate')}</Text>
+                            <Text strong>{t('detail.overallSuccessRate')}</Text>
                         </div>
                     </div>
                 </Col>
                 <Col span={12}>
                     <Space direction="vertical" style={{ width: '100%' }}>
                         <div>
-                            <Text type="secondary">{t('detail.Successful Deployments')}</Text>
+                            <Text type="secondary">{t('detail.successfulDeployments')}</Text>
                             <Progress percent={successRate} size="small" status="active" />
                         </div>
                         <div>
@@ -115,7 +115,7 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
                             />
                         </div>
                         <div>
-                            <Text type="secondary">{t('detail.Failed / Retrying')}</Text>
+                            <Text type="secondary">{t('detail.failedRetrying')}</Text>
                             <Progress
                                 percent={totalActions > 0 ? Math.round((((data.actions as any)?.error || 0) / totalActions) * 100) : 0}
                                 size="small"

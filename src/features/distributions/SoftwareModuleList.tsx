@@ -266,6 +266,7 @@ const SoftwareModuleList: React.FC = () => {
                             onChange: (keys) => setSelectedModuleIds(keys as number[]),
                         }}
                         scroll={{ x: 1000, y: '100%' }}
+                        size="small"
                     />
                 </div>
                 <CreateSoftwareModuleModal

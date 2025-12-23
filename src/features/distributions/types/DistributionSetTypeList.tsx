@@ -103,16 +103,26 @@ const DistributionSetTypeList: React.FC = () => {
             title: t('typeManagement.columns.colour'),
             dataIndex: 'colour',
             key: 'colour',
-            width: 100,
+            width: 140,
             render: (colour) => colour ? (
-                <div style={{
-                    width: 24,
-                    height: 24,
-                    backgroundColor: colour,
-                    borderRadius: 4,
-                    border: '1px solid #d9d9d9'
-                }} />
-            ) : '-',
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{
+                        width: 28,
+                        height: 28,
+                        backgroundColor: colour,
+                        borderRadius: 6,
+                        border: '2px solid rgba(0,0,0,0.1)',
+                        boxShadow: `0 2px 8px ${colour}40`,
+                    }} />
+                    <span style={{
+                        fontSize: 12,
+                        fontFamily: 'monospace',
+                        color: '#666',
+                    }}>
+                        {colour}
+                    </span>
+                </div>
+            ) : <span style={{ color: '#999' }}>-</span>,
         },
         {
             title: t('typeManagement.columns.lastModified'),
@@ -176,6 +186,7 @@ const DistributionSetTypeList: React.FC = () => {
                 }}
                 loading={isLoading}
                 onChange={handleTableChange}
+                size="small"
             />
             <DistributionSetTypeDialog
                 open={dialogOpen}

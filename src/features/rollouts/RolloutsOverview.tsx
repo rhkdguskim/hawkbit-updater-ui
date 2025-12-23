@@ -82,8 +82,6 @@ const RolloutsOverview: React.FC = () => {
     const errorCount = rollouts.filter(r => r.status === 'error' || r.status === 'stopped').length;
     const scheduledCount = rollouts.filter(r => r.status === 'scheduled' || r.status === 'ready').length;
 
-    const activeRollouts = rollouts.filter(r => r.status === 'running' || r.status === 'paused');
-
     const getStatusLabel = (status?: string) => {
         if (!status) return t('common:status.unknown', { defaultValue: 'UNKNOWN' });
         const key = status.toLowerCase();
@@ -98,7 +96,9 @@ const RolloutsOverview: React.FC = () => {
         { name: t('common:status.scheduled', 'Scheduled'), value: scheduledCount, color: ROLLOUT_COLORS.scheduled },
     ].filter(d => d.value > 0);
 
-    const getRolloutProgress = (rollout: { totalTargets?: number; totalTargetsPerStatus?: Record<string, number> }) => {
+    const getRolloutProgress = (rollout: { status?: string; totalTargets?: number; totalTargetsPerStatus?: Record<string, number> }) => {
+        // If rollout is finished, always return 100%
+        if (rollout.status === 'finished') return 100;
         const total = rollout.totalTargets || 0;
         const finished = rollout.totalTargetsPerStatus?.finished || 0;
         if (!total) return 0;
@@ -219,7 +219,7 @@ const RolloutsOverview: React.FC = () => {
                         $accentColor="linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
                         $delay={4}
                         $pulse={errorCount > 0}
-                        onClick={() => navigate('/rollouts/list?status=error')}
+                        onClick={() => navigate('/rollouts/list?status=stopped')}
                     >
                         {isLoading ? <Skeleton.Avatar active size={40} /> : (
                             <Flex vertical align="center" gap={4}>
@@ -320,18 +320,18 @@ const RolloutsOverview: React.FC = () => {
                 </ChartsContainer>
             </TopRow>
 
-            {/* Bottom Row: Active Rollouts */}
+            {/* Bottom Row: Recent Rollouts */}
             <BottomRow>
                 <OverviewListCard
                     $theme="rollouts"
                     title={
                         <Flex align="center" gap={10}>
-                            <IconBadge $color="linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)">
-                                <PlayCircleOutlined />
+                            <IconBadge $theme="rollouts">
+                                <RocketOutlined />
                             </IconBadge>
                             <Flex vertical gap={0}>
-                                <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.activeRollouts', 'Active Rollouts')}</span>
-                                <Text type="secondary" style={{ fontSize: 11 }}>{t('overview.activeCount', { count: activeRollouts.length })}</Text>
+                                <span style={{ fontSize: 14, fontWeight: 600 }}>{t('pageTitle', 'Rollouts')}</span>
+                                <Text type="secondary" style={{ fontSize: 11 }}>{t('overview.rolloutsCount', { count: totalCount })}</Text>
                             </Flex>
                         </Flex>
                     }
@@ -344,9 +344,9 @@ const RolloutsOverview: React.FC = () => {
                 >
                     {isLoading ? (
                         <Skeleton active paragraph={{ rows: 5 }} />
-                    ) : activeRollouts.length > 0 ? (
+                    ) : rollouts.length > 0 ? (
                         <Flex vertical gap={8} style={{ flex: 1, overflow: 'auto' }}>
-                            {activeRollouts.slice(0, 6).map(rollout => (
+                            {rollouts.slice(0, 10).map(rollout => (
                                 <ActivityItem
                                     key={rollout.id}
                                     onClick={() => navigate(`/rollouts/${rollout.id}`)}
@@ -356,14 +356,18 @@ const RolloutsOverview: React.FC = () => {
                                             width: 36, height: 36, borderRadius: 8,
                                             background: rollout.status === 'running'
                                                 ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%)'
-                                                : 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%)',
+                                                : rollout.status === 'finished'
+                                                    ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%)'
+                                                    : 'linear-gradient(135deg, rgba(100, 116, 139, 0.15) 0%, rgba(71, 85, 105, 0.1) 100%)',
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             flexShrink: 0
                                         }}>
                                             {rollout.status === 'running' ? (
                                                 <PlayCircleOutlined style={{ fontSize: 18, color: ROLLOUT_COLORS.running }} />
+                                            ) : rollout.status === 'finished' ? (
+                                                <CheckCircleOutlined style={{ fontSize: 18, color: ROLLOUT_COLORS.finished }} />
                                             ) : (
-                                                <PauseCircleOutlined style={{ fontSize: 18, color: ROLLOUT_COLORS.paused }} />
+                                                <RocketOutlined style={{ fontSize: 18, color: '#64748b' }} />
                                             )}
                                         </div>
                                         <Flex vertical gap={0} style={{ flex: 1, minWidth: 0 }}>
@@ -384,7 +388,12 @@ const RolloutsOverview: React.FC = () => {
                                         type="circle"
                                         percent={getRolloutProgress(rollout)}
                                         size={44}
-                                        strokeColor={rollout.status === 'running' ? ROLLOUT_COLORS.running : ROLLOUT_COLORS.paused}
+                                        strokeColor={
+                                            rollout.status === 'running' ? ROLLOUT_COLORS.running :
+                                                rollout.status === 'finished' ? ROLLOUT_COLORS.finished :
+                                                    rollout.status === 'error' ? ROLLOUT_COLORS.error :
+                                                        '#cbd5e1'
+                                        }
                                         strokeWidth={8}
                                     />
                                 </ActivityItem>
@@ -392,8 +401,8 @@ const RolloutsOverview: React.FC = () => {
                         </Flex>
                     ) : (
                         <Flex vertical justify="center" align="center" gap={12} style={{ flex: 1 }}>
-                            <ClockCircleOutlined style={{ fontSize: 40, color: '#94a3b8' }} />
-                            <Text type="secondary">{t('overview.noActiveRollouts', 'No active rollouts')}</Text>
+                            <RocketOutlined style={{ fontSize: 40, color: '#94a3b8' }} />
+                            <Text type="secondary">{t('overview.noRollouts', 'No rollouts yet')}</Text>
                             {isAdmin && (
                                 <Button
                                     type="primary"
@@ -449,7 +458,7 @@ const RolloutsOverview: React.FC = () => {
                                                     {rollout.name}
                                                 </Text>
                                                 <Text type="secondary" style={{ fontSize: 11 }}>
-                                                    {t('overview.targetsCount', { count: rollout.totalTargets })}
+                                                    {rollout.lastModifiedAt ? dayjs(rollout.lastModifiedAt).format('YYYY-MM-DD') : rollout.createdAt ? dayjs(rollout.createdAt).format('YYYY-MM-DD') : '-'}
                                                 </Text>
                                             </Flex>
                                         </Flex>

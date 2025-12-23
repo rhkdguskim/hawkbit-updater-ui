@@ -53,13 +53,13 @@
         "total": "총",
         "online": "온라인",
         "offline": "오프라인",
-        "connectivityStatus": "연결 상태",
+        "connectivityStatus": "타겟 연결 상태",
         "deploymentRate": "배포 진행률",
         "deploymentRateDesc": "대상 완료 비율",
         "targets": "대상",
         "rolloutStatus": "롤아웃 상태",
         "actionStatus": "액션 상태 (24시간)",
-        "fragmentation": "펌웨어 상태"
+        "fragmentation": "타겟 업데이트 상태"
     },
     "recentActions": {
         "title": "최근 액션 (24시간)",
@@ -84,7 +84,14 @@
         "title": "최근 디바이스 활동"
     },
     "deviceGrid": {
-        "title": "디바이스 상태 그리드"
+        "title": "디바이스 상태"
+    },
+    "activeUpdates": {
+        "title": "진행 중인 업데이트",
+        "empty": "진행 중인 업데이트 없음",
+        "noHistory": "상태 이력 없음",
+        "expandHistory": "이력 보기",
+        "statusHistory": "상태 이력"
     },
     "rollout": {
         "activeMonitor": "실시간 롤아웃 모니터",

@@ -179,7 +179,20 @@
             "size": "Size",
             "hashes": "Hashes",
             "actions": "Actions"
-        }
+        },
+        "monitoring": "Monitoring",
+        "activeRollouts": "Active Rollouts",
+        "totalActions": "Total Actions",
+        "autoAssignments": "Auto Assignments",
+        "successRate": "Success Rate",
+        "deploymentSuccessRate": "Deployment Success Rate",
+        "overallSuccessRate": "Overall Success Rate",
+        "successfulDeployments": "Successful Deployments",
+        "failedRetrying": "Failed / Retrying",
+        "noStatisticsAvailable": "No statistics available",
+        "assignedTargets": "Assigned Targets",
+        "installedTargets": "Installed Targets",
+        "total": "Total"
     },
     "builder": {
         "title": "Advanced Distribution Set Builder",

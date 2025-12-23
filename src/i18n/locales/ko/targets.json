@@ -141,7 +141,7 @@
         "viewAll": "전체 타겟 보기",
         "deviceStatus": "기기 상태",
         "deviceStatusDistribution": "기기 상태 분포",
-        "connectivityStatus": "연결 상태",
+        "connectivityStatus": "타겟 연결 상태",
         "updateStatusDistribution": "업데이트 상태",
         "recentActivity": "최근 기기 활동",
         "quickActions": "빠른 작업",
@@ -164,7 +164,9 @@
         "targetType": "타겟 유형",
         "awaitingConnection": "첫 접속 대기 중",
         "percentOfDevices": "전체 기기의 {{percent}}%",
-        "noDescription": "설명 없음"
+        "noDescription": "설명 없음",
+        "deviceGrid": "디바이스 상태",
+        "targetTypeDistribution": "타겟 유형 분포"
     },
     "status": {
         "inSync": "동기화됨",

@@ -1,5 +1,6 @@
 {
     "pageTitle": "시스템 구성",
+    "subtitle": "테넌트 설정 관리",
     "readOnly": "읽기 전용",
     "editMode": "편집 모드",
     "refresh": "새로고침",

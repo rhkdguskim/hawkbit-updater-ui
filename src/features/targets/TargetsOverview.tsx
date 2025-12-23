@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Typography, Button, Flex, Skeleton } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     ReloadOutlined,
     SyncOutlined,
-    WifiOutlined,
+    ApiOutlined,
     CheckCircleOutlined,
     ClockCircleOutlined,
     ExclamationCircleOutlined,
     AppstoreOutlined,
+    TagsOutlined,
 } from '@ant-design/icons';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import dayjs from 'dayjs';
@@ -17,6 +18,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 import { useGetTargets } from '@/api/generated/targets/targets';
 import { useGetActions } from '@/api/generated/actions/actions';
+import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import DeviceCardGrid from '@/features/dashboard/components/DeviceCardGrid';
 import {
     OverviewPageContainer,
@@ -52,12 +54,27 @@ const TargetsOverview: React.FC = () => {
         { limit: 100 },
         { query: { staleTime: 2000, refetchInterval: 2000 } }
     );
+    const { data: targetTypesData } = useGetTargetTypes(
+        { limit: 100 },
+        { query: { staleTime: 30000 } }
+    );
 
     const targets = allTargets?.content || [];
     const actions = actionsData?.content || [];
     const totalDevices = allTargets?.total ?? 0;
     const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';
     const isLoading = targetsLoading || actionsLoading;
+
+    // Build target type name to color map
+    const targetTypeColorMap = useMemo(() => {
+        const map = new Map<string, string>();
+        targetTypesData?.content?.forEach(tt => {
+            if (tt.name && tt.colour) {
+                map.set(tt.name, tt.colour);
+            }
+        });
+        return map;
+    }, [targetTypesData]);
     const refetch = () => { refetchTargets(); refetchActions(); };
 
     // Offline check
@@ -102,6 +119,26 @@ const TargetsOverview: React.FC = () => {
         { name: t('status.error', 'Error'), value: errorCount, color: COLORS.error },
         { name: t('status.unknown', 'Unknown'), value: unknownCount, color: COLORS.unknown },
     ].filter(d => d.value > 0);
+
+    // Pie Data for Target Types
+    const targetTypePieData = useMemo(() => {
+        const typeCounts = new Map<string, { count: number; color: string }>();
+        targets.forEach(target => {
+            const typeName = target.targetTypeName || t('status.unknown', 'Unknown');
+            const existing = typeCounts.get(typeName);
+            const typeColor = targetTypeColorMap.get(target.targetTypeName || '') || '#94a3b8';
+            if (existing) {
+                existing.count++;
+            } else {
+                typeCounts.set(typeName, { count: 1, color: typeColor });
+            }
+        });
+        return Array.from(typeCounts.entries()).map(([name, { count, color }]) => ({
+            name,
+            value: count,
+            color,
+        }));
+    }, [targets, targetTypeColorMap, t]);
 
 
 
@@ -232,7 +269,7 @@ const TargetsOverview: React.FC = () => {
                         title={
                             <Flex align="center" gap={10}>
                                 <IconBadge $theme="targets">
-                                    <WifiOutlined />
+                                    <ApiOutlined />
                                 </IconBadge>
                                 <Flex vertical gap={0}>
                                     <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.connectivityStatus', 'Connectivity')}</span>
@@ -257,6 +294,44 @@ const TargetsOverview: React.FC = () => {
                                     </PieChart>
                                 </ResponsiveContainer>
                                 {renderCustomLegend(connectivityPieData)}
+                            </Flex>
+                        ) : (
+                            <Flex justify="center" align="center" style={{ flex: 1 }}>
+                                <Text type="secondary">{t('common:messages.noData')}</Text>
+                            </Flex>
+                        )}
+                    </OverviewChartCard>
+
+                    <OverviewChartCard
+                        $theme="targets"
+                        title={
+                            <Flex align="center" gap={10}>
+                                <IconBadge $color="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)">
+                                    <TagsOutlined />
+                                </IconBadge>
+                                <Flex vertical gap={0}>
+                                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.targetTypeDistribution', 'Target Types')}</span>
+                                    <Text type="secondary" style={{ fontSize: 11 }}>{targetTypePieData.length} types</Text>
+                                </Flex>
+                            </Flex>
+                        }
+                        $delay={6}
+                    >
+                        {isLoading ? (
+                            <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
+                        ) : targetTypePieData.length > 0 ? (
+                            <Flex vertical style={{ flex: 1 }}>
+                                <ResponsiveContainer width="100%" height={100}>
+                                    <PieChart>
+                                        <Pie data={targetTypePieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
+                                            {targetTypePieData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                {renderCustomLegend(targetTypePieData)}
                             </Flex>
                         ) : (
                             <Flex justify="center" align="center" style={{ flex: 1 }}>
@@ -317,6 +392,7 @@ const TargetsOverview: React.FC = () => {
                     rows={4}
                     gap={8}
                     rowHeight={90}
+                    targetTypeColorMap={targetTypeColorMap}
                 />
             </BottomRow>
         </OverviewPageContainer>

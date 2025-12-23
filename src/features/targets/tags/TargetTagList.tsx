@@ -125,20 +125,30 @@ const TargetTagList: React.FC = () => {
             title: t('tagManagement.colour'),
             dataIndex: 'colour',
             key: 'colour',
-            width: 100,
+            width: 140,
             render: (colour: string) =>
                 colour ? (
-                    <div
-                        style={{
-                            width: 24,
-                            height: 24,
-                            backgroundColor: colour,
-                            borderRadius: 4,
-                            border: '1px solid #d9d9d9',
-                        }}
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div
+                            style={{
+                                width: 28,
+                                height: 28,
+                                backgroundColor: colour,
+                                borderRadius: 6,
+                                border: '2px solid rgba(0,0,0,0.1)',
+                                boxShadow: `0 2px 8px ${colour}40`,
+                            }}
+                        />
+                        <span style={{
+                            fontSize: 12,
+                            fontFamily: 'monospace',
+                            color: '#666',
+                        }}>
+                            {colour}
+                        </span>
+                    </div>
                 ) : (
-                    '-'
+                    <span style={{ color: '#999' }}>-</span>
                 ),
         },
         {
@@ -198,6 +208,7 @@ const TargetTagList: React.FC = () => {
                     pageSizeOptions: ['10', '20', '50'],
                     onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
                 }}
+                size="small"
             />
 
             <TargetTagDialog

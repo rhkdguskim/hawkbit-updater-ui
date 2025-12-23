@@ -4,3 +4,4 @@ export { default as AirportSlideList } from './AirportSlideList';
 export { ActionTimeline } from './ActionTimeline';
 export { StatusTag } from './StatusTag';
 export { default as SearchLayout } from './SearchLayout';
+export { ActiveUpdatesCard } from './ActiveUpdatesCard';

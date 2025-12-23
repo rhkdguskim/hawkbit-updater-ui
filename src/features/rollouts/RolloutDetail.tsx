@@ -75,16 +75,34 @@ const RolloutDetail: React.FC = () => {
 
     const rolloutIdNum = parseInt(rolloutId || '0', 10);
 
-    // Fetch rollout details
+    // Fetch rollout details with real-time polling
     const { data: rolloutData, isLoading, error } = useGetRollout(rolloutIdNum, {
-        query: { enabled: !!rolloutIdNum },
+        query: {
+            enabled: !!rolloutIdNum,
+            refetchInterval: (query) => {
+                const status = query.state.data?.status?.toLowerCase();
+                // Poll every 2 seconds when status is dynamic (creating, starting, running)
+                if (['creating', 'starting', 'running', 'paused', 'waiting_for_approval'].includes(status || '')) {
+                    return 2000;
+                }
+                // Poll less frequently for stable states
+                return 10000;
+            },
+            staleTime: 0,
+        },
     });
 
-    // Fetch deploy groups
+    // Fetch deploy groups with polling for real-time action tracking
     const { data: groupsData, isLoading: groupsLoading } = useGetRolloutGroups(
         rolloutIdNum,
         { limit: 100 },
-        { query: { enabled: !!rolloutIdNum } }
+        {
+            query: {
+                enabled: !!rolloutIdNum,
+                refetchInterval: rolloutData?.status === 'running' ? 2000 : 10000,
+                staleTime: 0,
+            }
+        }
     );
 
     // Mutations
@@ -254,7 +272,10 @@ const RolloutDetail: React.FC = () => {
     const statusPerTarget = rolloutData.totalTargetsPerStatus as Record<string, number> || {};
     const finishedTargets = statusPerTarget.finished || 0;
     const errorTargets = statusPerTarget.error || 0;
-    let overallProgress = totalTargets > 0 ? Math.round((finishedTargets / totalTargets) * 100) : 0;
+    // If rollout is finished, always show 100%
+    let overallProgress = rolloutData.status === 'finished'
+        ? 100
+        : (totalTargets > 0 ? Math.round((finishedTargets / totalTargets) * 100) : 0);
 
     const groupColumns: TableProps<MgmtRolloutGroup>['columns'] = [
         {

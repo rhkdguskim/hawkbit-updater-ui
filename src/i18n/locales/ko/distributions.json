@@ -179,7 +179,20 @@
             "size": "크기",
             "hashes": "해시",
             "actions": "액션"
-        }
+        },
+        "monitoring": "모니터링",
+        "activeRollouts": "활성 롤아웃",
+        "totalActions": "전체 액션",
+        "autoAssignments": "자동 할당",
+        "successRate": "성공률",
+        "deploymentSuccessRate": "배포 성공률",
+        "overallSuccessRate": "전체 성공률",
+        "successfulDeployments": "성공한 배포",
+        "failedRetrying": "실패 / 재시도 중",
+        "noStatisticsAvailable": "사용 가능한 통계가 없습니다",
+        "assignedTargets": "할당된 대상",
+        "installedTargets": "설치된 대상",
+        "total": "전체"
     },
     "builder": {
         "title": "고급 배포 세트 빌더",

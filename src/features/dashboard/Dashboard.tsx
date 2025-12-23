@@ -4,7 +4,6 @@ import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import { KPICards } from './components/widgets/KPICards';
 import { DashboardHeader } from './components/widgets/DashboardHeader';
 import { ConnectivityChart } from './components/widgets/ConnectivityChart';
-import { DeploymentChart } from './components/widgets/DeploymentChart';
 import { RolloutStatusChart } from './components/widgets/RolloutStatusChart';
 import { ActionStatusChart } from './components/widgets/ActionStatusChart';
 import { RecentActivityWidget } from './components/widgets/RecentActivityWidget';
@@ -45,11 +44,6 @@ const Dashboard: React.FC = () => {
                         isLoading={metrics.isLoading}
                         stats={metrics.fragmentationStats}
                     />
-                    <DeploymentChart
-                        isLoading={metrics.isLoading}
-                        deploymentRate={metrics.deploymentRate}
-                        deploymentRateLabel={metrics.deploymentRateLabel}
-                    />
                     <RolloutStatusChart
                         isLoading={metrics.isLoading}
                         activeRolloutCount={metrics.activeRolloutCount}
@@ -71,7 +65,11 @@ const Dashboard: React.FC = () => {
                         data={metrics.recentActivities}
                     />
                     {/* Reusing existing DeviceCardGrid if compatible, or just leave as is for now */}
-                    <DeviceCardGrid targets={metrics.targets} actions={metrics.actions} />
+                    <DeviceCardGrid
+                        targets={metrics.targets}
+                        actions={metrics.actions}
+                        targetTypeColorMap={metrics.targetTypeColorMap}
+                    />
                 </>
             }
         />

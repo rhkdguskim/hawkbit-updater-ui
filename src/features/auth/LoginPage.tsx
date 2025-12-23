@@ -28,51 +28,44 @@ const StyledTitle = styled(Title)`
   margin-bottom: 2rem !important;
 `;
 
+interface UserInfoResponse {
+    tenant?: string;
+    username?: string;
+}
+
 const LoginPage: React.FC = () => {
     const { t } = useTranslation('auth');
     const [loading, setLoading] = useState(false);
     const login = useAuthStore((state) => state.login);
     const navigate = useNavigate();
 
-    const onFinish = async (values: any) => {
+    const onFinish = async (values: { username: string; password: string }) => {
         setLoading(true);
         const { username, password } = values;
 
-        // 1. Internal Authentication Rule (UI Policy)
-        // Check credentials against our internal hardcoded policy
-        let isValid = false;
-
-        if (username === 'mirero' && password === 'mirero-0203') {
-            isValid = true;
-        } else if (username === 'admin' && password === 'admin') {
-            isValid = true;
-        }
-
-        if (!isValid) {
-            message.error(t('messages.loginFailed'));
-            setLoading(false);
-            return;
-        }
-
-        // 2. Fixed API Token Strategy
-        // If internal auth passes, we ALWAYS use the 'admin:admin' token for actual API calls
-        // because hawkBit server only knows 'admin'.
-        const apiToken = btoa('admin:admin');
+        // Generate Basic Auth token from user input
+        const apiToken = btoa(`${username}:${password}`);
 
         try {
-            // Verify connectivity with the fixed Admin token
-            await axios.get('/rest/v1/userinfo', {
+            // Verify credentials with HawkBit server
+            const response = await axios.get<UserInfoResponse>('/rest/v1/userinfo', {
                 headers: {
                     Authorization: `Basic ${apiToken}`,
                 },
             });
 
-            // Login successful: Store original username (for Role) and the fixed API token
-            login(username, apiToken);
+            // Login successful: Store API username (for role determination) and the token
+            const apiUsername = response.data.username || username;
+            login(apiUsername, apiToken);
             message.success(t('messages.loginSuccess'));
             navigate('/');
-        } catch (error: any) {
-            message.error(t('messages.serverError'));
+        } catch (error: unknown) {
+            // Check if it's an axios error with response
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                message.error(t('messages.loginFailed'));
+            } else {
+                message.error(t('messages.serverError'));
+            }
         } finally {
             setLoading(false);
         }
@@ -81,7 +74,7 @@ const LoginPage: React.FC = () => {
     return (
         <Container>
             <FormContainer>
-                <StyledTitle level={3}>{t('login.mireroProductManager')}</StyledTitle>
+                <StyledTitle level={3}>{import.meta.env.VITE_LOGIN_TITLE || t('login.mireroProductManager')}</StyledTitle>
                 <Form
                     name="login_form"
                     initialValues={{ remember: true }}

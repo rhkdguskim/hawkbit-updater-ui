@@ -14,6 +14,7 @@ import { PageContainer } from '@/components/layout/PageLayout';
 import { useServerTable } from '@/hooks/useServerTable';
 import dayjs from 'dayjs';
 import { buildWildcardSearch, appendFilter, buildCondition } from '@/utils/fiql';
+import RolloutCreateModal from './RolloutCreateModal';
 
 const { Text } = Typography;
 const { Search } = Input;
@@ -26,6 +27,7 @@ const RolloutList: React.FC = () => {
     const isAdmin = role === 'Admin';
     const tableContainerRef = useRef<HTMLDivElement | null>(null);
     const [tableScrollY, setTableScrollY] = useState<number | undefined>(undefined);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     const {
         pagination,
@@ -171,16 +173,22 @@ const RolloutList: React.FC = () => {
             key: 'progress',
             width: 200,
             render: (_, record) => {
-                const total = record.totalTargets || 0;
-                const finished = (record.totalTargetsPerStatus as Record<string, number>)?.finished || 0;
-                const percent = total > 0 ? Math.round((finished / total) * 100) : 0;
+                // If rollout is finished, always show 100%
+                let percent = 0;
+                if (record.status === 'finished') {
+                    percent = 100;
+                } else {
+                    const total = record.totalTargets || 0;
+                    const finished = (record.totalTargetsPerStatus as Record<string, number>)?.finished || 0;
+                    percent = total > 0 ? Math.round((finished / total) * 100) : 0;
+                }
                 return (
                     <Space direction="vertical" size={4} style={{ width: '100%' }}>
                         <Progress
                             percent={percent}
                             size="small"
-                            status={record.status === 'error' ? 'exception' : undefined}
-                            strokeColor={record.status === 'error' ? undefined : '#3b82f6'}
+                            status={record.status === 'stopped' ? 'exception' : undefined}
+                            strokeColor={record.status === 'stopped' ? undefined : '#3b82f6'}
                         />
                         <Text type="secondary" style={{ fontSize: 12 }}>
                             {t('columns.progressLabel', { percent })}
@@ -245,7 +253,7 @@ const RolloutList: React.FC = () => {
                             <Button
                                 type="primary"
                                 icon={<PlusOutlined />}
-                                onClick={() => navigate('/rollouts/create')}
+                                onClick={() => setIsCreateModalOpen(true)}
                             >
                                 {t('createRollout')}
                             </Button>
@@ -270,9 +278,19 @@ const RolloutList: React.FC = () => {
                         }}
                         onChange={handleTableChange}
                         scroll={tableScrollY ? { x: 1000, y: tableScrollY } : { x: 1000 }}
+                        size="small"
                     />
                 </div>
             </Card>
+
+            <RolloutCreateModal
+                open={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onSuccess={(id) => {
+                    setIsCreateModalOpen(false);
+                    navigate(`/rollouts/${id}`);
+                }}
+            />
         </PageContainer>
     );
 };

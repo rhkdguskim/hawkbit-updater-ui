@@ -386,7 +386,7 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
                 </Space>
 
                 {showNewModuleForm && (
-                    <Card size="small" style={{ marginBottom: 16, background: '#fafafa' }}>
+                    <Card size="small" style={{ marginBottom: 16, background: 'var(--ant-color-fill-alter, #fafafa)' }}>
                         <Form form={newModuleForm} layout="vertical" size="small">
                             <Space style={{ width: '100%' }} direction="vertical">
                                 <Space style={{ width: '100%' }} wrap>

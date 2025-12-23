@@ -65,8 +65,8 @@ const SetTargetsTab: React.FC<SetTargetsTabProps> = ({ distributionSetId }) => {
             <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Segmented
                     options={[
-                        { label: t('detail.Assigned Targets'), value: 'assigned' },
-                        { label: t('detail.Installed Targets'), value: 'installed' },
+                        { label: t('detail.assignedTargets'), value: 'assigned' },
+                        { label: t('detail.installedTargets'), value: 'installed' },
                     ]}
                     value={view}
                     onChange={(val) => {
@@ -75,7 +75,7 @@ const SetTargetsTab: React.FC<SetTargetsTabProps> = ({ distributionSetId }) => {
                     }}
                 />
                 <Text type="secondary">
-                    {t('detail.Total')}: {data?.total || 0}
+                    {t('detail.total')}: {data?.total || 0}
                 </Text>
             </div>
 

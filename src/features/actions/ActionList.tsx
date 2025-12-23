@@ -28,64 +28,10 @@ dayjs.extend(relativeTime);
 const { Title, Text } = Typography;
 
 // Animations
-const fadeInUp = keyframes`
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-`;
 
 const pulse = keyframes`
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
-`;
-
-const StatsCard = styled(Card) <{ $accentColor?: string; $delay?: number }>`
-    border: none;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    animation: ${fadeInUp} 0.5s ease-out;
-    animation-delay: ${props => (props.$delay || 0) * 0.1}s;
-    animation-fill-mode: both;
-    cursor: pointer;
-    min-height: 70px;
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: ${props => props.$accentColor || 'var(--gradient-primary)'};
-    }
-
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    .dark-mode & {
-        background: rgba(30, 41, 59, 0.9);
-    }
-`;
-
-const StatsGrid = styled.div`
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 12px;
-
-    @media (max-width: 1200px) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (max-width: 640px) {
-        grid-template-columns: 1fr;
-    }
 `;
 
 const FilterBar = styled(Card)`
@@ -124,12 +70,6 @@ const BulkActionBar = styled.div`
     margin-bottom: 16px;
 `;
 
-const COLORS = {
-    running: '#3b82f6',
-    pending: '#f59e0b',
-    finished: '#10b981',
-    error: '#ef4444',
-};
 
 const getStatusColor = (status?: string) => {
     const s = status?.toLowerCase();
@@ -223,28 +163,6 @@ const ActionList: React.FC = () => {
 
     const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';
     const isActivePolling = hasRunningActions(data?.content);
-
-    const summaryCounts = useMemo(() => {
-        const content = data?.content || [];
-        const counts = {
-            total: data?.total ?? content.length,
-            active: 0,
-            errors: 0,
-            completed: 0,
-        };
-        content.forEach((action) => {
-            if (isActiveStatus(action.status)) {
-                counts.active += 1;
-            }
-            if (isActionErrored(action)) {
-                counts.errors += 1;
-            }
-            if ((action.status || '').toLowerCase() === 'finished') {
-                counts.completed += 1;
-            }
-        });
-        return counts;
-    }, [data?.content, data?.total]);
 
     const resetFilters = useCallback(() => {
         setSearchQuery('');
@@ -439,26 +357,6 @@ const ActionList: React.FC = () => {
                     </Button>
                 </Space>
             </HeaderRow>
-
-            {/* Stats Cards */}
-            <StatsGrid>
-                <StatsCard $accentColor="linear-gradient(135deg, #64748b 0%, #94a3b8 100%)" $delay={1}>
-                    <Text type="secondary" style={{ fontSize: 13 }}>{t('summary.total')}</Text>
-                    <Title level={3} style={{ margin: '4px 0 0', color: '#475569' }}>{summaryCounts.total}</Title>
-                </StatsCard>
-                <StatsCard $accentColor={`linear-gradient(135deg, ${COLORS.running} 0%, #6366f1 100%)`} $delay={2}>
-                    <Text type="secondary" style={{ fontSize: 13 }}>{t('summary.active')}</Text>
-                    <Title level={3} style={{ margin: '4px 0 0', color: COLORS.running }}>{summaryCounts.active}</Title>
-                </StatsCard>
-                <StatsCard $accentColor={`linear-gradient(135deg, ${COLORS.error} 0%, #f87171 100%)`} $delay={3}>
-                    <Text type="secondary" style={{ fontSize: 13 }}>{t('summary.errors')}</Text>
-                    <Title level={3} style={{ margin: '4px 0 0', color: summaryCounts.errors > 0 ? COLORS.error : '#64748b' }}>{summaryCounts.errors}</Title>
-                </StatsCard>
-                <StatsCard $accentColor={`linear-gradient(135deg, ${COLORS.finished} 0%, #34d399 100%)`} $delay={4}>
-                    <Text type="secondary" style={{ fontSize: 13 }}>{t('summary.completed')}</Text>
-                    <Title level={3} style={{ margin: '4px 0 0', color: COLORS.finished }}>{summaryCounts.completed}</Title>
-                </StatsCard>
-            </StatsGrid>
 
             {/* Filter Bar */}
             <FilterBar>

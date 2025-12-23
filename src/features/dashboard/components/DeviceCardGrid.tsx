@@ -36,6 +36,7 @@ interface DeviceCardGridProps {
     rows?: number;
     gap?: number;
     rowHeight?: number;
+    targetTypeColorMap?: Map<string, string>;
 }
 
 const DeviceCardGrid: React.FC<DeviceCardGridProps> = ({
@@ -48,6 +49,7 @@ const DeviceCardGrid: React.FC<DeviceCardGridProps> = ({
     rows = 2,
     gap = 10,
     rowHeight = 110,
+    targetTypeColorMap,
 }) => {
     const { t } = useTranslation('dashboard');
     const [offsetLine, setOffsetLine] = useState(0);
@@ -168,6 +170,7 @@ const DeviceCardGrid: React.FC<DeviceCardGridProps> = ({
                                             key={`${target.controllerId}-${rowIndex}-${colIndex}`}
                                             target={target}
                                             recentAction={actionMap.get(target.controllerId || '')}
+                                            targetTypeColor={target.targetTypeName ? targetTypeColorMap?.get(target.targetTypeName) : undefined}
                                         />
                                     ))}
                                     {/* Fill empty cells */}
