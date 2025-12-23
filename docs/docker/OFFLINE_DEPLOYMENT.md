@@ -111,3 +111,39 @@ docker compose logs -f
 docker compose down
 docker compose up -d
 ```
+
+---
+
+## 버전 업데이트 (Redeployment)
+
+새로운 버전으로 업데이트할 때는 **반드시 이미지를 다시 로드**해야 합니다:
+
+1. **서비스 중지**
+
+   ```bash
+   docker compose down
+   ```
+
+2. **파일 덮어쓰기**
+   - 새로운 `docker-images/` 폴더를 기존 폴더에 덮어씁니다.
+   - `docker-compose.yml` 등 설정 파일이 변경되었다면 함께 덮어씁니다.
+
+3. **이미지 로딩 (필수)**
+   - 단순히 파일만 복사하면 Docker가 이전 이미지를 계속 사용합니다.
+   - 반드시 로드 스크립트를 실행하여 내부 이미지를 갱신해야 합니다.
+
+   ```cmd
+   # Windows
+   scripts\load-images.bat
+   ```
+
+   ```bash
+   # Linux/macOS
+   ./scripts/load-images.sh
+   ```
+
+4. **서비스 시작**
+
+   ```bash
+   docker compose up -d
+   ```
