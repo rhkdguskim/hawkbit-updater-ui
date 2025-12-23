@@ -4,6 +4,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  envPrefix: ['VITE_', 'API_'],
   plugins: [react()],
   resolve: {
     alias: {
@@ -13,7 +14,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/rest': {
-        target: 'http://localhost:8081',
+        target: 'http://110.110.10.102:9200',
         changeOrigin: true,
         secure: false,
         configure: (proxy, _options) => {

@@ -25,7 +25,7 @@ const { Text } = Typography;
 
 const StyledHeader = styled(Header) <{ $bg: string }>`
     padding: 0 24px;
-    height: 48px;
+    height: 64px;
     background: ${(props) => props.$bg};
     display: flex;
     align-items: center;

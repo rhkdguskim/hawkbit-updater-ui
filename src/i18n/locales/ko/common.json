@@ -1,5 +1,7 @@
 {
     "appName": "hawkBit 업데이터",
+    "updated": "업데이트",
+    "createdAt": "생성일",
     "nav": {
         "dashboard": "대시보드",
         "targets": "타겟 관리",
@@ -67,7 +69,10 @@
         "stopped": "중지됨",
         "canceling": "취소 중",
         "retrieving": "수신 중",
-        "registered": "등록됨"
+        "registered": "등록됨",
+        "live": "실시간",
+        "idle": "대기",
+        "active": "활성"
     },
     "messages": {
         "success": "성공적으로 처리되었습니다.",

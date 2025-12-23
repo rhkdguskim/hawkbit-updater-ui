@@ -3,6 +3,7 @@ import { message } from 'antd';
 import i18n from '@/i18n';
 
 export const AXIOS_INSTANCE = axios.create({
+    baseURL: import.meta.env.API_URL || '',
     headers: {
         'Content-Type': 'application/json',
     },

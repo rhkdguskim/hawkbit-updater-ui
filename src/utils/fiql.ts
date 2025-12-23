@@ -15,10 +15,18 @@ export interface FiqlCondition {
 
 /**
  * Escapes special characters in FIQL values.
+ * RSQL reserves: " ' ( ) ; , < > = ! ~ space
  */
 const escapeValue = (value: string): string => {
-    // Escape quotes and backslashes
-    return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    // If simple alphanumeric, return as is
+    if (/^[a-zA-Z0-9.\-_]+$/.test(value)) {
+        return value;
+    }
+
+    // Check if reliable Double Quote escaping is needed
+    // Standard RSQL: "value"
+    let escaped = value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    return `"${escaped}"`;
 };
 
 /**
@@ -31,21 +39,11 @@ const formatValue = (value: string | number | boolean): string => {
     if (typeof value === 'number') {
         return String(value);
     }
-    // String values - check if it needs quotes
-    const escaped = escapeValue(value);
-    // If contains special characters or spaces, quote it
-    if (/[\s,;()]/.test(escaped) || escaped.includes('*')) {
-        return `"${escaped}"`;
-    }
-    return escaped;
+    return escapeValue(String(value));
 };
 
 /**
  * Builds a single FIQL condition string.
- *
- * @example
- * buildCondition({ field: 'name', operator: '==', value: '*test*' })
- * // Returns: 'name==*test*'
  */
 export const buildCondition = (condition: FiqlCondition): string => {
     const { field, operator, value } = condition;
@@ -61,49 +59,64 @@ export const buildCondition = (condition: FiqlCondition): string => {
 
 /**
  * Builds a wildcard search query for a specific field.
- * This is the most common search pattern.
- *
- * @example
- * buildWildcardSearch('name', 'test')
- * // Returns: 'name==*test*'
  */
 export const buildWildcardSearch = (field: string, value: string): string => {
     if (!value.trim()) return '';
     const trimmed = value.trim();
+    // Wildcards are NOT escaped in the value content usually, 
+    // but the surrounding quotes must handle the string.
+    // However, for RSQL, * is special.
+    // If we want literal *, we escape it? HawkBit usually treats * as wildcard.
+    // We'll wrap in quotes if it contains other specials, but keep * unescaped inside?
+    // Actually, safest is to just return as-is if simple, but here we assume user WANTS wildcard.
     return `${field}==*${trimmed}*`;
 };
 
 /**
+ * Wraps a query string in parentheses if it contains logical operators.
+ * This is crucial when mixing AND (;) and OR (,) to enforce precedence.
+ */
+export const group = (query: string): string => {
+    if (!query) return '';
+    if (query.match(/[;,]/) && !query.startsWith('(')) {
+        return `(${query})`;
+    }
+    return query;
+};
+
+/**
  * Combines multiple FIQL conditions with AND (;) operator.
- *
- * @example
- * combineWithAnd(['name==*test*', 'status==online'])
- * // Returns: 'name==*test*;status==online'
  */
 export const combineWithAnd = (conditions: string[]): string => {
     const validConditions = conditions.filter(c => c && c.trim());
+    if (validConditions.length === 0) return '';
     return validConditions.join(';');
 };
 
 /**
  * Combines multiple FIQL conditions with OR (,) operator.
- *
- * @example
- * combineWithOr(['status==online', 'status==pending'])
- * // Returns: 'status==online,status==pending'
  */
 export const combineWithOr = (conditions: string[]): string => {
     const validConditions = conditions.filter(c => c && c.trim());
+    if (validConditions.length === 0) return '';
     return validConditions.join(',');
 };
 
 /**
+ * Helper to safely combine a main query with additional required filters (AND).
+ * Ensures the main query is grouped if it looks complex.
+ */
+export const appendFilter = (baseQuery: string | undefined, filterCondition: string): string => {
+    if (!baseQuery) return filterCondition;
+    if (!filterCondition) return baseQuery;
+
+    // Group base query if needed
+    const safeBase = group(baseQuery);
+    return `${safeBase};${filterCondition}`;
+};
+
+/**
  * Builds a complete FIQL query from a filter object.
- * Useful for building queries from form/filter state.
- *
- * @example
- * buildQueryFromFilters({ name: 'test', status: 'online' })
- * // Returns: 'name==*test*;status==online'
  */
 export const buildQueryFromFilters = (
     filters: Record<string, string | undefined>,

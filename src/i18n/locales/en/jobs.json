@@ -46,7 +46,9 @@
             "rolloutsPercent": "{{percent}}% complete",
             "waitingApproval": "Waiting approval: {{count}}",
             "errors": "Errors: {{count}}"
-        }
+        },
+        "totalCount": "{{count}} total",
+        "recentCount": "{{count}} recent"
     },
     "quickAccess": {
         "rollouts": "Rollouts",

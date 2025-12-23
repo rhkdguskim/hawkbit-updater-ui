@@ -28,11 +28,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         }
     }, [mode, getResolvedTheme]);
 
-    // Apply body background color for smooth theme transitions
+    // Apply body background color and class for smooth theme transitions
     useEffect(() => {
         const theme = resolvedTheme === 'dark' ? darkTheme : lightTheme;
         document.body.style.backgroundColor = theme.token?.colorBgLayout || '#f0f2f5';
         document.body.style.transition = 'background-color 0.3s ease';
+
+        if (resolvedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
     }, [resolvedTheme]);
 
     const currentTheme = resolvedTheme === 'dark' ? darkTheme : lightTheme;

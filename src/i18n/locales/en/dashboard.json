@@ -58,7 +58,8 @@
         "deploymentRateDesc": "Target completion rate",
         "targets": "targets",
         "rolloutStatus": "Rollout Status",
-        "actionStatus": "Action Status (24h)"
+        "actionStatus": "Action Status (24h)",
+        "fragmentation": "Firmware Status"
     },
     "recentActions": {
         "title": "Recent Actions (24h)",
@@ -67,6 +68,17 @@
         "status": "Status",
         "time": "Time",
         "empty": "No recent actions"
+    },
+    "recentActivities": {
+        "title": "Active Updates",
+        "inProgress": "{{count}} in progress",
+        "empty": "No active updates"
+    },
+    "timeline": {
+        "queued": "Queued",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed"
     },
     "recentDevices": {
         "title": "Recent Device Activity"

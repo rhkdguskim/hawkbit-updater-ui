@@ -18,7 +18,7 @@ const ContentLayout = styled(Layout)`
 const StyledContent = styled(Content) <{ $bg: string; $radius: number }>`
   margin: 8px;
   padding: 12px;
-  height: calc(100vh - 48px - 16px);
+  height: calc(100vh - 64px - 16px);
   overflow: auto;
   background: ${(props) => props.$bg};
   border-radius: ${(props) => props.$radius}px;
@@ -47,7 +47,10 @@ const MainLayout: React.FC = () => {
     <StyledLayout>
       <ContentLayout>
         <AppHeader />
-        <StyledContent $bg={colorBgContainer} $radius={borderRadiusLG}>
+        <StyledContent
+          $bg={colorBgContainer}
+          $radius={borderRadiusLG}
+        >
           <Outlet />
         </StyledContent>
       </ContentLayout>

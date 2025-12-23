@@ -17,7 +17,11 @@
         "noActiveRollouts": "No active rollouts",
         "createFirst": "Create First Rollout",
         "allTargets": "All targets",
-        "total": "Total"
+        "total": "Total",
+        "rolloutsCount": "{{count}} rollouts",
+        "activeCount": "{{count}} active",
+        "completedCount": "{{count}} completed",
+        "targetsCount": "{{count}} targets"
     },
     "refresh": "Refresh",
     "createRollout": "Create Rollout",
@@ -42,6 +46,9 @@
         "waitingForApproval": "Waiting for Approval",
         "scheduled": "Scheduled",
         "clearFilters": "Clear Filters"
+    },
+    "search": {
+        "placeholder": "Search by Name"
     },
     "pagination": {
         "total": "Total {{count}} rollouts",
@@ -125,7 +132,13 @@
             "selectDS": "Select a Distribution Set",
             "selected": "Selected",
             "noSelection": "No distribution set selected",
-            "selectRequired": "Please select a distribution set"
+            "selectRequired": "Please select a distribution set",
+            "columns": {
+                "id": "ID",
+                "name": "Name",
+                "version": "Version",
+                "type": "Type"
+            }
         },
         "targetFilter": {
             "title": "Target Filter",
@@ -139,9 +152,17 @@
             "targetTypePlaceholder": "Select target types",
             "anyType": "Match any selected type",
             "allType": "Match all selected types",
-            "status": "Device Status",
+            "pollingStatus": "Polling Status",
             "statusOnline": "Online",
             "statusOffline": "Offline",
+            "updateStatus": "Update Status",
+            "updateStatusPlaceholder": "Select update statuses",
+            "updateStatusInSync": "In Sync",
+            "updateStatusPending": "Pending",
+            "updateStatusError": "Error",
+            "updateStatusUnknown": "Unknown",
+            "updateStatusRegistered": "Registered",
+            "currentFilter": "Current Filter Query",
             "controllerId": "Controller ID contains",
             "controllerPlaceholder": "e.g., device-",
             "nameKeyword": "Device name contains",

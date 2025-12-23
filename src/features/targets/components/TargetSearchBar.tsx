@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { buildWildcardSearch } from '@/utils/fiql';
+import { buildWildcardSearch, appendFilter, buildCondition } from '@/utils/fiql';
 
 const { Search } = Input;
 
@@ -55,6 +55,9 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
     const { t } = useTranslation('targets');
     const [searchField, setSearchField] = useState<SearchField>('name');
     const [searchValue, setSearchValue] = useState('');
+    const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+    const [fiqlQuery, setFiqlQuery] = useState('');
+
     const manualSearchRef = useRef(false);
     const debounceRef = useRef<number | undefined>(undefined);
 
@@ -69,8 +72,10 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
             return;
         }
         setSearchValue('');
-        setSearchField('name');
-    }, [resetSignal]);
+        if (!isAdvancedMode) {
+            setSearchField('name');
+        }
+    }, [resetSignal, isAdvancedMode]);
 
     const handleSearch = (value: string) => {
         setSearchValue(value);
@@ -80,8 +85,15 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
         onSearch(query);
     };
 
+    const handleAdvancedSearch = (value: string) => {
+        setFiqlQuery(value);
+        manualSearchRef.current = true;
+        onSearch(value);
+    };
+
     const handleClear = () => {
         setSearchValue('');
+        setFiqlQuery('');
         onSearch('');
     };
 
@@ -96,8 +108,12 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
         }
 
         debounceRef.current = window.setTimeout(() => {
-            const query = buildWildcardSearch(searchField, searchValue);
-            onSearch(query);
+            if (isAdvancedMode) {
+                onSearch(fiqlQuery);
+            } else {
+                const query = buildWildcardSearch(searchField, searchValue);
+                onSearch(query);
+            }
         }, 400);
 
         return () => {
@@ -105,29 +121,55 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
                 window.clearTimeout(debounceRef.current);
             }
         };
-    }, [searchField, searchValue, onSearch]);
+    }, [searchField, searchValue, fiqlQuery, isAdvancedMode, onSearch]);
 
     return (
         <SearchContainer>
             <SearchGroup>
-                <Select
-                    value={searchField}
-                    onChange={setSearchField}
-                    options={searchFieldOptions}
-                    style={{ width: 140 }}
-                    suffixIcon={<FilterOutlined />}
-                />
-                <Search
-                    placeholder={t('search.placeholder', { field: searchFieldOptions.find(o => o.value === searchField)?.label })}
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    onSearch={handleSearch}
-                    allowClear
-                    onClear={handleClear}
-                    enterButton={<SearchOutlined />}
-                    style={{ maxWidth: 400 }}
-                    loading={loading}
-                />
+                <Tooltip title={isAdvancedMode ? t('search.switchToSimple') : t('search.switchToAdvanced')}>
+                    <Button
+                        icon={isAdvancedMode ? <SearchOutlined /> : <FilterOutlined />}
+                        onClick={() => {
+                            setIsAdvancedMode(!isAdvancedMode);
+                            handleClear();
+                        }}
+                    />
+                </Tooltip>
+                {!isAdvancedMode ? (
+                    <>
+                        <Select
+                            value={searchField}
+                            onChange={setSearchField}
+                            options={searchFieldOptions}
+                            style={{ width: 140 }}
+                            suffixIcon={<FilterOutlined />}
+                        />
+                        <Search
+                            placeholder={t('search.placeholder', { field: searchFieldOptions.find(o => o.value === searchField)?.label })}
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            onSearch={handleSearch}
+                            allowClear
+                            onClear={handleClear}
+                            enterButton={<SearchOutlined />}
+                            style={{ maxWidth: 400 }}
+                            loading={loading}
+                        />
+                    </>
+                ) : (
+                    <Input.Search
+                        placeholder="FIQL Query (e.g. name==*test*;status==online)"
+                        value={fiqlQuery}
+                        onChange={(e) => setFiqlQuery(e.target.value)}
+                        onSearch={handleAdvancedSearch}
+                        allowClear
+                        onClear={handleClear}
+                        enterButton={<SearchOutlined />}
+                        style={{ flex: 1, maxWidth: 600 }}
+                        loading={loading}
+                        prefix={<span style={{ color: '#aaa', fontSize: 12, marginRight: 4 }}>FIQL:</span>}
+                    />
+                )}
             </SearchGroup>
 
             <ActionGroup>

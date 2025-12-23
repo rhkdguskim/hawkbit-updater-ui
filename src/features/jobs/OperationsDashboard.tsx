@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
-import { Card, Row, Col, Typography, Button, Flex, Skeleton, Tag, Progress, Space } from 'antd';
+import { Typography, Button, Flex, Skeleton, Tag, Progress } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import styled, { keyframes, css } from 'styled-components';
 import {
     ThunderboltOutlined,
     CheckCircleOutlined,
@@ -17,198 +16,42 @@ import {
     RocketOutlined,
     AimOutlined,
 } from '@ant-design/icons';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 import { useGetRollouts } from '@/api/generated/rollouts/rollouts';
 import { useGetActions } from '@/api/generated/actions/actions';
 import type { MgmtAction } from '@/api/generated/model';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import {
+    OverviewPageContainer,
+    OverviewPageHeader,
+    HeaderContent,
+    GradientTitle,
+    TopRow,
+    BottomRow,
+    KPIGridContainer,
+    ChartsContainer,
+    OverviewStatsCard,
+    OverviewChartCard,
+    OverviewListCard,
+    IconBadge,
+    BigNumber,
+    LiveIndicator,
+    ChartLegendItem,
+    ActivityItem,
+} from '@/components/shared/OverviewStyles';
 
 dayjs.extend(relativeTime);
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
-// ============================================================================
 // Polling Optimization: Fast when active, slow when idle
-// ============================================================================
 const POLLING_FAST = 5000;
 const POLLING_SLOW = 30000;
 const STALE_TIME = 5000;
 
-// Animations
-const fadeInUp = keyframes`
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-`;
-
-const pulse = keyframes`
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-`;
-
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    height: 100%;
-    min-height: 100%;
-    overflow: auto;
-    animation: ${fadeInUp} 0.5s ease-out;
-`;
-
-const PageHeader = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 0;
-`;
-
-const HeaderContent = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-`;
-
-const GradientTitle = styled(Title)`
-    && {
-        margin: 0;
-        background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    .dark-mode & {
-        background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-    }
-`;
-
-const StatsCard = styled(Card) <{ $accentColor?: string; $delay?: number; $pulse?: boolean }>`
-    border: none;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    animation: ${fadeInUp} 0.5s ease-out;
-    animation-delay: ${props => (props.$delay || 0) * 0.1}s;
-    animation-fill-mode: both;
-    cursor: pointer;
-    min-height: 100px;
-
-    .ant-card-body {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: ${props => props.$accentColor || 'var(--gradient-primary)'};
-        ${props => props.$pulse && css`animation: ${pulse} 2s ease-in-out infinite;`}
-    }
-
-    &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .dark-mode & {
-        background: rgba(30, 41, 59, 0.9);
-    }
-`;
-
-const QuickAccessCard = styled(Card) <{ $delay?: number }>`
-    border: none;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    animation: ${fadeInUp} 0.5s ease-out;
-    animation-delay: ${props => (props.$delay || 0) * 0.1}s;
-    animation-fill-mode: both;
-    cursor: pointer;
-    transition: all 0.3s ease;
-
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
-    }
-
-    .dark-mode & {
-        background: rgba(30, 41, 59, 0.9);
-    }
-`;
-
-const ChartCard = styled(Card) <{ $delay?: number }>`
-    border: none;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    animation: ${fadeInUp} 0.5s ease-out;
-    animation-delay: ${props => (props.$delay || 0) * 0.1}s;
-    animation-fill-mode: both;
-    
-    .ant-card-head {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-    }
-    
-    .ant-card-head-title {
-        font-size: 15px;
-        font-weight: 600;
-        color: #334155;
-    }
-
-    .dark-mode & {
-        background: rgba(30, 41, 59, 0.9);
-        
-        .ant-card-head {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        
-        .ant-card-head-title {
-            color: #e2e8f0;
-        }
-    }
-`;
-
-const BigNumber = styled.div`
-    font-size: 36px;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 4px;
-`;
-
-const LiveIndicator = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: #64748b;
-    
-    &::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #10b981;
-        animation: ${pulse} 1.5s ease-in-out infinite;
-    }
-`;
-
-const COLORS = {
+const JOB_COLORS = {
     running: '#3b82f6',
     approval: '#8b5cf6',
     finished: '#10b981',
@@ -226,7 +69,7 @@ const isActionErrored = (action: MgmtAction) => {
 };
 
 const OperationsDashboard: React.FC = () => {
-    const { t } = useTranslation('jobs');
+    const { t } = useTranslation(['jobs', 'common']);
     const navigate = useNavigate();
 
     // Adaptive Polling
@@ -307,97 +150,94 @@ const OperationsDashboard: React.FC = () => {
 
     // Pie chart data
     const rolloutStatusData = useMemo(() => [
-        { name: t('status.running', 'Running'), value: activeRolloutCount, color: COLORS.running },
-        { name: t('status.waiting_for_approval', 'Waiting'), value: waitingApprovalCount, color: COLORS.approval },
-        { name: t('status.finished', 'Finished'), value: finishedRolloutCount, color: COLORS.finished },
-        { name: t('status.error', 'Error/Stopped'), value: criticalAlertCount, color: COLORS.error },
+        { name: t('common:status.running', 'Running'), value: activeRolloutCount, color: JOB_COLORS.running },
+        { name: t('common:status.waiting_for_approval', 'Waiting'), value: waitingApprovalCount, color: JOB_COLORS.approval },
+        { name: t('common:status.finished', 'Finished'), value: finishedRolloutCount, color: JOB_COLORS.finished },
+        { name: t('common:status.error', 'Error/Stopped'), value: criticalAlertCount, color: JOB_COLORS.error },
     ].filter(d => d.value > 0), [activeRolloutCount, waitingApprovalCount, finishedRolloutCount, criticalAlertCount, t]);
 
     const isActivePolling = activeRolloutCount > 0 || waitingApprovalCount > 0 || runningActionsCount > 0;
 
+    const renderCustomLegend = (data: { name: string; value: number; color: string }[]) => (
+        <Flex vertical gap={4} style={{ marginTop: 4 }}>
+            {data.map(entry => (
+                <ChartLegendItem key={entry.name}>
+                    <Flex align="center" gap={6}>
+                        <div style={{ width: 10, height: 10, borderRadius: 3, background: entry.color, boxShadow: `0 1px 3px ${entry.color}40` }} />
+                        <Text style={{ fontSize: 11, color: '#475569' }}>{entry.name}</Text>
+                    </Flex>
+                    <Text strong style={{ fontSize: 12, color: entry.color }}>{entry.value}</Text>
+                </ChartLegendItem>
+            ))}
+        </Flex>
+    );
+
     return (
-        <PageContainer>
-            <PageHeader>
+        <OverviewPageContainer>
+            <OverviewPageHeader>
                 <HeaderContent>
-                    <GradientTitle level={2}>
+                    <GradientTitle level={3} $theme="rollouts">
                         {t('operationsTitle', 'Operations Dashboard')}
                     </GradientTitle>
                     <Flex align="center" gap={12}>
-                        <Text type="secondary" style={{ fontSize: 15 }}>
+                        <Text type="secondary" style={{ fontSize: 13 }}>
                             {t('operationsSubtitle', 'Rollout monitoring & control center')}
                         </Text>
-                        <LiveIndicator>
+                        <LiveIndicator $active={isActivePolling} $color={isActivePolling ? JOB_COLORS.running : '#94a3b8'}>
                             {isActivePolling ? t('polling.fast', 'Live (5s)') : t('polling.slow', 'Idle (30s)')}
                         </LiveIndicator>
                     </Flex>
                 </HeaderContent>
                 <Flex align="center" gap={8}>
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                        {t('lastUpdated', 'Updated')}: {lastUpdated}
+                        {t('common:updated', 'Updated')}: {lastUpdated}
                     </Text>
-                    <Button icon={<ReloadOutlined />} onClick={refetch} loading={isLoading}>
-                        {t('actions.refresh', 'Refresh')}
+                    <Button icon={<ReloadOutlined />} onClick={refetch} loading={isLoading} size="small">
+                        {t('common:actions.refresh', 'Refresh')}
                     </Button>
                 </Flex>
-            </PageHeader>
+            </OverviewPageHeader>
 
-            {/* KPI Cards - Rollout Focused */}
-            <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12} lg={6}>
-                    <StatsCard
+            {/* Top Row: KPI Cards + Charts */}
+            <TopRow>
+                <KPIGridContainer>
+                    <OverviewStatsCard
                         $accentColor="linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)"
                         $delay={1}
                         $pulse={activeRolloutCount > 0}
                         onClick={() => navigate('/rollouts/list?status=running')}
                     >
-                        {isLoading ? <Skeleton active paragraph={{ rows: 1 }} /> : (
-                            <Flex justify="space-between" align="center">
-                                <div>
-                                    <Text type="secondary" style={{ fontSize: 13, fontWeight: 600 }}>
-                                        {t('kpi.activeRollouts', 'Active Rollouts')}
-                                    </Text>
-                                    <BigNumber style={{ color: COLORS.running }}>{activeRolloutCount}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 12 }}>
-                                        {runningActionsCount} {t('kpi.runningActions', 'running')}
-                                        {errorActionsCount > 0 && (
-                                            <Tag color="red" style={{ marginLeft: 4, fontSize: 10 }}>
-                                                {errorActionsCount} {t('kpi.errors', 'errors')}
-                                            </Tag>
-                                        )}
-                                    </Text>
-                                </div>
-                                <PlayCircleOutlined style={{ fontSize: 32, color: COLORS.running, opacity: 0.3 }} />
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $color="linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)">
+                                    <PlayCircleOutlined />
+                                </IconBadge>
+                                <BigNumber $color={JOB_COLORS.running}>{activeRolloutCount}</BigNumber>
+                                <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                    {t('kpi.activeRollouts', 'Active Rollouts')}
+                                </Text>
                             </Flex>
                         )}
-                    </StatsCard>
-                </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <StatsCard
+                    </OverviewStatsCard>
+                    <OverviewStatsCard
                         $accentColor="linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)"
                         $delay={2}
                         $pulse={waitingApprovalCount > 0}
                         onClick={() => navigate('/rollouts/list?status=waiting_for_approval')}
                     >
-                        {isLoading ? <Skeleton active paragraph={{ rows: 1 }} /> : (
-                            <Flex justify="space-between" align="center">
-                                <div>
-                                    <Text type="secondary" style={{ fontSize: 13, fontWeight: 600 }}>
-                                        {t('kpi.waitingApproval', 'Waiting Approval')}
-                                    </Text>
-                                    <BigNumber style={{ color: COLORS.approval }}>{waitingApprovalCount}</BigNumber>
-                                    {waitingApprovalCount > 0 && (
-                                        <Tag color="purple" icon={<ClockCircleOutlined />}>
-                                            {t('kpi.requiresReview', 'Requires review')}
-                                        </Tag>
-                                    )}
-                                </div>
-                                <PauseCircleOutlined style={{ fontSize: 32, color: COLORS.approval, opacity: 0.3 }} />
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $color="linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)">
+                                    <PauseCircleOutlined />
+                                </IconBadge>
+                                <BigNumber $color={JOB_COLORS.approval}>{waitingApprovalCount}</BigNumber>
+                                <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                    {t('kpi.waitingApproval', 'Waiting Approval')}
+                                </Text>
                             </Flex>
                         )}
-                    </StatsCard>
-                </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <StatsCard
+                    </OverviewStatsCard>
+                    <OverviewStatsCard
                         $accentColor={criticalAlertCount > 0
                             ? "linear-gradient(135deg, #ef4444 0%, #f87171 100%)"
                             : "linear-gradient(135deg, #10b981 0%, #34d399 100%)"}
@@ -405,177 +245,266 @@ const OperationsDashboard: React.FC = () => {
                         $pulse={criticalAlertCount > 0}
                         onClick={() => navigate('/rollouts/list?status=error,stopped')}
                     >
-                        {isLoading ? <Skeleton active paragraph={{ rows: 1 }} /> : (
-                            <Flex justify="space-between" align="center">
-                                <div>
-                                    <Text type="secondary" style={{ fontSize: 13, fontWeight: 600 }}>
-                                        {t('kpi.criticalAlerts', 'Critical Alerts')}
-                                    </Text>
-                                    <BigNumber style={{ color: criticalAlertCount > 0 ? COLORS.error : COLORS.finished }}>
-                                        {criticalAlertCount}
-                                    </BigNumber>
-                                    {criticalAlertCount > 0 ? (
-                                        <Tag color="red" icon={<WarningOutlined />}>
-                                            {t('kpi.immediateAttention', 'Needs attention')}
-                                        </Tag>
-                                    ) : (
-                                        <Tag color="green" icon={<CheckCircleOutlined />}>
-                                            {t('kpi.allClear', 'All clear')}
-                                        </Tag>
-                                    )}
-                                </div>
-                                <ExclamationCircleOutlined style={{ fontSize: 32, color: criticalAlertCount > 0 ? COLORS.error : COLORS.finished, opacity: 0.3 }} />
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $color={criticalAlertCount > 0
+                                    ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
+                                    : "linear-gradient(135deg, #10b981 0%, #059669 100%)"}>
+                                    {criticalAlertCount > 0 ? <ExclamationCircleOutlined /> : <CheckCircleOutlined />}
+                                </IconBadge>
+                                <BigNumber $color={criticalAlertCount > 0 ? JOB_COLORS.error : JOB_COLORS.finished}>
+                                    {criticalAlertCount}
+                                </BigNumber>
+                                <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                    {t('kpi.criticalAlerts', 'Critical Alerts')}
+                                </Text>
                             </Flex>
                         )}
-                    </StatsCard>
-                </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <StatsCard
+                    </OverviewStatsCard>
+                    <OverviewStatsCard
                         $accentColor="linear-gradient(135deg, #10b981 0%, #34d399 100%)"
                         $delay={4}
                         onClick={() => navigate('/rollouts')}
                     >
-                        {isLoading ? <Skeleton active paragraph={{ rows: 1 }} /> : (
-                            <Flex justify="space-between" align="center">
-                                <div>
-                                    <Text type="secondary" style={{ fontSize: 13, fontWeight: 600 }}>
-                                        {t('kpi.successRate', 'Success Rate')}
-                                    </Text>
-                                    <BigNumber style={{ color: COLORS.finished }}>
-                                        {successRate !== null ? `${successRate}%` : '-'}
-                                    </BigNumber>
-                                    <Progress
-                                        percent={successRate ?? 0}
-                                        size="small"
-                                        strokeColor={COLORS.finished}
-                                        showInfo={false}
-                                        style={{ width: 100 }}
-                                    />
-                                </div>
-                                <ThunderboltOutlined style={{ fontSize: 32, color: COLORS.finished, opacity: 0.3 }} />
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $color="linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                                    <ThunderboltOutlined />
+                                </IconBadge>
+                                <BigNumber $color={JOB_COLORS.finished}>
+                                    {successRate !== null ? `${successRate}%` : '-'}
+                                </BigNumber>
+                                <Progress
+                                    percent={successRate ?? 0}
+                                    size="small"
+                                    strokeColor={JOB_COLORS.finished}
+                                    showInfo={false}
+                                    style={{ width: 50 }}
+                                />
                             </Flex>
                         )}
-                    </StatsCard>
-                </Col>
-            </Row>
+                    </OverviewStatsCard>
+                </KPIGridContainer>
 
-            {/* Quick Access & Chart Row */}
-            <Row gutter={[16, 16]}>
-                {/* Rollout Status Chart */}
-                <Col xs={24} lg={8}>
-                    <ChartCard title={t('chart.rolloutStatus', 'Rollout Status')} $delay={5}>
+                <ChartsContainer>
+                    <OverviewChartCard
+                        $theme="rollouts"
+                        title={
+                            <Flex align="center" gap={10}>
+                                <IconBadge $theme="rollouts">
+                                    <RocketOutlined />
+                                </IconBadge>
+                                <Flex vertical gap={0}>
+                                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('chart.rolloutStatus', 'Rollout Status')}</span>
+                                    <Text type="secondary" style={{ fontSize: 11 }}>{t('chart.totalCount', { count: rollouts.length })}</Text>
+                                </Flex>
+                            </Flex>
+                        }
+                        $delay={5}
+                    >
                         {isLoading ? (
-                            <Skeleton.Avatar active size={150} shape="circle" style={{ margin: '20px auto', display: 'block' }} />
+                            <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
                         ) : rolloutStatusData.length > 0 ? (
-                            <div style={{ position: 'relative' }}>
-                                <ResponsiveContainer width="100%" height={180}>
+                            <Flex vertical style={{ flex: 1 }}>
+                                <ResponsiveContainer width="100%" height={100}>
                                     <PieChart>
-                                        <Pie
-                                            data={rolloutStatusData}
-                                            innerRadius={50}
-                                            outerRadius={70}
-                                            paddingAngle={3}
-                                            dataKey="value"
-                                            strokeWidth={0}
-                                        >
+                                        <Pie data={rolloutStatusData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
                                             {rolloutStatusData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                                <Cell key={`cell-${index}`} fill={entry.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
                                             ))}
                                         </Pie>
+                                        <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                                     </PieChart>
                                 </ResponsiveContainer>
-                                <div style={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    textAlign: 'center'
-                                }}>
-                                    <div style={{ fontSize: 22, fontWeight: 700, color: COLORS.running }}>{rollouts.length}</div>
-                                    <div style={{ fontSize: 10, color: '#64748b' }}>{t('chart.total', 'total')}</div>
-                                </div>
-                                <Flex justify="center" wrap gap={10} style={{ marginTop: 4 }}>
-                                    {rolloutStatusData.map((entry, index) => (
-                                        <Flex key={index} align="center" gap={4}>
-                                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: entry.color }} />
-                                            <Text style={{ fontSize: 11 }}>{entry.name} ({entry.value})</Text>
-                                        </Flex>
-                                    ))}
-                                </Flex>
-                            </div>
+                                {renderCustomLegend(rolloutStatusData)}
+                            </Flex>
                         ) : (
-                            <Flex justify="center" align="center" style={{ height: 180 }}>
+                            <Flex justify="center" align="center" style={{ flex: 1 }}>
                                 <Text type="secondary">{t('messages.noRollouts', 'No rollouts')}</Text>
                             </Flex>
                         )}
-                    </ChartCard>
-                </Col>
+                    </OverviewChartCard>
 
-                {/* Quick Access Cards */}
-                <Col xs={24} lg={16}>
-                    <Row gutter={[16, 16]}>
-                        <Col xs={24} sm={12}>
-                            <QuickAccessCard $delay={6} onClick={() => navigate('/rollouts')}>
-                                <Flex justify="space-between" align="center">
-                                    <Space direction="vertical" size={4}>
-                                        <Flex align="center" gap={8}>
-                                            <RocketOutlined style={{ fontSize: 24, color: COLORS.running }} />
-                                            <Text strong style={{ fontSize: 16 }}>{t('quickAccess.rollouts', 'Rollouts')}</Text>
-                                        </Flex>
-                                        <Text type="secondary">{t('quickAccess.rolloutsDesc', 'Manage rollout deployments')}</Text>
-                                        <Space style={{ marginTop: 8 }}>
-                                            <Tag color="blue">{rollouts.length} {t('quickAccess.total', 'total')}</Tag>
-                                            {activeRolloutCount > 0 && <Tag color="processing">{activeRolloutCount} {t('status.running', 'running')}</Tag>}
-                                        </Space>
-                                    </Space>
-                                    <RightOutlined style={{ fontSize: 16, color: '#94a3b8' }} />
+                    <OverviewChartCard
+                        $theme="actions"
+                        title={
+                            <Flex align="center" gap={10}>
+                                <IconBadge $theme="actions">
+                                    <AimOutlined />
+                                </IconBadge>
+                                <Flex vertical gap={0}>
+                                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('chart.actionSummary', 'Actions (24h)')}</span>
+                                    <Text type="secondary" style={{ fontSize: 11 }}>{t('chart.recentCount', { count: recentActions.length })}</Text>
                                 </Flex>
-                            </QuickAccessCard>
-                        </Col>
-                        <Col xs={24} sm={12}>
-                            <QuickAccessCard $delay={7} onClick={() => navigate('/actions')}>
-                                <Flex justify="space-between" align="center">
-                                    <Space direction="vertical" size={4}>
-                                        <Flex align="center" gap={8}>
-                                            <AimOutlined style={{ fontSize: 24, color: COLORS.approval }} />
-                                            <Text strong style={{ fontSize: 16 }}>{t('quickAccess.actions', 'Actions')}</Text>
-                                        </Flex>
-                                        <Text type="secondary">{t('quickAccess.actionsDesc', 'Track device actions')}</Text>
-                                        <Space style={{ marginTop: 8 }}>
-                                            <Tag color="default">{recentActions.length} {t('quickAccess.last24h', 'last 24h')}</Tag>
-                                            {runningActionsCount > 0 && <Tag color="processing"><SyncOutlined spin /> {runningActionsCount}</Tag>}
-                                            {errorActionsCount > 0 && <Tag color="error">{errorActionsCount} {t('kpi.errors', 'errors')}</Tag>}
-                                        </Space>
-                                    </Space>
-                                    <RightOutlined style={{ fontSize: 16, color: '#94a3b8' }} />
+                            </Flex>
+                        }
+                        $delay={6}
+                    >
+                        {isLoading ? (
+                            <Skeleton active paragraph={{ rows: 3 }} />
+                        ) : (
+                            <Flex vertical gap={8} style={{ flex: 1 }}>
+                                <Flex align="center" justify="space-between" style={{ padding: '8px 12px', background: `${JOB_COLORS.running}10`, borderRadius: 8 }}>
+                                    <Flex align="center" gap={8}>
+                                        <SyncOutlined spin style={{ color: JOB_COLORS.running }} />
+                                        <Text style={{ fontSize: 12 }}>{t('status.running', 'Running')}</Text>
+                                    </Flex>
+                                    <Text strong style={{ fontSize: 16, color: JOB_COLORS.running }}>{runningActionsCount}</Text>
                                 </Flex>
-                            </QuickAccessCard>
-                        </Col>
-                        <Col xs={24}>
-                            <ChartCard title={t('chart.actionSummary', 'Action Summary (24h)')} $delay={8}>
-                                <Flex justify="space-around" align="center" style={{ padding: '16px 0' }}>
-                                    <Flex vertical align="center" gap={4}>
-                                        <Text style={{ fontSize: 28, fontWeight: 700, color: COLORS.running }}>{runningActionsCount}</Text>
-                                        <Text type="secondary" style={{ fontSize: 12 }}>{t('status.running', 'Running')}</Text>
+                                <Flex align="center" justify="space-between" style={{ padding: '8px 12px', background: `${JOB_COLORS.finished}10`, borderRadius: 8 }}>
+                                    <Flex align="center" gap={8}>
+                                        <CheckCircleOutlined style={{ color: JOB_COLORS.finished }} />
+                                        <Text style={{ fontSize: 12 }}>{t('status.finished', 'Finished')}</Text>
                                     </Flex>
-                                    <Flex vertical align="center" gap={4}>
-                                        <Text style={{ fontSize: 28, fontWeight: 700, color: COLORS.finished }}>{finishedActionsCount}</Text>
-                                        <Text type="secondary" style={{ fontSize: 12 }}>{t('status.finished', 'Finished')}</Text>
-                                    </Flex>
-                                    <Flex vertical align="center" gap={4}>
-                                        <Text style={{ fontSize: 28, fontWeight: 700, color: errorActionsCount > 0 ? COLORS.error : '#64748b' }}>{errorActionsCount}</Text>
-                                        <Text type="secondary" style={{ fontSize: 12 }}>{t('status.error', 'Errors')}</Text>
-                                    </Flex>
-                                    <Button type="primary" onClick={() => navigate('/actions')}>
-                                        {t('quickAccess.viewAll', 'View All')} <RightOutlined />
-                                    </Button>
+                                    <Text strong style={{ fontSize: 16, color: JOB_COLORS.finished }}>{finishedActionsCount}</Text>
                                 </Flex>
-                            </ChartCard>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
-        </PageContainer>
+                                <Flex align="center" justify="space-between" style={{ padding: '8px 12px', background: errorActionsCount > 0 ? `${JOB_COLORS.error}10` : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
+                                    <Flex align="center" gap={8}>
+                                        <WarningOutlined style={{ color: errorActionsCount > 0 ? JOB_COLORS.error : '#94a3b8' }} />
+                                        <Text style={{ fontSize: 12 }}>{t('status.error', 'Errors')}</Text>
+                                    </Flex>
+                                    <Text strong style={{ fontSize: 16, color: errorActionsCount > 0 ? JOB_COLORS.error : '#94a3b8' }}>{errorActionsCount}</Text>
+                                </Flex>
+                            </Flex>
+                        )}
+                    </OverviewChartCard>
+                </ChartsContainer>
+            </TopRow>
+
+            {/* Bottom Row: Quick Access */}
+            <BottomRow>
+                <OverviewListCard
+                    $theme="rollouts"
+                    title={
+                        <Flex align="center" gap={10}>
+                            <IconBadge $theme="rollouts">
+                                <RocketOutlined />
+                            </IconBadge>
+                            <Flex vertical gap={0}>
+                                <span style={{ fontSize: 14, fontWeight: 600 }}>{t('quickAccess.rollouts', 'Rollouts')}</span>
+                                <Text type="secondary" style={{ fontSize: 11 }}>{t('quickAccess.rolloutsDesc', 'Manage rollout deployments')}</Text>
+                            </Flex>
+                        </Flex>
+                    }
+                    extra={
+                        <Button type="link" size="small" onClick={() => navigate('/rollouts')}>
+                            {t('quickAccess.viewAll', 'View All')} <RightOutlined />
+                        </Button>
+                    }
+                    $delay={7}
+                >
+                    <Flex vertical gap={12} style={{ flex: 1 }}>
+                        <ActivityItem onClick={() => navigate('/rollouts/list?status=running')}>
+                            <Flex align="center" gap={10}>
+                                <div style={{
+                                    width: 36, height: 36, borderRadius: 8,
+                                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                    <PlayCircleOutlined style={{ fontSize: 18, color: JOB_COLORS.running }} />
+                                </div>
+                                <Flex vertical gap={0}>
+                                    <Text strong style={{ fontSize: 13 }}>{t('status.running', 'Running')}</Text>
+                                    <Text type="secondary" style={{ fontSize: 11 }}>{t('kpi.activeRollouts', 'Active rollouts')}</Text>
+                                </Flex>
+                            </Flex>
+                            <Tag color="blue" style={{ margin: 0, borderRadius: 999 }}>{activeRolloutCount}</Tag>
+                        </ActivityItem>
+                        <ActivityItem onClick={() => navigate('/rollouts/list?status=waiting_for_approval')}>
+                            <Flex align="center" gap={10}>
+                                <div style={{
+                                    width: 36, height: 36, borderRadius: 8,
+                                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                    <ClockCircleOutlined style={{ fontSize: 18, color: JOB_COLORS.approval }} />
+                                </div>
+                                <Flex vertical gap={0}>
+                                    <Text strong style={{ fontSize: 13 }}>{t('status.waiting_for_approval', 'Waiting Approval')}</Text>
+                                    <Text type="secondary" style={{ fontSize: 11 }}>{t('kpi.requiresReview', 'Requires review')}</Text>
+                                </Flex>
+                            </Flex>
+                            <Tag color="purple" style={{ margin: 0, borderRadius: 999 }}>{waitingApprovalCount}</Tag>
+                        </ActivityItem>
+                        <ActivityItem onClick={() => navigate('/rollouts/list?status=finished')}>
+                            <Flex align="center" gap={10}>
+                                <div style={{
+                                    width: 36, height: 36, borderRadius: 8,
+                                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.1) 100%)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                    <CheckCircleOutlined style={{ fontSize: 18, color: JOB_COLORS.finished }} />
+                                </div>
+                                <Flex vertical gap={0}>
+                                    <Text strong style={{ fontSize: 13 }}>{t('status.finished', 'Finished')}</Text>
+                                    <Text type="secondary" style={{ fontSize: 11 }}>{t('quickAccess.completedRollouts', 'Completed')}</Text>
+                                </Flex>
+                            </Flex>
+                            <Tag color="green" style={{ margin: 0, borderRadius: 999 }}>{finishedRolloutCount}</Tag>
+                        </ActivityItem>
+                    </Flex>
+                </OverviewListCard>
+
+                <OverviewListCard
+                    $theme="actions"
+                    title={
+                        <Flex align="center" gap={10}>
+                            <IconBadge $theme="actions">
+                                <AimOutlined />
+                            </IconBadge>
+                            <Flex vertical gap={0}>
+                                <span style={{ fontSize: 14, fontWeight: 600 }}>{t('quickAccess.actions', 'Actions')}</span>
+                                <Text type="secondary" style={{ fontSize: 11 }}>{t('quickAccess.actionsDesc', 'Track device actions')}</Text>
+                            </Flex>
+                        </Flex>
+                    }
+                    extra={
+                        <Button type="link" size="small" onClick={() => navigate('/actions')}>
+                            {t('quickAccess.viewAll', 'View All')} <RightOutlined />
+                        </Button>
+                    }
+                    $delay={8}
+                >
+                    <Flex vertical gap={12} style={{ flex: 1, justifyContent: 'center' }}>
+                        <Flex justify="space-around" align="center" style={{ flex: 1 }}>
+                            <Flex vertical align="center" gap={4}>
+                                <div style={{
+                                    width: 48, height: 48, borderRadius: 12,
+                                    background: `${JOB_COLORS.running}15`,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                    <SyncOutlined spin style={{ fontSize: 24, color: JOB_COLORS.running }} />
+                                </div>
+                                <Text style={{ fontSize: 20, fontWeight: 700, color: JOB_COLORS.running }}>{runningActionsCount}</Text>
+                                <Text type="secondary" style={{ fontSize: 11 }}>{t('status.running', 'Running')}</Text>
+                            </Flex>
+                            <Flex vertical align="center" gap={4}>
+                                <div style={{
+                                    width: 48, height: 48, borderRadius: 12,
+                                    background: `${JOB_COLORS.finished}15`,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                    <CheckCircleOutlined style={{ fontSize: 24, color: JOB_COLORS.finished }} />
+                                </div>
+                                <Text style={{ fontSize: 20, fontWeight: 700, color: JOB_COLORS.finished }}>{finishedActionsCount}</Text>
+                                <Text type="secondary" style={{ fontSize: 11 }}>{t('status.finished', 'Finished')}</Text>
+                            </Flex>
+                            <Flex vertical align="center" gap={4}>
+                                <div style={{
+                                    width: 48, height: 48, borderRadius: 12,
+                                    background: errorActionsCount > 0 ? `${JOB_COLORS.error}15` : 'rgba(0,0,0,0.03)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                    <WarningOutlined style={{ fontSize: 24, color: errorActionsCount > 0 ? JOB_COLORS.error : '#94a3b8' }} />
+                                </div>
+                                <Text style={{ fontSize: 20, fontWeight: 700, color: errorActionsCount > 0 ? JOB_COLORS.error : '#94a3b8' }}>{errorActionsCount}</Text>
+                                <Text type="secondary" style={{ fontSize: 11 }}>{t('status.error', 'Errors')}</Text>
+                            </Flex>
+                        </Flex>
+                    </Flex>
+                </OverviewListCard>
+            </BottomRow>
+        </OverviewPageContainer>
     );
 };
 

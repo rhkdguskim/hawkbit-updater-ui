@@ -1,5 +1,7 @@
 {
     "appName": "hawkBit Updater",
+    "updated": "Updated",
+    "createdAt": "Created At",
     "nav": {
         "dashboard": "Dashboard",
         "targets": "Targets",
@@ -67,7 +69,10 @@
         "stopped": "Stopped",
         "canceling": "Canceling",
         "retrieving": "Retrieving",
-        "registered": "Registered"
+        "registered": "Registered",
+        "live": "Live",
+        "idle": "Idle",
+        "active": "Active"
     },
     "messages": {
         "success": "Operation completed successfully.",

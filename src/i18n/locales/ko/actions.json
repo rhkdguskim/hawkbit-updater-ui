@@ -139,9 +139,9 @@
         "successRate": "성공률",
         "statusDistribution": "상태 분포",
         "activeSummary": "활성 요약",
-        "activeActions": "실행 중인 작업",
+        "activeActions": "진행 중인 작업",
         "recentActions": "최근 작업 (24시간)",
-        "noActiveActions": "실행 중인 작업 없음",
+        "noActiveActions": "진행 중인 작업 없음",
         "noRecentActions": "최근 작업 없음"
     },
     "status": {

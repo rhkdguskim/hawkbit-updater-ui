@@ -46,7 +46,9 @@
             "rolloutsPercent": "{{percent}}% 완료",
             "waitingApproval": "승인 대기 {{count}}건",
             "errors": "오류 {{count}}건"
-        }
+        },
+        "totalCount": "총 {{count}}건",
+        "recentCount": "최근 {{count}}건"
     },
     "quickAccess": {
         "rollouts": "롤아웃",

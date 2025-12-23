@@ -17,7 +17,11 @@
         "noActiveRollouts": "활성 롤아웃이 없습니다",
         "createFirst": "첫 롤아웃 생성",
         "allTargets": "전체 대상",
-        "total": "전체"
+        "total": "전체",
+        "rolloutsCount": "{{count}}개 롤아웃",
+        "activeCount": "{{count}}개 활성",
+        "completedCount": "{{count}}개 완료",
+        "targetsCount": "{{count}}개 타겟"
     },
     "refresh": "새로고침",
     "columns": {
@@ -41,6 +45,9 @@
         "waitingForApproval": "승인 대기 중",
         "scheduled": "예약됨",
         "clearFilters": "필터 초기화"
+    },
+    "search": {
+        "placeholder": "이름으로 검색"
     },
     "pagination": {
         "total": "총 {{count}}개 롤아웃",
@@ -124,7 +131,13 @@
             "selectDS": "배포 세트를 선택하세요",
             "selected": "선택됨",
             "noSelection": "선택된 배포 세트가 없습니다",
-            "selectRequired": "배포 세트를 선택해주세요"
+            "selectRequired": "배포 세트를 선택해주세요",
+            "columns": {
+                "id": "ID",
+                "name": "이름",
+                "version": "버전",
+                "type": "타입"
+            }
         },
         "targetFilter": {
             "title": "대상 필터",
@@ -138,9 +151,17 @@
             "targetTypePlaceholder": "타겟 타입을 선택하세요",
             "anyType": "선택한 타입 중 하나라도 일치",
             "allType": "선택한 타입 모두 일치",
-            "status": "디바이스 상태",
+            "pollingStatus": "폴링 상태",
             "statusOnline": "온라인",
             "statusOffline": "오프라인",
+            "updateStatus": "업데이트 상태",
+            "updateStatusPlaceholder": "업데이트 상태를 선택하세요",
+            "updateStatusInSync": "동기화됨",
+            "updateStatusPending": "대기 중",
+            "updateStatusError": "오류",
+            "updateStatusUnknown": "알 수 없음",
+            "updateStatusRegistered": "등록됨",
+            "currentFilter": "현재 필터 쿼리",
             "controllerId": "컨트롤러 ID 포함",
             "controllerPlaceholder": "예: device-",
             "nameKeyword": "디바이스 이름 포함",

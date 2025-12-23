@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Card, Table, Tag, Space, Button, Select, Typography, Progress } from 'antd';
-import { ReloadOutlined, PlusOutlined, EyeOutlined, FilterOutlined } from '@ant-design/icons';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Card, Table, Tag, Space, Button, Select, Typography, Progress, Input, Tooltip } from 'antd';
+import { ReloadOutlined, PlusOutlined, EyeOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGetRollouts } from '@/api/generated/rollouts/rollouts';
 import type { MgmtRolloutResponseBody } from '@/api/generated/model';
@@ -9,19 +9,30 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { keepPreviousData } from '@tanstack/react-query';
 import styled from 'styled-components';
-import { PageContainer, HeaderRow } from '@/components/layout/PageLayout';
+import { PageContainer } from '@/components/layout/PageLayout';
 import { useServerTable } from '@/hooks/useServerTable';
+import dayjs from 'dayjs';
+import { buildWildcardSearch, appendFilter, buildCondition } from '@/utils/fiql';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
+const { Search } = Input;
 
-const HeaderMeta = styled.div`
+const SearchContainer = styled.div`
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
 `;
 
-const FilterBar = styled(Card)`
-    border-radius: 14px;
+const SearchGroup = styled(Space)`
+    flex: 1;
+    min-width: 300px;
+`;
+
+const ActionGroup = styled(Space)`
+    flex-shrink: 0;
 `;
 
 const getStatusColor = (status?: string) => {
@@ -53,6 +64,8 @@ const RolloutList: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
+    const tableContainerRef = useRef<HTMLDivElement | null>(null);
+    const [tableScrollY, setTableScrollY] = useState<number | undefined>(undefined);
 
     const {
         pagination,
@@ -62,23 +75,59 @@ const RolloutList: React.FC = () => {
     } = useServerTable<MgmtRolloutResponseBody>({ syncToUrl: true });
 
     const [statusFilter, setStatusFilter] = useState<string>('');
+    const [searchValue, setSearchValue] = useState<string>('');
+
+    useLayoutEffect(() => {
+        if (!tableContainerRef.current) {
+            return;
+        }
+        const element = tableContainerRef.current;
+        const updateHeight = () => {
+            const height = element.getBoundingClientRect().height;
+            const scrollHeight = Math.max(240, Math.floor(height - 55)); // Adjust buffer for header/pagination
+            setTableScrollY(scrollHeight);
+        };
+        updateHeight();
+        if (typeof ResizeObserver === 'undefined') {
+            window.addEventListener('resize', updateHeight);
+            return () => window.removeEventListener('resize', updateHeight);
+        }
+        const observer = new ResizeObserver(updateHeight);
+        observer.observe(element);
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         const statusParam = searchParams.get('status') || '';
+        const searchParam = searchParams.get('q_search') || '';
         setStatusFilter(statusParam);
+        setSearchValue(searchParam);
     }, [searchParams]);
+
+    const buildQuery = () => {
+        let query = '';
+        if (statusFilter) {
+            query = appendFilter(query, buildCondition({ field: 'status', operator: '==', value: statusFilter }));
+        }
+        if (searchValue) {
+            // Assuming name search for rollouts
+            query = appendFilter(query, buildWildcardSearch('name', searchValue));
+        }
+        return query || undefined;
+    };
 
     const { data, isLoading, isFetching, refetch } = useGetRollouts(
         {
             offset,
             limit: pagination.pageSize,
-            q: statusFilter ? `status==${statusFilter}` : undefined,
+            q: buildQuery(),
         },
         {
             query: {
                 placeholderData: keepPreviousData,
                 refetchOnWindowFocus: false,
                 refetchOnReconnect: false,
+                refetchInterval: 2000,
             },
         }
     );
@@ -100,6 +149,25 @@ const RolloutList: React.FC = () => {
         { value: 'waiting_for_approval', label: t('filter.waitingForApproval') },
         { value: 'scheduled', label: t('filter.scheduled') },
     ], [t]);
+
+    const handleSearch = (value: string) => {
+        setSearchValue(value);
+        resetPagination();
+        const newParams: any = {};
+        if (statusFilter) newParams.status = statusFilter;
+        if (value) newParams.q_search = value;
+        setSearchParams(newParams);
+    };
+
+    const handleStatusChange = (value?: string) => {
+        const nextValue = value || '';
+        setStatusFilter(nextValue);
+        resetPagination();
+        const newParams: any = {};
+        if (nextValue) newParams.status = nextValue;
+        if (searchValue) newParams.q_search = searchValue;
+        setSearchParams(newParams);
+    };
 
     const columns: TableProps<MgmtRolloutResponseBody>['columns'] = [
         {
@@ -131,6 +199,18 @@ const RolloutList: React.FC = () => {
                     {getStatusLabel(status)}
                 </Tag>
             ),
+        },
+        {
+            title: t('common:createdAt', { defaultValue: 'Created At' }),
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            width: 160,
+            render: (date: string) => date ? (
+                <Space direction="vertical" size={0}>
+                    <Text style={{ fontSize: 13 }}>{dayjs(date).format('YYYY-MM-DD')}</Text>
+                    <Text type="secondary" style={{ fontSize: 11 }}>{dayjs(date).format('HH:mm')}</Text>
+                </Space>
+            ) : '-',
         },
         {
             title: t('columns.progress'),
@@ -171,75 +251,55 @@ const RolloutList: React.FC = () => {
         },
     ];
 
-
-
-    const handleStatusChange = (value?: string) => {
-        const nextValue = value || '';
-        setStatusFilter(nextValue);
-        resetPagination();
-        if (nextValue) {
-            setSearchParams({ status: nextValue });
-        } else {
-            setSearchParams({});
-        }
-    };
-
     return (
         <PageContainer>
-            <HeaderRow>
-                <HeaderMeta>
-                    <Title level={2} style={{ margin: 0 }}>{t('pageTitle')}</Title>
-                    <Text type="secondary">{t('subtitle')}</Text>
-                </HeaderMeta>
-                <Space>
-                    {isAdmin && (
-                        <Button
-                            type="primary"
-                            icon={<PlusOutlined />}
-                            onClick={() => navigate('/rollouts/create')}
-                        >
-                            {t('createRollout')}
-                        </Button>
-                    )}
-                    <Button
-                        icon={<ReloadOutlined />}
-                        onClick={() => refetch()}
-                        loading={isLoading}
-                    >
-                        {t('refresh')}
-                    </Button>
-                </Space>
-            </HeaderRow>
-
-            <FilterBar>
-                <Space wrap style={{ width: '100%', justifyContent: 'space-between' }}>
-                    <Space wrap>
+            <Card
+                title={t('pageTitle')}
+                style={{ flex: 1, height: '100%', overflow: 'hidden' }}
+                styles={{ body: { height: 'calc(100% - 57px)', display: 'flex', flexDirection: 'column' } }}
+            >
+                <SearchContainer>
+                    <SearchGroup>
                         <Select
                             placeholder={t('filter.placeholder')}
                             value={statusFilter || undefined}
                             onChange={handleStatusChange}
                             allowClear
-                            style={{ width: 220 }}
+                            style={{ width: 200 }}
                             suffixIcon={<FilterOutlined />}
                             options={statusOptions}
                         />
-                        {statusFilter && (
-                            <Tag color={getStatusColor(statusFilter)} style={{ borderRadius: 999 }}>
-                                {getStatusLabel(statusFilter)}
-                            </Tag>
+                        <Search
+                            placeholder={t('search.placeholder', { defaultValue: 'Search by Name' })}
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            onSearch={handleSearch}
+                            allowClear
+                            style={{ maxWidth: 300 }}
+                            enterButton={<SearchOutlined />}
+                        />
+                    </SearchGroup>
+                    <ActionGroup>
+                        <Tooltip title={t('refresh')}>
+                            <Button
+                                icon={<ReloadOutlined />}
+                                onClick={() => refetch()}
+                                loading={isLoading}
+                            />
+                        </Tooltip>
+                        {isAdmin && (
+                            <Button
+                                type="primary"
+                                icon={<PlusOutlined />}
+                                onClick={() => navigate('/rollouts/create')}
+                            >
+                                {t('createRollout')}
+                            </Button>
                         )}
-                        <Button onClick={() => handleStatusChange('')} disabled={!statusFilter}>
-                            {t('filter.clearFilters')}
-                        </Button>
-                    </Space>
-                </Space>
-            </FilterBar>
+                    </ActionGroup>
+                </SearchContainer>
 
-            <Card
-                style={{ flex: 1, height: '100%', overflow: 'hidden' }}
-                styles={{ body: { height: '100%', display: 'flex', flexDirection: 'column' } }}
-            >
-                <div style={{ flex: 1, minHeight: 0 }}>
+                <div ref={tableContainerRef} style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
                     <Table
                         dataSource={data?.content || []}
                         columns={columns}
@@ -255,7 +315,7 @@ const RolloutList: React.FC = () => {
                             position: ['topRight'],
                         }}
                         onChange={handleTableChange}
-                        scroll={{ x: 1000, y: '100%' }}
+                        scroll={tableScrollY ? { x: 1000, y: tableScrollY } : { x: 1000 }}
                     />
                 </div>
             </Card>

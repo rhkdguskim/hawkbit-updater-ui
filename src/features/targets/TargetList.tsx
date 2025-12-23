@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef, useState, useCallback } from 'react';
-import { Typography, Card, message, Alert, Space, Tag, Tooltip } from 'antd';
+import { Card, message, Alert, Space, Tag, Tooltip, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { PageContainer, HeaderRow } from '@/components/layout/PageLayout';
+import { PageContainer } from '@/components/layout/PageLayout';
 import { useServerTable } from '@/hooks/useServerTable';
 import {
     TargetTable,
@@ -35,7 +35,9 @@ import type { MgmtTag, MgmtTargetType, MgmtTargetFilterQuery } from '@/api/gener
 
 import { FilterOutlined } from '@ant-design/icons';
 
-const { Title, Text } = Typography;
+import { appendFilter, buildCondition } from '@/utils/fiql';
+
+const { Text } = Typography;
 
 // Styled components removed in favor of PageLayout
 
@@ -141,11 +143,16 @@ const TargetList: React.FC = () => {
 
     // Build search query combining manual search, tag filter, type filter
     const buildFinalQuery = useCallback(() => {
-        const queries: string[] = [];
-        if (searchQuery) queries.push(searchQuery);
-        if (selectedTagName) queries.push(`tag.name==${selectedTagName}`);
-        if (selectedTypeName) queries.push(`targettype.name==${selectedTypeName}`);
-        return queries.length > 0 ? queries.join(';') : undefined;
+        let query = searchQuery;
+
+        if (selectedTagName) {
+            query = appendFilter(query, buildCondition({ field: 'tag.name', operator: '==', value: selectedTagName }));
+        }
+        if (selectedTypeName) {
+            query = appendFilter(query, buildCondition({ field: 'targettype.name', operator: '==', value: selectedTypeName }));
+        }
+        // Return undefined if empty to avoid malformed query error
+        return query?.trim() || undefined;
     }, [searchQuery, selectedTagName, selectedTypeName]);
 
     // API Queries
@@ -306,15 +313,10 @@ const TargetList: React.FC = () => {
 
     return (
         <PageContainer>
-            <HeaderRow>
-                <Title level={2} style={{ margin: 0 }}>
-                    {t('title')}
-                </Title>
-            </HeaderRow>
-
             <Card
+                title={t('title')}
                 style={{ flex: 1, height: '100%', overflow: 'hidden' }}
-                styles={{ body: { height: '100%', display: 'flex', flexDirection: 'column' } }}
+                styles={{ body: { height: 'calc(100% - 57px)', display: 'flex', flexDirection: 'column' } }}
             >
                 <TargetSearchBar
                     onSearch={handleSearchWrapper}

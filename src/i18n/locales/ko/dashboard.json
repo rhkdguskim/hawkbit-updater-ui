@@ -58,7 +58,8 @@
         "deploymentRateDesc": "대상 완료 비율",
         "targets": "대상",
         "rolloutStatus": "롤아웃 상태",
-        "actionStatus": "액션 상태 (24시간)"
+        "actionStatus": "액션 상태 (24시간)",
+        "fragmentation": "펌웨어 상태"
     },
     "recentActions": {
         "title": "최근 액션 (24시간)",
@@ -67,6 +68,17 @@
         "status": "상태",
         "time": "시간",
         "empty": "최근 액션이 없습니다"
+    },
+    "recentActivities": {
+        "title": "진행 중인 업데이트",
+        "inProgress": "{{count}}개 진행 중",
+        "empty": "진행 중인 업데이트가 없습니다"
+    },
+    "timeline": {
+        "queued": "대기 중",
+        "processing": "처리 중",
+        "completed": "완료됨",
+        "failed": "실패"
     },
     "recentDevices": {
         "title": "최근 디바이스 활동"
