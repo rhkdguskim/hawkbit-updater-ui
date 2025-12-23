@@ -6,6 +6,24 @@
 
 /* Root Variables */
 :root {
+    /* Base Colors - used directly when theme-agnostic */
+    --primary-color: #6366f1;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --info-color: #3b82f6;
+
+    /* Theme-aware variables */
+    --bg-page: #f8fafc;
+    --bg-container: #ffffff;
+    --bg-elevated: #ffffff;
+    --bg-header: #ffffff;
+    --text-main: #1e293b;
+    --text-secondary: #64748b;
+    --text-tertiary: #94a3b8;
+    --border-color: rgba(0, 0, 0, 0.06);
+    --border-color-heavy: rgba(0, 0, 0, 0.1);
+
     /* Typography */
     --font-sans: 'Pretendard Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
@@ -76,9 +94,18 @@
     --space-12: 48px;
 }
 
-
-/* Dark mode variables */
+/* Dark mode variables override */
 [data-theme='dark'] {
+    --bg-page: #020617;
+    --bg-container: #09090b;
+    --bg-elevated: #18181b;
+    --bg-header: #09090b;
+    --text-main: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --border-color: rgba(255, 255, 255, 0.06);
+    --border-color-heavy: rgba(255, 255, 255, 0.1);
+
     --glass-bg: rgba(30, 30, 46, 0.8);
     --glass-border: rgba(69, 71, 90, 0.5);
     --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
@@ -602,8 +629,8 @@ textarea {
 }
 
 [data-theme='dark'] .enterprise-table .ant-table-thead>tr>th {
-    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-    border-bottom: 2px solid #334155;
+    background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-container) 100%);
+    border-bottom: 2px solid var(--border-color-heavy);
 }
 
 .enterprise-table .ant-table-tbody>tr {
@@ -697,12 +724,16 @@ textarea {
     display: flex;
     flex-direction: column;
     padding: var(--space-5);
-    background: #ffffff;
+    background: var(--bg-container);
     border-radius: 16px;
     box-shadow: var(--shadow-sm);
     transition: all var(--transition-normal) var(--ease-smooth);
     position: relative;
     overflow: hidden;
+}
+
+[data-theme='dark'] .kpi-card {
+    border: 1px solid var(--border-color);
 }
 
 .kpi-card::before {

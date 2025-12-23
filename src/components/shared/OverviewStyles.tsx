@@ -80,6 +80,7 @@ export const GradientTitle = styled(Typography.Title) <{ $theme?: keyof typeof O
         background-clip: text;
     }
     
+    [data-theme='dark'] &,
     .dark-mode & {
         background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
         -webkit-background-clip: text;
@@ -148,6 +149,7 @@ export const OverviewStatsCard = styled(Card) <{ $accentColor?: string; $delay?:
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
     }
 
+    [data-theme='dark'] &,
     .dark-mode & {
         background: linear-gradient(145deg, rgba(24, 24, 27, 0.95) 0%, rgba(9, 9, 11, 0.9) 100%);
         border: 1px solid rgba(255, 255, 255, 0.04);
@@ -231,6 +233,7 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
         flex-direction: column;
     }
 
+    [data-theme='dark'] &,
     .dark-mode & {
         background: linear-gradient(145deg, rgba(24, 24, 27, 0.95) 0%, rgba(9, 9, 11, 0.9) 100%);
         border: 1px solid rgba(255, 255, 255, 0.04);
@@ -310,6 +313,7 @@ export const ChartLegendItem = styled.div`
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     }
 
+    [data-theme='dark'] &,
     .dark-mode & {
         background: linear-gradient(135deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.6) 100%);
         border: 1px solid rgba(255, 255, 255, 0.03);
@@ -337,6 +341,7 @@ export const ActivityItem = styled.div`
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
+    [data-theme='dark'] &,
     .dark-mode & {
         background: linear-gradient(135deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.6) 100%);
         border: 1px solid rgba(255, 255, 255, 0.03);

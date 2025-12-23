@@ -14,6 +14,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGetActions } from '@/api/generated/actions/actions';
+import { useCancelAction } from '@/api/generated/targets/targets';
 import type { MgmtAction } from '@/api/generated/model';
 import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -123,6 +124,7 @@ const ActionList: React.FC = () => {
     });
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [selectedActionIds, setSelectedActionIds] = useState<number[]>([]);
+    const [selectedTargetIdsMap, setSelectedTargetIdsMap] = useState<Record<number, string>>({});
 
     const offset = (pagination.current - 1) * pagination.pageSize;
 
@@ -318,13 +320,43 @@ const ActionList: React.FC = () => {
         }
     }, [setSearchParams]);
 
-    const handleBulkCancel = useCallback(() => {
-        // TODO: Implement bulk cancel API
-        message.info(t('bulk.cancelComingSoon', { defaultValue: 'Bulk cancel will be available soon.' }));
-    }, [t]);
+    const cancelMutation = useCancelAction();
+
+    const handleBulkCancel = useCallback(async () => {
+        if (selectedActionIds.length === 0) return;
+
+        const promises = selectedActionIds.map(id => {
+            const targetId = selectedTargetIdsMap[id];
+            if (!targetId) {
+                return Promise.reject(new Error(`Target ID not found for action ${id}`));
+            }
+            return cancelMutation.mutateAsync({ targetId, actionId: id });
+        });
+
+        try {
+            const results = await Promise.allSettled(promises);
+            const successCount = results.filter(r => r.status === 'fulfilled').length;
+            const failCount = results.length - successCount;
+
+            if (successCount > 0) {
+                message.success(t('bulk.cancelSuccess', { count: successCount }));
+                refetch();
+                setSelectedActionIds([]);
+                setSelectedTargetIdsMap({});
+            }
+
+            if (failCount > 0) {
+                message.error(t('bulk.cancelError', { count: failCount }));
+            }
+        } catch (error) {
+            console.error('Bulk cancel failed:', error);
+            message.error(t('common:apiErrors.generic.unknown'));
+        }
+    }, [selectedActionIds, selectedTargetIdsMap, cancelMutation, t, refetch]);
 
     const handleClearSelection = useCallback(() => {
         setSelectedActionIds([]);
+        setSelectedTargetIdsMap({});
     }, []);
 
     const statusOptions = useMemo(() => [
@@ -427,7 +459,20 @@ const ActionList: React.FC = () => {
                     loading={isLoading || isFetching}
                     rowSelection={{
                         selectedRowKeys: selectedActionIds,
-                        onChange: (keys) => setSelectedActionIds(keys as number[]),
+                        onChange: (keys, selectedRows) => {
+                            setSelectedActionIds(keys as number[]);
+                            const newMap = { ...selectedTargetIdsMap };
+                            selectedRows.forEach(row => {
+                                const tid = getTargetId(row);
+                                if (tid && row.id) newMap[row.id] = tid;
+                            });
+                            // Filter map to only keep keys present in 'keys' to avoid memory leak
+                            const finalMap: Record<number, string> = {};
+                            (keys as number[]).forEach(k => {
+                                if (newMap[k]) finalMap[k] = newMap[k];
+                            });
+                            setSelectedTargetIdsMap(finalMap);
+                        },
                     }}
                     onRow={(record) => ({
                         onClick: () => navigate(`/actions/${record.id}`),

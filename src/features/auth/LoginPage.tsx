@@ -14,13 +14,18 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #f0f2f5;
+  background: var(--bg-page);
 `;
 
 const FormContainer = styled(Card)`
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
+  background: var(--bg-container);
+  
+  [data-theme='dark'] & {
+      border: 1px solid var(--border-color);
+  }
 `;
 
 const StyledTitle = styled(Title)`

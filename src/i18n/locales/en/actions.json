@@ -84,6 +84,8 @@
         "force": "Bulk Force",
         "cancelConfirm": "Cancel selected actions?",
         "cancelComingSoon": "Bulk cancel will be available soon.",
+        "cancelSuccess": "Successfully cancelled {{count}} actions",
+        "cancelError": "Failed to cancel {{count}} actions",
         "clearSelection": "Clear Selection"
     },
     "detail": {

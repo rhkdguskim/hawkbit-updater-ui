@@ -35,8 +35,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         document.body.style.transition = 'background-color 0.3s ease';
 
         if (resolvedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
             document.body.classList.add('dark-mode');
         } else {
+            document.documentElement.setAttribute('data-theme', 'light');
             document.body.classList.remove('dark-mode');
         }
     }, [resolvedTheme]);

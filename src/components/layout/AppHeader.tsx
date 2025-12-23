@@ -30,15 +30,11 @@ const StyledHeader = styled(Header) <{ $bg: string }>`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid var(--border-color);
     backdrop-filter: blur(20px);
     position: sticky;
     top: 0;
     z-index: 100;
-    
-    .dark-mode & {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
 `;
 
 const HeaderLeft = styled.div`
@@ -77,11 +73,7 @@ const LogoContainer = styled.div`
     font-size: 1.1rem;
     font-weight: 700;
     letter-spacing: -0.01em;
-    color: #1e293b;
-    
-    .dark-mode & {
-      color: #f8fafc;
-    }
+    color: var(--text-main);
   }
 `;
 

@@ -84,6 +84,8 @@
         "force": "일괄 강제",
         "cancelConfirm": "선택한 액션을 취소할까요?",
         "cancelComingSoon": "일괄 취소 기능은 곧 제공됩니다.",
+        "cancelSuccess": "{{count}}개의 액션이 성공적으로 취소되었습니다",
+        "cancelError": "{{count}}개의 액션 취소에 실패했습니다",
         "clearSelection": "선택 해제"
     },
     "detail": {
