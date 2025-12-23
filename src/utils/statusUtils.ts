@@ -13,7 +13,8 @@ export type StatusType =
     | 'finished' | 'running' | 'paused' | 'ready' | 'creating'
     | 'starting' | 'error' | 'waiting_for_approval' | 'scheduled'
     | 'pending' | 'retrieving' | 'retrieved' | 'downloading'
-    | 'active' | 'completed' | 'canceled' | 'failed';
+    | 'active' | 'completed' | 'canceled' | 'failed'
+    | 'wait_for_confirmation' | 'waiting_for_confirmation' | 'canceling' | 'timeout';
 
 export const getStatusColor = (status?: string): string => {
     if (!status) return 'default';
@@ -28,9 +29,14 @@ export const getStatusColor = (status?: string): string => {
         case 'retrieved':
         case 'downloading':
         case 'processing':
+        case 'canceling':
             return 'processing';
         case 'paused':
-            return 'warning';
+        case 'warning':
+        case 'timeout':
+        case 'wait_for_confirmation':
+        case 'waiting_for_confirmation':
+            return 'warning'; // or purple/gold depending on preference, existing code used purple for wait
         case 'ready':
             return 'cyan';
         case 'creating':
@@ -53,7 +59,6 @@ export const getStatusColor = (status?: string): string => {
 export const getStatusLabel = (status: string, t: (key: string, options?: any) => string): string => {
     if (!status) return t('common:status.unknown', { defaultValue: 'UNKNOWN' });
     const key = status.toLowerCase();
-    // Try to find a specific key, simple fallback handled by i18next usually if configured, 
-    // but here we provide a default value logic similar to existing code.
     return t(`common:status.${key}`, { defaultValue: status.replace(/_/g, ' ').toUpperCase() });
 };
+

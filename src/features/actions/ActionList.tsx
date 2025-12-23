@@ -1,18 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Card, Table, Tag, Space, Button, Select, Typography, Input, Tooltip, message, Popconfirm } from 'antd';
+import React, { useCallback, useState } from 'react';
+import { Card, Table, Tag, Space, Button, Tooltip, message, Popconfirm, Typography } from 'antd'; // Removed unused imports
 import {
-    ReloadOutlined,
-    SearchOutlined,
     EyeOutlined,
-    CheckCircleOutlined,
-    CloseCircleOutlined,
-    SyncOutlined,
-    ClockCircleOutlined,
     StopOutlined,
     ThunderboltOutlined,
-    FilterOutlined,
-} from '@ant-design/icons';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+} from '@ant-design/icons'; // Cleaned up imports
+import { useNavigate } from 'react-router-dom';
 import { useGetActions } from '@/api/generated/actions/actions';
 import { useCancelAction } from '@/api/generated/targets/targets';
 import type { MgmtAction } from '@/api/generated/model';
@@ -23,25 +16,19 @@ import { keepPreviousData } from '@tanstack/react-query';
 import { PageContainer, HeaderRow } from '@/components/layout/PageLayout';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useServerTable } from '@/hooks/useServerTable'; // Added
+import ActionSearchBar from './components/ActionSearchBar'; // Added
+import { StatusTag } from '@/components/common/StatusTag'; // Added
 
 dayjs.extend(relativeTime);
 
 const { Title, Text } = Typography;
 
-// Animations
+// Animations (Keeping pulse and LiveIndicator for now)
 
 const pulse = keyframes`
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
-`;
-
-const FilterBar = styled(Card)`
-    border-radius: 10px;
-    margin-bottom: 8px;
-
-    .ant-card-body {
-        padding: 8px 12px;
-    }
 `;
 
 const LiveIndicator = styled.div`
@@ -71,28 +58,6 @@ const BulkActionBar = styled.div`
     margin-bottom: 16px;
 `;
 
-
-const getStatusColor = (status?: string) => {
-    const s = status?.toLowerCase();
-    if (s === 'finished') return 'success';
-    if (s === 'error' || s === 'failed') return 'error';
-    if (s === 'running' || s === 'retrieving') return 'processing';
-    if (s === 'pending' || s === 'scheduled') return 'default';
-    if (s === 'canceled' || s === 'canceling') return 'warning';
-    if (s === 'wait_for_confirmation' || s === 'waiting_for_confirmation') return 'purple';
-    return 'default';
-};
-
-const getStatusIcon = (status?: string) => {
-    const s = status?.toLowerCase();
-    if (s === 'finished') return <CheckCircleOutlined />;
-    if (s === 'error' || s === 'failed') return <CloseCircleOutlined />;
-    if (s === 'running' || s === 'retrieving') return <SyncOutlined spin />;
-    if (s === 'pending' || s === 'scheduled' || s === 'wait_for_confirmation' || s === 'waiting_for_confirmation') return <ClockCircleOutlined />;
-    if (s === 'canceled' || s === 'canceling') return <StopOutlined />;
-    return <ClockCircleOutlined />;
-};
-
 const isActionErrored = (action: MgmtAction) => {
     const status = action.status?.toLowerCase() || '';
     const detail = action.detailStatus?.toLowerCase() || '';
@@ -104,7 +69,7 @@ const isActionErrored = (action: MgmtAction) => {
 
 const getActionDisplayStatus = (action: MgmtAction) => {
     if (isActionErrored(action)) return 'error';
-    return action.status;
+    return action.status || 'unknown';
 };
 
 const isActiveStatus = (status?: string) => {
@@ -115,31 +80,19 @@ const isActiveStatus = (status?: string) => {
 const ActionList: React.FC = () => {
     const { t } = useTranslation(['actions', 'common']);
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
 
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
-    const [statusFilter, setStatusFilter] = useState<string[]>(() => {
-        const initial = searchParams.get('status');
-        return initial ? [initial] : [];
-    });
-    const [searchQuery, setSearchQuery] = useState<string>('');
+    // Use Shared Hook
+    const {
+        pagination,
+        offset,
+        searchQuery,
+        handleTableChange,
+        handleSearch,
+    } = useServerTable<MgmtAction>({ syncToUrl: true });
+
     const [selectedActionIds, setSelectedActionIds] = useState<number[]>([]);
     const [selectedTargetIdsMap, setSelectedTargetIdsMap] = useState<Record<number, string>>({});
 
-    const offset = (pagination.current - 1) * pagination.pageSize;
-
-    // Build query filter
-    const buildQuery = useCallback(() => {
-        const filters: string[] = [];
-        if (statusFilter.length > 0) {
-            filters.push(`status=in=(${statusFilter.join(',')})`);
-        }
-        if (searchQuery) {
-            // Search by target name or ID
-            filters.push(`target.name==*${searchQuery}*`);
-        }
-        return filters.length > 0 ? filters.join(';') : undefined;
-    }, [statusFilter, searchQuery]);
 
     // Check if any running actions exist for auto-refresh
     const hasRunningActions = (content?: MgmtAction[]) =>
@@ -149,7 +102,7 @@ const ActionList: React.FC = () => {
         {
             offset,
             limit: pagination.pageSize,
-            q: buildQuery(),
+            q: searchQuery || undefined,
         },
         {
             query: {
@@ -165,19 +118,6 @@ const ActionList: React.FC = () => {
 
     const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';
     const isActivePolling = hasRunningActions(data?.content);
-
-    const resetFilters = useCallback(() => {
-        setSearchQuery('');
-        setStatusFilter([]);
-        setPagination((prev) => ({ ...prev, current: 1 }));
-        setSearchParams({});
-    }, [setSearchParams]);
-
-    const getStatusLabel = useCallback((status?: string) => {
-        if (!status) return t('common:status.unknown', { defaultValue: 'UNKNOWN' });
-        const key = status.toLowerCase();
-        return t(`common:status.${key}`, { defaultValue: status.replace(/_/g, ' ').toUpperCase() });
-    }, [t]);
 
     const getTypeLabel = useCallback((type?: string) => {
         if (!type) return '-';
@@ -227,20 +167,9 @@ const ActionList: React.FC = () => {
             dataIndex: 'status',
             key: 'status',
             width: 160,
-            filters: [
-                { text: t('filter.pending'), value: 'pending' },
-                { text: t('filter.running'), value: 'running' },
-                { text: t('filter.finished'), value: 'finished' },
-                { text: t('filter.error'), value: 'error' },
-                { text: t('filter.canceled'), value: 'canceled' },
-            ],
             render: (_, record) => {
                 const displayStatus = getActionDisplayStatus(record);
-                return (
-                    <Tag color={getStatusColor(displayStatus)} icon={getStatusIcon(displayStatus)} style={{ borderRadius: 999 }}>
-                        {getStatusLabel(displayStatus)}
-                    </Tag>
-                );
+                return <StatusTag status={displayStatus} showIcon />;
             },
         },
         {
@@ -298,28 +227,6 @@ const ActionList: React.FC = () => {
         },
     ];
 
-    const handleTableChange: TableProps<MgmtAction>['onChange'] = (paginationConfig) => {
-        setPagination({
-            current: paginationConfig.current || 1,
-            pageSize: paginationConfig.pageSize || 20,
-        });
-    };
-
-    const handleSearchChange = useCallback((value: string) => {
-        setSearchQuery(value);
-        setPagination((prev) => ({ ...prev, current: 1 }));
-    }, []);
-
-    const handleStatusChange = useCallback((value: string[]) => {
-        setStatusFilter(value);
-        setPagination((prev) => ({ ...prev, current: 1 }));
-        if (value.length > 0) {
-            setSearchParams({ status: value.join(',') });
-        } else {
-            setSearchParams({});
-        }
-    }, [setSearchParams]);
-
     const cancelMutation = useCancelAction();
 
     const handleBulkCancel = useCallback(async () => {
@@ -359,15 +266,6 @@ const ActionList: React.FC = () => {
         setSelectedTargetIdsMap({});
     }, []);
 
-    const statusOptions = useMemo(() => [
-        { value: 'pending', label: t('filter.pending') },
-        { value: 'running', label: t('filter.running') },
-        { value: 'finished', label: t('filter.finished') },
-        { value: 'error', label: t('filter.error') },
-        { value: 'canceled', label: t('filter.canceled') },
-        { value: 'wait_for_confirmation', label: t('filter.waitForConfirmation') },
-    ], [t]);
-
     return (
         <PageContainer>
             <HeaderRow>
@@ -384,45 +282,14 @@ const ActionList: React.FC = () => {
                     <Text type="secondary" style={{ fontSize: 12 }}>
                         {t('lastUpdated', { defaultValue: 'Updated' })}: {lastUpdated}
                     </Text>
-                    <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading || isFetching}>
-                        {t('refresh')}
-                    </Button>
                 </Space>
             </HeaderRow>
 
-            {/* Filter Bar */}
-            <FilterBar>
-                <Space wrap style={{ width: '100%', justifyContent: 'space-between' }}>
-                    <Space wrap>
-                        <Input
-                            placeholder={t('filter.searchPlaceholder')}
-                            prefix={<SearchOutlined />}
-                            value={searchQuery}
-                            onChange={(e) => handleSearchChange(e.target.value)}
-                            style={{ width: 240 }}
-                            allowClear
-                        />
-                        <Select
-                            mode="multiple"
-                            placeholder={t('filter.statusPlaceholder')}
-                            value={statusFilter}
-                            onChange={handleStatusChange}
-                            allowClear
-                            style={{ minWidth: 220 }}
-                            suffixIcon={<FilterOutlined />}
-                            options={statusOptions}
-                        />
-                        {(searchQuery || statusFilter.length > 0) && (
-                            <Button onClick={resetFilters}>{t('filter.clearFilters')}</Button>
-                        )}
-                    </Space>
-                    {statusFilter.map(s => (
-                        <Tag key={s} color={getStatusColor(s)} closable onClose={() => handleStatusChange(statusFilter.filter(x => x !== s))}>
-                            {getStatusLabel(s)}
-                        </Tag>
-                    ))}
-                </Space>
-            </FilterBar>
+            <ActionSearchBar
+                onSearch={handleSearch}
+                onRefresh={refetch}
+                loading={isLoading || isFetching}
+            />
 
             {/* Bulk Action Bar */}
             {selectedActionIds.length > 0 && (
