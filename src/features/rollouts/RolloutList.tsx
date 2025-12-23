@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Card, Table, Tag, Space, Button, Select, Typography, Progress, Input, Tooltip } from 'antd';
+import { Card, Table, Space, Button, Select, Typography, Progress, Input, Tooltip } from 'antd';
 import { ReloadOutlined, PlusOutlined, EyeOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGetRollouts } from '@/api/generated/rollouts/rollouts';
@@ -8,7 +8,8 @@ import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { keepPreviousData } from '@tanstack/react-query';
-import styled from 'styled-components';
+import { SearchLayout, StatusTag } from '@/components/common';
+
 import { PageContainer } from '@/components/layout/PageLayout';
 import { useServerTable } from '@/hooks/useServerTable';
 import dayjs from 'dayjs';
@@ -16,47 +17,6 @@ import { buildWildcardSearch, appendFilter, buildCondition } from '@/utils/fiql'
 
 const { Text } = Typography;
 const { Search } = Input;
-
-const SearchContainer = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 12px;
-`;
-
-const SearchGroup = styled(Space)`
-    flex: 1;
-    min-width: 300px;
-`;
-
-const ActionGroup = styled(Space)`
-    flex-shrink: 0;
-`;
-
-const getStatusColor = (status?: string) => {
-    switch (status) {
-        case 'finished':
-            return 'success';
-        case 'running':
-            return 'processing';
-        case 'paused':
-            return 'warning';
-        case 'ready':
-            return 'cyan';
-        case 'creating':
-            return 'default';
-        case 'starting':
-            return 'blue';
-        case 'error':
-            return 'error';
-        case 'waiting_for_approval':
-            return 'purple';
-        default:
-            return 'default';
-    }
-};
 
 const RolloutList: React.FC = () => {
     const { t } = useTranslation(['rollouts', 'common']);
@@ -132,11 +92,7 @@ const RolloutList: React.FC = () => {
         }
     );
 
-    const getStatusLabel = (status?: string) => {
-        if (!status) return t('common:status.unknown', { defaultValue: 'UNKNOWN' });
-        const key = status.toLowerCase();
-        return t(`common:status.${key}`, { defaultValue: status.replace(/_/g, ' ').toUpperCase() });
-    };
+
 
     const statusOptions = useMemo(() => [
         { value: 'creating', label: t('filter.creating') },
@@ -195,9 +151,7 @@ const RolloutList: React.FC = () => {
             key: 'status',
             width: 150,
             render: (status: string) => (
-                <Tag color={getStatusColor(status)} style={{ borderRadius: 999 }}>
-                    {getStatusLabel(status)}
-                </Tag>
+                <StatusTag status={status} />
             ),
         },
         {
@@ -258,8 +212,8 @@ const RolloutList: React.FC = () => {
                 style={{ flex: 1, height: '100%', overflow: 'hidden' }}
                 styles={{ body: { height: 'calc(100% - 57px)', display: 'flex', flexDirection: 'column' } }}
             >
-                <SearchContainer>
-                    <SearchGroup>
+                <SearchLayout>
+                    <SearchLayout.SearchGroup>
                         <Select
                             placeholder={t('filter.placeholder')}
                             value={statusFilter || undefined}
@@ -278,8 +232,8 @@ const RolloutList: React.FC = () => {
                             style={{ maxWidth: 300 }}
                             enterButton={<SearchOutlined />}
                         />
-                    </SearchGroup>
-                    <ActionGroup>
+                    </SearchLayout.SearchGroup>
+                    <SearchLayout.ActionGroup>
                         <Tooltip title={t('refresh')}>
                             <Button
                                 icon={<ReloadOutlined />}
@@ -296,8 +250,8 @@ const RolloutList: React.FC = () => {
                                 {t('createRollout')}
                             </Button>
                         )}
-                    </ActionGroup>
-                </SearchContainer>
+                    </SearchLayout.ActionGroup>
+                </SearchLayout>
 
                 <div ref={tableContainerRef} style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
                     <Table

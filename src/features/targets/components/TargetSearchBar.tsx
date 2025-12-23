@@ -1,35 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Input, Space, Button, Select, Tooltip } from 'antd';
+import { Input, Select, Button, Tooltip } from 'antd';
 import {
     SearchOutlined,
-    ReloadOutlined,
     PlusOutlined,
+    ReloadOutlined,
     FilterOutlined,
     BookOutlined,
 } from '@ant-design/icons';
-import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { buildWildcardSearch } from '@/utils/fiql';
+import { SearchLayout } from '@/components/common';
 
 const { Search } = Input;
-
-const SearchContainer = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 12px;
-`;
-
-const SearchGroup = styled(Space)`
-    flex: 1;
-    min-width: 300px;
-`;
-
-const ActionGroup = styled(Space)`
-    flex-shrink: 0;
-`;
 
 interface TargetSearchBarProps {
     onSearch: (query: string) => void;
@@ -124,8 +106,8 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
     }, [searchField, searchValue, fiqlQuery, isAdvancedMode, onSearch]);
 
     return (
-        <SearchContainer>
-            <SearchGroup>
+        <SearchLayout>
+            <SearchLayout.SearchGroup>
                 <Tooltip title={isAdvancedMode ? t('search.switchToSimple') : t('search.switchToAdvanced')}>
                     <Button
                         icon={isAdvancedMode ? <SearchOutlined /> : <FilterOutlined />}
@@ -147,7 +129,7 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
                         <Search
                             placeholder={t('search.placeholder', { field: searchFieldOptions.find(o => o.value === searchField)?.label })}
                             value={searchValue}
-                            onChange={(e) => setSearchValue(e.target.value)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)}
                             onSearch={handleSearch}
                             allowClear
                             onClear={handleClear}
@@ -170,9 +152,9 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
                         prefix={<span style={{ color: '#aaa', fontSize: 12, marginRight: 4 }}>FIQL:</span>}
                     />
                 )}
-            </SearchGroup>
+            </SearchLayout.SearchGroup>
 
-            <ActionGroup>
+            <SearchLayout.ActionGroup>
                 {onOpenSavedFilters && (
                     <Tooltip title={t('list.savedFilters')}>
                         <Button icon={<BookOutlined />} onClick={onOpenSavedFilters} />
@@ -194,8 +176,8 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
                         {t('list.addTarget')}
                     </Button>
                 )}
-            </ActionGroup>
-        </SearchContainer>
+            </SearchLayout.ActionGroup>
+        </SearchLayout>
     );
 };
 

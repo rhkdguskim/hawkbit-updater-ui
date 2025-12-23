@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     Card,
     Descriptions,
-    Tag,
+
     Button,
     Space,
     Typography,
@@ -44,37 +44,17 @@ import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { PageContainer, HeaderRow } from '@/components/layout/PageLayout';
+import { StatusTag } from '@/components/common';
 import styled from 'styled-components';
 
 const { Title, Text } = Typography;
-
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 24px;
-`;
-
-const HeaderRow = styled.div`
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-`;
 
 const TitleGroup = styled.div`
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
-`;
-
-const StatusPill = styled(Tag)`
-    border-radius: 999px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
 `;
 
 const ActionCard = styled(Card)`
@@ -84,31 +64,6 @@ const ActionCard = styled(Card)`
 const SectionCard = styled(Card)`
     border-radius: 14px;
 `;
-
-const getStatusColor = (status?: string) => {
-    switch (status) {
-        case 'finished':
-            return 'success';
-        case 'running':
-            return 'processing';
-        case 'paused':
-            return 'warning';
-        case 'ready':
-            return 'cyan';
-        case 'creating':
-            return 'default';
-        case 'starting':
-            return 'blue';
-        case 'error':
-            return 'error';
-        case 'waiting_for_approval':
-            return 'purple';
-        case 'scheduled':
-            return 'default';
-        default:
-            return 'default';
-    }
-};
 
 const RolloutDetail: React.FC = () => {
     const { t } = useTranslation(['rollouts', 'common']);
@@ -301,19 +256,6 @@ const RolloutDetail: React.FC = () => {
     const errorTargets = statusPerTarget.error || 0;
     let overallProgress = totalTargets > 0 ? Math.round((finishedTargets / totalTargets) * 100) : 0;
 
-    // If status is finished or error (stopped), show 100% or actual calculation?
-    // User requested "ended means 100%", assuming successful finish.
-    // If it's truly 'finished' (not error), it implies completion.
-    if (rolloutData.status === 'finished') {
-        overallProgress = 100;
-    }
-
-    const getStatusLabel = (status?: string) => {
-        if (!status) return t('common:status.unknown', { defaultValue: 'UNKNOWN' });
-        const key = status.toLowerCase();
-        return t(`common:status.${key}`, { defaultValue: status.replace(/_/g, ' ').toUpperCase() });
-    };
-
     const groupColumns: TableProps<MgmtRolloutGroup>['columns'] = [
         {
             title: t('columns.id'),
@@ -332,9 +274,7 @@ const RolloutDetail: React.FC = () => {
             key: 'status',
             width: 120,
             render: (status: string) => (
-                <Tag color={getStatusColor(status)}>
-                    {getStatusLabel(status)}
-                </Tag>
+                <StatusTag status={status} />
             ),
         },
         {
@@ -378,9 +318,7 @@ const RolloutDetail: React.FC = () => {
                     <Title level={2} style={{ margin: 0 }}>
                         {rolloutData.name}
                     </Title>
-                    <StatusPill color={getStatusColor(rolloutData.status)}>
-                        {getStatusLabel(rolloutData.status)}
-                    </StatusPill>
+                    <StatusTag status={rolloutData.status} style={{ fontWeight: 600, textTransform: 'uppercase' }} />
                 </TitleGroup>
                 <Space wrap>
                     {canStart && (
@@ -498,9 +436,7 @@ const RolloutDetail: React.FC = () => {
                     <Descriptions.Item label={t('detail.labels.id')}>{rolloutData.id}</Descriptions.Item>
                     <Descriptions.Item label={t('detail.labels.name')}>{rolloutData.name}</Descriptions.Item>
                     <Descriptions.Item label={t('detail.labels.status')}>
-                        <Tag color={getStatusColor(rolloutData.status)}>
-                            {getStatusLabel(rolloutData.status)}
-                        </Tag>
+                        <StatusTag status={rolloutData.status} />
                     </Descriptions.Item>
                     <Descriptions.Item label={t('detail.labels.createdAt')}>
                         {rolloutData.createdAt
