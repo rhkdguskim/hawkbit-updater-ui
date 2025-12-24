@@ -24,6 +24,7 @@ import {
 } from '@/api/generated/target-types/target-types';
 import type { MgmtTargetType, MgmtTargetTypeRequestBodyPost, MgmtTargetTypeRequestBodyPut } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { ColorSwatch } from '@/components/common';
 import TargetTypeDialog from './TargetTypeDialog';
 
 
@@ -164,11 +165,13 @@ const TargetTypeList: React.FC = () => {
             dataIndex: 'id',
             key: 'id',
             width: 80,
+            sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
         },
         {
             title: t('table.name'),
             dataIndex: 'name',
             key: 'name',
+            sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
             render: (name: string, record) => (
                 <Space>
                     {record.colour && (
@@ -184,12 +187,21 @@ const TargetTypeList: React.FC = () => {
             title: t('typeManagement.key'),
             dataIndex: 'key',
             key: 'key',
+            sorter: (a, b) => (a.key ?? '').localeCompare(b.key ?? ''),
         },
         {
             title: t('form.description'),
             dataIndex: 'description',
             key: 'description',
             ellipsis: true,
+            sorter: (a, b) => (a.description ?? '').localeCompare(b.description ?? ''),
+        },
+        {
+            title: t('tagManagement.colour'),
+            dataIndex: 'colour',
+            key: 'colour',
+            width: 140,
+            render: (colour: string) => <ColorSwatch color={colour} />,
         },
         {
             title: t('table.actions'),

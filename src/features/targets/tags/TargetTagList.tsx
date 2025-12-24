@@ -20,7 +20,8 @@ import {
 } from '@/api/generated/target-tags/target-tags';
 import type { MgmtTag } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
-import TargetTagDialog from './TargetTagDialog';
+import { ColorSwatch, TagFormModal } from '@/components/common';
+import type { TagFormValues } from '@/components/common';
 
 
 
@@ -106,11 +107,13 @@ const TargetTagList: React.FC = () => {
             dataIndex: 'id',
             key: 'id',
             width: 80,
+            sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
         },
         {
             title: t('table.name'),
             dataIndex: 'name',
             key: 'name',
+            sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
             render: (name: string, record) => (
                 <Tag color={record.colour || 'default'}>{name}</Tag>
             ),
@@ -120,36 +123,14 @@ const TargetTagList: React.FC = () => {
             dataIndex: 'description',
             key: 'description',
             ellipsis: true,
+            sorter: (a, b) => (a.description ?? '').localeCompare(b.description ?? ''),
         },
         {
             title: t('tagManagement.colour'),
             dataIndex: 'colour',
             key: 'colour',
             width: 140,
-            render: (colour: string) =>
-                colour ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div
-                            style={{
-                                width: 28,
-                                height: 28,
-                                backgroundColor: colour,
-                                borderRadius: 6,
-                                border: '2px solid rgba(0,0,0,0.1)',
-                                boxShadow: `0 2px 8px ${colour}40`,
-                            }}
-                        />
-                        <span style={{
-                            fontSize: 12,
-                            fontFamily: 'monospace',
-                            color: '#666',
-                        }}>
-                            {colour}
-                        </span>
-                    </div>
-                ) : (
-                    <span style={{ color: '#999' }}>-</span>
-                ),
+            render: (colour: string) => <ColorSwatch color={colour} />,
         },
         {
             title: t('table.actions'),
@@ -211,15 +192,25 @@ const TargetTagList: React.FC = () => {
                 size="small"
             />
 
-            <TargetTagDialog
+            <TagFormModal
                 open={dialogOpen}
                 mode={editingTag ? 'edit' : 'create'}
                 initialData={editingTag}
                 loading={createMutation.isPending || updateMutation.isPending}
-                onSubmit={editingTag ? handleUpdate : handleCreate}
+                onSubmit={(values: TagFormValues) => editingTag ? handleUpdate(values) : handleCreate(values)}
                 onCancel={() => {
                     setDialogOpen(false);
                     setEditingTag(null);
+                }}
+                translations={{
+                    createTitle: t('tagManagement.createTitle'),
+                    editTitle: t('tagManagement.editTitle'),
+                    nameLabel: t('table.name'),
+                    namePlaceholder: t('form.namePlaceholder'),
+                    nameRequired: t('common:validation.required'),
+                    descriptionLabel: t('form.description'),
+                    descriptionPlaceholder: t('form.descriptionPlaceholder'),
+                    colourLabel: t('tagManagement.colour'),
                 }}
             />
         </>

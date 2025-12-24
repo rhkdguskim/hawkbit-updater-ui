@@ -60,6 +60,9 @@ const TargetTypeTab: React.FC<TargetTypeTabProps> = ({
     const currentTypeId = target?.targetType;
     const currentTypeName = target?.targetTypeName;
 
+    // Get current type colour from types data when available
+    const currentTypeColour = targetTypesData?.content?.find(t => t.id === currentTypeId)?.colour;
+
     const handleAssign = () => {
         if (selectedTypeId) {
             onAssign(selectedTypeId);
@@ -83,7 +86,7 @@ const TargetTypeTab: React.FC<TargetTypeTabProps> = ({
                         <Space direction="vertical" size="large" style={{ width: '100%' }}>
                             <Space align="center">
                                 <Title level={5} style={{ margin: 0 }}>{t('targetType.current')}</Title>
-                                <Tag color="blue">{currentTypeName}</Tag>
+                                <Tag color={currentTypeColour || 'default'}>{currentTypeName}</Tag>
                             </Space>
 
                             <Descriptions column={1} bordered size="small">
@@ -157,7 +160,7 @@ const TargetTypeTab: React.FC<TargetTypeTabProps> = ({
                             value: type.id,
                             label: (
                                 <Space>
-                                    <span>{type.name}</span>
+                                    <Tag color={type.colour || 'default'}>{type.name}</Tag>
                                     {type.description && (
                                         <Text type="secondary" style={{ fontSize: 12 }}>
                                             - {type.description}

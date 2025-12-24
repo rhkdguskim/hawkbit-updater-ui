@@ -5,3 +5,6 @@ export { ActionTimeline } from './ActionTimeline';
 export { StatusTag } from './StatusTag';
 export { default as SearchLayout } from './SearchLayout';
 export { ActiveUpdatesCard } from './ActiveUpdatesCard';
+export { ColorSwatch } from './ColorSwatch';
+export { TagFormModal } from './TagFormModal';
+export type { TagFormValues, TagFormModalProps } from './TagFormModal';

@@ -133,11 +133,13 @@ const RolloutList: React.FC = () => {
             dataIndex: 'id',
             key: 'id',
             width: 80,
+            sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
         },
         {
             title: t('columns.name'),
             dataIndex: 'name',
             key: 'name',
+            sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
             render: (value: string, record) => (
                 <Space direction="vertical" size={0}>
                     <Text strong>{value}</Text>
@@ -152,6 +154,7 @@ const RolloutList: React.FC = () => {
             dataIndex: 'status',
             key: 'status',
             width: 150,
+            sorter: (a, b) => (a.status ?? '').localeCompare(b.status ?? ''),
             render: (status: string) => (
                 <StatusTag status={status} />
             ),
@@ -161,6 +164,7 @@ const RolloutList: React.FC = () => {
             dataIndex: 'createdAt',
             key: 'createdAt',
             width: 160,
+            sorter: (a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0),
             render: (date: string) => date ? (
                 <Space direction="vertical" size={0}>
                     <Text style={{ fontSize: 13 }}>{dayjs(date).format('YYYY-MM-DD')}</Text>

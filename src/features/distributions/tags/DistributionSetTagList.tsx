@@ -5,12 +5,15 @@ import { EditOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined } from '@ant
 import {
     useGetDistributionSetTags,
     useDeleteDistributionSetTag,
+    useCreateDistributionSetTags,
+    useUpdateDistributionSetTag,
 } from '@/api/generated/distribution-set-tags/distribution-set-tags';
 import type { MgmtTag } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import DistributionSetTagDialog from './DistributionSetTagDialog';
+import { ColorSwatch, TagFormModal } from '@/components/common';
+import type { TagFormValues } from '@/components/common';
 
 
 
@@ -68,9 +71,51 @@ const DistributionSetTagList: React.FC = () => {
         setEditingTag(null);
     };
 
-    const handleDialogSuccess = () => {
-        handleDialogClose();
-        refetch();
+    const createMutation = useCreateDistributionSetTags({
+        mutation: {
+            onSuccess: () => {
+                message.success(t('tagManagement.createSuccess'));
+                handleDialogClose();
+                refetch();
+            },
+            onError: (error) => {
+                message.error((error as Error).message || t('tagManagement.createError'));
+            },
+        },
+    });
+
+    const updateMutation = useUpdateDistributionSetTag({
+        mutation: {
+            onSuccess: () => {
+                message.success(t('tagManagement.updateSuccess'));
+                handleDialogClose();
+                refetch();
+            },
+            onError: (error) => {
+                message.error((error as Error).message || t('tagManagement.updateError'));
+            },
+        },
+    });
+
+    const handleSubmit = (values: TagFormValues) => {
+        if (editingTag) {
+            updateMutation.mutate({
+                distributionsetTagId: editingTag.id,
+                data: {
+                    name: values.name,
+                    description: values.description,
+                    colour: values.colour,
+                },
+            });
+        } else {
+            createMutation.mutate({
+                data: [{
+                    name: values.name,
+                    description: values.description,
+                    colour: values.colour,
+                }],
+            });
+        }
     };
 
     const handleTableChange: TableProps<MgmtTag>['onChange'] = (newPagination) => {
@@ -86,6 +131,7 @@ const DistributionSetTagList: React.FC = () => {
             title: t('tagManagement.columns.name'),
             dataIndex: 'name',
             key: 'name',
+            sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
             render: (text, record) => (
                 <Tag color={record.colour || 'blue'}>{text}</Tag>
             ),
@@ -95,37 +141,21 @@ const DistributionSetTagList: React.FC = () => {
             dataIndex: 'description',
             key: 'description',
             ellipsis: true,
+            sorter: (a, b) => (a.description ?? '').localeCompare(b.description ?? ''),
         },
         {
             title: t('tagManagement.columns.colour'),
             dataIndex: 'colour',
             key: 'colour',
             width: 140,
-            render: (colour) => colour ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{
-                        width: 28,
-                        height: 28,
-                        backgroundColor: colour,
-                        borderRadius: 6,
-                        border: '2px solid rgba(0,0,0,0.1)',
-                        boxShadow: `0 2px 8px ${colour}40`,
-                    }} />
-                    <span style={{
-                        fontSize: 12,
-                        fontFamily: 'monospace',
-                        color: '#666',
-                    }}>
-                        {colour}
-                    </span>
-                </div>
-            ) : <span style={{ color: '#999' }}>-</span>,
+            render: (colour) => <ColorSwatch color={colour} />,
         },
         {
             title: t('tagManagement.columns.lastModified'),
             dataIndex: 'lastModifiedAt',
             key: 'lastModifiedAt',
             width: 180,
+            sorter: (a, b) => (a.lastModifiedAt ?? 0) - (b.lastModifiedAt ?? 0),
             render: (val: number) => (val ? format(val, 'yyyy-MM-dd HH:mm') : '-'),
         },
         {
@@ -185,11 +215,23 @@ const DistributionSetTagList: React.FC = () => {
                 onChange={handleTableChange}
                 size="small"
             />
-            <DistributionSetTagDialog
+            <TagFormModal
                 open={dialogOpen}
-                editingTag={editingTag}
-                onClose={handleDialogClose}
-                onSuccess={handleDialogSuccess}
+                mode={editingTag ? 'edit' : 'create'}
+                initialData={editingTag}
+                loading={createMutation.isPending || updateMutation.isPending}
+                onSubmit={handleSubmit}
+                onCancel={handleDialogClose}
+                translations={{
+                    createTitle: t('tagManagement.addTag'),
+                    editTitle: t('tagManagement.editTag'),
+                    nameLabel: t('tagManagement.columns.name'),
+                    namePlaceholder: t('tagManagement.namePlaceholder'),
+                    nameRequired: t('tagManagement.nameRequired'),
+                    descriptionLabel: t('tagManagement.columns.description'),
+                    descriptionPlaceholder: t('tagManagement.descriptionPlaceholder'),
+                    colourLabel: t('tagManagement.columns.colour'),
+                }}
             />
         </>
     );

@@ -138,13 +138,17 @@ const TargetTable: React.FC<TargetTableProps> = ({
             filters: availableTypes?.map(type => ({ text: type.name || '', value: type.name || '' })),
             filterMultiple: false,
             filteredValue: filters?.typeName ? [filters.typeName] : null,
-            render: (_, record) => (
-                <TargetTypeCell
-                    controllerId={record.controllerId!}
-                    currentTypeId={record.targetType}
-                    currentTypeName={record.targetTypeName}
-                />
-            ),
+            render: (_, record) => {
+                const typeColour = availableTypes?.find(t => t.id === record.targetType)?.colour;
+                return (
+                    <TargetTypeCell
+                        controllerId={record.controllerId!}
+                        currentTypeId={record.targetType}
+                        currentTypeName={record.targetTypeName}
+                        currentTypeColour={typeColour}
+                    />
+                );
+            },
         },
         {
             title: t('table.tags'),
