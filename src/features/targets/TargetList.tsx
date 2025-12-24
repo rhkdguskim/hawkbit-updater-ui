@@ -112,7 +112,7 @@ const TargetList: React.FC = () => {
 
     // Get saved filters for Quick Access
     const { data: filtersData } = useGetFilters(
-        { limit: 20 },
+        { limit: 10 },
         { query: { staleTime: 60000 } }
     );
     const savedFilters = filtersData?.content || [];

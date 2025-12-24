@@ -14,7 +14,7 @@ interface PaginationState {
 }
 
 export function useServerTable<T>({
-    defaultPageSize = 20,
+    defaultPageSize = 10,
     syncToUrl = false,
 }: UseServerTableProps = {}) {
     const [searchParams, setSearchParams] = useSearchParams();

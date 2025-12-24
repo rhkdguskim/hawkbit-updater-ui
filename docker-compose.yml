@@ -51,6 +51,9 @@ services:
       # Disable RabbitMQ (Not present in compose)
       - SPRING_RABBITMQ_ENABLED=false
       - HAWKBIT_DMF_RABBITMQ_ENABLED=false
+
+      # Artifact storage - persist to mounted volume
+      - HAWKBIT_ARTIFACT_REPOSITORY_FILE_FILEPATH=/opt/hawkbit/data/artifacts
     volumes:
       - hawkbit-data:/opt/hawkbit/data
     depends_on:
