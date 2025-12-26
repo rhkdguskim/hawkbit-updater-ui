@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Flex, Typography, Skeleton, Progress } from 'antd';
+import { Flex, Typography, Skeleton } from 'antd';
 import {
     AppstoreOutlined,
     ApiOutlined,
@@ -12,27 +12,27 @@ import {
     ThunderboltOutlined,
     CodeOutlined,
 } from '@ant-design/icons';
-import { IntegratedKPIGrid, StatsCard, BigNumber, COLORS } from '../DashboardStyles';
+import { StatsCard, COLORS } from '../DashboardStyles';
 import styled from 'styled-components';
 
 const { Text } = Typography;
 
 const IconBadge = styled.div<{ $color: string }>`
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: ${props => props.$color};
     color: white;
-    font-size: 20px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     flex-shrink: 0;
 `;
 
 const MiniNumber = styled.div<{ $color?: string }>`
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
     line-height: 1.2;
     color: ${props => props.$color || 'var(--ant-color-text)'};
@@ -48,13 +48,10 @@ interface IntegratedKPICardsProps {
     errorCount: number;
     // Distributions
     distributionSetsCount: number;
-    softwareModulesCount: number;
     // Rollouts
     runningRolloutCount: number;
-    activeRolloutCount: number;
     // Actions
     successRate: number | null;
-    totalActions: number;
 }
 
 interface KPICardConfig {
@@ -76,11 +73,8 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
     pendingCount,
     errorCount,
     distributionSetsCount,
-    softwareModulesCount,
     runningRolloutCount,
-    activeRolloutCount,
     successRate,
-    totalActions,
 }) => {
     const { t } = useTranslation(['dashboard', 'common']);
     const navigate = useNavigate();
@@ -164,7 +158,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
     ];
 
     return (
-        <IntegratedKPIGrid>
+        <>
             {cards.map((card, index) => (
                 <StatsCard
                     key={card.key}
@@ -172,23 +166,26 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
                     $delay={index + 1}
                     $pulse={card.pulse}
                     onClick={card.onClick}
+                    style={{ minHeight: 'auto' }}
                 >
                     {isLoading ? (
-                        <Skeleton.Avatar active size={48} />
+                        <Skeleton.Avatar active size={32} />
                     ) : (
-                        <Flex vertical align="center" justify="center" gap={8} style={{ height: '100%' }}>
+                        <Flex align="center" gap={8} style={{ height: '100%' }}>
                             <IconBadge $color={card.gradient}>
                                 {card.icon}
                             </IconBadge>
-                            <MiniNumber $color={card.color}>{card.value}</MiniNumber>
-                            <Text type="secondary" style={{ fontSize: 11, textAlign: 'center', lineHeight: 1.2 }}>
-                                {card.label}
-                            </Text>
+                            <Flex vertical gap={0} style={{ flex: 1, minWidth: 0 }}>
+                                <MiniNumber $color={card.color}>{card.value}</MiniNumber>
+                                <Text type="secondary" style={{ fontSize: 10, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {card.label}
+                                </Text>
+                            </Flex>
                         </Flex>
                     )}
                 </StatsCard>
             ))}
-        </IntegratedKPIGrid>
+        </>
     );
 };
 

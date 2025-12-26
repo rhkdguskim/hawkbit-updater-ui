@@ -30,25 +30,7 @@ export const FragmentationChart: React.FC<FragmentationChartProps> = ({ isLoadin
         { name: t('common:status.error', 'Error'), value: stats.error, color: '#ef4444' },
     ].filter(d => d.value > 0), [stats, t]);
 
-    const renderCustomLegend = (data: { name: string; value: number; color: string }[]) => (
-        <Flex vertical gap={4} style={{ marginTop: 4 }}>
-            {data.map(entry => (
-                <ChartLegendItem key={entry.name}>
-                    <Flex align="center" gap={6}>
-                        <div style={{
-                            width: 10,
-                            height: 10,
-                            borderRadius: 3,
-                            background: entry.color,
-                            boxShadow: `0 1px 3px ${entry.color}40`
-                        }} />
-                        <Text style={{ fontSize: 11, color: '#475569' }}>{entry.name}</Text>
-                    </Flex>
-                    <Text strong style={{ fontSize: 12, color: entry.color }}>{entry.value}</Text>
-                </ChartLegendItem>
-            ))}
-        </Flex>
-    );
+
 
     return (
         <ChartCard
@@ -69,13 +51,13 @@ export const FragmentationChart: React.FC<FragmentationChartProps> = ({ isLoadin
             {isLoading ? (
                 <Skeleton.Avatar active size={80} shape="circle" style={{ margin: '12px auto', display: 'block' }} />
             ) : data.length > 0 ? (
-                <Flex vertical style={{ flex: 1 }}>
-                    <ResponsiveContainer width="100%" height={110}>
+                <Flex gap={8} style={{ flex: 1 }} align="center">
+                    <ResponsiveContainer width="45%" height={100}>
                         <PieChart>
                             <Pie
                                 data={data}
-                                innerRadius={32}
-                                outerRadius={48}
+                                innerRadius={28}
+                                outerRadius={42}
                                 paddingAngle={4}
                                 dataKey="value"
                                 strokeWidth={0}
@@ -97,7 +79,23 @@ export const FragmentationChart: React.FC<FragmentationChartProps> = ({ isLoadin
                             />
                         </PieChart>
                     </ResponsiveContainer>
-                    {renderCustomLegend(data)}
+                    <Flex vertical gap={3} style={{ flex: 1, minWidth: 0 }}>
+                        {data.slice(0, 4).map(entry => (
+                            <ChartLegendItem key={entry.name} style={{ padding: '4px 8px' }}>
+                                <Flex align="center" gap={4}>
+                                    <div style={{
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: 2,
+                                        background: entry.color,
+                                        flexShrink: 0
+                                    }} />
+                                    <Text style={{ fontSize: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.name}</Text>
+                                </Flex>
+                                <Text strong style={{ fontSize: 11, color: entry.color }}>{entry.value}</Text>
+                            </ChartLegendItem>
+                        ))}
+                    </Flex>
                 </Flex>
             ) : (
                 <Flex justify="center" align="center" style={{ flex: 1 }}>

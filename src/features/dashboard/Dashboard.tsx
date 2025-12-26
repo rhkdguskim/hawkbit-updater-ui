@@ -36,11 +36,8 @@ const Dashboard: React.FC = () => {
                     pendingCount={metrics.pendingCount}
                     errorCount={metrics.errorCount}
                     distributionSetsCount={metrics.distributionSetsCount}
-                    softwareModulesCount={metrics.softwareModulesCount}
                     runningRolloutCount={metrics.runningRolloutCount}
-                    activeRolloutCount={metrics.activeRolloutCount}
                     successRate={metrics.successRate}
-                    totalActions={metrics.actions.length}
                 />
             }
             charts={

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { PageContainer, DashboardScrollContent, IntegratedKPIGrid, IntegratedChartsRow, IntegratedBottomRow } from '../DashboardStyles';
+import { PageContainer, DashboardScrollContent, IntegratedKPIGrid, IntegratedTopRow, IntegratedChartsGrid, IntegratedBottomRow } from '../DashboardStyles';
 
 const HeaderRow = styled.div`
     flex-shrink: 0;
@@ -26,15 +26,17 @@ export const IntegratedDashboardGrid: React.FC<IntegratedDashboardGridProps> = (
                 {header}
             </HeaderRow>
             <DashboardScrollContent>
-                {/* KPI Row: 8 cards */}
-                {kpiCards}
+                {/* Top Row: KPI 2x4 grid + 4 Charts */}
+                <IntegratedTopRow>
+                    <IntegratedKPIGrid>
+                        {kpiCards}
+                    </IntegratedKPIGrid>
+                    <IntegratedChartsGrid>
+                        {charts}
+                    </IntegratedChartsGrid>
+                </IntegratedTopRow>
 
-                {/* Charts Row: 4 charts */}
-                <IntegratedChartsRow>
-                    {charts}
-                </IntegratedChartsRow>
-
-                {/* Bottom Row: 3 widgets */}
+                {/* Bottom Row: 3 widgets with 1:1:2 ratio */}
                 <IntegratedBottomRow>
                     {bottomWidgets}
                 </IntegratedBottomRow>

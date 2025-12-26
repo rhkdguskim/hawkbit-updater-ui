@@ -20,22 +20,6 @@ export const DistributionCompletenessChart: React.FC<DistributionCompletenessCha
 }) => {
     const { t } = useTranslation(['distributions', 'common']);
 
-    const renderCustomLegend = (data: { name: string; value: number; color: string }[]) => (
-        <Flex vertical gap={4} style={{ marginTop: 4 }}>
-            {data.map(entry => (
-                <ChartLegendItem key={entry.name}>
-                    <Flex align="center" gap={6}>
-                        <div style={{ width: 10, height: 10, borderRadius: 3, background: entry.color, boxShadow: `0 1px 3px ${entry.color}40` }} />
-                        <Text style={{ fontSize: 11 }}>
-                            {entry.name === 'Complete' ? t('status.complete', 'Complete') : t('status.incomplete', 'Incomplete')}
-                        </Text>
-                    </Flex>
-                    <Text strong style={{ fontSize: 12, color: entry.color }}>{entry.value}</Text>
-                </ChartLegendItem>
-            ))}
-        </Flex>
-    );
-
     return (
         <ChartCard
             $theme="deployment"
@@ -55,8 +39,8 @@ export const DistributionCompletenessChart: React.FC<DistributionCompletenessCha
             {isLoading ? (
                 <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
             ) : completenessData.length > 0 ? (
-                <Flex vertical style={{ flex: 1 }}>
-                    <ResponsiveContainer width="100%" height={100}>
+                <Flex gap={8} style={{ flex: 1 }} align="center">
+                    <ResponsiveContainer width="45%" height={100}>
                         <PieChart>
                             <Pie data={completenessData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
                                 {completenessData.map((entry, index) => (
@@ -66,7 +50,19 @@ export const DistributionCompletenessChart: React.FC<DistributionCompletenessCha
                             <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                         </PieChart>
                     </ResponsiveContainer>
-                    {renderCustomLegend(completenessData)}
+                    <Flex vertical gap={4} style={{ flex: 1, minWidth: 0 }}>
+                        {completenessData.map(entry => (
+                            <ChartLegendItem key={entry.name} style={{ padding: '6px 10px' }}>
+                                <Flex align="center" gap={6}>
+                                    <div style={{ width: 10, height: 10, borderRadius: 3, background: entry.color, flexShrink: 0 }} />
+                                    <Text style={{ fontSize: 11, whiteSpace: 'nowrap' }}>
+                                        {entry.name === 'Complete' ? t('status.complete', 'Complete') : t('status.incomplete', 'Incomplete')}
+                                    </Text>
+                                </Flex>
+                                <Text strong style={{ fontSize: 12, color: entry.color }}>{entry.value}</Text>
+                            </ChartLegendItem>
+                        ))}
+                    </Flex>
                 </Flex>
             ) : (
                 <Flex justify="center" align="center" style={{ flex: 1 }}>

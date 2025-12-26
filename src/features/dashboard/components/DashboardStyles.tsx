@@ -59,54 +59,69 @@ export const KPIGridContainer = styled.div`
     flex: 0 0 280px;
 `;
 
-// NEW: Integrated Dashboard - 8 KPI cards in a row
+// NEW: Integrated Dashboard - KPI cards in 4x2 grid
 export const IntegratedKPIGrid = styled.div`
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px;
     flex-shrink: 0;
-    height: 130px;
-
-    @media (max-width: 1600px) {
-        grid-template-columns: repeat(4, 1fr);
-        grid-template-rows: repeat(2, 1fr);
-        height: 260px;
-    }
-
-    @media (max-width: 900px) {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(4, 1fr);
-        height: 520px;
-    }
+    width: 520px;
+    height: 100%;
 `;
 
-// NEW: Charts row - 4 equal columns (scrollable content)
-export const IntegratedChartsRow = styled.div`
+// NEW: Top row - KPI grid + Charts combined (flex: 1 for 1:2 ratio with bottom)
+export const IntegratedTopRow = styled.div`
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    min-height: 180px;
+`;
+
+// NEW: Charts container within top row
+export const IntegratedChartsGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    height: 220px;
-    flex-shrink: 0;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
 
     @media (max-width: 1400px) {
         grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 110px);
-        height: auto;
+        grid-template-rows: repeat(2, 1fr);
     }
 `;
 
-// NEW: Bottom widgets row - 3 equal columns (scrollable content)
+
+
+// NEW: Bottom widgets row - 1:1:2 ratio (flex: 2 for 1:2 ratio with top)
 export const IntegratedBottomRow = styled.div`
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr 2fr;
     gap: 16px;
-    height: 300px;
-    flex-shrink: 0;
+    flex: 2;
+    min-height: 300px;
 
     @media (max-width: 1200px) {
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(3, 300px);
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        flex: none;
         height: auto;
+        
+        & > *:last-child {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, 280px);
+        height: auto;
+        
+        & > *:last-child {
+            grid-column: auto;
+        }
     }
 `;
 
