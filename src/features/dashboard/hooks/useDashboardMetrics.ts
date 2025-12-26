@@ -6,6 +6,9 @@ import { useGetTargets } from '@/api/generated/targets/targets';
 import { useGetActions } from '@/api/generated/actions/actions';
 import { useGetRollouts } from '@/api/generated/rollouts/rollouts';
 import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
+import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
+import { useGetSoftwareModules } from '@/api/generated/software-modules/software-modules';
+import type { MgmtDistributionSet, MgmtSoftwareModule, MgmtRolloutResponseBody } from '@/api/generated/model';
 import type { MgmtAction } from '@/api/generated/model';
 
 dayjs.extend(relativeTime);
@@ -30,9 +33,17 @@ export const useDashboardMetrics = () => {
         { limit: 100 },
         { query: { staleTime: 30000 } }
     );
+    const { data: distributionSetsData, isLoading: dsLoading, refetch: refetchDS } = useGetDistributionSets(
+        { limit: 500 },
+        { query: { staleTime: 5000, refetchInterval: 10000 } }
+    );
+    const { data: softwareModulesData, isLoading: smLoading, refetch: refetchSM } = useGetSoftwareModules(
+        { limit: 500 },
+        { query: { staleTime: 5000, refetchInterval: 10000 } }
+    );
 
-    const isLoading = targetsLoading || actionsLoading || rolloutsLoading;
-    const refetch = () => { refetchTargets(); refetchActions(); refetchRollouts(); };
+    const isLoading = targetsLoading || actionsLoading || rolloutsLoading || dsLoading || smLoading;
+    const refetch = () => { refetchTargets(); refetchActions(); refetchRollouts(); refetchDS(); refetchSM(); };
     const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';
 
     const targets = targetsData?.content || [];
@@ -191,6 +202,43 @@ export const useDashboardMetrics = () => {
         registered: targets.filter(t => t.updateStatus?.toUpperCase() === 'REGISTERED').length,
     };
 
+    // 9. Distribution Sets Metrics
+    const distributionSets = distributionSetsData?.content || [];
+    const distributionSetsCount = distributionSetsData?.total ?? 0;
+    const softwareModulesCount = softwareModulesData?.total ?? 0;
+    const completeSetsCount = distributionSets.filter(ds => ds.complete).length;
+    const incompleteSetsCount = distributionSets.length - completeSetsCount;
+
+    const completenessData = useMemo(() => [
+        { name: 'Complete', value: completeSetsCount, color: '#10b981' },
+        { name: 'Incomplete', value: incompleteSetsCount, color: '#f59e0b' },
+    ].filter(d => d.value > 0), [completeSetsCount, incompleteSetsCount]);
+
+    const recentDistributionSets: MgmtDistributionSet[] = useMemo(() => {
+        return [...distributionSets]
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+            .slice(0, 10);
+    }, [distributionSets]);
+
+    const recentSoftwareModules: MgmtSoftwareModule[] = useMemo(() => {
+        return [...(softwareModulesData?.content || [])]
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+            .slice(0, 10);
+    }, [softwareModulesData]);
+
+    // 10. Active Rollouts List
+    const activeRollouts: MgmtRolloutResponseBody[] = useMemo(() => {
+        return rollouts
+            .filter(r => r.status === 'running' || r.status === 'paused' || r.status === 'scheduled' || r.status === 'ready')
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+            .slice(0, 10);
+    }, [rollouts]);
+
+    // 11. Rollout running count for KPI
+    const runningRolloutCount = rollouts.filter(r => r.status === 'running').length;
+    const pausedRolloutCount = rollouts.filter(r => r.status === 'paused').length;
+    const scheduledRolloutCount = rollouts.filter(r => r.status === 'scheduled' || r.status === 'ready').length;
+
     const isActivePolling = activeRolloutCount > 0 || pendingCount > 0;
 
     return {
@@ -204,6 +252,7 @@ export const useDashboardMetrics = () => {
         targets,
         rollouts,
         actions: recentActions,
+        distributionSets,
 
         // Metrics
         totalDevices,
@@ -216,8 +265,18 @@ export const useDashboardMetrics = () => {
 
         // Rollout Metrics
         activeRolloutCount,
+        runningRolloutCount,
+        pausedRolloutCount,
+        scheduledRolloutCount,
         finishedRolloutCount,
         errorRolloutCount,
+
+        // Distribution Metrics
+        distributionSetsCount,
+        softwareModulesCount,
+        completeSetsCount,
+        incompleteSetsCount,
+        completenessData,
 
         // Deployment Metrics
         deploymentRate,
@@ -227,8 +286,11 @@ export const useDashboardMetrics = () => {
         fragmentationStats,
 
         // Lists
-        recentDevices, // Keeping for backward compat if needed, but will likely remove usage
+        recentDevices,
         recentActivities,
+        recentDistributionSets,
+        recentSoftwareModules,
+        activeRollouts,
 
         // Target Type Colors
         targetTypeColorMap,

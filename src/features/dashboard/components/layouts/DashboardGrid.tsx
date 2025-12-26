@@ -1,7 +1,49 @@
 import React from 'react';
 import styled from 'styled-components';
-import { PageContainer, ChartsContainer, DashboardScrollContent } from '../DashboardStyles';
+import { PageContainer, DashboardScrollContent, IntegratedKPIGrid, IntegratedChartsRow, IntegratedBottomRow } from '../DashboardStyles';
 
+const HeaderRow = styled.div`
+    flex-shrink: 0;
+    margin-bottom: 8px;
+`;
+
+interface IntegratedDashboardGridProps {
+    header: React.ReactNode;
+    kpiCards: React.ReactNode;
+    charts: React.ReactNode;
+    bottomWidgets: React.ReactNode;
+}
+
+export const IntegratedDashboardGrid: React.FC<IntegratedDashboardGridProps> = ({
+    header,
+    kpiCards,
+    charts,
+    bottomWidgets,
+}) => {
+    return (
+        <PageContainer>
+            <HeaderRow>
+                {header}
+            </HeaderRow>
+            <DashboardScrollContent>
+                {/* KPI Row: 8 cards */}
+                {kpiCards}
+
+                {/* Charts Row: 4 charts */}
+                <IntegratedChartsRow>
+                    {charts}
+                </IntegratedChartsRow>
+
+                {/* Bottom Row: 3 widgets */}
+                <IntegratedBottomRow>
+                    {bottomWidgets}
+                </IntegratedBottomRow>
+            </DashboardScrollContent>
+        </PageContainer>
+    );
+};
+
+// Keep original DashboardGrid for backward compatibility
 const TopRow = styled.div`
     display: flex;
     gap: 16px;
@@ -36,9 +78,7 @@ export const DashboardGrid: React.FC<DashboardGridProps> = ({
             <DashboardScrollContent>
                 <TopRow>
                     {kpiCards}
-                    <ChartsContainer>
-                        {charts}
-                    </ChartsContainer>
+                    {charts}
                 </TopRow>
                 <BottomRow>
                     {bottomWidgets}

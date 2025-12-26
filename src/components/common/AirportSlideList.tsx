@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
+const scrollAnimation = keyframes`
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-50%);
+    }
+`;
 
 const Container = styled.div<{ $fullHeight?: boolean }>`
     overflow: hidden;
@@ -11,12 +19,15 @@ const Container = styled.div<{ $fullHeight?: boolean }>`
         display: flex;
         flex-direction: column;
     `}
+
+    &:hover .slide-wrapper {
+        animation-play-state: paused;
+    }
 `;
 
-const SlideWrapper = styled.div<{ $offset: number; $itemHeight: number; $isAnimating: boolean }>`
-    transform: translateY(${props => -props.$offset * props.$itemHeight}px);
-    transition: ${props => props.$isAnimating ? 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)' : 'none'};
+const SlideWrapper = styled.div<{ $shouldAnimate: boolean; $duration: number }>`
     width: 100%;
+    animation: ${props => props.$shouldAnimate ? `${scrollAnimation} ${props.$duration}s linear infinite` : 'none'};
 `;
 
 const ItemRow = styled.div<{ $height: number }>`
@@ -31,7 +42,7 @@ interface AirportSlideListProps<T> {
     renderItem: (item: T, index: number) => React.ReactNode;
     itemHeight: number;
     visibleCount?: number;
-    interval?: number; // ms
+    scrollSpeed?: number; // pixels per second (default: 30)
     className?: string;
     fullHeight?: boolean; // If true, fills the parent container
 }
@@ -41,12 +52,10 @@ function AirportSlideList<T>({
     renderItem,
     itemHeight,
     visibleCount = 5,
-    interval = 3000,
+    scrollSpeed = 30,
     className,
     fullHeight = false,
 }: AirportSlideListProps<T>) {
-    const [offset, setOffset] = useState(0);
-    const [isAnimating, setIsAnimating] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const [dynamicVisibleCount, setDynamicVisibleCount] = useState(visibleCount);
 
@@ -68,34 +77,17 @@ function AirportSlideList<T>({
     }, [fullHeight, itemHeight]);
 
     const effectiveVisibleCount = fullHeight ? dynamicVisibleCount : visibleCount;
+    const shouldAnimate = items.length > effectiveVisibleCount;
 
     // Double the items for seamless looping
-    const displayItems = items.length > effectiveVisibleCount
-        ? [...items, ...items.slice(0, effectiveVisibleCount)]
+    const displayItems = shouldAnimate
+        ? [...items, ...items]
         : items;
 
-    useEffect(() => {
-        if (items.length <= effectiveVisibleCount) return;
-
-        const timer = setInterval(() => {
-            setIsAnimating(true);
-            setOffset(prev => prev + 1);
-        }, interval);
-
-        return () => clearInterval(timer);
-    }, [items.length, effectiveVisibleCount, interval]);
-
-    // Reset to beginning when we've scrolled through all items
-    useEffect(() => {
-        if (offset >= items.length) {
-            // Wait for animation to complete, then reset without animation
-            const resetTimer = setTimeout(() => {
-                setIsAnimating(false);
-                setOffset(0);
-            }, 600);
-            return () => clearTimeout(resetTimer);
-        }
-    }, [offset, items.length]);
+    // Calculate animation duration based on scroll speed
+    // Total distance to scroll = items.length * itemHeight (half of doubled list)
+    const totalScrollDistance = items.length * itemHeight;
+    const animationDuration = totalScrollDistance / scrollSpeed;
 
     const containerStyle = fullHeight
         ? { flex: 1, minHeight: 0, height: '100%' }
@@ -109,9 +101,9 @@ function AirportSlideList<T>({
             style={containerStyle}
         >
             <SlideWrapper
-                $offset={offset}
-                $itemHeight={itemHeight}
-                $isAnimating={isAnimating}
+                className="slide-wrapper"
+                $duration={animationDuration}
+                $shouldAnimate={shouldAnimate}
             >
                 {displayItems.map((item, idx) => (
                     <ItemRow key={`item-${idx}`} $height={itemHeight}>

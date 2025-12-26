@@ -59,6 +59,57 @@ export const KPIGridContainer = styled.div`
     flex: 0 0 280px;
 `;
 
+// NEW: Integrated Dashboard - 8 KPI cards in a row
+export const IntegratedKPIGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 12px;
+    flex-shrink: 0;
+    height: 130px;
+
+    @media (max-width: 1600px) {
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        height: 260px;
+    }
+
+    @media (max-width: 900px) {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        height: 520px;
+    }
+`;
+
+// NEW: Charts row - 4 equal columns (scrollable content)
+export const IntegratedChartsRow = styled.div`
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    height: 220px;
+    flex-shrink: 0;
+
+    @media (max-width: 1400px) {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 110px);
+        height: auto;
+    }
+`;
+
+// NEW: Bottom widgets row - 3 equal columns (scrollable content)
+export const IntegratedBottomRow = styled.div`
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    height: 300px;
+    flex-shrink: 0;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, 300px);
+        height: auto;
+    }
+`;
+
 export const ChartsContainer = styled.div`
     display: flex;
     gap: 16px;
