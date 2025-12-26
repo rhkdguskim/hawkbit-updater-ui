@@ -281,6 +281,7 @@ const SoftwareModuleList: React.FC = () => {
     return (
         <StandardListLayout
             title={t('moduleList.title')}
+            description={t('moduleList.description')}
             searchBar={
                 <FilterBuilder
                     fields={filterFields}

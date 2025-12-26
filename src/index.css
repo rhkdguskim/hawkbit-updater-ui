@@ -279,7 +279,7 @@ textarea {
 .ant-table-thead>tr>th {
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     letter-spacing: 0.05em;
 }
 
@@ -356,7 +356,7 @@ textarea {
 
 .ant-menu-dark .ant-menu-item-group-title {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 11px;
+    font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -365,7 +365,7 @@ textarea {
 
 /* Tooltip enhancements */
 .ant-tooltip-inner {
-    font-size: 13px;
+    font-size: var(--ant-font-size-sm);
     padding: 8px 12px;
 }
 
@@ -571,7 +571,7 @@ textarea {
     gap: 6px;
     padding: 4px 10px;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     font-weight: 500;
     transition: all var(--transition-fast) var(--ease-smooth);
 }
@@ -622,7 +622,7 @@ textarea {
 .enterprise-table .ant-table-thead>tr>th {
     background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
     font-weight: 600;
-    font-size: 11px;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     border-bottom: 2px solid #e2e8f0;
@@ -662,7 +662,7 @@ textarea {
 .command-palette__input {
     width: 100%;
     padding: 16px 20px;
-    font-size: 16px;
+    font-size: var(--ant-font-size-lg, 1rem);
     border: none;
     background: transparent;
     outline: none;
@@ -714,7 +714,7 @@ textarea {
 
 .chart-container__title h4 {
     margin: 0;
-    font-size: 14px;
+    font-size: var(--ant-font-size);
     font-weight: 600;
     color: var(--status-neutral);
 }
@@ -764,14 +764,14 @@ textarea {
 }
 
 .kpi-card__value {
-    font-size: 32px;
+    font-size: 2rem;
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: var(--space-2);
 }
 
 .kpi-card__label {
-    font-size: 13px;
+    font-size: var(--ant-font-size-sm);
     color: var(--status-neutral);
     font-weight: 500;
 }
@@ -780,7 +780,7 @@ textarea {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     font-weight: 600;
     margin-top: var(--space-3);
     padding: 4px 8px;
@@ -839,7 +839,7 @@ textarea {
 }
 
 .chart-tooltip__label {
-    font-size: 11px;
+    font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -847,7 +847,7 @@ textarea {
 }
 
 .chart-tooltip__value {
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 600;
     color: #ffffff;
 }
@@ -949,18 +949,18 @@ textarea {
 
 /* Compact Statistic */
 .ant-statistic-content-value {
-    font-size: 28px !important;
+    font-size: 2rem !important;
 }
 
 .ant-statistic-title {
-    font-size: 12px !important;
+    font-size: var(--ant-font-size-sm) !important;
     margin-bottom: 4px !important;
 }
 
 /* Compact Tag */
 .ant-tag {
     padding: 2px 8px !important;
-    font-size: 11px !important;
+    font-size: var(--ant-font-size-sm) !important;
     line-height: 1.4 !important;
 }
 
@@ -968,12 +968,12 @@ textarea {
 .ant-btn-sm {
     height: 28px !important;
     padding: 0 10px !important;
-    font-size: 12px !important;
+    font-size: var(--ant-font-size-sm) !important;
 }
 
 /* Compact Pagination */
 .ant-pagination {
-    font-size: 13px;
+    font-size: var(--ant-font-size-sm);
 }
 
 .ant-pagination-item {

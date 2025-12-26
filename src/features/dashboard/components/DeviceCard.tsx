@@ -105,7 +105,7 @@ const OnlineIndicator = styled.div<{ $isOnline: boolean; $typeColor?: string }>`
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     background: ${props => {
         if (props.$typeColor) {
             return `linear-gradient(135deg, ${props.$typeColor} 0%, ${props.$typeColor}cc 100%)`;
@@ -128,7 +128,7 @@ const StatusBadge = styled.div<{ $status?: string }>`
     gap: 4px;
     padding: 4px 10px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: var(--ant-font-size-sm);
     font-weight: 500;
     
     ${props => {
@@ -158,7 +158,7 @@ const ActionBadge = styled.div<{ $status?: string }>`
     gap: 4px;
     padding: 3px 8px;
     border-radius: 6px;
-    font-size: 10px;
+    font-size: 0.75rem;
     font-weight: 500;
     
     ${props => {
@@ -240,7 +240,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ target, recentAction, targetTyp
                         <ApiOutlined />
                     </OnlineIndicator>
                     <Flex vertical gap={2} style={{ flex: 1, minWidth: 0 }}>
-                        <Text strong ellipsis style={{ fontSize: 13, lineHeight: 1.2 }}>
+                        <Text strong ellipsis style={{ fontSize: '0.9rem', lineHeight: 1.2 }}>
                             {target.name || target.controllerId}
                         </Text>
                         <Flex align="center" gap={4} wrap="wrap">
@@ -258,7 +258,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ target, recentAction, targetTyp
                                     {target.targetTypeName}
                                 </Tag>
                             )}
-                            <Text type="secondary" style={{ fontSize: 10, fontFamily: 'monospace' }}>
+                            <Text type="secondary" style={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>
                                 {target.ipAddress || target.address || ''}
                             </Text>
                         </Flex>
@@ -284,7 +284,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ target, recentAction, targetTyp
 
                 {/* Footer: Last Seen */}
                 {lastSeen && (
-                    <Text type="secondary" style={{ fontSize: 10 }}>
+                    <Text type="secondary" style={{ fontSize: '0.75rem' }}>
                         {isOnline ? '활성' : ''} {lastSeen}
                     </Text>
                 )}

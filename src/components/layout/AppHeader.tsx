@@ -22,121 +22,121 @@ const { Header } = Layout;
 const { Text } = Typography;
 
 const StyledHeader = styled(Header) <{ $bg: string }>`
-padding: 0 24px;
-height: 64px;
-background: ${(props) => props.$bg};
-display: flex;
-align - items: center;
-justify - content: space - between;
-border - bottom: 1px solid var(--border - color);
-backdrop - filter: blur(20px);
-position: sticky;
-top: 0;
-z - index: 100;
+    padding: 0 24px;
+    height: 64px;
+    background: ${(props) => props.$bg};
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    backdrop-filter: blur(20px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 `;
 
 const HeaderLeft = styled.div`
-display: flex;
-align - items: center;
-gap: 32px;
-flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex: 1;
 `;
 
 const HeaderRight = styled.div`
-display: flex;
-align - items: center;
-gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 `;
 
 const LogoContainer = styled.div`
-display: flex;
-align - items: center;
-gap: 8px;
-cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
   
-  .logo - icon {
+  .logo-icon {
     width: 26px;
     height: 26px;
-    background: var(--ant - color - primary, linear - gradient(135deg, #6366f1 0 %, #8b5cf6 100 %));
-    border - radius: 6px;
+    background: var(--ant-color-primary, linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%));
+    border-radius: 6px;
     display: flex;
-    align - items: center;
-    justify - content: center;
+    align-items: center;
+    justify-content: center;
     color: white;
-    font - size: 14px;
-    box - shadow: 0 2px 8px var(--ant - color - primary - hover, rgba(99, 102, 241, 0.3));
-}
+    font-size: 14px;
+    box-shadow: 0 2px 8px var(--ant-color-primary-hover, rgba(99, 102, 241, 0.3));
+  }
   
-  .logo - text {
-    font - size: 1.1rem;
-    font - weight: 700;
-    letter - spacing: -0.01em;
-    color: var(--text - main);
-}
+  .logo-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text-main);
+  }
 `;
 
 const StyledMenu = styled(Menu)`
-flex: 1;
-border - bottom: none!important;
-background: transparent!important;
-margin - left: 24px;
+    flex: 1;
+    border-bottom: none !important;
+    background: transparent !important;
+    margin-left: 24px;
     
-    .ant - menu - item, .ant - menu - submenu {
-    top: 0!important;
-    margin - bottom: 0!important;
+    .ant-menu-item, .ant-menu-submenu {
+        top: 0 !important;
+        margin-bottom: 0 !important;
         
         &::after {
-        bottom: -1px!important;
+            bottom: -1px !important;
+        }
     }
-}
 `;
 
 const SettingsGroup = styled.div`
-display: flex;
-align - items: center;
-gap: 4px;
-padding: 4px;
-background: var(--ant - color - primary - bg, rgba(99, 102, 241, 0.06));
-border - radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    background: var(--ant-color-primary-bg, rgba(99, 102, 241, 0.06));
+    border-radius: 10px;
 `;
 
 const UserSection = styled.div`
-display: flex;
-align - items: center;
-gap: 10px;
-padding: 4px 8px 4px 12px;
-background: var(--ant - color - primary - bg, rgba(99, 102, 241, 0.06));
-border - radius: 10px;
-cursor: pointer;
-transition: all 0.2s ease;
-height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px 4px 12px;
+    background: var(--ant-color-primary-bg, rgba(99, 102, 241, 0.06));
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 40px;
     
     &:hover {
-    background: var(--ant - color - primary - bg - hover, rgba(99, 102, 241, 0.1));
-}
+        background: var(--ant-color-primary-bg-hover, rgba(99, 102, 241, 0.1));
+    }
 `;
 
 const UserInfo = styled.div`
-display: flex;
-flex - direction: column;
-align - items: flex - end;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 `;
 
 const UserName = styled(Text)`
-font - weight: 600;
-font - size: 13px;
-line - height: 1.2;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.2;
 `;
 
 const UserRole = styled(Text)`
-font - size: 11px;
-opacity: 0.7;
+    font-size: 11px;
+    opacity: 0.7;
 `;
 
 const StyledAvatar = styled(Avatar)`
-background: var(--ant - color - primary, linear - gradient(135deg, #6366f1 0 %, #8b5cf6 100 %));
-box - shadow: 0 2px 8px var(--ant - color - primary - hover, rgba(99, 102, 241, 0.25));
-font - size: 14px;
+    background: var(--ant-color-primary, linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%));
+    box-shadow: 0 2px 8px var(--ant-color-primary-hover, rgba(99, 102, 241, 0.25));
+    font-size: 14px;
 `;
 
 interface AppHeaderProps {

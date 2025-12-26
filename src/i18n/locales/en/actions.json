@@ -1,7 +1,8 @@
 {
     "pageTitle": "Actions",
     "list": {
-        "title": "Actions"
+        "title": "Actions",
+        "description": "Detailed deployment action history and real-time execution tracking"
     },
     "subtitle": "Track device actions and status updates",
     "refresh": "Refresh",
@@ -93,6 +94,7 @@
     },
     "detail": {
         "pageTitle": "Action Details",
+        "description": "Action execution timeline, status updates, and target feedback",
         "back": "Back",
         "backToActions": "Back to Actions",
         "notFound": "Action not found",

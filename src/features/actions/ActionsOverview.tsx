@@ -20,12 +20,9 @@ import { useGetActions } from '@/api/generated/actions/actions';
 import { AirportSlideList, ActiveUpdatesCard } from '@/components/common';
 import { ActionTimeline } from '@/components/common/ActionTimeline';
 import type { MgmtAction } from '@/api/generated/model';
+import { PageLayout, PageHeader } from '@/components/patterns';
 import {
-    OverviewPageContainer,
-    OverviewPageHeader,
-    HeaderContent,
     OverviewScrollContent,
-    GradientTitle,
     TopRow,
     BottomRow,
     KPIGridContainer,
@@ -141,12 +138,10 @@ const ActionsOverview: React.FC = () => {
     );
 
     return (
-        <OverviewPageContainer>
-            <OverviewPageHeader>
-                <HeaderContent>
-                    <GradientTitle level={3} $theme="actions">
-                        {t('overview.title', 'Action Management')}
-                    </GradientTitle>
+        <PageLayout>
+            <PageHeader
+                title={t('overview.title', 'Action Management')}
+                description={
                     <Flex align="center" gap={12}>
                         <Text type="secondary" style={{ fontSize: 13 }}>
                             {t('overview.subtitle', 'Deployment actions and status overview')}
@@ -155,28 +150,30 @@ const ActionsOverview: React.FC = () => {
                             {runningCount > 0 ? t('common:status.active', 'Active') : t('common:status.idle', 'Idle')}
                         </LiveIndicator>
                     </Flex>
-                </HeaderContent>
-                <Flex align="center" gap={8}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                        {t('common:updated', 'Updated')}: {lastUpdated}
-                    </Text>
-                    <Button
-                        type="primary"
-                        onClick={() => navigate('/actions/list')}
-                        size="small"
-                    >
-                        {t('overview.viewAllActions', 'View All Actions')}
-                    </Button>
-                    <Button
-                        icon={<ReloadOutlined />}
-                        onClick={() => refetch()}
-                        loading={isLoading}
-                        size="small"
-                    >
-                        {t('common:actions.refresh', 'Refresh')}
-                    </Button>
-                </Flex>
-            </OverviewPageHeader>
+                }
+                actions={
+                    <Flex align="center" gap={8}>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                            {t('common:updated', 'Updated')}: {lastUpdated}
+                        </Text>
+                        <Button
+                            type="primary"
+                            onClick={() => navigate('/actions/list')}
+                            size="small"
+                        >
+                            {t('overview.viewAllActions', 'View All Actions')}
+                        </Button>
+                        <Button
+                            icon={<ReloadOutlined />}
+                            onClick={() => refetch()}
+                            loading={isLoading}
+                            size="small"
+                        >
+                            {t('common:actions.refresh', 'Refresh')}
+                        </Button>
+                    </Flex>
+                }
+            />
 
             <OverviewScrollContent>
                 {/* Top Row: KPI Cards + 2 Charts */}
@@ -402,7 +399,6 @@ const ActionsOverview: React.FC = () => {
                                     items={recentActions}
                                     itemHeight={52}
                                     visibleCount={5}
-                                    interval={3500}
                                     fullHeight={true}
                                     renderItem={(record: MgmtAction) => (
                                         <ActivityItem
@@ -442,7 +438,7 @@ const ActionsOverview: React.FC = () => {
                     </OverviewListCard>
                 </BottomRow>
             </OverviewScrollContent>
-        </OverviewPageContainer>
+        </PageLayout>
     );
 };
 

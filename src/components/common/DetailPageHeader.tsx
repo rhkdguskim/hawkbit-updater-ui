@@ -1,67 +1,6 @@
 import React from 'react';
-import { Typography, Button, Space, Skeleton } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
-import styled from 'styled-components';
-import { StatusTag } from './StatusTag';
-
-const { Title, Text } = Typography;
-
-const HeaderContainer = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 16px;
-    padding: 8px 0;
-`;
-
-const TitleSection = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-`;
-
-const TitleRow = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-`;
-
-const StyledTitle = styled(Title)`
-    && {
-        margin: 0;
-        font-size: 24px;
-        font-weight: 600;
-        line-height: 1.3;
-    }
-`;
-
-const BackButton = styled(Button)`
-    && {
-        padding: 4px 12px;
-        height: 32px;
-        font-size: 13px;
-    }
-`;
-
-const Description = styled(Text)`
-    && {
-        margin-left: 0;
-        font-size: 14px;
-        max-width: 600px;
-    }
-`;
-
-const ActionsContainer = styled(Space)`
-    && {
-        .ant-btn {
-            height: 36px;
-            padding: 4px 16px;
-            font-size: 14px;
-        }
-    }
-`;
+import { PageHeader } from '@/components/patterns';
+import { Skeleton } from 'antd';
 
 export interface DetailPageHeaderProps {
     /** Title of the page */
@@ -84,7 +23,7 @@ export interface DetailPageHeaderProps {
 
 /**
  * Standardized header component for all detail pages.
- * Provides consistent layout for back button, title, status, and actions.
+ * Re-implemented using the PageHeader pattern to ensure application-wide consistency.
  */
 export const DetailPageHeader: React.FC<DetailPageHeaderProps> = ({
     title,
@@ -97,35 +36,27 @@ export const DetailPageHeader: React.FC<DetailPageHeaderProps> = ({
     extra,
 }) => {
     return (
-        <HeaderContainer>
-            <TitleSection>
-                <TitleRow>
-                    <BackButton icon={<ArrowLeftOutlined />} onClick={onBack}>
-                        {backLabel}
-                    </BackButton>
-                    {loading ? (
-                        <Skeleton.Input active size="large" style={{ width: 200, height: 32 }} />
-                    ) : (
-                        <StyledTitle level={3}>
-                            {title}
-                        </StyledTitle>
-                    )}
+        <PageHeader
+            onBack={onBack}
+            backLabel={backLabel}
+            title={loading ? <Skeleton.Input active size="large" style={{ width: 200, height: 32 }} /> : title}
+            description={description}
+            extra={(status || extra) && (
+                <>
                     {status && (
-                        <StatusTag
-                            status={status}
-                            style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: 12 }}
-                        />
+                        <div style={{ marginLeft: 4 }}>
+                            {/* StatusTag logic is now handled by the caller, passing it as extra if needed, 
+                                but for DetailPageHeader we'll keep the StatusTag here for compatibility */}
+                            <div style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: 'var(--ant-font-size-sm)' }}>
+                                {status}
+                            </div>
+                        </div>
                     )}
                     {extra}
-                </TitleRow>
-                {description && (
-                    <Description type="secondary">
-                        {description}
-                    </Description>
-                )}
-            </TitleSection>
-            {actions && <ActionsContainer wrap>{actions}</ActionsContainer>}
-        </HeaderContainer>
+                </>
+            )}
+            actions={actions}
+        />
     );
 };
 

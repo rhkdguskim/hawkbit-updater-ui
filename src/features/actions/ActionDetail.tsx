@@ -271,6 +271,7 @@ const ActionDetail: React.FC = () => {
             {/* Header */}
             <DetailPageHeader
                 title={`${t('detail.pageTitle')} #${actionData.id}`}
+                description={t('detail.description')}
                 status={actionData.status}
                 backLabel={t('detail.back')}
                 onBack={() => navigate('/actions')}

@@ -2,6 +2,7 @@
     "title": "Target Management",
     "list": {
         "title": "Target List",
+        "description": "Search, filter, and manage IoT targets and their deployment status",
         "addTarget": "Add Target",
         "addType": "Add Type",
         "addTag": "Add Tag",
@@ -17,6 +18,7 @@
     "manageFilters": "Manage",
     "detail": {
         "title": "Target Details",
+        "description": "View detailed information, installed software, and execution history for this target",
         "tabs": {
             "overview": "Overview",
             "actions": "Actions",

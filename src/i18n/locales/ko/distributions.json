@@ -32,6 +32,7 @@
     },
     "list": {
         "title": "배포 세트",
+        "description": "소프트웨어 배포 세트 관리 및 완료 상태 확인",
         "columns": {
             "name": "이름",
             "version": "버전",
@@ -59,6 +60,7 @@
     },
     "moduleList": {
         "title": "소프트웨어 모듈",
+        "description": "개별 소프트웨어 모듈 및 버전별 아티팩트 관리",
         "selectedCount": "{{count}}개 모듈 선택됨"
     },
     "tags": {
@@ -125,6 +127,8 @@
         }
     },
     "detail": {
+        "description": "배포 세트의 상세 구성 및 할당된 모듈 정보를 확인합니다.",
+        "moduleDescription": "소프트웨어 모듈 아티팩트, 메타데이터 및 사용 통계를 확인합니다.",
         "overview": "개요",
         "assignedModules": "할당된 모듈",
         "metadata": "메타데이터",

@@ -9,7 +9,7 @@ export const PageContainer = styled.div`
     min-height: 0;
     height: 100%;
     overflow-y: auto;
-    padding: 0 4px 24px 4px;
+    padding: 24px;
 `;
 
 
@@ -35,7 +35,7 @@ export const SectionCard = styled(Card)`
     }
     
     .ant-card-head-title {
-        font-size: 16px;
+        font-size: var(--ant-font-size-lg, 16px);
         font-weight: 600;
     }
     

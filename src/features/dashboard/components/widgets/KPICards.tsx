@@ -97,7 +97,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
                         <Text type="secondary" style={{ fontSize: 11, fontWeight: 600 }}>
                             {t('kpi.errors', 'Errors')}
                         </Text>
-                        <BigNumber style={{ color: errorCount > 0 ? COLORS.error : '#64748b' }}>
+                        <BigNumber style={{ color: errorCount > 0 ? COLORS.error : 'var(--ant-color-text-description)' }}>
                             {errorCount}
                         </BigNumber>
                         {errorCount > 0 ? (

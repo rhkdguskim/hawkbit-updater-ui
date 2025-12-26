@@ -261,7 +261,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
                 <Space direction="vertical" size={0}>
                     <Text strong>{record.name || record.controllerId}</Text>
                     {record.ipAddress && (
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {record.ipAddress}
                         </Text>
                     )}
@@ -327,7 +327,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
                             <Text type="secondary">-</Text>
                         )}
                         {record.installedAt && (
-                            <Text type="secondary" style={{ fontSize: 12 }}>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                 {dayjs(record.installedAt).format('YYYY-MM-DD HH:mm')}
                             </Text>
                         )}

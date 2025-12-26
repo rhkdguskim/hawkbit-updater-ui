@@ -60,21 +60,11 @@ const ValueContainer = styled.div`
 `;
 
 const ValueText = styled.span<{ $size?: string }>`
-    font-size: ${props => props.$size === 'large' ? '36px' : '28px'};
+    font-size: ${props => props.$size === 'large' ? '2.5rem' : '2rem'};
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-
-    .dark-mode &,
-    [data-theme='dark'] & {
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-    }
+    color: var(--ant-color-text, #1e293b);
 `;
 
 const TrendBadge = styled.div<{ $isPositive?: boolean; $isNeutral?: boolean }>`
@@ -83,7 +73,7 @@ const TrendBadge = styled.div<{ $isPositive?: boolean; $isNeutral?: boolean }>`
     gap: 4px;
     padding: 4px 8px;
     border-radius: 8px;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     font-weight: 600;
     background: ${props =>
         props.$isNeutral
@@ -94,10 +84,10 @@ const TrendBadge = styled.div<{ $isPositive?: boolean; $isNeutral?: boolean }>`
     };
     color: ${props =>
         props.$isNeutral
-            ? 'var(--status-neutral)'
+            ? 'var(--ant-color-text-description)'
             : props.$isPositive
-                ? 'var(--status-success)'
-                : 'var(--status-error)'
+                ? 'var(--ant-color-success)'
+                : 'var(--ant-color-error)'
     };
     border: 1px solid ${props =>
         props.$isNeutral
@@ -119,11 +109,11 @@ const SparklineContainer = styled.div`
 `;
 
 const TitleText = styled(Text)`
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--status-neutral);
+    color: var(--ant-color-text-description);
 `;
 
 const SkeletonValue = styled.div`
@@ -236,7 +226,7 @@ export const KPICard: React.FC<KPICardProps> = ({
                     </Flex>
                     {description && (
                         <Tooltip title={description}>
-                            <Text type="secondary" style={{ fontSize: '11px', marginTop: 2, display: 'block' }}>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', marginTop: 2, display: 'block' }}>
                                 {description.length > 30 ? `${description.slice(0, 30)}...` : description}
                             </Text>
                         </Tooltip>
@@ -252,7 +242,7 @@ export const KPICard: React.FC<KPICardProps> = ({
             <Flex align="baseline" gap={12} style={{ marginTop: 8 }}>
                 <ValueContainer>
                     <ValueText>{value}</ValueText>
-                    {suffix && <span style={{ fontSize: '14px', fontWeight: 500, color: '#64748b', marginLeft: 4 }}>{suffix}</span>}
+                    {suffix && <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 500, color: 'var(--ant-color-text-description)', marginLeft: 4 }}>{suffix}</span>}
                 </ValueContainer>
 
                 {hasTrend && (

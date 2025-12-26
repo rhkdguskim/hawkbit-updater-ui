@@ -241,9 +241,11 @@ const DistributionSetDetail: React.FC = () => {
 
             {/* Header */}
             <DetailPageHeader
-                title={setData?.name}
-                backLabel={t('common:actions.back')}
                 onBack={() => navigate('/distributions/sets')}
+                backLabel={t('sets.title')}
+                title={setData ? `${setData.name} : ${setData.version}` : ''}
+                description={t('detail.description')}
+                status={setData?.complete ? 'COMPLETE' : 'INCOMPLETE'}
                 loading={isSetLoading}
                 extra={titleExtra}
                 actions={headerActions}

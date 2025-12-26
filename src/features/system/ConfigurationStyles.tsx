@@ -128,7 +128,7 @@ export const StatusIndicator = styled.div<{ $isEdit?: boolean }>`
     gap: 8px;
     padding: 6px 14px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     font-weight: 600;
     background: ${props => props.$isEdit
         ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%)'
@@ -215,7 +215,7 @@ export const ConfigGroupCard = styled(Card) <{ $themeKey?: GroupThemeKey; $delay
     }
     
     .ant-card-head-title {
-        font-size: 15px;
+        font-size: 0.95rem;
         font-weight: 600;
         color: #1e293b;
         padding: 0;
@@ -254,7 +254,7 @@ export const GroupIconBadge = styled.div<{ $themeKey?: GroupThemeKey }>`
         return theme?.gradient || SYSTEM_THEME.gradient;
     }};
     color: white;
-    font-size: 18px;
+    font-size: 1.25rem;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
     flex-shrink: 0;
 `;
@@ -301,7 +301,7 @@ export const ConfigItemLabel = styled.div`
 
 export const ConfigKeyText = styled.span`
     font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     color: #64748b;
     background: rgba(100, 116, 139, 0.1);
     padding: 2px 8px;
@@ -316,7 +316,7 @@ export const ConfigKeyText = styled.span`
 `;
 
 export const ConfigDescText = styled.span`
-    font-size: 13px;
+    font-size: var(--ant-font-size-sm);
     color: #475569;
     line-height: 1.4;
     
@@ -342,7 +342,7 @@ export const BooleanTag = styled.span<{ $enabled?: boolean }>`
     gap: 6px;
     padding: 6px 14px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     font-weight: 500;
     background: ${props => props.$enabled
         ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%)'
@@ -362,7 +362,7 @@ export const BooleanTag = styled.span<{ $enabled?: boolean }>`
 // Value Display for non-boolean
 export const ValueDisplay = styled.span`
     font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-    font-size: 13px;
+    font-size: var(--ant-font-size-sm);
     color: #1e293b;
     background: rgba(99, 102, 241, 0.08);
     padding: 6px 12px;
@@ -384,7 +384,7 @@ export const ArrayValueContainer = styled.div`
 `;
 
 export const ArrayTag = styled.span`
-    font-size: 11px;
+    font-size: 0.75rem;
     padding: 4px 10px;
     border-radius: 6px;
     background: rgba(99, 102, 241, 0.1);
@@ -399,7 +399,7 @@ export const ArrayTag = styled.span`
 
 // Empty Value
 export const EmptyValue = styled.span`
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     color: #94a3b8;
     font-style: italic;
 `;
@@ -409,5 +409,5 @@ export const NoItemsMessage = styled.div`
     text-align: center;
     padding: 20px;
     color: #94a3b8;
-    font-size: 13px;
+    font-size: var(--ant-font-size-sm);
 `;

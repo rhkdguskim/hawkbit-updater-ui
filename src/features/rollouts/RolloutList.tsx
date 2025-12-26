@@ -201,6 +201,7 @@ const RolloutList: React.FC = () => {
     return (
         <StandardListLayout
             title={t('pageTitle')}
+            description={t('list.description')}
             searchBar={
                 <FilterBuilder
                     fields={filterFields}

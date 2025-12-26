@@ -42,6 +42,7 @@
     },
     "list": {
         "title": "Distribution Sets",
+        "description": "Manage software distribution sets and their completeness",
         "columns": {
             "name": "Name",
             "version": "Version",
@@ -69,6 +70,7 @@
     },
     "moduleList": {
         "title": "Software Modules",
+        "description": "Manage individual software modules and their versioned artifacts",
         "selectedCount": "{{count}} modules selected"
     },
     "tags": {
@@ -125,6 +127,8 @@
         }
     },
     "detail": {
+        "description": "Detailed configuration and assigned modules for this distribution set",
+        "moduleDescription": "Software module artifacts, metadata, and usage statistics",
         "overview": "Overview",
         "assignedModules": "Assigned Modules",
         "metadata": "Metadata",

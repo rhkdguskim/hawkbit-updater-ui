@@ -9,7 +9,7 @@ const ChipContainer = styled(Tag)`
     gap: 6px;
     padding: 4px 8px 4px 10px;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     margin: 2px;
     background: var(--ant-color-primary-bg, #e6f4ff);
     border: 1px solid var(--ant-color-primary-border, #91caff);

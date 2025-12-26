@@ -317,6 +317,7 @@ const SoftwareModuleDetail: React.FC = () => {
                 loading={isModuleLoading}
                 extra={titleExtra}
                 status={moduleData?.locked ? 'locked' : undefined}
+                description={t('detail.moduleDescription')}
             />
 
             {/* Tabs */}

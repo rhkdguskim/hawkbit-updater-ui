@@ -82,8 +82,8 @@ const UpdateRow = styled.div<{ $isCompleting?: boolean; $isExpanded?: boolean }>
     display: flex;
     flex-direction: column;
     padding: 12px 16px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    background: transparent;
+    border-bottom: 1px solid var(--ant-color-border-secondary, rgba(0, 0, 0, 0.03));
     transition: all 0.3s ease;
     animation: ${props => props.$isCompleting
         ? css`${fadeOutSlide} 0.5s ease-out forwards`
@@ -91,11 +91,11 @@ const UpdateRow = styled.div<{ $isCompleting?: boolean; $isExpanded?: boolean }>
     cursor: pointer;
 
     ${props => props.$isExpanded && `
-        background: rgba(59, 130, 246, 0.04);
+        background: var(--ant-color-primary-bg, rgba(59, 130, 246, 0.04));
     `}
 
     &:hover {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+        background: var(--ant-color-item-hover, rgba(59, 130, 246, 0.03));
     }
 `;
 
@@ -136,7 +136,7 @@ const IconBadge = styled.div<{ $status?: string }>`
                 return '#3b82f6';
         }
     }};
-    font-size: 16px;
+    font-size: 1.1rem;
 
     ${props => ['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(props.$status || '') && css`
         animation: ${pulse} 2s ease-in-out infinite;
@@ -148,22 +148,22 @@ const ExpandButton = styled.div`
     align-items: center;
     gap: 4px;
     padding: 4px 8px;
-    font-size: 11px;
-    color: #6b7280;
+    font-size: var(--ant-font-size-sm);
+    color: var(--ant-color-text-description, #6b7280);
     cursor: pointer;
     border-radius: 4px;
     transition: all 0.2s;
 
     &:hover {
-        background: rgba(0, 0, 0, 0.04);
-        color: #3b82f6;
+        background: var(--ant-color-item-hover, rgba(0, 0, 0, 0.04));
+        color: var(--ant-color-primary, #3b82f6);
     }
 `;
 
 const HistoryPanel = styled.div`
     margin-top: 12px;
     padding: 12px;
-    background: rgba(0, 0, 0, 0.02);
+    background: var(--ant-color-fill-quaternary, rgba(0, 0, 0, 0.02));
     border-radius: 8px;
     max-height: 200px;
     overflow-y: auto;
@@ -300,7 +300,7 @@ const ActiveUpdateRowComponent: React.FC<{
     const popoverContent = messages && messages.length > 0 ? (
         <div style={{ maxWidth: 320, maxHeight: 300, overflow: 'auto' }}>
             <Flex vertical gap={4}>
-                <Text strong style={{ fontSize: 12, marginBottom: 4 }}>
+                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', marginBottom: 4 }}>
                     {t('activeUpdates.statusHistory', 'Status History')}
                 </Text>
                 {messages.slice().reverse().slice(0, 8).map((msg: string, idx: number) => (
@@ -308,7 +308,7 @@ const ActiveUpdateRowComponent: React.FC<{
                         <Tag color={idx === 0 ? 'blue' : 'default'} style={{ fontSize: 10, margin: 0, flexShrink: 0 }}>
                             {idx === 0 ? t('common:status.current', 'Current') : `#${messages.length - idx}`}
                         </Tag>
-                        <Text style={{ fontSize: 11, wordBreak: 'break-word' }} type={idx === 0 ? undefined : 'secondary'}>
+                        <Text style={{ fontSize: 'var(--ant-font-size-sm)', wordBreak: 'break-word' }} type={idx === 0 ? undefined : 'secondary'}>
                             {msg}
                         </Text>
                     </Flex>
@@ -349,7 +349,7 @@ const ActiveUpdateRowComponent: React.FC<{
                             <Text strong style={{ fontSize: 13 }}>
                                 {item.targetName || item.controllerId || `Action #${item.action.id}`}
                             </Text>
-                            <Text type="secondary" style={{ fontSize: 11 }}>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                 {item.action.createdAt ? dayjs(item.action.createdAt).fromNow(true) : ''}
                             </Text>
                         </Flex>
@@ -357,7 +357,7 @@ const ActiveUpdateRowComponent: React.FC<{
                             <Text
                                 type="secondary"
                                 style={{
-                                    fontSize: 11,
+                                    fontSize: 'var(--ant-font-size-sm)',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap',
@@ -400,7 +400,7 @@ const ActiveUpdateRowComponent: React.FC<{
                                             {idx === 0 ? t('common:status.current', 'Current') : `Step ${messages.length - idx}`}
                                         </Tag>
                                     </Flex>
-                                    <Text type="secondary" style={{ fontSize: 11 }}>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                         {msg}
                                     </Text>
                                 </Flex>

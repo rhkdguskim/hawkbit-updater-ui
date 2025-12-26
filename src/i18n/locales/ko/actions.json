@@ -1,7 +1,8 @@
 {
     "pageTitle": "액션",
     "list": {
-        "title": "액션 목록"
+        "title": "액션 목록",
+        "description": "상세 배포 액션 이력 및 실시간 실행 상태 추적"
     },
     "subtitle": "디바이스 액션과 상태 변경을 한눈에 확인하세요",
     "refresh": "새로고침",
@@ -93,6 +94,7 @@
     },
     "detail": {
         "pageTitle": "액션 상세",
+        "description": "액션 실행 타임라인, 상태 업데이트 및 타겟 피드백을 확인합니다.",
         "back": "뒤로",
         "backToActions": "액션 목록으로",
         "notFound": "액션을 찾을 수 없습니다",

@@ -20,12 +20,9 @@ import { useGetTargets } from '@/api/generated/targets/targets';
 import { useGetActions } from '@/api/generated/actions/actions';
 import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import DeviceCardGrid from '@/features/dashboard/components/DeviceCardGrid';
+import { PageLayout, PageHeader } from '@/components/patterns';
 import {
-    OverviewPageContainer,
-    OverviewPageHeader,
-    HeaderContent,
     OverviewScrollContent,
-    GradientTitle,
     TopRow,
     BottomRow,
     KPIGridContainer,
@@ -159,12 +156,10 @@ const TargetsOverview: React.FC = () => {
     );
 
     return (
-        <OverviewPageContainer>
-            <OverviewPageHeader>
-                <HeaderContent>
-                    <GradientTitle level={3} $theme="targets">
-                        {t('overview.title', 'Device Monitoring')}
-                    </GradientTitle>
+        <PageLayout>
+            <PageHeader
+                title={t('overview.title', 'Device Monitoring')}
+                description={
                     <Flex align="center" gap={12}>
                         <Text type="secondary" style={{ fontSize: 13 }}>
                             {t('overview.subtitle', 'Real-time device status overview')}
@@ -173,21 +168,23 @@ const TargetsOverview: React.FC = () => {
                             {onlineCount > 0 ? t('common:status.live', 'Live') : t('common:status.idle', 'Idle')}
                         </LiveIndicator>
                     </Flex>
-                </HeaderContent>
-                <Flex align="center" gap={8}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                        {t('common:updated', 'Updated')}: {lastUpdated}
-                    </Text>
-                    <Button
-                        icon={<ReloadOutlined />}
-                        onClick={() => refetch()}
-                        loading={isLoading}
-                        size="small"
-                    >
-                        {t('actions.refresh')}
-                    </Button>
-                </Flex>
-            </OverviewPageHeader>
+                }
+                actions={
+                    <Flex align="center" gap={8}>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                            {t('common:updated', 'Updated')}: {lastUpdated}
+                        </Text>
+                        <Button
+                            icon={<ReloadOutlined />}
+                            onClick={() => refetch()}
+                            loading={isLoading}
+                            size="small"
+                        >
+                            {t('actions.refresh')}
+                        </Button>
+                    </Flex>
+                }
+            />
 
             <OverviewScrollContent>
                 {/* Top Row: KPI Cards + 3 Pie Charts */}
@@ -398,7 +395,7 @@ const TargetsOverview: React.FC = () => {
                     />
                 </BottomRow>
             </OverviewScrollContent>
-        </OverviewPageContainer>
+        </PageLayout>
     );
 };
 

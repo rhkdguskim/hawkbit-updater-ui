@@ -32,12 +32,12 @@ const EditWrapper = styled.div`
     width: 100%;
 
     .ant-input {
-        font-size: 12px;
+        font-size: var(--ant-font-size-sm);
     }
 
     .action-icon {
         cursor: pointer;
-        font-size: 14px;
+        font-size: var(--ant-font-size);
         padding: 2px;
         border-radius: 4px;
         transition: all 0.15s ease;
@@ -165,7 +165,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         <CellWrapper onClick={handleStartEdit}>
             <Text
                 type={secondary ? 'secondary' : undefined}
-                style={{ fontSize: 12, cursor: editable ? 'pointer' : 'default' }}
+                style={{ fontSize: 'var(--ant-font-size-sm)', cursor: editable ? 'pointer' : 'default' }}
                 ellipsis={{ tooltip: value }}
             >
                 {value || placeholder}

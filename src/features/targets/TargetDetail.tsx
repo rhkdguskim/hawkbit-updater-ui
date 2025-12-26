@@ -387,7 +387,7 @@ const TargetDetail: React.FC = () => {
                 <DetailPageHeader
                     title={t('detail.notFoundTitle')}
                     backLabel={t('detail.backToTargets')}
-                    onBack={() => navigate('/targets')}
+                    onBack={() => navigate('/targets/list')}
                 />
             </PageContainer>
         );
@@ -530,7 +530,7 @@ const TargetDetail: React.FC = () => {
             {/* Header */}
             <DetailPageHeader
                 title={targetData?.name || targetId}
-                description={targetData?.description}
+                description={targetData?.description || t('detail.description')}
                 backLabel={t('actions.back', { ns: 'common' })}
                 onBack={() => navigate('/targets')}
                 loading={targetLoading}

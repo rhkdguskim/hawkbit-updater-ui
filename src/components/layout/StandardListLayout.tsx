@@ -51,6 +51,8 @@ const TableWrapper = styled.div`
 interface StandardListLayoutProps {
     title: React.ReactNode;
     subtitle?: React.ReactNode;
+    /** Optional description shown below title */
+    description?: React.ReactNode;
     headerSubtitleExtra?: React.ReactNode;
     headerExtra?: React.ReactNode;
     searchBar?: React.ReactNode;
@@ -62,6 +64,7 @@ interface StandardListLayoutProps {
 export const StandardListLayout: React.FC<StandardListLayoutProps> = ({
     title,
     subtitle,
+    description,
     headerSubtitleExtra,
     headerExtra,
     searchBar,
@@ -74,6 +77,7 @@ export const StandardListLayout: React.FC<StandardListLayoutProps> = ({
             <PageHeader
                 title={title}
                 subtitle={subtitle}
+                description={description}
                 subtitleExtra={headerSubtitleExtra}
                 actions={headerExtra}
             />

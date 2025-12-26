@@ -410,6 +410,7 @@ const RolloutDetail: React.FC = () => {
             {/* Header */}
             <DetailPageHeader
                 title={rolloutData.name}
+                description={t('detail.description')}
                 status={rolloutData.status}
                 backLabel={t('detail.back')}
                 onBack={() => navigate('/rollouts')}

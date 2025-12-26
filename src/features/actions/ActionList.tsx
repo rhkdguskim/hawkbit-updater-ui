@@ -34,7 +34,7 @@ const LiveIndicator = styled.div`
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     color: var(--ant-color-text-secondary, #64748b);
 
     &::before {
@@ -234,13 +234,13 @@ const ActionList: React.FC = () => {
             width: 160,
             render: (_, record) => {
                 const targetId = getTargetId(record);
-                if (!targetId) return <Text type="secondary" style={{ fontSize: 12 }}>-</Text>;
+                if (!targetId) return <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>-</Text>;
                 return (
                     <a
                         onClick={(e) => { e.stopPropagation(); navigate(`/targets/${targetId}`); }}
                         style={{ cursor: 'pointer' }}
                     >
-                        <Text strong ellipsis style={{ maxWidth: 140, fontSize: 12 }}>{targetId}</Text>
+                        <Text strong ellipsis style={{ maxWidth: 140, fontSize: 'var(--ant-font-size-sm)' }}>{targetId}</Text>
                     </a>
                 );
             },
@@ -272,13 +272,13 @@ const ActionList: React.FC = () => {
             width: 180,
             render: (_, record) => {
                 const ds = getDistributionInfo(record);
-                if (!ds) return <Text type="secondary" style={{ fontSize: 12 }}>-</Text>;
+                if (!ds) return <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>-</Text>;
                 return (
                     <a
                         onClick={(e) => { e.stopPropagation(); navigate(`/distributions/sets/${ds.id}`); }}
                         style={{ cursor: 'pointer' }}
                     >
-                        <Text ellipsis style={{ maxWidth: 160, fontSize: 12 }}>{ds.name}</Text>
+                        <Text ellipsis style={{ maxWidth: 160, fontSize: 'var(--ant-font-size-sm)' }}>{ds.name}</Text>
                     </a>
                 );
             },
@@ -289,7 +289,7 @@ const ActionList: React.FC = () => {
             width: 100,
             render: (_, record) => (
                 <Tooltip title={record.createdAt ? dayjs(record.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>{record.createdAt ? dayjs(record.createdAt).fromNow() : '-'}</Text>
+                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{record.createdAt ? dayjs(record.createdAt).fromNow() : '-'}</Text>
                 </Tooltip>
             ),
         },
@@ -351,13 +351,14 @@ const ActionList: React.FC = () => {
         <StandardListLayout
             title={t('pageTitle')}
             subtitle={t('subtitle')}
+            description={t('list.description')}
             headerSubtitleExtra={
                 <LiveIndicator>
                     {isActivePolling ? t('polling.live', { defaultValue: 'Live (5s)' }) : t('polling.idle', { defaultValue: 'Idle (30s)' })}
                 </LiveIndicator>
             }
             headerExtra={
-                <Text type="secondary" style={{ fontSize: 12 }}>
+                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                     {t('lastUpdated', { defaultValue: 'Updated' })}: {lastUpdated}
                 </Text>
             }

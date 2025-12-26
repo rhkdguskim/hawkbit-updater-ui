@@ -519,7 +519,8 @@ const TargetList: React.FC = () => {
 
     return (
         <StandardListLayout
-            title={t('title')}
+            title={t('list.title')}
+            description={t('list.description')}
             searchBar={
                 <FilterBuilder
                     fields={filterFields}
@@ -640,7 +641,7 @@ const TargetList: React.FC = () => {
                     // Convert saved filter to FilterValue format
                     if (filter.query) {
                         setFilters([{
-                            id: `saved-${filter.id}`,
+                            id: `saved - ${filter.id} `,
                             field: 'query',
                             fieldLabel: 'Query',
                             operator: 'equals',

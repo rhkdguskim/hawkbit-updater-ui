@@ -22,12 +22,9 @@ import { useGetActions } from '@/api/generated/actions/actions';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { AirportSlideList, ActiveUpdatesCard } from '@/components/common';
 import type { MgmtAction, MgmtRolloutResponseBody } from '@/api/generated/model';
+import { PageLayout, PageHeader } from '@/components/patterns';
 import {
-    OverviewPageContainer,
-    OverviewPageHeader,
-    HeaderContent,
     OverviewScrollContent,
-    GradientTitle,
     TopRow,
     BottomRow,
     KPIGridContainer,
@@ -194,12 +191,10 @@ const RolloutsOverview: React.FC = () => {
     const totalActive = runningRollouts + runningActions;
 
     return (
-        <OverviewPageContainer>
-            <OverviewPageHeader>
-                <HeaderContent>
-                    <GradientTitle level={3} $theme="rollouts">
-                        {t('overview.title', 'Rollout Management')}
-                    </GradientTitle>
+        <PageLayout>
+            <PageHeader
+                title={t('overview.title', 'Rollout Management')}
+                description={
                     <Flex align="center" gap={12}>
                         <Text type="secondary" style={{ fontSize: 13 }}>
                             {t('overview.subtitle', 'Deployment rollout overview and monitoring')}
@@ -208,31 +203,33 @@ const RolloutsOverview: React.FC = () => {
                             {totalActive > 0 ? `${totalActive} ${t('common:status.active', 'Active')}` : t('common:status.idle', 'Idle')}
                         </LiveIndicator>
                     </Flex>
-                </HeaderContent>
-                <Flex align="center" gap={8}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                        {t('common:updated', 'Updated')}: {lastUpdated}
-                    </Text>
-                    <Button
-                        icon={<ReloadOutlined />}
-                        onClick={() => { refetchRollouts(); refetchActions(); }}
-                        loading={isLoading}
-                        size="small"
-                    >
-                        {t('common:actions.refresh', 'Refresh')}
-                    </Button>
-                    {isAdmin && (
+                }
+                actions={
+                    <Flex align="center" gap={8}>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                            {t('common:updated', 'Updated')}: {lastUpdated}
+                        </Text>
                         <Button
-                            type="primary"
-                            icon={<PlusOutlined />}
-                            onClick={() => setIsCreateModalOpen(true)}
+                            icon={<ReloadOutlined />}
+                            onClick={() => { refetchRollouts(); refetchActions(); }}
+                            loading={isLoading}
                             size="small"
                         >
-                            {t('overview.createRollout', 'Create')}
+                            {t('common:actions.refresh', 'Refresh')}
                         </Button>
-                    )}
-                </Flex>
-            </OverviewPageHeader>
+                        {isAdmin && (
+                            <Button
+                                type="primary"
+                                icon={<PlusOutlined />}
+                                onClick={() => setIsCreateModalOpen(true)}
+                                size="small"
+                            >
+                                {t('overview.createRollout', 'Create')}
+                            </Button>
+                        )}
+                    </Flex>
+                }
+            />
 
             <OverviewScrollContent>
                 {/* Top Row: 2x2 KPI Grid + 2 Pie Charts */}
@@ -434,7 +431,6 @@ const RolloutsOverview: React.FC = () => {
                                     items={activeRollouts}
                                     itemHeight={56}
                                     visibleCount={5}
-                                    interval={4000}
                                     fullHeight={true}
                                     renderItem={(rollout: MgmtRolloutResponseBody) => (
                                         <ActivityItem
@@ -558,7 +554,7 @@ const RolloutsOverview: React.FC = () => {
                     navigate(`/rollouts/${id}`);
                 }}
             />
-        </OverviewPageContainer>
+        </PageLayout>
     );
 };
 

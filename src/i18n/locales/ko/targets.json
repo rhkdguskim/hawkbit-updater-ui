@@ -2,6 +2,7 @@
     "title": "타겟 관리",
     "list": {
         "title": "타겟 목록",
+        "description": "IoT 타겟 검색, 필터링 및 배포 상태 관리",
         "addTarget": "타겟 추가",
         "addType": "유형 추가",
         "addTag": "태그 추가",
@@ -16,7 +17,8 @@
     "quickFilters": "빠른 필터",
     "manageFilters": "관리",
     "detail": {
-        "title": "타겟 상세",
+        "title": "타겟 상세 정보",
+        "description": "타겟의 상세 정보, 설치된 소프트웨어 및 실행 이력을 확인합니다.",
         "tabs": {
             "overview": "개요",
             "actions": "액션",

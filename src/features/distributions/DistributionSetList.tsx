@@ -289,6 +289,7 @@ const DistributionSetList: React.FC = () => {
     return (
         <StandardListLayout
             title={t('list.title')}
+            description={t('list.description')}
             searchBar={
                 <FilterBuilder
                     fields={filterFields}

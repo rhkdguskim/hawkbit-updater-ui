@@ -19,12 +19,9 @@ import { useGetDistributionSetTags } from '@/api/generated/distribution-set-tags
 import { useGetDistributionSetTypes } from '@/api/generated/distribution-set-types/distribution-set-types';
 import { AirportSlideList } from '@/components/common';
 import type { MgmtDistributionSet, MgmtSoftwareModule } from '@/api/generated/model';
+import { PageLayout, PageHeader } from '@/components/patterns';
 import {
-    OverviewPageContainer,
-    OverviewPageHeader,
-    HeaderContent,
     OverviewScrollContent,
-    GradientTitle,
     TopRow,
     BottomRow,
     KPIGridContainer,
@@ -118,12 +115,10 @@ const DistributionsOverview: React.FC = () => {
     );
 
     return (
-        <OverviewPageContainer>
-            <OverviewPageHeader>
-                <HeaderContent>
-                    <GradientTitle level={3} $theme="distributions">
-                        {t('overview.title')}
-                    </GradientTitle>
+        <PageLayout>
+            <PageHeader
+                title={t('overview.title')}
+                description={
                     <Flex align="center" gap={12}>
                         <Text type="secondary" style={{ fontSize: 13 }}>
                             {t('overview.subtitle', 'Distribution sets and software modules overview')}
@@ -132,21 +127,23 @@ const DistributionsOverview: React.FC = () => {
                             {setsCount > 0 ? t('common:status.active', 'Active') : t('common:status.idle', 'Idle')}
                         </LiveIndicator>
                     </Flex>
-                </HeaderContent>
-                <Flex align="center" gap={8}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                        {t('common:updated', 'Updated')}: {lastUpdated}
-                    </Text>
-                    <Button
-                        icon={<ReloadOutlined />}
-                        onClick={refetch}
-                        loading={isLoading}
-                        size="small"
-                    >
-                        {t('common:actions.refresh')}
-                    </Button>
-                </Flex>
-            </OverviewPageHeader>
+                }
+                actions={
+                    <Flex align="center" gap={8}>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                            {t('common:updated', 'Updated')}: {lastUpdated}
+                        </Text>
+                        <Button
+                            icon={<ReloadOutlined />}
+                            onClick={refetch}
+                            loading={isLoading}
+                            size="small"
+                        >
+                            {t('common:actions.refresh')}
+                        </Button>
+                    </Flex>
+                }
+            />
 
             <OverviewScrollContent>
                 {/* Top Row: KPI Cards + 2 Pie Charts */}
@@ -326,7 +323,6 @@ const DistributionsOverview: React.FC = () => {
                                     items={recentSets}
                                     itemHeight={52}
                                     visibleCount={5}
-                                    interval={3000}
                                     fullHeight={true}
                                     renderItem={(record: MgmtDistributionSet) => (
                                         <ActivityItem
@@ -389,7 +385,6 @@ const DistributionsOverview: React.FC = () => {
                                     items={recentModules}
                                     itemHeight={52}
                                     visibleCount={5}
-                                    interval={3500}
                                     fullHeight={true}
                                     renderItem={(record: MgmtSoftwareModule) => (
                                         <ActivityItem
@@ -430,7 +425,7 @@ const DistributionsOverview: React.FC = () => {
                     </OverviewListCard>
                 </BottomRow>
             </OverviewScrollContent>
-        </OverviewPageContainer>
+        </PageLayout>
     );
 };
 

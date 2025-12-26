@@ -26,13 +26,13 @@ const IconBadge = styled.div<{ $color: string }>`
     justify-content: center;
     background: ${props => props.$color};
     color: white;
-    font-size: 14px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-size: var(--ant-font-size);
+    box-shadow: var(--ant-box-shadow-tertiary, 0 2px 8px rgba(0, 0, 0, 0.15));
     flex-shrink: 0;
 `;
 
 const MiniNumber = styled.div<{ $color?: string }>`
-    font-size: 18px;
+    font-size: 1.25rem;
     font-weight: 700;
     line-height: 1.2;
     color: ${props => props.$color || 'var(--ant-color-text)'};
@@ -85,8 +85,8 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
             label: t('kpi.totalDevices', 'Total Devices'),
             value: totalDevices,
             icon: <AppstoreOutlined />,
-            color: '#3b82f6',
-            gradient: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
+            color: 'var(--ant-color-primary, #3b82f6)',
+            gradient: 'var(--gradient-primary, linear-gradient(135deg, #3b82f6 0%, #6366f1 100%))',
             onClick: () => navigate('/targets'),
         },
         {
@@ -122,7 +122,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
             label: t('kpi.distributions', 'Distributions'),
             value: distributionSetsCount,
             icon: <CodeOutlined />,
-            color: '#6366f1',
+            color: 'var(--ant-color-primary)',
             gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
             onClick: () => navigate('/distributions'),
         },
@@ -131,7 +131,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
             label: t('kpi.activeRollouts', 'Running'),
             value: runningRolloutCount,
             icon: <RocketOutlined />,
-            color: '#f59e0b',
+            color: COLORS.offline,
             gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
             pulse: runningRolloutCount > 0,
             onClick: () => navigate('/rollouts'),
@@ -150,7 +150,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
             label: t('kpi.errors', 'Errors'),
             value: errorCount,
             icon: <ExclamationCircleOutlined />,
-            color: errorCount > 0 ? COLORS.error : '#94a3b8',
+            color: errorCount > 0 ? COLORS.error : 'var(--ant-color-text-description)',
             gradient: errorCount > 0 ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)',
             pulse: errorCount > 0,
             onClick: () => navigate('/targets'),
@@ -177,7 +177,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
                             </IconBadge>
                             <Flex vertical gap={0} style={{ flex: 1, minWidth: 0 }}>
                                 <MiniNumber $color={card.color}>{card.value}</MiniNumber>
-                                <Text type="secondary" style={{ fontSize: 10, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                <Text type="secondary" style={{ fontSize: '0.75rem', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                     {card.label}
                                 </Text>
                             </Flex>

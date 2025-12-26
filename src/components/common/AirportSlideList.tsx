@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 
 const scrollAnimation = keyframes`
     0% {
@@ -27,7 +27,9 @@ const Container = styled.div<{ $fullHeight?: boolean }>`
 
 const SlideWrapper = styled.div<{ $shouldAnimate: boolean; $duration: number }>`
     width: 100%;
-    animation: ${props => props.$shouldAnimate ? `${scrollAnimation} ${props.$duration}s linear infinite` : 'none'};
+    ${props => props.$shouldAnimate && css`
+        animation: ${scrollAnimation} ${props.$duration}s linear infinite;
+    `}
 `;
 
 const ItemRow = styled.div<{ $height: number }>`

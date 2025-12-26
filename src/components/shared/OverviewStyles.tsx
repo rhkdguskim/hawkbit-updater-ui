@@ -12,7 +12,12 @@ export const pulse = keyframes`
     50% { opacity: 0.6; }
 `;
 
-// Color Theme Definitions
+export const shimmer = keyframes`
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+`;
+
+// Color Theme Definitions - Combined from Dashboard & Feature Overviews
 export const OVERVIEW_THEMES = {
     targets: {
         gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
@@ -41,6 +46,31 @@ export const OVERVIEW_THEMES = {
         accentBorder: 'rgba(245, 158, 11, 0.2)',
         iconBg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
         color: 'var(--ant-color-warning, #f59e0b)',
+    },
+    // Dashboard Specific / Additional Themes
+    connectivity: {
+        gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+        accentLight: 'rgba(16, 185, 129, 0.08)',
+        accentBorder: 'rgba(16, 185, 129, 0.2)',
+        iconBg: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    },
+    deployment: {
+        gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+        accentLight: 'rgba(59, 130, 246, 0.08)',
+        accentBorder: 'rgba(59, 130, 246, 0.2)',
+        iconBg: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    },
+    fragmentation: {
+        gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+        accentLight: 'rgba(236, 72, 153, 0.08)',
+        accentBorder: 'rgba(236, 72, 153, 0.2)',
+        iconBg: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+    },
+    activity: {
+        gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+        accentLight: 'rgba(6, 182, 212, 0.08)',
+        accentBorder: 'rgba(6, 182, 212, 0.2)',
+        iconBg: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
     },
 };
 
@@ -243,7 +273,7 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
     }
     
     .ant-card-head-title {
-        font-size: 14px;
+        font-size: var(--ant-font-size);
         font-weight: 600;
         color: var(--ant-color-text, #1e293b);
         padding: 4px 0;
@@ -265,10 +295,6 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
         .ant-card-head {
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
-        
-        .ant-card-head-title {
-            color: #f8fafc;
-        }
     }
 `;
 
@@ -277,9 +303,9 @@ export const OverviewListCard = styled(OverviewChartCard)`
     `;
 
 export const IconBadge = styled.div<{ $theme?: keyof typeof OVERVIEW_THEMES; $color?: string }>`
-    width: 36px;
-    height: 36px;
-    border-radius: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -289,25 +315,25 @@ export const IconBadge = styled.div<{ $theme?: keyof typeof OVERVIEW_THEMES; $co
         return theme?.iconBg || 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
     }};
     color: white;
-    font-size: 18px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    font-size: 1.1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     flex-shrink: 0;
 `;
 
 export const BigNumber = styled.div<{ $color?: string }>`
-font-size: 32px;
+font-size: 2rem;
 font-weight: 700;
 line-height: 1.2;
 margin-bottom: 4px;
 color: ${props => props.$color || 'var(--ant-color-primary, #3b82f6)'};
 `;
 
-export const LiveIndicator = styled.div<{ $color?: string; $active?: boolean }>`
+export const LiveIndicator = styled.div<{ $active?: boolean; $color?: string }>`
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: ${props => props.$color || '#64748b'};
+    gap: 6px;
+    font-size: var(--ant-font-size-sm);
+    color: ${props => props.$active ? (props.$color || 'var(--ant-color-success)') : 'var(--ant-color-text-quaternary)'};
     font-weight: 500;
     
     &::before {
@@ -342,7 +368,7 @@ export const ChartLegendItem = styled.div`
         background: linear-gradient(135deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.6) 100%);
         border: 1px solid rgba(255, 255, 255, 0.03);
         
-        span { color: #94a3b8 !important; }
+        span { color: var(--ant-color-text-description, #94a3b8) !important; }
     }
 `;
 
@@ -378,7 +404,7 @@ export const StatusBadge = styled.div<{ $status?: string }>`
     gap: 8px;
     padding: 8px 12px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: var(--ant-font-size-sm);
     font-weight: 500;
     
     ${props => {
@@ -391,11 +417,11 @@ export const StatusBadge = styled.div<{ $status?: string }>`
             background: rgba(59, 130, 246, 0.1);
             color: #2563eb;
         `;
-        if (status === 'offline' || status === 'incomplete') return css`
+        if (status === 'offline' || status === 'incomplete' || status === 'paused') return css`
             background: rgba(245, 158, 11, 0.1);
             color: #d97706;
         `;
-        if (status === 'error') return css`
+        if (status === 'error' || status === 'failed') return css`
             background: rgba(239, 68, 68, 0.1);
             color: #dc2626;
         `;
@@ -404,6 +430,27 @@ export const StatusBadge = styled.div<{ $status?: string }>`
             color: #64748b;
         `;
     }}
+`;
+
+export const ProgressBar = styled.div<{ $progress: number; $color?: string }>`
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: ${props => props.$progress}%;
+        background: ${props => props.$color || 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)'};
+        border-radius: 3px;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 `;
 
 export const COLORS = {

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import styled from 'styled-components';
+import React, { useMemo } from 'react';
+import styled, { keyframes, css } from 'styled-components';
 import { Typography, Flex, Empty } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { CloudServerOutlined } from '@ant-design/icons';
@@ -9,15 +9,30 @@ import type { MgmtTarget, MgmtAction } from '@/api/generated/model';
 
 const { Text } = Typography;
 
-const SlideWrapper = styled.div<{ $offsetLine: number; $rowHeight: number; $gap: number; $isAnimating: boolean }>`
-    transform: translateY(-${props => props.$offsetLine * (props.$rowHeight + props.$gap)}px);
-    transition: ${props => props.$isAnimating ? 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)' : 'none'};
+const scrollAnimation = keyframes`
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-50%);
+    }
+`;
+
+const SlideWrapper = styled.div<{ $duration: number; $shouldAnimate: boolean }>`
+    width: 100%;
+    ${props => props.$shouldAnimate && css`
+        animation: ${scrollAnimation} ${props.$duration}s linear infinite;
+    `}
 `;
 
 const Viewport = styled.div`
     flex: 1;
     min-height: 0;
     overflow: hidden;
+
+    &:hover .slide-wrapper {
+        animation-play-state: paused;
+    }
 `;
 
 const GridRow = styled.div<{ $cols: number; $gap: number }>`
@@ -37,6 +52,7 @@ interface DeviceCardGridProps {
     gap?: number;
     rowHeight?: number;
     targetTypeColorMap?: Map<string, string>;
+    scrollSpeed?: number; // pixels per second
 }
 
 const DeviceCardGrid: React.FC<DeviceCardGridProps> = ({
@@ -50,10 +66,9 @@ const DeviceCardGrid: React.FC<DeviceCardGridProps> = ({
     gap = 8,
     rowHeight = 90,
     targetTypeColorMap,
+    scrollSpeed = 30,
 }) => {
     const { t } = useTranslation('dashboard');
-    const [offsetLine, setOffsetLine] = useState(0);
-    const [isAnimating, setIsAnimating] = useState(false);
 
     // Build a map of controllerId to most recent action
     const actionMap = useMemo(() => {
@@ -92,33 +107,18 @@ const DeviceCardGrid: React.FC<DeviceCardGridProps> = ({
         return rowsArr;
     }, [sortedTargets, cols]);
 
-    // Virtual items for seamless looping
+    const shouldAnimate = gridRows.length > rows;
+
+    // Seamless looping rows
     const displayRows = useMemo(() => {
-        if (gridRows.length <= rows) return gridRows;
-        return [...gridRows, ...gridRows.slice(0, rows)];
-    }, [gridRows, rows]);
+        if (!shouldAnimate) return gridRows;
+        return [...gridRows, ...gridRows];
+    }, [gridRows, shouldAnimate]);
 
-    // Animation Logic
-    useEffect(() => {
-        if (gridRows.length <= rows) return;
-
-        const interval = setInterval(() => {
-            setIsAnimating(true);
-            setOffsetLine(prev => prev + 1);
-        }, 4000);
-
-        return () => clearInterval(interval);
-    }, [gridRows.length, rows]);
-
-    useEffect(() => {
-        if (offsetLine >= gridRows.length) {
-            const resetTimer = setTimeout(() => {
-                setIsAnimating(false);
-                setOffsetLine(0);
-            }, 600);
-            return () => clearTimeout(resetTimer);
-        }
-    }, [offsetLine, gridRows.length]);
+    // Calculate animation duration based on scroll speed
+    // Total distance to scroll = gridRows.length * (rowHeight + gap)
+    const totalScrollDistance = gridRows.length * (rowHeight + gap);
+    const animationDuration = totalScrollDistance / scrollSpeed;
 
     const viewPortHeight = (rowHeight * rows) + (gap * (rows - 1));
     const resolvedTitle = title || t('deviceGrid.title', '디바이스 상태 그리드');
@@ -157,14 +157,13 @@ const DeviceCardGrid: React.FC<DeviceCardGridProps> = ({
             ) : sortedTargets.length > 0 ? (
                 <Viewport>
                     <SlideWrapper
-                        $offsetLine={offsetLine}
-                        $rowHeight={rowHeight}
-                        $gap={gap}
-                        $isAnimating={isAnimating}
+                        className="slide-wrapper"
+                        $duration={animationDuration}
+                        $shouldAnimate={shouldAnimate}
                     >
                         <Flex vertical gap={gap}>
                             {displayRows.map((rowItems, rowIndex) => (
-                                <GridRow key={`row-${rowIndex}`} $cols={cols} $gap={gap}>
+                                <GridRow key={`row-${rowIndex}`} $cols={cols} $gap={gap} style={{ height: rowHeight }}>
                                     {rowItems.map((target, colIndex) => (
                                         <DeviceCard
                                             key={`${target.controllerId}-${rowIndex}-${colIndex}`}
