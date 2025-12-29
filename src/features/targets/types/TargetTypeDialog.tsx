@@ -51,16 +51,19 @@ const TargetTypeDialog: React.FC<TargetTypeDialogProps> = ({
                     description: initialData.description,
                     colour: initialData.colour,
                 });
-                // Set compatible DS types from fetched data
-                if (compatibleDsTypes) {
-                    setSelectedDsTypes(compatibleDsTypes.map(dt => dt.id));
-                }
             } else {
                 form.resetFields();
-                setSelectedDsTypes([]);
+                setSelectedDsTypes([]); // Clear selection on create mode
             }
         }
-    }, [open, mode, initialData, form, compatibleDsTypes]);
+    }, [open, mode, initialData, form]);
+
+    // Update selected types when data loads
+    useEffect(() => {
+        if (open && mode === 'edit' && compatibleDsTypes) {
+            setSelectedDsTypes(compatibleDsTypes.map(dt => dt.id));
+        }
+    }, [open, mode, compatibleDsTypes]);
 
     const handleOk = async () => {
         try {
