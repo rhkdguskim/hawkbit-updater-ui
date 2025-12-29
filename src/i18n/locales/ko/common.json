@@ -3,6 +3,7 @@
     "updated": "업데이트",
     "createdAt": "생성일",
     "nav": {
+        "home": "홈",
         "dashboard": "대시보드",
         "targets": "타겟 관리",
         "targetList": "타겟",

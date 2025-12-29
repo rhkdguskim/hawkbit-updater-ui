@@ -21,9 +21,15 @@ import {
     Row,
     Col,
     Flex,
+    Modal,
 } from 'antd';
-import { ArrowLeftOutlined, ReloadOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ReloadOutlined, AppstoreAddOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+import { useApprovalPolicyStore } from '@/stores/useApprovalPolicyStore';
+
+dayjs.extend(isBetween);
 import { useCreate, useStart, getRollouts } from '@/api/generated/rollouts/rollouts';
 import { useGetDistributionSets, useGetAssignedSoftwareModules } from '@/api/generated/distribution-sets/distribution-sets';
 import { useGetArtifacts } from '@/api/generated/software-modules/software-modules';
@@ -33,6 +39,8 @@ import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import { useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { buildCondition, combineWithAnd, combineWithOr, escapeValue } from '@/utils/fiql';
+
+import RolloutTemplateModal from './RolloutTemplateModal';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -221,6 +229,24 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
         searchKeyword: '',
     });
 
+    const [templateModalOpen, setTemplateModalOpen] = useState(false);
+
+    const handleTemplateSelect = (template: any) => {
+        setFormData((prev) => ({
+            ...prev,
+            amountGroups: template.config.amountGroups,
+            successThreshold: template.config.successThreshold,
+            errorThreshold: template.config.errorThreshold,
+            startImmediately: template.config.startImmediately,
+        }));
+        groupSettingsForm.setFieldsValue({
+            amountGroups: template.config.amountGroups,
+            successThreshold: template.config.successThreshold,
+            errorThreshold: template.config.errorThreshold,
+            startImmediately: template.config.startImmediately,
+        });
+    };
+
     useEffect(() => {
         if (filterMode === 'builder') {
             const timer = setTimeout(() => {
@@ -386,31 +412,95 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
             return;
         }
 
-        const finalQuery = builderState.allTargets && !formData.targetFilterQuery?.trim()
-            ? 'controllerId==*'
-            : formData.targetFilterQuery?.trim();
+        // Approval Policy Check
+        const { rules } = useApprovalPolicyStore.getState();
+        const activeRules = rules.filter(r => r.enabled);
+        const matchingRules: string[] = [];
 
-        const payload: any = {
-            name: formData.name,
-            description: formData.description || '',
-            distributionSetId: formData.distributionSetId,
-            amountGroups: formData.amountGroups,
-            successCondition: {
-                condition: 'THRESHOLD',
-                expression: formData.successThreshold.toString(),
-            },
-            errorCondition: {
-                condition: 'THRESHOLD',
-                expression: formData.errorThreshold.toString(),
-            },
-        };
+        for (const rule of activeRules) {
+            if (rule.type === 'target_count') {
+                const threshold = (rule.condition as any).threshold;
+                if ((targetsData?.total || 0) > threshold) {
+                    matchingRules.push(t('approvalPolicy.rules.target_count.title'));
+                }
+            } else if (rule.type === 'tag') {
+                const tag = (rule.condition as any).tag;
+                if (builderState.tags.includes(tag)) {
+                    matchingRules.push(t('approvalPolicy.rules.tag.title'));
+                }
+            } else if (rule.type === 'target_type') {
+                const targetType = (rule.condition as any).targetType;
+                if (builderState.targetTypes.includes(targetType)) {
+                    matchingRules.push(t('approvalPolicy.rules.target_type.title'));
+                }
+            } else if (rule.type === 'time_range') {
+                const now = dayjs();
+                const startStr = (rule.condition as any).start;
+                const endStr = (rule.condition as any).end;
+                const [startH, startM] = startStr.split(':').map(Number);
+                const [endH, endM] = endStr.split(':').map(Number);
+                const start = dayjs().hour(startH).minute(startM);
+                const end = dayjs().hour(endH).minute(endM);
 
-        // Only include targetFilterQuery if it's not empty/null
-        if (finalQuery && finalQuery.trim() !== '') {
-            payload.targetFilterQuery = finalQuery;
+                let isInside = false;
+                if (start.isAfter(end)) {
+                    isInside = now.isAfter(start) || now.isBefore(end);
+                } else {
+                    isInside = now.isBetween(start, end);
+                }
+
+                if (isInside) {
+                    matchingRules.push(t('approvalPolicy.rules.time_range.title'));
+                }
+            }
         }
 
-        createMutation.mutate({ data: payload });
+        const executeCreate = () => {
+            const finalQuery = builderState.allTargets && !formData.targetFilterQuery?.trim()
+                ? 'controllerId==*'
+                : formData.targetFilterQuery?.trim();
+
+            const payload: any = {
+                name: formData.name,
+                description: formData.description || '',
+                distributionSetId: formData.distributionSetId,
+                amountGroups: formData.amountGroups,
+                successCondition: {
+                    condition: 'THRESHOLD',
+                    expression: formData.successThreshold.toString(),
+                },
+                errorCondition: {
+                    condition: 'THRESHOLD',
+                    expression: formData.errorThreshold.toString(),
+                },
+            };
+
+            if (finalQuery && finalQuery.trim() !== '') {
+                payload.targetFilterQuery = finalQuery;
+            }
+
+            createMutation.mutate({ data: payload });
+        };
+
+        if (matchingRules.length > 0) {
+            Modal.confirm({
+                title: t('approvalPolicy.confirmTitle', { defaultValue: 'Approval Required' }),
+                content: (
+                    <Flex vertical gap={12}>
+                        <Text>{t('approvalPolicy.matchingRulesDesc', { defaultValue: 'The following local approval policies are applicable:' })}</Text>
+                        <ul>
+                            {matchingRules.map((r, i) => <li key={i}><Text strong>{r}</Text></li>)}
+                        </ul>
+                        <Text type="secondary">{t('approvalPolicy.proceedConfirm', { defaultValue: 'Do you want to proceed anyway? Note: Final approval requirement depends on server configuration.' })}</Text>
+                    </Flex>
+                ),
+                okText: t('common:confirm'),
+                cancelText: t('common:cancel'),
+                onOk: executeCreate,
+            });
+        } else {
+            executeCreate();
+        }
     };
 
     const renderBasicInfoStep = () => (
@@ -699,7 +789,15 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
         const remainder = totalTargets % amountGroups;
 
         return (
-            <Card title={t('wizard.groupSettings.title')} style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}>
+            <Card
+                title={t('wizard.groupSettings.title')}
+                extra={
+                    <Button icon={<AppstoreAddOutlined />} onClick={() => setTemplateModalOpen(true)}>
+                        {t('wizard.loadTemplate')}
+                    </Button>
+                }
+                style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}
+            >
                 <Form
                     form={groupSettingsForm}
                     layout="vertical"
@@ -885,6 +983,18 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                     </Row>
                 )}
             </div>
+
+            <RolloutTemplateModal
+                open={templateModalOpen}
+                onClose={() => setTemplateModalOpen(false)}
+                onSelect={handleTemplateSelect}
+                currentConfig={{
+                    amountGroups: formData.amountGroups,
+                    successThreshold: formData.successThreshold,
+                    errorThreshold: formData.errorThreshold,
+                    startImmediately: formData.startImmediately,
+                }}
+            />
         </PageContainer>
     );
 };

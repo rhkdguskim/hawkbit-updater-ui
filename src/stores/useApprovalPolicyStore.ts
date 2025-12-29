@@ -1,11 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export type ApprovalRuleCondition =
+    | { threshold: number }
+    | { tag: string }
+    | { targetType: string }
+    | { start: string; end: string };
+
 export interface ApprovalRule {
     id: string;
     type: 'target_count' | 'tag' | 'target_type' | 'time_range';
     enabled: boolean;
-    condition: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    condition: any; // Using any for flexibility in store but we will cast in components or use better union
     priority: number;
 }
 
@@ -14,6 +21,7 @@ interface ApprovalPolicyState {
     rules: ApprovalRule[];
     setGlobalEnabled: (enabled: boolean) => void;
     toggleRule: (id: string, enabled: boolean) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updateRule: (id: string, condition: any) => void;
 }
 

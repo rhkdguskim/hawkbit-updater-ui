@@ -64,6 +64,8 @@ import {
 } from './ConfigurationStyles';
 import type { GroupThemeKey } from './ConfigurationStyles';
 
+import ApprovalPolicyCard from './components/ApprovalPolicyCard';
+
 const { Text } = Typography;
 
 // Configuration group definitions
@@ -598,6 +600,7 @@ const Configuration: React.FC = () => {
 
             <ConfigGroupsContainer>
                 {allGroups.map((group, index) => renderGroup(group, index))}
+                <ApprovalPolicyCard isEditMode={isEditMode} />
             </ConfigGroupsContainer>
         </ConfigPageContainer>
     );

@@ -91,5 +91,27 @@
     "errors": {
         "loadFailed": "설정 로드 실패",
         "loadFailedDesc": "시스템 설정을 가져올 수 없습니다. 권한을 확인해주세요."
+    },
+    "approvalPolicy": {
+        "title": "승인 정책 설정 (로컬)",
+        "desc": "UI 관리 계층에서 강제되는 추가 승인 규칙을 정의합니다.",
+        "rules": {
+            "target_count": {
+                "title": "타겟 수 제한",
+                "desc": "선택된 타겟 수가 임계값을 초과할 경우 승인 필요"
+            },
+            "tag": {
+                "title": "제한된 태그",
+                "desc": "타겟이 특정 태그(예: production)를 포함할 경우 승인 필요"
+            },
+            "target_type": {
+                "title": "제한된 타입",
+                "desc": "타겟이 특정 타입에 속할 경우 승인 필요"
+            },
+            "time_range": {
+                "title": "업무 시간 외 배포",
+                "desc": "특정 시간대(예: 야간)에 예정된 롤아웃의 경우 승인 필요"
+            }
+        }
     }
 }

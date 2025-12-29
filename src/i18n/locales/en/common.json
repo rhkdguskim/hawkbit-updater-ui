@@ -3,6 +3,7 @@
     "updated": "Updated",
     "createdAt": "Created At",
     "nav": {
+        "home": "Home",
         "dashboard": "Dashboard",
         "targets": "Targets",
         "targetList": "Targets",

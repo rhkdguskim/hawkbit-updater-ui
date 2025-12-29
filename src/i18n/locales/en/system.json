@@ -91,5 +91,27 @@
     "errors": {
         "loadFailed": "Failed to load configuration",
         "loadFailedDesc": "Unable to fetch system configuration. Please check your permissions."
+    },
+    "approvalPolicy": {
+        "title": "Approval Policies (Local)",
+        "desc": "Define additional approval rules that are enforced by the UI management layer.",
+        "rules": {
+            "target_count": {
+                "title": "Target Limit",
+                "desc": "Require approval if target count exceeds threshold"
+            },
+            "tag": {
+                "title": "Restricted Tag",
+                "desc": "Require approval if targets have specific tags (e.g. production)"
+            },
+            "target_type": {
+                "title": "Restricted Type",
+                "desc": "Require approval if targets belong to specific types"
+            },
+            "time_range": {
+                "title": "Off-Business Hours",
+                "desc": "Require approval for rollouts scheduled during specific time windows"
+            }
+        }
     }
 }
