@@ -10,7 +10,6 @@ import {
     ExclamationCircleOutlined,
     RocketOutlined,
     ThunderboltOutlined,
-    CodeOutlined,
 } from '@ant-design/icons';
 import { StatsCard, COLORS } from '../DashboardStyles';
 import styled from 'styled-components';
@@ -46,12 +45,12 @@ interface IntegratedKPICardsProps {
     inSyncCount: number;
     pendingCount: number;
     errorCount: number;
-    // Distributions
-    distributionSetsCount: number;
     // Rollouts
     runningRolloutCount: number;
     // Actions
     successRate: number | null;
+    currentVelocity: number;
+    onErrorClick?: () => void;
 }
 
 interface KPICardConfig {
@@ -72,9 +71,10 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
     inSyncCount,
     pendingCount,
     errorCount,
-    distributionSetsCount,
     runningRolloutCount,
     successRate,
+    currentVelocity,
+    onErrorClick,
 }) => {
     const { t } = useTranslation(['dashboard', 'common']);
     const navigate = useNavigate();
@@ -118,13 +118,14 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
             onClick: () => navigate('/targets'),
         },
         {
-            key: 'distributions',
-            label: t('kpi.distributions', 'Distributions'),
-            value: distributionSetsCount,
-            icon: <CodeOutlined />,
+            key: 'velocity',
+            label: t('velocity.current', 'Current Speed'),
+            value: `${currentVelocity}`,
+            icon: <ThunderboltOutlined />,
             color: 'var(--ant-color-primary)',
-            gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-            onClick: () => navigate('/distributions'),
+            gradient: 'linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%)',
+            pulse: currentVelocity > 0,
+            onClick: () => navigate('/actions'),
         },
         {
             key: 'rollouts',
@@ -153,7 +154,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
             color: errorCount > 0 ? COLORS.error : 'var(--ant-color-text-description)',
             gradient: errorCount > 0 ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)',
             pulse: errorCount > 0,
-            onClick: () => navigate('/targets'),
+            onClick: () => onErrorClick ? onErrorClick() : navigate('/targets'),
         },
     ];
 

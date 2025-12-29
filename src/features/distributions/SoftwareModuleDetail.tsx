@@ -1,7 +1,8 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Descriptions, Tabs, Table, Button, Upload, message, Modal, Space, Tag, Tooltip, List, Badge, Breadcrumb } from 'antd';
-import { DeleteOutlined, DownloadOutlined, FileOutlined, InboxOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, DownloadOutlined, FileOutlined, InboxOutlined, InfoCircleOutlined, EyeOutlined } from '@ant-design/icons';
+import ArtifactVerificationCard from './components/ArtifactVerificationCard';
 import {
     useGetSoftwareModule,
     useGetArtifacts,
@@ -38,6 +39,8 @@ const SoftwareModuleDetail: React.FC = () => {
         file: File;
     }
     const [uploadJobs, setUploadJobs] = useState<UploadJob[]>([]);
+    const [selectedArtifact, setSelectedArtifact] = useState<MgmtArtifact | null>(null);
+    const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
     const uploadQueueRef = useRef<UploadQueueItem[]>([]);
     const isProcessingRef = useRef(false);
     const badgeStatusMap: Record<UploadJobStatus, 'default' | 'processing' | 'success' | 'error'> = {
@@ -269,6 +272,16 @@ const SoftwareModuleDetail: React.FC = () => {
                         key: 'actions',
                         render: (_, record: MgmtArtifact) => (
                             <Space>
+                                <Tooltip title={t('detail.verification.title')}>
+                                    <Button
+                                        icon={<EyeOutlined />}
+                                        type="text"
+                                        onClick={() => {
+                                            setSelectedArtifact(record);
+                                            setIsVerificationModalOpen(true);
+                                        }}
+                                    />
+                                </Tooltip>
                                 <Tooltip title={t('detail.download')}>
                                     <Button
                                         icon={<DownloadOutlined />}
@@ -332,6 +345,22 @@ const SoftwareModuleDetail: React.FC = () => {
                     ]}
                 />
             </SectionCard>
+
+            <Modal
+                title={t('detail.verification.title')}
+                open={isVerificationModalOpen}
+                onCancel={() => setIsVerificationModalOpen(false)}
+                footer={null}
+                width={600}
+                destroyOnClose
+            >
+                {selectedArtifact && (
+                    <ArtifactVerificationCard
+                        artifact={selectedArtifact}
+                        softwareModuleId={softwareModuleId}
+                    />
+                )}
+            </Modal>
         </PageContainer>
     );
 };

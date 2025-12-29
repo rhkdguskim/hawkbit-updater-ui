@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { TagOutlined, AppstoreOutlined, DeleteOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
+import { TagOutlined, AppstoreOutlined, DeleteOutlined, UploadOutlined, DownloadOutlined, TagsOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import {
@@ -11,6 +11,7 @@ import {
     BulkDeleteTargetModal,
     SavedFiltersModal,
     ImportTargetsModal,
+    BulkEditMetadataModal,
 } from './components';
 import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction } from '@/components/patterns';
 import { useTargetListModel } from './hooks/useTargetListModel';
@@ -35,6 +36,12 @@ const TargetList: React.FC = () => {
                 label: t('bulkAssign.assignType'),
                 icon: <AppstoreOutlined />,
                 onClick: () => model.setBulkTypeModalOpen(true),
+            },
+            {
+                key: 'bulkEditTags',
+                label: t('bulkEdit.title'),
+                icon: <TagsOutlined />,
+                onClick: () => model.setBulkEditModalOpen(true),
             },
         ];
         if (isAdmin) {
@@ -73,6 +80,9 @@ const TargetList: React.FC = () => {
                     canAdd={isAdmin}
                     addLabel={t('actions.addTarget')}
                     loading={model.targetsLoading || model.targetsFetching}
+                    buildQuery={model.buildFinalQuery}
+                    onApplySavedFilter={model.handleApplySavedFilter}
+                    onManageSavedFilters={() => model.setSavedFiltersOpen(true)}
                     extra={
                         <>
                             <Button
@@ -216,6 +226,17 @@ const TargetList: React.FC = () => {
                 onCancel={() => model.setImportModalOpen(false)}
                 onSuccess={() => {
                     model.setImportModalOpen(false);
+                    model.refetchTargets();
+                }}
+            />
+
+            <BulkEditMetadataModal
+                open={model.bulkEditModalOpen}
+                targetIds={model.selectedTargetIds as string[]}
+                onCancel={() => model.setBulkEditModalOpen(false)}
+                onSuccess={() => {
+                    model.setBulkEditModalOpen(false);
+                    model.setSelectedTargetIds([]);
                     model.refetchTargets();
                 }}
             />

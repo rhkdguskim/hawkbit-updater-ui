@@ -227,6 +227,75 @@ export const useDashboardMetrics = () => {
 
     const isActivePolling = activeRolloutCount > 0 || pendingCount > 0;
 
+    // 12. Deployment Velocity Calculation
+    const velocityData = useMemo(() => {
+        const now = dayjs();
+        const sixtyMinutesAgo = now.subtract(60, 'minute');
+
+        // Filter actions that finished in the last hour
+        // We only have the last 100 actions from the server, 
+        // which is a limitation but we work with what we have.
+        const finishedInLastHour = actions.filter(a => {
+            if (a.status?.toLowerCase() !== 'finished' || !a.lastModifiedAt) return false;
+            return dayjs(a.lastModifiedAt).isAfter(sixtyMinutesAgo);
+        });
+
+        // Current velocity (last 5 minutes average)
+        const fiveMinutesAgo = now.subtract(5, 'minute');
+        const finishedInLast5 = finishedInLastHour.filter(a =>
+            dayjs(a.lastModifiedAt).isAfter(fiveMinutesAgo)
+        ).length;
+
+        const currentVelocity = parseFloat((finishedInLast5 / 5).toFixed(1));
+
+        // Trend data (6 slots of 10 minutes)
+        const slots = 6;
+        const interval = 10;
+        const trend = Array.from({ length: slots }).map((_, i) => {
+            const end = now.subtract((slots - 1 - i) * interval, 'minute');
+            const start = end.subtract(interval, 'minute');
+            const count = finishedInLastHour.filter(a => {
+                const finishedAt = dayjs(a.lastModifiedAt);
+                return (finishedAt.isAfter(start) || finishedAt.isSame(start)) && finishedAt.isBefore(end);
+            }).length;
+
+            return {
+                time: end.format('HH:mm'),
+                rate: parseFloat((count / interval).toFixed(1)),
+                count
+            };
+        });
+
+        return { currentVelocity, trend };
+    }, [actions]);
+
+    // 13. Error Analysis Calculation
+    const errorAnalysis = useMemo(() => {
+        const errorActions = actions.filter(a =>
+            a.status?.toLowerCase() === 'error' ||
+            a.status?.toLowerCase() === 'canceled' ||
+            a.status?.toLowerCase() === 'warning'
+        );
+
+        const groups: Record<string, { count: number; actions: any[] }> = {};
+
+        errorActions.forEach(a => {
+            const cause = a.detailStatus || 'Unknown Error';
+            if (!groups[cause]) {
+                groups[cause] = { count: 0, actions: [] };
+            }
+            groups[cause].count++;
+            groups[cause].actions.push(a);
+        });
+
+        return Object.entries(groups).map(([cause, data]) => ({
+            cause,
+            count: data.count,
+            percentage: errorActions.length > 0 ? Math.round((data.count / errorActions.length) * 100) : 0,
+            actions: data.actions
+        })).sort((a, b) => b.count - a.count);
+    }, [actions]);
+
     return {
         // State
         isLoading,
@@ -267,6 +336,8 @@ export const useDashboardMetrics = () => {
         // Deployment Metrics
         deploymentRate,
         deploymentRateLabel,
+        velocityData,
+        errorAnalysis,
 
         // Fragmentation Metrics
         fragmentationStats,
@@ -283,5 +354,6 @@ export const useDashboardMetrics = () => {
 
         // Helper
         isActionErrored,
+        isActionFinished: (a: any) => a.status?.toLowerCase() === 'finished',
     };
 };

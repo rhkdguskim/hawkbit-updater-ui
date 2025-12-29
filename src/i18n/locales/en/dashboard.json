@@ -65,7 +65,20 @@
         "targets": "targets",
         "rolloutStatus": "Rollout Status",
         "actionStatus": "Action Status (24h)",
-        "fragmentation": "Target Update Status"
+        "fragmentation": "Target Update Status",
+        "velocity": "Deployment Velocity",
+        "velocityDesc": "Action completion rate per minute"
+    },
+    "velocity": {
+        "title": "Deployment Velocity Monitor",
+        "current": "Current Speed",
+        "trend": "Last 1h Trend",
+        "unit": "act/min",
+        "status": {
+            "slow": "Slow",
+            "normal": "Normal",
+            "fast": "Fast"
+        }
     },
     "recentActions": {
         "title": "Recent Actions (24h)",
