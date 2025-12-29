@@ -1,4 +1,29 @@
 {
+    "templates": {
+        "title": "Rollout Templates",
+        "createNew": "Create New Template",
+        "saveCurrentAsTemplate": "Save Configuration as Template",
+        "defaultTemplates": "Default Templates",
+        "customTemplates": "My Templates",
+        "name": "Template Name",
+        "namePlaceholder": "e.g., Standard Phase Rollout",
+        "nameRequired": "Please enter a template name.",
+        "description": "Description",
+        "descriptionPlaceholder": "Briefly describe the rollout strategy",
+        "default": "Default",
+        "groups": "Groups",
+        "success": "Success",
+        "error": "Error",
+        "createSuccess": "Template created successfully.",
+        "deleteSuccess": "Template deleted.",
+        "applySuccess": "Template '{{name}}' applied.",
+        "noConfigToSave": "No configuration to save. Please set up groups first.",
+        "noCustomTemplates": "No custom templates yet. Create one or save current configuration!",
+        "noDescription": "No description",
+        "saveTemplate": "Save Template",
+        "deleteConfirm": "Are you sure you want to delete this template?",
+        "createFirst": "Create your first template"
+    },
     "pageTitle": "Rollouts",
     "list": {
         "title": "Rollouts",
@@ -120,6 +145,7 @@
     },
     "wizard": {
         "title": "Create Rollout",
+        "loadTemplate": "Load Template",
         "steps": {
             "basicInfo": "Basic Info",
             "distributionSet": "Distribution Set",

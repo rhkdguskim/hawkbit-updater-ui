@@ -5,8 +5,6 @@ import {
     Button,
     Space,
     Typography,
-    Table,
-    Tooltip,
     Popconfirm,
     Form,
     Input,
@@ -23,7 +21,6 @@ import {
     DeleteOutlined,
     StarOutlined,
     CopyOutlined,
-    EditOutlined,
     SaveOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';

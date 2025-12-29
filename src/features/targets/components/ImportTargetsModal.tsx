@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Modal, Upload, Button, Table, message, Alert, Typography } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import Papa from 'papaparse';
-import type { UploadFile } from 'antd/es/upload/interface';
 import { useCreateTargets, getGetTargetsQueryKey } from '@/api/generated/targets/targets';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';

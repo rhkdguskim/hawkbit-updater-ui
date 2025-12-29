@@ -256,6 +256,11 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
             label: t('nav.configuration'),
             icon: <SettingOutlined />,
             onClick: () => navigate('/system/config'),
+        }, {
+            key: 'types',
+            label: t('nav.typeManagement'),
+            icon: <MdExtension />,
+            onClick: () => navigate('/system/types'),
         }, { type: 'divider' as const }] : []),
         {
             key: 'logout',

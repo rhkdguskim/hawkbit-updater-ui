@@ -1,4 +1,23 @@
 {
+    "typeManagement": {
+        "title": "Type Management",
+        "description": "Manage Distribution Set Types and Software Module Types to standardize update packages.",
+        "distributionSetTypes": "Distribution Set Types",
+        "softwareModuleTypes": "Software Module Types",
+        "addType": "Add Type",
+        "deleteSuccess": "Type deleted successfully.",
+        "deleteError": "Failed to delete type.",
+        "deleteConfirmTitle": "Delete Type",
+        "deleteConfirmDesc": "Are you sure you want to delete this type? This action cannot be undone.",
+        "columns": {
+            "name": "Name",
+            "key": "Key",
+            "description": "Description",
+            "colour": "Color",
+            "lastModified": "Last Modified",
+            "maxAssignments": "Max Assignments"
+        }
+    },
     "pageTitle": "System Configuration",
     "subtitle": "Manage your tenant settings",
     "readOnly": "Read-only",

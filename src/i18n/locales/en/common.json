@@ -21,6 +21,7 @@
         "rolloutOverview": "Overview",
         "system": "System",
         "configuration": "Configuration",
+        "typeManagement": "Type Management",
         "deployment": "Deployment",
         "list": "List",
         "types": "Types",

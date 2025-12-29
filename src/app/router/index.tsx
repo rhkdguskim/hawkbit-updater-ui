@@ -18,6 +18,7 @@ const Actions = React.lazy(() => import('@/features/actions/Actions'));
 const Rollouts = React.lazy(() => import('@/features/rollouts/Rollouts'));
 
 const Configuration = React.lazy(() => import('@/features/system/Configuration'));
+const TypeManagement = React.lazy(() => import('@/features/system/TypeManagement'));
 const LoginPage = React.lazy(() => import('@/features/auth/LoginPage'));
 const AuthGuard = React.lazy(() => import('@/features/auth/AuthGuard'));
 
@@ -51,6 +52,7 @@ const AppRouter: React.FC = () => {
                         <Route path="rollouts/*" element={<Rollouts />} />
 
                         <Route path="system/config" element={<Configuration />} />
+                        <Route path="system/types" element={<TypeManagement />} />
                     </Route>
                 </Route>
 

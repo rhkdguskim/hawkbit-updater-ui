@@ -21,6 +21,7 @@
         "rolloutOverview": "개요",
         "system": "시스템",
         "configuration": "환경 설정",
+        "typeManagement": "타입 관리",
         "deployment": "배포 관리",
         "list": "목록",
         "types": "유형",
