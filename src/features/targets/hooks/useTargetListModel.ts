@@ -50,6 +50,7 @@ export const useTargetListModel = () => {
     const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
     const [savedFiltersOpen, setSavedFiltersOpen] = useState(false);
     const [importModalOpen, setImportModalOpen] = useState(false);
+    const [bulkEditModalOpen, setBulkEditModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [formModalOpen, setFormModalOpen] = useState(false);
     const [assignModalOpen, setAssignModalOpen] = useState(false);
@@ -94,12 +95,13 @@ export const useTargetListModel = () => {
         },
     ], [t, availableTypes, availableTags]);
 
-    const buildFinalQuery = useCallback(() => {
-        if (filters.length === 0) return undefined;
-        const conditions = filters.map(f => {
+    const buildFinalQuery = useCallback((targetFilters: FilterValue[] = filters): string => {
+        if (targetFilters.length === 0) return '';
+        const conditions = targetFilters.map(f => {
             let field = f.field;
             if (f.field === 'targetType') field = 'targetTypeName';
             if (f.field === 'tag') field = 'tag';
+            if (f.field === 'query') return f.value as string;
             let val = String(f.value);
             if (f.operator === 'contains') val = `*${val}*`;
             else if (f.operator === 'startsWith') val = `${val}*`;
@@ -109,6 +111,23 @@ export const useTargetListModel = () => {
         });
         return conditions.reduce((acc, cond) => appendFilter(acc, cond), '');
     }, [filters]);
+
+    const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
+        setFilters(newFilters);
+        resetPagination();
+    }, [resetPagination]);
+
+    const handleApplySavedFilter = useCallback((query: string, name?: string) => {
+        handleFiltersChange([{
+            id: `saved-${Date.now()}`,
+            field: 'query',
+            fieldLabel: t('filter.savedFilter', { defaultValue: 'Saved Filter' }),
+            operator: 'equals',
+            operatorLabel: '=',
+            value: query,
+            displayValue: name || query,
+        }]);
+    }, [handleFiltersChange, t]);
 
     // Main Data Query
     const {
@@ -122,7 +141,7 @@ export const useTargetListModel = () => {
             offset,
             limit: pagination.pageSize,
             sort: sort || undefined,
-            q: buildFinalQuery(),
+            q: buildFinalQuery() || undefined,
         },
         { query: { placeholderData: keepPreviousData, refetchOnWindowFocus: false, refetchOnReconnect: false } }
     );
@@ -192,14 +211,9 @@ export const useTargetListModel = () => {
     });
 
     // Handlers
-    const handleTableChange = (paginationConfig: TableProps<MgmtTarget>['pagination'], tableFilters: any, sorter: any, extra: any) => {
+    const handleTableChange = (paginationConfig: TableProps<MgmtTarget>['pagination'], tableFilters: Record<string, any>, sorter: any, extra: any) => {
         serverTableChange(paginationConfig || {}, tableFilters, sorter, extra);
     };
-
-    const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
-        setFilters(newFilters);
-        resetPagination();
-    }, [resetPagination]);
 
     const handleAddTarget = useCallback(() => {
         setEditingTarget(null);
@@ -302,6 +316,7 @@ export const useTargetListModel = () => {
         bulkDeleteModalOpen, setBulkDeleteModalOpen,
         savedFiltersOpen, setSavedFiltersOpen,
         importModalOpen, setImportModalOpen,
+        bulkEditModalOpen, setBulkEditModalOpen,
         deleteModalOpen, setDeleteModalOpen,
         formModalOpen, setFormModalOpen,
         assignModalOpen, setAssignModalOpen,
@@ -314,6 +329,8 @@ export const useTargetListModel = () => {
         // Handlers
         handleTableChange,
         handleFiltersChange,
+        handleApplySavedFilter,
+        buildFinalQuery,
         refetchTargets,
         handleAddTarget,
         handleEditTarget,

@@ -1,16 +1,28 @@
 import React, { useState, useCallback } from 'react';
-import { Button, Popover } from 'antd';
+import { Button, Popover, Divider } from 'antd';
 import { PlusOutlined, ClearOutlined, ReloadOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { FilterChip } from './FilterChip';
 import { FilterCondition, type FilterField, type FilterConditionValue } from './FilterCondition';
+import { SavedFilterDropdown } from './SavedFilterDropdown';
+import { FilterPreview } from './FilterPreview';
 
 const Container = styled.div`
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--ant-color-bg-container, #ffffff);
+    border-radius: 8px;
+    border: 1px solid var(--ant-color-border-secondary, rgba(5, 5, 5, 0.06));
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+`;
+
+const HeaderRow = styled.div`
+    display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 0;
     gap: 12px;
     flex-wrap: wrap;
 `;
@@ -18,7 +30,7 @@ const Container = styled.div`
 const FiltersSection = styled.div`
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     flex-wrap: wrap;
     flex: 1;
 `;
@@ -33,7 +45,7 @@ const ChipsContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 `;
 
 export interface FilterValue {
@@ -56,6 +68,9 @@ export interface FilterBuilderProps {
     addLabel?: string;
     loading?: boolean;
     extra?: React.ReactNode;
+    onApplySavedFilter?: (query: string, name?: string) => void;
+    onManageSavedFilters?: () => void;
+    buildQuery?: (filters: FilterValue[]) => string;
 }
 
 export const FilterBuilder: React.FC<FilterBuilderProps> = ({
@@ -68,9 +83,14 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     addLabel,
     loading = false,
     extra,
+    onApplySavedFilter,
+    onManageSavedFilters,
+    buildQuery,
 }) => {
     const { t } = useTranslation('common');
     const [conditionOpen, setConditionOpen] = useState(false);
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [pendingFilters, setPendingFilters] = useState<FilterValue[] | null>(null);
 
     const operatorLabels: Record<string, string> = {
         contains: t('filter.contains'),
@@ -108,95 +128,144 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
             displayValue,
         };
 
-        onFiltersChange([...filters, newFilter]);
+        const nextFilters = [...filters, newFilter];
+
+        if (buildQuery) {
+            setPendingFilters(nextFilters);
+            setPreviewOpen(true);
+        } else {
+            onFiltersChange(nextFilters);
+        }
         setConditionOpen(false);
-    }, [fields, filters, onFiltersChange, operatorLabels, t]);
+    }, [fields, filters, onFiltersChange, operatorLabels, t, buildQuery]);
 
     const handleRemoveFilter = useCallback((id: string) => {
-        onFiltersChange(filters.filter(f => f.id !== id));
-    }, [filters, onFiltersChange]);
+        const nextFilters = filters.filter(f => f.id !== id);
+        if (buildQuery && nextFilters.length < filters.length) {
+            setPendingFilters(nextFilters);
+            setPreviewOpen(true);
+        } else {
+            onFiltersChange(nextFilters);
+        }
+    }, [filters, onFiltersChange, buildQuery]);
 
     const handleClearAll = useCallback(() => {
-        onFiltersChange([]);
-    }, [onFiltersChange]);
+        if (buildQuery && filters.length > 0) {
+            setPendingFilters([]);
+            setPreviewOpen(true);
+        } else {
+            onFiltersChange([]);
+        }
+    }, [onFiltersChange, buildQuery, filters.length]);
+
+    const handleConfirmPreview = () => {
+        if (pendingFilters !== null) {
+            onFiltersChange(pendingFilters);
+            setPendingFilters(null);
+        }
+        setPreviewOpen(false);
+    };
 
     return (
         <Container>
-            <FiltersSection>
-                <Popover
-                    content={
-                        <FilterCondition
-                            fields={fields}
-                            onApply={handleAddFilter}
-                        />
-                    }
-                    trigger="click"
-                    open={conditionOpen}
-                    onOpenChange={setConditionOpen}
-                    placement="bottomLeft"
-                >
-                    <Button
-                        icon={<PlusOutlined />}
-                        size="small"
-                        type="default"
-                        style={{
-                            borderColor: 'var(--ant-color-primary, #1677ff)',
-                            color: 'var(--ant-color-primary, #1677ff)',
-                            fontWeight: 500,
-                        }}
+            <HeaderRow>
+                <FiltersSection>
+                    <Popover
+                        content={
+                            <FilterCondition
+                                fields={fields}
+                                onApply={handleAddFilter}
+                            />
+                        }
+                        trigger="click"
+                        open={conditionOpen}
+                        onOpenChange={setConditionOpen}
+                        placement="bottomLeft"
                     >
-                        {t('filter.addFilter')}
-                    </Button>
-                </Popover>
-
-
-
-                {filters.length > 0 && (
-                    <>
-                        <ChipsContainer>
-                            {filters.map((filter) => (
-                                <FilterChip
-                                    key={filter.id}
-                                    field={filter.fieldLabel}
-                                    operator={filter.operatorLabel}
-                                    value={filter.displayValue}
-                                    onRemove={() => handleRemoveFilter(filter.id)}
-                                />
-                            ))}
-                        </ChipsContainer>
                         <Button
-                            type="text"
+                            icon={<PlusOutlined />}
                             size="small"
-                            icon={<ClearOutlined />}
-                            onClick={handleClearAll}
+                            type="default"
+                            style={{
+                                borderColor: 'var(--ant-color-primary, #1677ff)',
+                                color: 'var(--ant-color-primary, #1677ff)',
+                                fontWeight: 500,
+                            }}
                         >
-                            {t('filter.clear')}
+                            {t('filter.addFilter')}
                         </Button>
-                    </>
-                )}
-            </FiltersSection>
+                    </Popover>
 
-            <ActionsSection>
-                {extra}
-                {onRefresh && (
-                    <Button
-                        icon={<ReloadOutlined />}
-                        onClick={onRefresh}
-                        loading={loading}
-                        size="small"
-                    />
-                )}
-                {onAdd && canAdd && (
-                    <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={onAdd}
-                        size="small"
-                    >
-                        {addLabel || t('actions.add')}
-                    </Button>
-                )}
-            </ActionsSection>
+                    {onApplySavedFilter && (
+                        <SavedFilterDropdown
+                            onApply={(f) => onApplySavedFilter(f.query || '', f.name)}
+                            onManageClick={onManageSavedFilters}
+                        />
+                    )}
+
+                    {filters.length > 0 && (
+                        <>
+                            <Divider type="vertical" style={{ height: 20 }} />
+                            <ChipsContainer>
+                                {filters.map((filter) => (
+                                    <FilterChip
+                                        key={filter.id}
+                                        field={filter.fieldLabel}
+                                        operator={filter.operatorLabel}
+                                        value={filter.displayValue}
+                                        onRemove={() => handleRemoveFilter(filter.id)}
+                                    />
+                                ))}
+                            </ChipsContainer>
+                            <Button
+                                type="text"
+                                size="small"
+                                icon={<ClearOutlined />}
+                                onClick={handleClearAll}
+                                style={{ fontSize: 12 }}
+                            >
+                                {t('filter.clear')}
+                            </Button>
+                        </>
+                    )}
+                </FiltersSection>
+
+                <ActionsSection>
+                    {extra}
+                    {onRefresh && (
+                        <Button
+                            icon={<ReloadOutlined />}
+                            onClick={onRefresh}
+                            loading={loading}
+                            size="small"
+                        />
+                    )}
+                    {onAdd && canAdd && (
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={onAdd}
+                            size="small"
+                        >
+                            {addLabel || t('actions.add')}
+                        </Button>
+                    )}
+                </ActionsSection>
+            </HeaderRow>
+
+            {buildQuery && pendingFilters !== null && (
+                <FilterPreview
+                    open={previewOpen}
+                    query={buildQuery(pendingFilters)}
+                    onConfirm={handleConfirmPreview}
+                    onCancel={() => {
+                        setPreviewOpen(false);
+                        setPendingFilters(null);
+                    }}
+                >
+                    <div style={{ position: 'absolute', visibility: 'hidden', height: 0, width: 0 }} />
+                </FilterPreview>
+            )}
         </Container>
     );
 };

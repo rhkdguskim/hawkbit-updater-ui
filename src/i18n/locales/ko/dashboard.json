@@ -65,7 +65,20 @@
         "targets": "대상",
         "rolloutStatus": "롤아웃 상태",
         "actionStatus": "액션 상태 (24시간)",
-        "fragmentation": "타겟 업데이트 상태"
+        "fragmentation": "타겟 업데이트 상태",
+        "velocity": "배포 속도 (분/완료)",
+        "velocityDesc": "분당 액션 완료 속도"
+    },
+    "velocity": {
+        "title": "배포 속도 모니터링",
+        "current": "현재 속도",
+        "trend": "최근 1시간 추이",
+        "unit": "건/분",
+        "status": {
+            "slow": "느림",
+            "normal": "정상",
+            "fast": "빠름"
+        }
     },
     "recentActions": {
         "title": "최근 액션 (24시간)",
