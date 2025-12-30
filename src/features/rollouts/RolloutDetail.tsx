@@ -7,7 +7,6 @@ import {
     Typography,
     Table,
     Progress,
-    Spin,
     Alert,
     Popconfirm,
     message,
@@ -42,7 +41,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { PageContainer, SectionCard } from '@/components/layout/PageLayout';
+import { PageLayout } from '@/components/patterns';
+import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader, StatusTag } from '@/components/common';
 
 const { Text } = Typography;
@@ -217,17 +217,9 @@ const RolloutDetail: React.FC = () => {
         }
     };
 
-    if (isLoading) {
+    if (error || (!isLoading && !rolloutData)) {
         return (
-            <div style={{ padding: 24, textAlign: 'center' }}>
-                <Spin size="large" />
-            </div>
-        );
-    }
-
-    if (error || !rolloutData) {
-        return (
-            <PageContainer>
+            <PageLayout>
                 <Alert
                     type="error"
                     message={t('detail.notFound')}
@@ -238,24 +230,24 @@ const RolloutDetail: React.FC = () => {
                         </Button>
                     }
                 />
-            </PageContainer>
+            </PageLayout>
         );
     }
 
-    const canStart = rolloutData.status === 'ready';
-    const canPause = rolloutData.status === 'running';
-    const canResume = rolloutData.status === 'paused';
-    const canApprove = rolloutData.status === 'waiting_for_approval';
-    const canRetry = rolloutData.status === 'error';
-    const canDelete = ['ready', 'finished', 'error'].includes(rolloutData.status || '');
+    const canStart = rolloutData?.status === 'ready';
+    const canPause = rolloutData?.status === 'running';
+    const canResume = rolloutData?.status === 'paused';
+    const canApprove = rolloutData?.status === 'waiting_for_approval';
+    const canRetry = rolloutData?.status === 'error';
+    const canDelete = ['ready', 'finished', 'error'].includes(rolloutData?.status || '');
 
     // Calculate overall progress
-    const totalTargets = rolloutData.totalTargets || 0;
-    const statusPerTarget = rolloutData.totalTargetsPerStatus as Record<string, number> || {};
+    const totalTargets = rolloutData?.totalTargets || 0;
+    const statusPerTarget = rolloutData?.totalTargetsPerStatus as Record<string, number> || {};
     const finishedTargets = statusPerTarget.finished || 0;
     const errorTargets = statusPerTarget.error || 0;
     // If rollout is finished, always show 100%
-    let overallProgress = rolloutData.status === 'finished'
+    let overallProgress = rolloutData?.status === 'finished'
         ? 100
         : (totalTargets > 0 ? Math.round((finishedTargets / totalTargets) * 100) : 0);
 
@@ -398,23 +390,25 @@ const RolloutDetail: React.FC = () => {
     );
 
     return (
-        <PageContainer>
+        <PageLayout>
             {/* Breadcrumb */}
             <Breadcrumb
                 items={[
                     { title: <Link to="/rollouts">{t('list.title')}</Link> },
-                    { title: rolloutData.name },
+                    { title: rolloutData?.name || rolloutId },
                 ]}
+                style={{ marginBottom: 0 }}
             />
 
             {/* Header */}
             <DetailPageHeader
-                title={rolloutData.name}
+                title={rolloutData?.name || rolloutId}
                 description={t('detail.description')}
-                status={rolloutData.status}
+                status={rolloutData?.status}
                 backLabel={t('detail.back')}
                 onBack={() => navigate('/rollouts')}
                 actions={headerActions}
+                loading={isLoading}
             />
 
             {isAdmin && !canStart && !canPause && !canResume && !canApprove && !canRetry && !canDelete && (
@@ -423,7 +417,7 @@ const RolloutDetail: React.FC = () => {
                 </SectionCard>
             )}
 
-            <SectionCard title={t('detail.overviewTitle')}>
+            <SectionCard title={t('detail.overviewTitle')} loading={isLoading}>
                 <Row gutter={[16, 16]}>
                     <Col xs={24} md={8}>
                         <Statistic title={t('detail.labels.totalTargets')} value={totalTargets} />
@@ -442,22 +436,22 @@ const RolloutDetail: React.FC = () => {
                 </div>
 
                 <Descriptions bordered column={2} style={{ marginTop: 16 }}>
-                    <Descriptions.Item label={t('detail.labels.id')}>{rolloutData.id}</Descriptions.Item>
-                    <Descriptions.Item label={t('detail.labels.name')}>{rolloutData.name}</Descriptions.Item>
+                    <Descriptions.Item label={t('detail.labels.id')}>{rolloutData?.id}</Descriptions.Item>
+                    <Descriptions.Item label={t('detail.labels.name')}>{rolloutData?.name}</Descriptions.Item>
                     <Descriptions.Item label={t('detail.labels.status')}>
-                        <StatusTag status={rolloutData.status} />
+                        <StatusTag status={rolloutData?.status} />
                     </Descriptions.Item>
                     <Descriptions.Item label={t('detail.labels.createdAt')}>
-                        {rolloutData.createdAt
+                        {rolloutData?.createdAt
                             ? dayjs(rolloutData.createdAt).format('YYYY-MM-DD HH:mm:ss')
                             : '-'}
                     </Descriptions.Item>
                     <Descriptions.Item label={t('detail.labels.lastModified')}>
-                        {rolloutData.lastModifiedAt
+                        {rolloutData?.lastModifiedAt
                             ? dayjs(rolloutData.lastModifiedAt).format('YYYY-MM-DD HH:mm:ss')
                             : '-'}
                     </Descriptions.Item>
-                    {rolloutData.description && (
+                    {rolloutData?.description && (
                         <Descriptions.Item label={t('detail.labels.description')} span={2}>
                             {rolloutData.description}
                         </Descriptions.Item>
@@ -474,7 +468,7 @@ const RolloutDetail: React.FC = () => {
                     locale={{ emptyText: t('detail.emptyGroups') }}
                 />
             </SectionCard>
-        </PageContainer>
+        </PageLayout>
     );
 };
 

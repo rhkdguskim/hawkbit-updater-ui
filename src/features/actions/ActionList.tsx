@@ -98,11 +98,9 @@ const ActionList: React.FC = () => {
         return conditions.reduce((acc, cond) => appendFilter(acc, cond), '');
     }, [filters]);
 
-    // Check if any running actions exist for auto-refresh
-    const hasRunningActions = (content?: MgmtAction[]) =>
-        content?.some((a) => isActiveStatus(a.status));
 
-    const { data, isLoading, isFetching, error, refetch, dataUpdatedAt } = useGetActions(
+
+    const { data, isLoading, isFetching, error, refetch } = useGetActions(
         {
             offset,
             limit: pagination.pageSize,
@@ -110,9 +108,6 @@ const ActionList: React.FC = () => {
         },
         {
             query: {
-                refetchInterval: (query) => {
-                    return hasRunningActions(query.state.data?.content) ? 5000 : 30000;
-                },
                 placeholderData: keepPreviousData,
                 refetchOnWindowFocus: true,
                 staleTime: 5000,
@@ -120,7 +115,7 @@ const ActionList: React.FC = () => {
         }
     );
 
-    const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';
+
 
     const getTypeLabel = useCallback((type?: string) => {
         if (!type) return '-';
@@ -327,12 +322,8 @@ const ActionList: React.FC = () => {
 
     return (
         <StandardListLayout
-            title={t('list.description')}
-            headerExtra={
-                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
-                    {t('lastUpdated', { defaultValue: 'Updated' })}: {lastUpdated}
-                </Text>
-            }
+            title={t('list.title')}
+            description={t('list.description')}
             searchBar={
                 <FilterBuilder
                     fields={filterFields}

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import {
-    Table,
     Button,
     Space,
     message,
-    Popconfirm,
+    Modal,
     Tag,
+    Tooltip,
+    Typography,
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import type { TableProps } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ColumnsType } from 'antd/es/table';
@@ -22,8 +24,9 @@ import type { MgmtTag } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { ColorSwatch, TagFormModal } from '@/components/common';
 import type { TagFormValues } from '@/components/common';
+import { EnhancedTable } from '@/components/patterns';
 
-
+const { Text } = Typography;
 
 interface MgmtTagRequestBodyPost {
     name: string;
@@ -43,7 +46,7 @@ const TargetTagList: React.FC = () => {
 
     const offset = (pagination.current - 1) * pagination.pageSize;
 
-    const { data, isLoading } = useGetTargetTags({
+    const { data, isLoading, refetch } = useGetTargetTags({
         offset,
         limit: pagination.pageSize,
     });
@@ -98,7 +101,21 @@ const TargetTagList: React.FC = () => {
     };
 
     const handleDelete = (id: number) => {
-        deleteMutation.mutate({ targetTagId: id });
+        Modal.confirm({
+            title: t('tagManagement.deleteConfirmTitle'),
+            content: t('tagManagement.deleteConfirmDesc'),
+            okText: t('common:actions.delete'),
+            okType: 'danger',
+            cancelText: t('common:actions.cancel'),
+            onOk: () => deleteMutation.mutate({ targetTagId: id }),
+        });
+    };
+
+    const handleTableChange: TableProps<MgmtTag>['onChange'] = (newPagination) => {
+        setPagination({
+            current: newPagination.current || 1,
+            pageSize: newPagination.pageSize || 20,
+        });
     };
 
     const columns: ColumnsType<MgmtTag> = [
@@ -106,13 +123,15 @@ const TargetTagList: React.FC = () => {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
-            width: 80,
+            width: 60,
             sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
+            render: (id) => <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{id}</Text>,
         },
         {
             title: t('table.name'),
             dataIndex: 'name',
             key: 'name',
+            width: 180,
             sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
             render: (name: string, record) => (
                 <Tag color={record.colour || 'default'}>{name}</Tag>
@@ -124,37 +143,43 @@ const TargetTagList: React.FC = () => {
             key: 'description',
             ellipsis: true,
             sorter: (a, b) => (a.description ?? '').localeCompare(b.description ?? ''),
+            render: (text) => <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{text || '-'}</Text>,
         },
         {
             title: t('tagManagement.colour'),
             dataIndex: 'colour',
             key: 'colour',
-            width: 140,
+            width: 120,
             render: (colour: string) => <ColorSwatch color={colour} />,
         },
         {
             title: t('table.actions'),
             key: 'actions',
-            width: 150,
+            width: 100,
+            fixed: 'right',
             render: (_, record) => (
-                <Space>
-                    <Button
-                        type="text"
-                        icon={<EditOutlined />}
-                        onClick={() => {
-                            setEditingTag(record);
-                            setDialogOpen(true);
-                        }}
-                    />
+                <Space size={0} className="action-cell">
+                    <Tooltip title={t('common:actions.edit')}>
+                        <Button
+                            type="text"
+                            size="small"
+                            icon={<EditOutlined />}
+                            onClick={() => {
+                                setEditingTag(record);
+                                setDialogOpen(true);
+                            }}
+                        />
+                    </Tooltip>
                     {isAdmin && (
-                        <Popconfirm
-                            title={t('tagManagement.deleteConfirm')}
-                            onConfirm={() => handleDelete(record.id)}
-                            okText={t('common:confirm')}
-                            cancelText={t('common:cancel')}
-                        >
-                            <Button type="text" danger icon={<DeleteOutlined />} />
-                        </Popconfirm>
+                        <Tooltip title={t('common:actions.delete')}>
+                            <Button
+                                type="text"
+                                size="small"
+                                danger
+                                icon={<DeleteOutlined />}
+                                onClick={() => handleDelete(record.id)}
+                            />
+                        </Tooltip>
                     )}
                 </Space>
             ),
@@ -164,32 +189,36 @@ const TargetTagList: React.FC = () => {
     return (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={() => {
-                        setEditingTag(null);
-                        setDialogOpen(true);
-                    }}
-                >
-                    {t('tagManagement.add')}
-                </Button>
+                <Space>
+                    <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>
+                        {t('common:actions.refresh')}
+                    </Button>
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={() => {
+                            setEditingTag(null);
+                            setDialogOpen(true);
+                        }}
+                    >
+                        {t('tagManagement.add')}
+                    </Button>
+                </Space>
             </div>
 
-            <Table<MgmtTag>
+            <EnhancedTable<MgmtTag>
                 columns={columns}
                 dataSource={data?.content || []}
                 rowKey="id"
                 loading={isLoading}
                 pagination={{
-                    current: pagination.current,
-                    pageSize: pagination.pageSize,
+                    ...pagination,
                     total: data?.total || 0,
                     showSizeChanger: true,
                     pageSizeOptions: ['10', '20', '50'],
-                    onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
                 }}
-                size="small"
+                onChange={handleTableChange}
+                scroll={{ x: 700 }}
             />
 
             <TagFormModal

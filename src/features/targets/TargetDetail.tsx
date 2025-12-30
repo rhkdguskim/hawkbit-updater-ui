@@ -53,7 +53,8 @@ import type { MgmtDistributionSetAssignment, MgmtDistributionSetAssignments, Mgm
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { PageContainer, SectionCard } from '@/components/layout/PageLayout';
+import { PageLayout } from '@/components/patterns';
+import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader } from '@/components/common';
 
 const TargetDetail: React.FC = () => {
@@ -340,13 +341,13 @@ const TargetDetail: React.FC = () => {
     // Error State
     if (targetError) {
         return (
-            <PageContainer>
+            <PageLayout>
                 <DetailPageHeader
                     title={t('detail.notFoundTitle')}
                     backLabel={t('detail.backToTargets')}
                     onBack={() => navigate('/targets/list')}
                 />
-            </PageContainer>
+            </PageLayout>
         );
     }
 
@@ -458,13 +459,14 @@ const TargetDetail: React.FC = () => {
     );
 
     return (
-        <PageContainer>
+        <PageLayout>
             {/* Breadcrumb */}
             <Breadcrumb
                 items={[
                     { title: <Link to="/targets">{t('list.title')}</Link> },
                     { title: targetId },
                 ]}
+                style={{ marginBottom: 0 }}
             />
 
             {/* Header */}
@@ -539,7 +541,7 @@ const TargetDetail: React.FC = () => {
                     setMetadataToDelete(null);
                 }}
             />
-        </PageContainer>
+        </PageLayout>
     );
 };
 

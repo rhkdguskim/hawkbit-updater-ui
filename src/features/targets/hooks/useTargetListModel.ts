@@ -40,7 +40,7 @@ export const useTargetListModel = () => {
         setPagination,
     } = useServerTable<MgmtTarget>({
         syncToUrl: true,
-        allowedSortFields: ['name', 'controllerId', 'lastModifiedAt', 'createdAt'], // Allow sorting by valid target fields
+        allowedSortFields: ['name', 'controllerId'], // Only allow reliably sortable fields
     });
 
     // State

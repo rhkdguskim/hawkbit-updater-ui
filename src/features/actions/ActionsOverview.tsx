@@ -56,7 +56,7 @@ const ActionsOverview: React.FC = () => {
 
     const { data: actionsData, isLoading, refetch, dataUpdatedAt } = useGetActions(
         { limit: 500 },
-        { query: { staleTime: 2000, refetchInterval: 2000 } }
+        { query: { staleTime: 5000 } }
     );
 
     const actions = actionsData?.content || [];

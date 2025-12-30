@@ -103,7 +103,7 @@ const RolloutList: React.FC = () => {
             dataIndex: 'id',
             key: 'id',
             width: 60,
-            render: (id) => <Text style={{ fontSize: 12 }}>{id}</Text>,
+            render: (id) => <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{id}</Text>,
         },
         {
             title: t('columns.name'),
@@ -112,7 +112,7 @@ const RolloutList: React.FC = () => {
             width: 200,
             sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
             render: (value: string) => (
-                <Text strong style={{ fontSize: 12 }}>{value}</Text>
+                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>{value}</Text>
             ),
         },
         {
@@ -121,7 +121,7 @@ const RolloutList: React.FC = () => {
             key: 'totalTargets',
             width: 100,
             render: (value: number) => (
-                <Text style={{ fontSize: 12 }}>{value || 0}</Text>
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{value || 0}</Text>
             ),
         },
         {
@@ -137,9 +137,9 @@ const RolloutList: React.FC = () => {
             key: 'createdAt',
             width: 120,
             render: (date: string) => date ? (
-                <Text style={{ fontSize: 12 }}>{dayjs(date).format('YYYY-MM-DD HH:mm')}</Text>
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{dayjs(date).format('YYYY-MM-DD HH:mm')}</Text>
             ) : (
-                <Text type="secondary" style={{ fontSize: 12 }}>-</Text>
+                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>-</Text>
             ),
         },
         {
@@ -204,7 +204,7 @@ const RolloutList: React.FC = () => {
 
     return (
         <StandardListLayout
-            title={t('pageTitle')}
+            title={t('list.title')}
             description={t('list.description')}
             searchBar={
                 <FilterBuilder

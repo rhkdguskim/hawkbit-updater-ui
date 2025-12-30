@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Table, Tag, Tooltip, Space, Button, message, Modal } from 'antd';
+import { Tag, Tooltip, Space, Button, message, Modal, Typography } from 'antd';
 import type { TableProps } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
 import {
     useGetDistributionSetTags,
     useDeleteDistributionSetTag,
@@ -14,8 +15,9 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { ColorSwatch, TagFormModal } from '@/components/common';
 import type { TagFormValues } from '@/components/common';
+import { EnhancedTable } from '@/components/patterns';
 
-
+const { Text } = Typography;
 
 const DistributionSetTagList: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
@@ -119,18 +121,26 @@ const DistributionSetTagList: React.FC = () => {
     };
 
     const handleTableChange: TableProps<MgmtTag>['onChange'] = (newPagination) => {
-        setPagination((prev) => ({
-            ...prev,
+        setPagination({
             current: newPagination.current || 1,
             pageSize: newPagination.pageSize || 20,
-        }));
+        });
     };
 
-    const columns: TableProps<MgmtTag>['columns'] = [
+    const columns: ColumnsType<MgmtTag> = [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            width: 60,
+            sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
+            render: (id) => <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{id}</Text>,
+        },
         {
             title: t('tagManagement.columns.name'),
             dataIndex: 'name',
             key: 'name',
+            width: 180,
             sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
             render: (text, record) => (
                 <Tag color={record.colour || 'blue'}>{text}</Tag>
@@ -142,33 +152,40 @@ const DistributionSetTagList: React.FC = () => {
             key: 'description',
             ellipsis: true,
             sorter: (a, b) => (a.description ?? '').localeCompare(b.description ?? ''),
+            render: (text) => <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{text || '-'}</Text>,
         },
         {
             title: t('tagManagement.columns.colour'),
             dataIndex: 'colour',
             key: 'colour',
-            width: 140,
+            width: 120,
             render: (colour) => <ColorSwatch color={colour} />,
         },
         {
             title: t('tagManagement.columns.lastModified'),
             dataIndex: 'lastModifiedAt',
             key: 'lastModifiedAt',
-            width: 180,
+            width: 150,
             sorter: (a, b) => (a.lastModifiedAt ?? 0) - (b.lastModifiedAt ?? 0),
-            render: (val: number) => (val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'),
+            render: (val: number) => (
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>
+                    {val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}
+                </Text>
+            ),
         },
         {
             title: t('common:table.actions'),
             key: 'actions',
-            width: 120,
+            width: 100,
+            fixed: 'right',
             render: (_, record) => (
-                <Space size="small">
+                <Space size={0} className="action-cell">
                     {isAdmin && (
                         <>
                             <Tooltip title={t('common:actions.edit')}>
                                 <Button
                                     type="text"
+                                    size="small"
                                     icon={<EditOutlined />}
                                     onClick={() => handleEdit(record)}
                                 />
@@ -176,6 +193,7 @@ const DistributionSetTagList: React.FC = () => {
                             <Tooltip title={t('common:actions.delete')}>
                                 <Button
                                     type="text"
+                                    size="small"
                                     danger
                                     icon={<DeleteOutlined />}
                                     onClick={() => handleDelete(record.id)}
@@ -202,7 +220,7 @@ const DistributionSetTagList: React.FC = () => {
                     )}
                 </Space>
             </div>
-            <Table
+            <EnhancedTable<MgmtTag>
                 columns={columns}
                 dataSource={data?.content || []}
                 rowKey="id"
@@ -210,10 +228,11 @@ const DistributionSetTagList: React.FC = () => {
                     ...pagination,
                     total: data?.total || 0,
                     showSizeChanger: true,
+                    pageSizeOptions: ['10', '20', '50'],
                 }}
                 loading={isLoading}
                 onChange={handleTableChange}
-                size="small"
+                scroll={{ x: 700 }}
             />
             <TagFormModal
                 open={dialogOpen}

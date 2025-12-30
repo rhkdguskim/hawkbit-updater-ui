@@ -3,12 +3,13 @@ import {
     Button,
     Space,
     message,
-    Popconfirm,
+    Modal,
     Tag,
     Typography,
     Tooltip,
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import type { TableProps } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query';
 import type { ColumnsType } from 'antd/es/table';
@@ -43,7 +44,7 @@ const TargetTypeList: React.FC = () => {
 
     const offset = (pagination.current - 1) * pagination.pageSize;
 
-    const { data, isLoading } = useGetTargetTypes({
+    const { data, isLoading, refetch } = useGetTargetTypes({
         offset,
         limit: pagination.pageSize,
     });
@@ -159,7 +160,21 @@ const TargetTypeList: React.FC = () => {
     };
 
     const handleDelete = (id: number) => {
-        deleteMutation.mutate({ targetTypeId: id });
+        Modal.confirm({
+            title: t('typeManagement.deleteConfirmTitle'),
+            content: t('typeManagement.deleteConfirmDesc'),
+            okText: t('common:actions.delete'),
+            okType: 'danger',
+            cancelText: t('common:actions.cancel'),
+            onOk: () => deleteMutation.mutate({ targetTypeId: id }),
+        });
+    };
+
+    const handleTableChange: TableProps<MgmtTargetType>['onChange'] = (newPagination) => {
+        setPagination({
+            current: newPagination.current || 1,
+            pageSize: newPagination.pageSize || 20,
+        });
     };
 
     const columns: ColumnsType<MgmtTargetType> = [
@@ -169,7 +184,7 @@ const TargetTypeList: React.FC = () => {
             key: 'id',
             width: 60,
             sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
-            render: (id) => <Text style={{ fontSize: 12 }}>{id}</Text>,
+            render: (id) => <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{id}</Text>,
         },
         {
             title: t('table.name'),
@@ -180,11 +195,11 @@ const TargetTypeList: React.FC = () => {
             render: (name: string, record) => (
                 <Space size={4}>
                     {record.colour && (
-                        <Tag color={record.colour} style={{ fontSize: 12, margin: 0 }}>
+                        <Tag color={record.colour} style={{ fontSize: 'var(--ant-font-size-sm)', margin: 0 }}>
                             {name}
                         </Tag>
                     )}
-                    {!record.colour && <Text strong style={{ fontSize: 12 }}>{name}</Text>}
+                    {!record.colour && <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>{name}</Text>}
                 </Space>
             ),
         },
@@ -194,7 +209,7 @@ const TargetTypeList: React.FC = () => {
             key: 'key',
             width: 150,
             sorter: (a, b) => (a.key ?? '').localeCompare(b.key ?? ''),
-            render: (key) => <Text style={{ fontSize: 12 }}>{key}</Text>,
+            render: (key) => <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{key}</Text>,
         },
         {
             title: t('form.description'),
@@ -202,7 +217,7 @@ const TargetTypeList: React.FC = () => {
             key: 'description',
             ellipsis: true,
             sorter: (a, b) => (a.description ?? '').localeCompare(b.description ?? ''),
-            render: (desc) => <Text type="secondary" style={{ fontSize: 12 }}>{desc || '-'}</Text>,
+            render: (desc) => <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{desc || '-'}</Text>,
         },
         {
             title: t('tagManagement.colour'),
@@ -220,7 +235,7 @@ const TargetTypeList: React.FC = () => {
                 <Space size={0} className="action-cell">
                     {isAdmin && (
                         <>
-                            <Tooltip title={t('common:edit')}>
+                            <Tooltip title={t('common:actions.edit')}>
                                 <Button
                                     type="text"
                                     size="small"
@@ -231,16 +246,15 @@ const TargetTypeList: React.FC = () => {
                                     }}
                                 />
                             </Tooltip>
-                            <Popconfirm
-                                title={t('typeManagement.deleteConfirm')}
-                                onConfirm={() => handleDelete(record.id)}
-                                okText={t('common:confirm')}
-                                cancelText={t('common:cancel')}
-                            >
-                                <Tooltip title={t('common:delete')}>
-                                    <Button type="text" size="small" danger icon={<DeleteOutlined />} />
-                                </Tooltip>
-                            </Popconfirm>
+                            <Tooltip title={t('common:actions.delete')}>
+                                <Button
+                                    type="text"
+                                    size="small"
+                                    danger
+                                    icon={<DeleteOutlined />}
+                                    onClick={() => handleDelete(record.id)}
+                                />
+                            </Tooltip>
                         </>
                     )}
                 </Space>
@@ -254,18 +268,23 @@ const TargetTypeList: React.FC = () => {
     return (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                {isAdmin && (
-                    <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={() => {
-                            setEditingType(null);
-                            setDialogOpen(true);
-                        }}
-                    >
-                        {t('typeManagement.add')}
+                <Space>
+                    <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>
+                        {t('common:actions.refresh')}
                     </Button>
-                )}
+                    {isAdmin && (
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={() => {
+                                setEditingType(null);
+                                setDialogOpen(true);
+                            }}
+                        >
+                            {t('typeManagement.add')}
+                        </Button>
+                    )}
+                </Space>
             </div>
 
             <EnhancedTable<MgmtTargetType>
@@ -274,13 +293,12 @@ const TargetTypeList: React.FC = () => {
                 rowKey="id"
                 loading={isLoading}
                 pagination={{
-                    current: pagination.current,
-                    pageSize: pagination.pageSize,
+                    ...pagination,
                     total: data?.total || 0,
                     showSizeChanger: true,
                     pageSizeOptions: ['10', '20', '50'],
-                    onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
                 }}
+                onChange={handleTableChange}
                 scroll={{ x: 800 }}
             />
 

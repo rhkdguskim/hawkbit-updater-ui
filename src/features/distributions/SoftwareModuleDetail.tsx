@@ -16,7 +16,8 @@ import type { MgmtArtifact } from '@/api/generated/model';
 import ModuleMetadataTab from './components/ModuleMetadataTab';
 import { useTranslation } from 'react-i18next';
 import type { RcFile } from 'antd/es/upload';
-import { PageContainer, SectionCard } from '@/components/layout/PageLayout';
+import { PageLayout } from '@/components/patterns';
+import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader } from '@/components/common';
 
 const SoftwareModuleDetail: React.FC = () => {
@@ -313,18 +314,19 @@ const SoftwareModuleDetail: React.FC = () => {
     ) : undefined;
 
     return (
-        <PageContainer>
+        <PageLayout>
             {/* Breadcrumb */}
             <Breadcrumb
                 items={[
                     { title: <Link to="/distributions/modules">{t('modules.title')}</Link> },
                     { title: moduleData?.name || id },
                 ]}
+                style={{ marginBottom: 0 }}
             />
 
             {/* Header */}
             <DetailPageHeader
-                title={moduleData?.name}
+                title={moduleData?.name || id}
                 backLabel={t('common:actions.back')}
                 onBack={() => navigate('/distributions/modules')}
                 loading={isModuleLoading}
@@ -361,7 +363,7 @@ const SoftwareModuleDetail: React.FC = () => {
                     />
                 )}
             </Modal>
-        </PageContainer>
+        </PageLayout>
     );
 };
 

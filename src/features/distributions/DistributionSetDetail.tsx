@@ -23,7 +23,8 @@ import SetTargetsTab from './components/SetTargetsTab';
 import type { MgmtSoftwareModuleAssignment, MgmtSoftwareModule, MgmtDistributionSetRequestBodyPost } from '@/api/generated/model';
 import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { PageContainer, SectionCard } from '@/components/layout/PageLayout';
+import { PageLayout } from '@/components/patterns';
+import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader } from '@/components/common';
 
 const DistributionSetDetail: React.FC = () => {
@@ -230,20 +231,21 @@ const DistributionSetDetail: React.FC = () => {
     ) : undefined;
 
     return (
-        <PageContainer>
+        <PageLayout>
             {/* Breadcrumb */}
             <Breadcrumb
                 items={[
                     { title: <Link to="/distributions/sets">{t('sets.title')}</Link> },
                     { title: setData?.name || id },
                 ]}
+                style={{ marginBottom: 0 }}
             />
 
             {/* Header */}
             <DetailPageHeader
                 onBack={() => navigate('/distributions/sets')}
                 backLabel={t('sets.title')}
-                title={setData ? `${setData.name} : ${setData.version}` : ''}
+                title={setData?.name || id}
                 description={t('detail.description')}
                 status={setData?.complete ? 'COMPLETE' : 'INCOMPLETE'}
                 loading={isSetLoading}
@@ -266,7 +268,7 @@ const DistributionSetDetail: React.FC = () => {
                     ]}
                 />
             </SectionCard>
-        </PageContainer>
+        </PageLayout>
     );
 };
 

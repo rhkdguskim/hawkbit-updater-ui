@@ -87,7 +87,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                         </BackButton>
                     )}
                     {typeof title === 'string' ? (
-                        <Title level={2} style={{ margin: 0, fontSize: 'var(--ant-font-size-heading-3)' }}>
+                        <Title level={2} style={{ margin: 0, fontSize: 'var(--ant-font-size-heading-2)' }}>
                             {title}
                         </Title>
                     ) : (

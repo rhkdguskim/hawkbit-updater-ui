@@ -6,8 +6,6 @@ import {
     Button,
     Space,
     Typography,
-    Timeline,
-    Spin,
     Alert,
     Popconfirm,
     message,
@@ -31,7 +29,9 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { PageContainer, SectionCard } from '@/components/layout/PageLayout';
+import { PageLayout } from '@/components/patterns';
+import { SectionCard } from '@/components/layout/PageLayout';
+import { ActionStatusTimeline } from '@/components/common/ActionStatusTimeline';
 import { DetailPageHeader, StatusTag } from '@/components/common';
 
 const { Text } = Typography;
@@ -65,10 +65,6 @@ const ActionDetail: React.FC = () => {
     const { data: actionData, isLoading, error } = useGetAction1(actionIdNum, {
         query: {
             enabled: !!actionIdNum,
-            refetchInterval: (query) => {
-                const data = query.state.data;
-                return isRunning(data?.status) ? 5000 : false;
-            },
         },
     });
 
@@ -86,7 +82,6 @@ const ActionDetail: React.FC = () => {
         {
             query: {
                 enabled: !!targetId && !!actionIdNum,
-                refetchInterval: isRunning(actionData?.status) ? 5000 : false,
             },
         }
     );
@@ -164,17 +159,9 @@ const ActionDetail: React.FC = () => {
         }
     };
 
-    if (isLoading) {
+    if (error || (!isLoading && !actionData)) {
         return (
-            <div style={{ padding: 24, textAlign: 'center' }}>
-                <Spin size="large" />
-            </div>
-        );
-    }
-
-    if (error || !actionData) {
-        return (
-            <PageContainer>
+            <PageLayout>
                 <Alert
                     type="error"
                     message={t('detail.notFound')}
@@ -185,13 +172,13 @@ const ActionDetail: React.FC = () => {
                         </Button>
                     }
                 />
-            </PageContainer>
+            </PageLayout>
         );
     }
 
-    const canCancel = ['pending', 'running'].includes(actionData.status || '');
-    const canForce = actionData.status === 'running' && actionData.forceType !== 'forced';
-    const canConfirm = actionData.status === 'wait_for_confirmation';
+    const canCancel = ['pending', 'running'].includes(actionData?.status || '');
+    const canForce = actionData?.status === 'running' && actionData?.forceType !== 'forced';
+    const canConfirm = actionData?.status === 'wait_for_confirmation';
 
     // Find latest error message from status history
     const latestError = statusData?.content?.find((s: MgmtActionStatus) => s.type === 'error');
@@ -254,33 +241,35 @@ const ActionDetail: React.FC = () => {
         </Space>
     ) : undefined;
 
-    const liveTag = isRunning(actionData.status) ? (
+    const liveTag = isRunning(actionData?.status) ? (
         <Tag color="blue">{t('detail.liveTag', 'LIVE')}</Tag>
     ) : undefined;
 
     return (
-        <PageContainer>
+        <PageLayout>
             {/* Breadcrumb */}
             <Breadcrumb
                 items={[
                     { title: <Link to="/actions">{t('list.title')}</Link> },
-                    { title: `#${actionData.id}` },
+                    { title: actionData ? `#${actionData.id}` : `#${actionId}` },
                 ]}
+                style={{ marginBottom: 0 }}
             />
 
             {/* Header */}
             <DetailPageHeader
-                title={`${t('detail.pageTitle')} #${actionData.id}`}
+                title={actionData ? `${t('detail.pageTitle')} #${actionData.id}` : `#${actionId}`}
                 description={t('detail.description')}
-                status={actionData.status}
+                status={actionData?.status}
                 backLabel={t('detail.back')}
                 onBack={() => navigate('/actions')}
                 extra={liveTag}
                 actions={headerActions}
+                loading={isLoading}
             />
 
             {/* Error Banner */}
-            {actionData.status === 'error' && errorMessages.length > 0 && (
+            {actionData?.status === 'error' && errorMessages.length > 0 && (
                 <Alert
                     type="error"
                     message={t('detail.errorBannerTitle')}
@@ -296,27 +285,27 @@ const ActionDetail: React.FC = () => {
             )}
 
             {/* Overview */}
-            <SectionCard title={t('detail.overviewTitle')}>
+            <SectionCard title={t('detail.overviewTitle')} loading={isLoading}>
                 <Descriptions bordered column={2}>
-                    <Descriptions.Item label={t('detail.labels.id')}>{actionData.id}</Descriptions.Item>
+                    <Descriptions.Item label={t('detail.labels.id')}>{actionData?.id}</Descriptions.Item>
                     <Descriptions.Item label={t('detail.labels.status')}>
-                        <StatusTag status={actionData.status} />
+                        <StatusTag status={actionData?.status} />
                     </Descriptions.Item>
                     <Descriptions.Item label={t('detail.labels.type')}>
-                        <Tag color={actionData.type === 'forced' ? 'red' : 'blue'}>
-                            {getTypeLabel(actionData.type)}
+                        <Tag color={actionData?.type === 'forced' ? 'red' : 'blue'}>
+                            {getTypeLabel(actionData?.type)}
                         </Tag>
                     </Descriptions.Item>
                     <Descriptions.Item label={t('detail.labels.forceType')}>
-                        {getForceTypeLabel(actionData.forceType)}
+                        {getForceTypeLabel(actionData?.forceType)}
                     </Descriptions.Item>
                     <Descriptions.Item label={t('detail.labels.createdAt')}>
-                        {actionData.createdAt
+                        {actionData?.createdAt
                             ? dayjs(actionData.createdAt).format('YYYY-MM-DD HH:mm:ss')
                             : '-'}
                     </Descriptions.Item>
                     <Descriptions.Item label={t('detail.labels.lastModified')}>
-                        {actionData.lastModifiedAt
+                        {actionData?.lastModifiedAt
                             ? dayjs(actionData.lastModifiedAt).format('YYYY-MM-DD HH:mm:ss')
                             : '-'}
                     </Descriptions.Item>
@@ -335,35 +324,12 @@ const ActionDetail: React.FC = () => {
 
             {/* Status History Timeline */}
             <SectionCard title={t('detail.statusHistoryTitle')} loading={statusLoading}>
-                {statusData?.content && statusData.content.length > 0 ? (
-                    <Timeline
-                        mode="left"
-                        items={statusData.content.map((status: MgmtActionStatus) => ({
-                            color: status.type === 'finished' ? 'green' : status.type === 'error' ? 'red' : 'blue',
-                            label: status.reportedAt
-                                ? dayjs(status.reportedAt).format('YYYY-MM-DD HH:mm:ss')
-                                : '',
-                            children: (
-                                <div>
-                                    <StatusTag status={status.type} />
-                                    {status.messages && status.messages.length > 0 && (
-                                        <div style={{ marginTop: 8 }}>
-                                            {status.messages.map((msg: string, idx: number) => (
-                                                <Text key={idx} type="secondary" style={{ display: 'block' }}>
-                                                    {msg}
-                                                </Text>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ),
-                        }))}
-                    />
-                ) : (
-                    <Text type="secondary">{t('detail.noStatusHistory')}</Text>
-                )}
+                <ActionStatusTimeline
+                    statuses={statusData?.content}
+                    emptyText={t('detail.noStatusHistory')}
+                />
             </SectionCard>
-        </PageContainer>
+        </PageLayout>
     );
 };
 

@@ -85,25 +85,33 @@ const DistributionSetTypeList: React.FC = () => {
 
     const columns: ColumnsType<MgmtDistributionSetType> = [
         {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            width: 60,
+            sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
+            render: (id) => <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{id}</Text>,
+        },
+        {
             title: t('typeManagement.columns.name'),
             dataIndex: 'name',
             key: 'name',
             width: 180,
-            render: (text) => <Text strong style={{ fontSize: 12 }}>{text}</Text>,
+            render: (text) => <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>{text}</Text>,
         },
         {
             title: t('typeManagement.columns.key'),
             dataIndex: 'key',
             key: 'key',
             width: 150,
-            render: (text) => <Tag style={{ fontSize: 12 }}>{text}</Tag>,
+            render: (text) => <Tag style={{ fontSize: 'var(--ant-font-size-sm)' }}>{text}</Tag>,
         },
         {
             title: t('typeManagement.columns.description'),
             dataIndex: 'description',
             key: 'description',
             ellipsis: true,
-            render: (text) => <Text type="secondary" style={{ fontSize: 12 }}>{text || '-'}</Text>,
+            render: (text) => <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{text || '-'}</Text>,
         },
         {
             title: t('typeManagement.columns.colour'),
@@ -120,14 +128,14 @@ const DistributionSetTypeList: React.FC = () => {
                         border: '1px solid rgba(0,0,0,0.1)',
                     }} />
                     <span style={{
-                        fontSize: 11,
+                        fontSize: 'var(--ant-font-size-sm)',
                         fontFamily: 'monospace',
                         color: '#666',
                     }}>
                         {colour}
                     </span>
                 </div>
-            ) : <Text type="secondary" style={{ fontSize: 12 }}>-</Text>,
+            ) : <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>-</Text>,
         },
         {
             title: t('typeManagement.columns.lastModified'),
@@ -135,7 +143,7 @@ const DistributionSetTypeList: React.FC = () => {
             key: 'lastModifiedAt',
             width: 150,
             render: (val: number) => (
-                <Text style={{ fontSize: 12 }}>
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                     {val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}
                 </Text>
             ),
@@ -195,6 +203,7 @@ const DistributionSetTypeList: React.FC = () => {
                     ...pagination,
                     total: data?.total || 0,
                     showSizeChanger: true,
+                    pageSizeOptions: ['10', '20', '50'],
                 }}
                 loading={isLoading}
                 onChange={handleTableChange}

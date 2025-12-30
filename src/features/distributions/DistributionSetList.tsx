@@ -244,7 +244,7 @@ const DistributionSetList: React.FC = () => {
             sorter: true,
             width: 130,
             render: (val: number) => (
-                <Text style={{ fontSize: 12 }}>{val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}</Text>
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}</Text>
             ),
         },
         {
