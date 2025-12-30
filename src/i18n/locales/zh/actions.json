@@ -1,56 +1,168 @@
 {
-    "title": "操作概览",
-    "subtitle": "监控更新操作的状态",
-    "status": {
-        "running": "运行中",
-        "finished": "已完成",
-        "pending": "挂起",
-        "scheduled": "已调度",
-        "canceling": "取消中",
-        "canceled": "已取消",
-        "error": "错误",
-        "retrieving": "检索中",
-        "downloading": "下载中",
-        "installing": "安装中",
-        "active": "活动",
-        "history": "历史"
+    "pageTitle": "操作管理",
+    "list": {
+        "title": "操作列表",
+        "description": "详细的部署操作历史和实时执行跟踪"
     },
+    "subtitle": "跟踪设备操作和状态更新",
+    "refresh": "刷新",
     "columns": {
         "id": "ID",
-        "target": "目标",
-        "distribution": "分发集",
         "status": "状态",
         "type": "类型",
-        "force": "强制类型",
-        "created": "创建时间",
-        "lastModified": "最后修改"
+        "target": "目标",
+        "distributionSet": "分发集",
+        "forceType": "强制类型",
+        "createdAt": "创建时间",
+        "actions": "操作"
+    },
+    "forceTypes": {
+        "soft": "软 (Soft)",
+        "hard": "硬 (Hard)",
+        "forced": "强制 (Forced)"
+    },
+    "typeLabels": {
+        "forced": "强制",
+        "soft": "软",
+        "update": "更新",
+        "download_only": "仅下载",
+        "download": "下载",
+        "install": "安装",
+        "cancel": "取消"
     },
     "filter": {
-        "status": "状态",
-        "target": "目标",
-        "distribution": "分发集"
+        "searchPlaceholder": "按目标搜索...",
+        "statusPlaceholder": "按状态筛选",
+        "pending": "挂起",
+        "running": "运行中",
+        "finished": "已完成",
+        "error": "错误",
+        "canceled": "已取消",
+        "waitForConfirmation": "等待确认",
+        "clearFilters": "清除筛选"
     },
-    "messages": {
-        "cancelSuccess": "操作取消成功",
-        "cancelError": "取消操作失败",
-        "retrySuccess": "操作重试成功",
-        "retryError": "重试操作失败"
+    "pagination": {
+        "total": "共 {{count}} 个操作",
+        "range": "显示 {{start}}-{{end}} 共 {{total}} 个操作"
     },
-    "overview": {
-        "statusDistribution": "操作状态分布",
-        "activeActions": "活动操作",
-        "noActiveActions": "当前没有活动操作"
+    "summary": {
+        "total": "所有操作",
+        "active": "活动 / 进行中",
+        "errors": "有错误",
+        "completed": "已完成"
+    },
+    "statusHistoryTitle": "操作状态历史",
+    "statusHistoryHeader": "操作 #{{id}}",
+    "statusHistoryEmpty": "无可用状态历史",
+    "statusCode": "状态码：{{code}}",
+    "statusMessages": {
+        "updateFailedRollback": "更新失败，已执行回滚",
+        "startingServices": "正在启动服务",
+        "updatingBinaries": "正在更新二进制文件",
+        "downloadingArtifacts": "正在下载工件",
+        "verifyingServicesStopped": "正在验证服务停止",
+        "stoppingServices": "正在停止 {{service}} 服务",
+        "creatingBackup": "正在创建备份",
+        "startingUpdateProcess": "正在启动更新进程",
+        "targetRetrieved": "更新服务器：目标已检索更新操作，现在应开始下载。",
+        "targetDownloads": "更新服务器：目标正在下载 {{path}}",
+        "assignmentInitiated": "由用户 '{{user}}' 发起的分配"
+    },
+    "statusHistoryFilter": "筛选",
+    "statusFilters": {
+        "all": "全部",
+        "error": "错误",
+        "download": "下载",
+        "system": "系统"
+    },
+    "actions": {
+        "view": "查看",
+        "cancel": "取消",
+        "addAction": "添加操作",
+        "addActionComingSoon": "操作创建功能即将推出。"
+    },
+    "polling": {
+        "live": "实时 (5s)",
+        "idle": "空闲 (30s)"
+    },
+    "lastUpdated": "更新于",
+    "bulk": {
+        "selected": "已选 {{count}} 项",
+        "cancel": "批量取消",
+        "force": "批量强制",
+        "cancelConfirm": "取消选定的操作？",
+        "cancelComingSoon": "批量取消即将推出。",
+        "cancelSuccess": "成功取消 {{count}} 个操作",
+        "cancelError": "取消 {{count}} 个操作失败",
+        "clearSelection": "清除选择"
     },
     "detail": {
-        "title": "操作详情",
-        "messages": "消息",
-        "technicalDetails": "技术详情",
-        "history": "状态历史",
-        "cancel": "取消操作",
-        "retry": "重试操作",
-        "forceType": "强制类型",
-        "maintenanceWindow": "维护窗口",
-        "execution": "执行"
+        "pageTitle": "操作详情",
+        "description": "操作执行时间轴、状态更新和目标反馈",
+        "back": "返回",
+        "backToActions": "返回操作列表",
+        "notFound": "未找到操作",
+        "notFoundDesc": "请求的操作不存在。",
+        "overviewTitle": "概览",
+        "controlsTitle": "操作控制",
+        "statusHistoryTitle": "状态历史",
+        "noStatusHistory": "无可用状态历史",
+        "errorBannerTitle": "发生错误",
+        "noActions": "此状态无可用操作",
+        "liveTag": "实时",
+        "labels": {
+            "id": "ID",
+            "status": "状态",
+            "type": "类型",
+            "forceType": "强制类型",
+            "createdAt": "创建时间",
+            "lastModified": "最后修改",
+            "detailStatus": "详细状态",
+            "rollout": "Rollout",
+            "rolloutName": "Rollout 名称",
+            "weight": "权重",
+            "target": "目标",
+            "distributionSet": "分发集"
+        },
+        "controls": {
+            "cancel": "取消",
+            "cancelConfirm": "取消此操作？",
+            "cancelDesc": "此操作无法撤销。",
+            "force": "强制",
+            "forceConfirm": "强制此操作？",
+            "forceDesc": "这将把操作类型更改为强制。",
+            "confirm": "确认",
+            "deny": "拒绝"
+        },
+        "messages": {
+            "cancelSuccess": "操作取消成功",
+            "cancelError": "取消操作失败",
+            "forceSuccess": "操作已更新为强制",
+            "forceError": "更新操作失败",
+            "confirmSuccess": "操作已确认",
+            "confirmError": "确认操作失败"
+        }
     },
-    "empty": "未找到操作"
+    "overview": {
+        "title": "操作管理",
+        "subtitle": "部署操作和状态概览",
+        "totalActions": "总操作数",
+        "successRate": "成功率",
+        "statusDistribution": "操作状态分布",
+        "activeSummary": "活动摘要",
+        "activeActions": "活动操作",
+        "recentActions": "最近操作 (24h)",
+        "noActiveActions": "无活动操作",
+        "noRecentActions": "无最近操作",
+        "viewAllActions": "查看所有操作"
+    },
+    "status": {
+        "running": "运行中",
+        "pending": "挂起",
+        "scheduled": "已调度",
+        "finished": "已完成",
+        "error": "错误",
+        "canceled": "已取消",
+        "unknown": "未知"
+    }
 }
