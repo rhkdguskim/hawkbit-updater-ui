@@ -240,6 +240,7 @@ const TargetTagList: React.FC = () => {
                     descriptionLabel: t('form.description'),
                     descriptionPlaceholder: t('form.descriptionPlaceholder'),
                     colourLabel: t('tagManagement.colour'),
+                    cancelText: t('common:actions.cancel'),
                 }}
             />
         </Space>

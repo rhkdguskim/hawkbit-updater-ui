@@ -1,11 +1,42 @@
 import React, { useState } from 'react';
-import { Modal, Typography, Alert, Progress, App, Space } from 'antd';
+import { Typography, Alert, Progress, App, Space } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { deleteTarget } from '@/api/generated/targets/targets';
 import { useQueryClient } from '@tanstack/react-query';
+import styled from 'styled-components';
+import { StandardModal } from '@/components/patterns';
 
 const { Text } = Typography;
+
+const TitleContent = styled(Space)`
+    && {
+        align-items: center;
+    }
+`;
+
+const TitleIcon = styled(ExclamationCircleOutlined)`
+    color: var(--ant-color-warning);
+`;
+
+const LoadingContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ant-margin, 16px);
+    padding: var(--ant-padding-lg, 24px) 0;
+`;
+
+const FullWidthStack = styled(Space)`
+    && {
+        width: 100%;
+    }
+`;
+
+const ErrorList = styled.ul`
+    margin: 0;
+    padding-left: var(--ant-padding-sm, 12px);
+`;
 
 interface BulkDeleteTargetModalProps {
     open: boolean;
@@ -76,12 +107,12 @@ const BulkDeleteTargetModal: React.FC<BulkDeleteTargetModalProps> = ({
     };
 
     return (
-        <Modal
+        <StandardModal
             title={
-                <span>
-                    <ExclamationCircleOutlined style={{ color: '#faad14', marginRight: 8 }} />
+                <TitleContent size="small">
+                    <TitleIcon />
                     {t('bulkDelete.title', { defaultValue: 'Bulk Delete Targets' })}
-                </span>
+                </TitleContent>
             }
             open={open}
             onOk={handleConfirm}
@@ -94,14 +125,14 @@ const BulkDeleteTargetModal: React.FC<BulkDeleteTargetModalProps> = ({
             maskClosable={!loading}
         >
             {loading ? (
-                <div style={{ textAlign: 'center', padding: '24px 0' }}>
+                <LoadingContainer>
                     <Progress type="circle" percent={progress} />
-                    <Text style={{ display: 'block', marginTop: 16 }}>
+                    <Text>
                         {t('bulkDelete.processing', { defaultValue: 'Deleting targets...' })}
                     </Text>
-                </div>
+                </LoadingContainer>
             ) : (
-                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <FullWidthStack direction="vertical" size="middle">
                     <Alert
                         type="warning"
                         showIcon
@@ -118,20 +149,20 @@ const BulkDeleteTargetModal: React.FC<BulkDeleteTargetModalProps> = ({
                             type="error"
                             title={t('bulkDelete.errorTitle', { defaultValue: 'Some deletions failed' })}
                             description={
-                                <ul style={{ margin: 0, paddingLeft: 20 }}>
+                                <ErrorList>
                                     {errors.slice(0, 5).map((err, idx) => (
                                         <li key={idx}>{err}</li>
                                     ))}
                                     {errors.length > 5 && (
                                         <li>{t('bulkDelete.andMore', { count: errors.length - 5 })}</li>
                                     )}
-                                </ul>
+                                </ErrorList>
                             }
                         />
                     )}
-                </Space>
+                </FullWidthStack>
             )}
-        </Modal>
+        </StandardModal>
     );
 };
 

@@ -250,6 +250,7 @@ const DistributionSetTagList: React.FC = () => {
                     descriptionLabel: t('tagManagement.columns.description'),
                     descriptionPlaceholder: t('tagManagement.descriptionPlaceholder'),
                     colourLabel: t('tagManagement.columns.colour'),
+                    cancelText: t('common:actions.cancel'),
                 }}
             />
         </Space>

@@ -39,6 +39,20 @@ const SelectionInfo = styled.div`
     color: white;
 `;
 
+const SelectionText = styled(Text)`
+    && {
+        color: var(--ant-color-text-light-solid, #fff);
+        font-size: var(--ant-font-size);
+    }
+`;
+
+const Separator = styled(Divider)`
+    && {
+        border-color: rgba(255, 255, 255, 0.3);
+        height: var(--ant-control-height-sm, 24px);
+    }
+`;
+
 const ActionGroup = styled.div`
     display: flex;
     align-items: center;
@@ -111,10 +125,10 @@ export const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
     return (
         <ToolbarContainer>
             <SelectionInfo>
-                <Text strong style={{ color: 'white', fontSize: 14 }}>
+                <SelectionText strong>
                     {selectedCount} {label}
-                </Text>
-                <Divider type="vertical" style={{ borderColor: 'rgba(255,255,255,0.3)', height: 20 }} />
+                </SelectionText>
+                <Separator type="vertical" />
             </SelectionInfo>
 
             <ActionGroup>
@@ -147,4 +161,3 @@ export const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
 };
 
 export default SelectionToolbar;
-

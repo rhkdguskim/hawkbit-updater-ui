@@ -14,31 +14,40 @@ import type { MgmtActionStatus } from '@/api/generated/model';
 const { Text } = Typography;
 
 const LogContainer = styled.div`
-    background: #0d1117;
-    border-radius: 6px;
-    padding: 12px;
-    margin-top: 8px;
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-    font-size: 12px;
-    color: #e6edf3;
+    background: var(--ant-color-bg-container);
+    border-radius: var(--ant-border-radius, 8px);
+    padding: var(--ant-padding-sm, 12px);
+    margin-top: var(--ant-margin-xs, 8px);
+    font-family: var(--font-mono);
+    font-size: var(--ant-font-size-sm);
+    color: var(--ant-color-text);
     width: 100%;
     max-width: 100%;
     overflow-x: auto;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--ant-color-border-secondary);
 `;
 
 const LogLine = styled.div`
     line-height: 1.6;
     display: flex;
-    gap: 8px;
+    gap: var(--ant-margin-xs, 8px);
     white-space: pre-wrap;
     word-break: break-all;
     
     &::before {
         content: '>';
-        color: #7d8590;
+        color: var(--ant-color-text-tertiary);
         flex-shrink: 0;
     }
+`;
+
+const TimelineContainer = styled.div`
+    padding: var(--ant-padding-xs, 8px) var(--ant-padding-xxs, 4px);
+`;
+
+const StepContent = styled.div`
+    width: 100%;
+    margin-bottom: var(--ant-margin, 16px);
 `;
 
 const StepHeader = styled.div`
@@ -49,12 +58,12 @@ const StepHeader = styled.div`
 `;
 
 const StepTitle = styled(Text)`
-    font-size: 14px;
+    font-size: var(--ant-font-size);
     font-weight: 600;
 `;
 
 const StepTime = styled(Text)`
-    font-size: 11px;
+    font-size: var(--ant-font-size-sm);
     color: var(--ant-color-text-quaternary);
 `;
 
@@ -63,15 +72,23 @@ const ColoredDot = styled.span<{ $tone: string; $color: string }>`
     height: 24px;
     border-radius: 50%;
     background: ${props =>
-        props.$tone === 'error' ? 'rgba(239, 68, 68, 0.1)' :
-            props.$tone === 'success' ? 'rgba(16, 185, 129, 0.1)' :
-                props.$tone === 'processing' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(0, 0, 0, 0.05)'};
+        props.$tone === 'error' ? 'rgba(var(--ant-color-error-rgb), 0.12)' :
+            props.$tone === 'success' ? 'rgba(var(--ant-color-success-rgb), 0.12)' :
+                props.$tone === 'processing' ? 'rgba(var(--ant-color-info-rgb), 0.12)' :
+                    props.$tone === 'warning' ? 'rgba(var(--ant-color-warning-rgb), 0.12)' :
+                        'var(--ant-color-fill-tertiary)'};
     color: ${props => props.$color};
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-xs);
+`;
+
+const StatusCodeTag = styled(Tag)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
 `;
 
 interface ActionStatusTimelineProps {
@@ -144,12 +161,12 @@ export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ stat
                     color: tone,
                     dot: <ColoredDot $tone={tone} $color={color}>{icon}</ColoredDot>,
                     children: (
-                        <div style={{ width: '100%', marginBottom: 16 }}>
+                        <StepContent>
                             <StepHeader>
-                                <Space align="center" size={8}>
+                                <Space align="center" size="small">
                                     <StepTitle>{getStatusLabel(status.type)}</StepTitle>
                                     {status.code !== undefined && (
-                                        <Tag bordered={false} style={{ fontSize: 10 }}>{t('actions:statusCode', { code: status.code })}</Tag>
+                                        <StatusCodeTag bordered={false}>{t('actions:statusCode', { code: status.code })}</StatusCodeTag>
                                     )}
                                 </Space>
                                 <StepTime>
@@ -168,7 +185,7 @@ export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ stat
                                     ))}
                                 </LogContainer>
                             ) : null}
-                        </div>
+                        </StepContent>
                     ),
                 };
             });
@@ -179,8 +196,8 @@ export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ stat
     }
 
     return (
-        <div style={{ padding: '8px 4px' }}>
+        <TimelineContainer>
             <Timeline items={timelineItems} />
-        </div>
+        </TimelineContainer>
     );
 };

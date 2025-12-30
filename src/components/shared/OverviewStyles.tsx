@@ -81,7 +81,7 @@ export const OverviewPageContainer = styled.div`
     min-height: 0;
     height: 100%;
     overflow: hidden;
-    padding: 24px;
+    padding: var(--ant-margin-lg, 24px);
     animation: ${fadeInUp} 0.5s ease-out;
 `;
 
@@ -91,7 +91,7 @@ export const OverviewScrollContent = styled.div`
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--ant-margin, 16px);
     min-height: 0;
     
     /* Custom scrollbar for premium feel */
@@ -111,14 +111,14 @@ export const OverviewPageHeader = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 0 8px 0;
+    padding: 0 0 var(--ant-padding-xs, 8px) 0;
     flex-shrink: 0;
 `;
 
 export const HeaderContent = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--ant-margin-xs, 8px);
 `;
 
 export const GradientTitle = styled(Typography.Title) <{ $theme?: keyof typeof OVERVIEW_THEMES }>`
@@ -136,14 +136,14 @@ export const GradientTitle = styled(Typography.Title) <{ $theme?: keyof typeof O
 
 export const TopRow = styled.div`
     display: flex;
-    gap: 16px;
+    gap: var(--ant-margin, 16px);
     min-height: 240px;
     flex-shrink: 0;
 `;
 
 export const BottomRow = styled.div`
     display: flex;
-    gap: 16px;
+    gap: var(--ant-margin, 16px);
     min-height: 300px;
     flex: 1;
 `;
@@ -151,14 +151,14 @@ export const BottomRow = styled.div`
 export const KPIGridContainer = styled.div`
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: var(--ant-margin-xs, 8px);
     flex: 0 0 260px;
     height: 100%;
 `;
 
 export const ChartsContainer = styled.div`
     display: flex;
-    gap: 16px;
+    gap: var(--ant-margin, 16px);
     flex: 1;
     min-width: 0;
 `;
@@ -166,10 +166,10 @@ export const ChartsContainer = styled.div`
 // Card Components
 export const OverviewStatsCard = styled(Card) <{ $accentColor?: string; $delay?: number; $pulse?: boolean }>`
     border: none;
-    border-radius: 16px;
+    border-radius: var(--ant-border-radius-lg, 20px);
     background: var(--ant-color-bg-container);
     backdrop-filter: blur(20px);
-    box-shadow: var(--ant-shadow-tertiary);
+    box-shadow: var(--shadow-sm);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
@@ -192,7 +192,7 @@ export const OverviewStatsCard = styled(Card) <{ $accentColor?: string; $delay?:
 
     &:hover {
         transform: translateY(-4px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        box-shadow: var(--shadow-lg);
     }
 
     [data-theme='dark'] &,
@@ -201,7 +201,7 @@ export const OverviewStatsCard = styled(Card) <{ $accentColor?: string; $delay?:
     }
 
     .ant-card-body {
-        padding: 12px;
+        padding: var(--ant-padding-sm, 12px);
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -212,7 +212,7 @@ export const OverviewStatsCard = styled(Card) <{ $accentColor?: string; $delay?:
 
 export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof typeof OVERVIEW_THEMES }>`
     border: none;
-    border-radius: 16px;
+    border-radius: var(--ant-border-radius-lg, 20px);
     background: ${props => {
         const theme = props.$theme ? OVERVIEW_THEMES[props.$theme] : null;
         return theme
@@ -220,7 +220,7 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
             : 'var(--ant-color-bg-container)';
     }};
     backdrop-filter: blur(20px);
-    box-shadow: var(--ant-shadow-tertiary);
+    box-shadow: var(--shadow-sm);
     animation: ${fadeInUp} 0.5s ease-out;
     animation-delay: ${props => (props.$delay || 0) * 0.1}s;
     animation-fill-mode: both;
@@ -244,12 +244,12 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
         const theme = props.$theme ? OVERVIEW_THEMES[props.$theme] : null;
         return theme?.gradient || 'linear-gradient(180deg, #3b82f6 0%, #2563eb 100%)';
     }};
-        border-radius: 16px 0 0 16px;
+        border-radius: var(--ant-border-radius-lg, 20px) 0 0 var(--ant-border-radius-lg, 20px);
     }
 
     &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-md);
     }
     
     .ant-card-head {
@@ -258,7 +258,7 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
         return theme?.accentBorder || 'rgba(0, 0, 0, 0.04)';
     }};
         flex-shrink: 0;
-        padding: 12px 16px;
+        padding: var(--ant-padding-sm, 12px) var(--ant-padding, 16px);
         min-height: auto;
         background: transparent;
     }
@@ -267,12 +267,12 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
         font-size: var(--ant-font-size);
         font-weight: 600;
         color: var(--ant-color-text, #1e293b);
-        padding: 4px 0;
+        padding: var(--ant-padding-xxs, 4px) 0;
     }
-    
+
     .ant-card-body {
         flex: 1;
-        padding: 12px 16px;
+        padding: var(--ant-padding-sm, 12px) var(--ant-padding, 16px);
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -293,9 +293,9 @@ export const OverviewListCard = styled(OverviewChartCard)`
     `;
 
 export const IconBadge = styled.div<{ $theme?: keyof typeof OVERVIEW_THEMES; $color?: string }>`
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
+    width: var(--ant-control-height, 32px);
+    height: var(--ant-control-height, 32px);
+    border-radius: var(--ant-border-radius-sm, 10px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -306,7 +306,7 @@ export const IconBadge = styled.div<{ $theme?: keyof typeof OVERVIEW_THEMES; $co
     }};
     color: white;
     font-size: 1.1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-sm);
     flex-shrink: 0;
 `;
 
@@ -314,14 +314,14 @@ export const BigNumber = styled.div<{ $color?: string }>`
 font-size: 2rem;
 font-weight: 700;
 line-height: 1.2;
-margin-bottom: 4px;
+margin-bottom: var(--ant-margin-xxs, 4px);
 color: ${props => props.$color || 'var(--ant-color-primary, #3b82f6)'};
 `;
 
 export const LiveIndicator = styled.div<{ $active?: boolean; $color?: string }>`
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--ant-margin-xxs, 4px);
     font-size: var(--ant-font-size-sm);
     color: ${props => props.$active ? (props.$color || 'var(--ant-color-success)') : 'var(--ant-color-text-quaternary)'};
     font-weight: 500;
@@ -340,17 +340,17 @@ export const ChartLegendItem = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
+    padding: var(--ant-padding-xs, 8px) var(--ant-padding-sm, 12px);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 250, 252, 0.6) 100%);
-    border-radius: 8px;
+    border-radius: var(--ant-border-radius, 8px);
     cursor: pointer;
     transition: all 0.2s ease;
-    border: 1px solid rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--ant-color-border-secondary);
     
     &:hover {
         background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(248, 250, 252, 0.9) 100%);
         transform: translateX(2px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        box-shadow: var(--shadow-xs);
     }
 
     [data-theme='dark'] &,
@@ -366,19 +366,19 @@ export const ActivityItem = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
+    padding: var(--ant-padding-xs, 8px) var(--ant-padding-sm, 12px);
     cursor: pointer;
     height: 100%;
     width: 100%;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 100%);
-    border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    border-radius: var(--ant-border-radius, 8px);
+    border: 1px solid var(--ant-color-border-secondary);
     transition: all 0.2s ease;
 
     &:hover {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.7) 100%);
         transform: translateX(2px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        box-shadow: var(--shadow-xs);
     }
 
     [data-theme='dark'] &,
@@ -391,33 +391,33 @@ export const ActivityItem = styled.div`
 export const StatusBadge = styled.div<{ $status?: string }>`
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 20px;
+    gap: var(--ant-margin-xs, 8px);
+    padding: var(--ant-padding-xs, 8px) var(--ant-padding-sm, 12px);
+    border-radius: var(--ant-border-radius-lg, 20px);
     font-size: var(--ant-font-size-sm);
     font-weight: 500;
     
     ${props => {
         const status = props.$status?.toLowerCase();
         if (status === 'online' || status === 'in_sync' || status === 'finished' || status === 'complete') return css`
-            background: rgba(16, 185, 129, 0.1);
-            color: #059669;
+            background: rgba(var(--ant-color-success-rgb), 0.1);
+            color: var(--ant-color-success);
         `;
         if (status === 'running' || status === 'pending') return css`
-            background: rgba(59, 130, 246, 0.1);
-            color: #2563eb;
+            background: rgba(var(--ant-color-info-rgb), 0.1);
+            color: var(--ant-color-info);
         `;
         if (status === 'offline' || status === 'incomplete' || status === 'paused') return css`
-            background: rgba(245, 158, 11, 0.1);
-            color: #d97706;
+            background: rgba(var(--ant-color-warning-rgb), 0.1);
+            color: var(--ant-color-warning);
         `;
         if (status === 'error' || status === 'failed') return css`
-            background: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
+            background: rgba(var(--ant-color-error-rgb), 0.1);
+            color: var(--ant-color-error);
         `;
         return css`
-            background: rgba(148, 163, 184, 0.15);
-            color: #64748b;
+            background: var(--ant-color-fill-secondary);
+            color: var(--ant-color-text-secondary);
         `;
     }}
 `;
@@ -425,8 +425,8 @@ export const StatusBadge = styled.div<{ $status?: string }>`
 export const ProgressBar = styled.div<{ $progress: number; $color?: string }>`
     width: 100%;
     height: 6px;
-    background: rgba(0, 0, 0, 0.06);
-    border-radius: 3px;
+    background: var(--ant-color-fill-secondary);
+    border-radius: var(--ant-border-radius-xs, 4px);
     overflow: hidden;
     position: relative;
 
@@ -438,7 +438,7 @@ export const ProgressBar = styled.div<{ $progress: number; $color?: string }>`
         height: 100%;
         width: ${props => props.$progress}%;
         background: ${props => props.$color || 'var(--ant-color-primary)'};
-        border-radius: 3px;
+        border-radius: var(--ant-border-radius-xs, 4px);
         transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 `;

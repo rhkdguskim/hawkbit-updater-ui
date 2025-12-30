@@ -4,6 +4,19 @@ import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons'
 import { buildWildcardSearch } from '@/utils/fiql';
 import { FilterBar } from '@/components/patterns';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+
+const SearchSelect = styled(Select)`
+    && {
+        width: 120px;
+    }
+`;
+
+const SearchInput = styled(Input)`
+    && {
+        width: 300px;
+    }
+`;
 
 interface DistributionSearchBarProps {
     onSearch: (query: string) => void;
@@ -61,7 +74,7 @@ const DistributionSearchBar: React.FC<DistributionSearchBarProps> = ({
             }
         >
             <Space size="small">
-                <Select
+                <SearchSelect
                     defaultValue="name"
                     options={[
                         { value: 'name', label: t('list.searchFields.name') },
@@ -69,14 +82,12 @@ const DistributionSearchBar: React.FC<DistributionSearchBarProps> = ({
                         { value: 'description', label: t('list.searchFields.description') },
                     ]}
                     onChange={setSearchField}
-                    style={{ width: 120 }}
                 />
-                <Input
+                <SearchInput
                     placeholder={displayPlaceholder}
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    style={{ width: 300 }}
                     allowClear
                     prefix={<SearchOutlined />}
                 />

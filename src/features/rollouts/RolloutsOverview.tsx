@@ -40,27 +40,189 @@ import {
     COLORS,
 } from '@/components/shared/OverviewStyles';
 import RolloutCreateModal from './RolloutCreateModal';
+import styled from 'styled-components';
 
 dayjs.extend(relativeTime);
 
 const { Text } = Typography;
 
 const ROLLOUT_COLORS = {
-    running: '#3b82f6',
-    ready: '#10b981',
-    paused: '#f59e0b',
-    finished: '#22c55e',
-    error: '#ef4444',
-    scheduled: '#8b5cf6',
+    running: 'var(--ant-color-info)',
+    ready: 'var(--ant-color-success)',
+    paused: 'var(--ant-color-warning)',
+    finished: 'var(--ant-color-success)',
+    error: 'var(--ant-color-error)',
+    scheduled: 'var(--ant-color-primary)',
 };
 
 const ACTION_COLORS = {
-    finished: '#10b981',
-    running: '#3b82f6',
-    pending: '#f59e0b',
-    error: '#ef4444',
-    canceled: '#94a3b8',
+    finished: 'var(--ant-color-success)',
+    running: 'var(--ant-color-info)',
+    pending: 'var(--ant-color-warning)',
+    error: 'var(--ant-color-error)',
+    canceled: 'var(--ant-color-text-quaternary)',
 };
+
+const LegendStack = styled(Flex)`
+    margin-top: var(--ant-margin-xxs, 4px);
+`;
+
+const LegendSwatch = styled.div<{ $color: string }>`
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: ${props => props.$color};
+    box-shadow: 0 1px 3px ${props => `${props.$color}40`};
+`;
+
+const LegendLabel = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+        color: var(--ant-color-text-secondary);
+    }
+`;
+
+const LegendValue = styled(Text)<{ $color: string }>`
+    && {
+        font-size: var(--ant-font-size-sm);
+        color: ${props => props.$color};
+    }
+`;
+
+const SubtitleText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size);
+    }
+`;
+
+const UpdatedText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const StatCaption = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+        text-align: center;
+    }
+`;
+
+const TinyText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const ProgressThin = styled(Progress)`
+    && {
+        width: 60px;
+    }
+`;
+
+const ChartTitle = styled.span`
+    font-size: var(--ant-font-size);
+    font-weight: 600;
+`;
+
+const ChartSubtitle = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const ChartSkeleton = styled(Skeleton.Avatar)`
+    margin: var(--ant-margin-xs, 8px) auto;
+    display: block;
+`;
+
+const FlexFill = styled(Flex)`
+    flex: 1;
+`;
+
+const CenteredFlex = styled(Flex)`
+    flex: 1;
+`;
+
+const ActiveListContainer = styled.div`
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+`;
+
+const ActivityRow = styled(Flex)`
+    flex: 1;
+    min-width: 0;
+`;
+
+const ActivityMeta = styled(Flex)`
+    flex: 1;
+    min-width: 0;
+`;
+
+const ActivityName = styled(Text)`
+    && {
+        font-size: var(--ant-font-size);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+`;
+
+const ActivityTag = styled(Tag)`
+    && {
+        margin: 0;
+        font-size: var(--ant-font-size-sm);
+        border-radius: 999px;
+    }
+`;
+
+const ActivityCaption = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const EmptyState = styled(Flex)`
+    flex: 1;
+`;
+
+const EmptyIcon = styled(RocketOutlined)`
+    font-size: 40px;
+    color: var(--ant-color-text-quaternary);
+`;
+
+const StatusIconWrap = styled.div<{ $status?: string }>`
+    width: var(--ant-control-height-lg, 40px);
+    height: var(--ant-control-height-lg, 40px);
+    border-radius: var(--ant-border-radius, 8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: ${props => {
+        switch (props.$status) {
+            case 'running':
+                return 'linear-gradient(135deg, rgba(var(--ant-color-info-rgb), 0.15) 0%, rgba(var(--ant-color-info-rgb), 0.1) 100%)';
+            case 'paused':
+                return 'linear-gradient(135deg, rgba(var(--ant-color-warning-rgb), 0.15) 0%, rgba(var(--ant-color-warning-rgb), 0.1) 100%)';
+            default:
+                return 'linear-gradient(135deg, rgba(var(--ant-color-primary-rgb), 0.15) 0%, rgba(var(--ant-color-primary-rgb), 0.1) 100%)';
+        }
+    }};
+`;
+
+const StatusIcon = styled.span<{ $color: string }>`
+    display: inline-flex;
+    font-size: 18px;
+    color: ${props => props.$color};
+`;
+
+const ShadowCell = styled(Cell)`
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+`;
 
 const statusColorMap: Record<string, string> = {
     running: 'blue',
@@ -175,17 +337,17 @@ const RolloutsOverview: React.FC = () => {
     };
 
     const renderCustomLegend = (data: { name: string; value: number; color: string }[]) => (
-        <Flex vertical gap={4} style={{ marginTop: 4 }}>
+        <LegendStack vertical gap="small">
             {data.map(entry => (
                 <ChartLegendItem key={entry.name}>
                     <Flex align="center" gap={6}>
-                        <div style={{ width: 10, height: 10, borderRadius: 3, background: entry.color, boxShadow: `0 1px 3px ${entry.color}40` }} />
-                        <Text style={{ fontSize: 11, color: '#475569' }}>{entry.name}</Text>
+                        <LegendSwatch $color={entry.color} />
+                        <LegendLabel>{entry.name}</LegendLabel>
                     </Flex>
-                    <Text strong style={{ fontSize: 12, color: entry.color }}>{entry.value}</Text>
+                    <LegendValue strong $color={entry.color}>{entry.value}</LegendValue>
                 </ChartLegendItem>
             ))}
-        </Flex>
+        </LegendStack>
     );
 
     const totalActive = runningRollouts + runningActions;
@@ -196,9 +358,9 @@ const RolloutsOverview: React.FC = () => {
                 title={t('overview.title', 'Rollout Management')}
                 description={
                     <Flex align="center" gap={12}>
-                        <Text type="secondary" style={{ fontSize: 13 }}>
+                        <SubtitleText type="secondary">
                             {t('overview.subtitle', 'Deployment rollout overview and monitoring')}
-                        </Text>
+                        </SubtitleText>
                         <LiveIndicator $active={totalActive > 0} $color={COLORS.rollouts}>
                             {totalActive > 0 ? `${totalActive} ${t('common:status.active', 'Active')}` : t('common:status.idle', 'Idle')}
                         </LiveIndicator>
@@ -206,9 +368,9 @@ const RolloutsOverview: React.FC = () => {
                 }
                 actions={
                     <Flex align="center" gap={8}>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                        <UpdatedText type="secondary">
                             {t('common:updated', 'Updated')}: {lastUpdated}
-                        </Text>
+                        </UpdatedText>
                         <Button
                             icon={<ReloadOutlined />}
                             onClick={() => { refetchRollouts(); refetchActions(); }}
@@ -237,7 +399,7 @@ const RolloutsOverview: React.FC = () => {
                     <KPIGridContainer>
                         {/* Total Rollouts */}
                         <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
+                            $accentColor="var(--gradient-warning)"
                             $delay={1}
                             onClick={() => navigate('/rollouts/list')}
                         >
@@ -247,72 +409,71 @@ const RolloutsOverview: React.FC = () => {
                                         <RocketOutlined />
                                     </IconBadge>
                                     <BigNumber $color={COLORS.rollouts}>{totalRollouts}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                    <StatCaption type="secondary">
                                         {t('overview.totalRollouts', 'Rollouts')}
-                                    </Text>
+                                    </StatCaption>
                                 </Flex>
                             )}
                         </OverviewStatsCard>
 
                         {/* Active Rollouts */}
                         <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
+                            $accentColor="var(--gradient-info)"
                             $delay={2}
                             $pulse={runningRollouts > 0}
                             onClick={() => navigate('/rollouts/list?status=running')}
                         >
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)">
+                                    <IconBadge $color="var(--gradient-info)">
                                         <PlayCircleOutlined />
                                     </IconBadge>
                                     <BigNumber $color={ROLLOUT_COLORS.running}>{runningRollouts}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                    <StatCaption type="secondary">
                                         {t('actions:status.running', 'Running')}
-                                    </Text>
+                                    </StatCaption>
                                 </Flex>
                             )}
                         </OverviewStatsCard>
 
                         {/* Total Actions */}
                         <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
+                            $accentColor="var(--gradient-primary)"
                             $delay={3}
                             onClick={() => navigate('/actions')}
                         >
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)">
+                                    <IconBadge $color="var(--gradient-primary)">
                                         <ThunderboltOutlined />
                                     </IconBadge>
-                                    <BigNumber $color="#6366f1">{totalActions}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                    <BigNumber $color="var(--ant-color-primary)">{totalActions}</BigNumber>
+                                    <StatCaption type="secondary">
                                         {t('common:nav.actions', 'Actions')}
-                                    </Text>
+                                    </StatCaption>
                                 </Flex>
                             )}
                         </OverviewStatsCard>
 
                         {/* Success Rate */}
                         <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #10b981 0%, #059669 100%)"
+                            $accentColor="var(--gradient-success)"
                             $delay={4}
                             onClick={() => navigate('/actions')}
                         >
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                                    <IconBadge $color="var(--gradient-success)">
                                         <CheckCircleOutlined />
                                     </IconBadge>
                                     <BigNumber $color={ACTION_COLORS.finished}>
                                         {successRate !== null ? `${successRate}%` : '-'}
                                     </BigNumber>
-                                    <Progress
+                                    <ProgressThin
                                         percent={successRate ?? 0}
                                         size="small"
                                         strokeColor={ACTION_COLORS.finished}
                                         showInfo={false}
-                                        style={{ width: 60 }}
                                     />
                                 </Flex>
                             )}
@@ -329,33 +490,33 @@ const RolloutsOverview: React.FC = () => {
                                         <RocketOutlined />
                                     </IconBadge>
                                     <Flex vertical gap={0}>
-                                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.statusDistribution', 'Rollout Status')}</span>
-                                        <Text type="secondary" style={{ fontSize: 11 }}>{totalRollouts} total</Text>
+                                        <ChartTitle>{t('overview.statusDistribution', 'Rollout Status')}</ChartTitle>
+                                        <ChartSubtitle type="secondary">{totalRollouts} total</ChartSubtitle>
                                     </Flex>
                                 </Flex>
                             }
                             $delay={5}
                         >
                             {isLoading ? (
-                                <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
+                                <ChartSkeleton active size={60} shape="circle" />
                             ) : rolloutPieData.length > 0 ? (
-                                <Flex vertical style={{ flex: 1 }}>
+                                <FlexFill vertical>
                                     <ResponsiveContainer width="100%" height={100}>
                                         <PieChart>
                                             <Pie data={rolloutPieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
                                                 {rolloutPieData.map((entry, index) => (
-                                                    <Cell key={`rollout-cell-${index}`} fill={entry.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+                                                    <ShadowCell key={`rollout-cell-${index}`} fill={entry.color} />
                                                 ))}
                                             </Pie>
                                             <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                     {renderCustomLegend(rolloutPieData.slice(0, 4))}
-                                </Flex>
+                                </FlexFill>
                             ) : (
-                                <Flex justify="center" align="center" style={{ flex: 1 }}>
+                                <CenteredFlex justify="center" align="center">
                                     <Text type="secondary">{t('overview.noRollouts', 'No rollouts')}</Text>
-                                </Flex>
+                                </CenteredFlex>
                             )}
                         </OverviewChartCard>
 
@@ -368,33 +529,33 @@ const RolloutsOverview: React.FC = () => {
                                         <ThunderboltOutlined />
                                     </IconBadge>
                                     <Flex vertical gap={0}>
-                                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('actions:overview.statusDistribution', 'Action Status')}</span>
-                                        <Text type="secondary" style={{ fontSize: 11 }}>{totalActions} total</Text>
+                                        <ChartTitle>{t('actions:overview.statusDistribution', 'Action Status')}</ChartTitle>
+                                        <ChartSubtitle type="secondary">{totalActions} total</ChartSubtitle>
                                     </Flex>
                                 </Flex>
                             }
                             $delay={6}
                         >
                             {isLoading ? (
-                                <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
+                                <ChartSkeleton active size={60} shape="circle" />
                             ) : actionPieData.length > 0 ? (
-                                <Flex vertical style={{ flex: 1 }}>
+                                <FlexFill vertical>
                                     <ResponsiveContainer width="100%" height={100}>
                                         <PieChart>
                                             <Pie data={actionPieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
                                                 {actionPieData.map((entry, index) => (
-                                                    <Cell key={`action-cell-${index}`} fill={entry.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+                                                    <ShadowCell key={`action-cell-${index}`} fill={entry.color} />
                                                 ))}
                                             </Pie>
                                             <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                     {renderCustomLegend(actionPieData.slice(0, 4))}
-                                </Flex>
+                                </FlexFill>
                             ) : (
-                                <Flex justify="center" align="center" style={{ flex: 1 }}>
+                                <CenteredFlex justify="center" align="center">
                                     <Text type="secondary">{t('actions:empty', 'No actions')}</Text>
-                                </Flex>
+                                </CenteredFlex>
                             )}
                         </OverviewChartCard>
                     </ChartsContainer>
@@ -407,15 +568,15 @@ const RolloutsOverview: React.FC = () => {
                         $theme="rollouts"
                         title={
                             <Flex align="center" gap={10}>
-                                <IconBadge $theme="rollouts">
-                                    <RocketOutlined />
-                                </IconBadge>
-                                <Flex vertical gap={0}>
-                                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.activeRollouts', 'Active Rollouts')}</span>
-                                    <Text type="secondary" style={{ fontSize: 11 }}>{activeRollouts.length} active</Text>
+                                    <IconBadge $theme="rollouts">
+                                        <RocketOutlined />
+                                    </IconBadge>
+                                    <Flex vertical gap={0}>
+                                        <ChartTitle>{t('overview.activeRollouts', 'Active Rollouts')}</ChartTitle>
+                                        <ChartSubtitle type="secondary">{activeRollouts.length} active</ChartSubtitle>
+                                    </Flex>
                                 </Flex>
-                            </Flex>
-                        }
+                            }
                         extra={
                             <Button type="link" size="small" onClick={() => navigate('/rollouts/list')}>
                                 {t('overview.viewAll', 'View All')}
@@ -426,7 +587,7 @@ const RolloutsOverview: React.FC = () => {
                         {isLoading ? (
                             <Skeleton active paragraph={{ rows: 5 }} />
                         ) : activeRollouts.length > 0 ? (
-                            <div style={{ flex: 1, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                            <ActiveListContainer>
                                 <AirportSlideList
                                     items={activeRollouts}
                                     itemHeight={56}
@@ -437,39 +598,30 @@ const RolloutsOverview: React.FC = () => {
                                             key={rollout.id}
                                             onClick={() => navigate(`/rollouts/${rollout.id}`)}
                                         >
-                                            <Flex align="center" gap={12} style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{
-                                                    width: 36, height: 36, borderRadius: 8,
-                                                    background: rollout.status === 'running'
-                                                        ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%)'
-                                                        : rollout.status === 'paused'
-                                                            ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%)'
-                                                            : 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%)',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    flexShrink: 0
-                                                }}>
+                                            <ActivityRow align="center" gap={12}>
+                                                <StatusIconWrap $status={rollout.status}>
                                                     {rollout.status === 'running' ? (
-                                                        <SyncOutlined spin style={{ fontSize: 18, color: ROLLOUT_COLORS.running }} />
+                                                        <StatusIcon $color={ROLLOUT_COLORS.running}><SyncOutlined spin /></StatusIcon>
                                                     ) : rollout.status === 'paused' ? (
-                                                        <PauseCircleOutlined style={{ fontSize: 18, color: ROLLOUT_COLORS.paused }} />
+                                                        <StatusIcon $color={ROLLOUT_COLORS.paused}><PauseCircleOutlined /></StatusIcon>
                                                     ) : (
-                                                        <ClockCircleOutlined style={{ fontSize: 18, color: ROLLOUT_COLORS.scheduled }} />
+                                                        <StatusIcon $color={ROLLOUT_COLORS.scheduled}><ClockCircleOutlined /></StatusIcon>
                                                     )}
-                                                </div>
-                                                <Flex vertical gap={0} style={{ flex: 1, minWidth: 0 }}>
+                                                </StatusIconWrap>
+                                                <ActivityMeta vertical gap={0}>
                                                     <Flex align="center" gap={8}>
-                                                        <Text strong style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                        <ActivityName strong>
                                                             {rollout.name}
-                                                        </Text>
-                                                        <Tag color={statusColorMap[rollout.status || ''] || 'default'} style={{ margin: 0, fontSize: 10, borderRadius: 999 }}>
+                                                        </ActivityName>
+                                                        <ActivityTag color={statusColorMap[rollout.status || ''] || 'default'}>
                                                             {getStatusLabel(rollout.status)}
-                                                        </Tag>
+                                                        </ActivityTag>
                                                     </Flex>
-                                                    <Text type="secondary" style={{ fontSize: 11 }}>
+                                                    <ActivityCaption type="secondary">
                                                         {rollout.totalTargets || 0} targets
-                                                    </Text>
-                                                </Flex>
-                                            </Flex>
+                                                    </ActivityCaption>
+                                                </ActivityMeta>
+                                            </ActivityRow>
                                             <Progress
                                                 type="circle"
                                                 percent={getRolloutProgress(rollout)}
@@ -484,10 +636,10 @@ const RolloutsOverview: React.FC = () => {
                                         </ActivityItem>
                                     )}
                                 />
-                            </div>
+                            </ActiveListContainer>
                         ) : (
-                            <Flex vertical justify="center" align="center" gap={12} style={{ flex: 1 }}>
-                                <RocketOutlined style={{ fontSize: 40, color: '#94a3b8' }} />
+                            <EmptyState vertical justify="center" align="center" gap={12}>
+                                <EmptyIcon />
                                 <Text type="secondary">{t('overview.noActiveRollouts', 'No active rollouts')}</Text>
                                 {isAdmin && (
                                     <Button
@@ -499,7 +651,7 @@ const RolloutsOverview: React.FC = () => {
                                         {t('overview.createFirst', 'Create First Rollout')}
                                     </Button>
                                 )}
-                            </Flex>
+                            </EmptyState>
                         )}
                     </OverviewListCard>
 
@@ -512,8 +664,8 @@ const RolloutsOverview: React.FC = () => {
                                     <ThunderboltOutlined />
                                 </IconBadge>
                                 <Flex vertical gap={0}>
-                                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('actions:overview.activeActions', 'Active Actions')}</span>
-                                    <Text type="secondary" style={{ fontSize: 11 }}>{activeActions.length} active</Text>
+                                    <ChartTitle>{t('actions:overview.activeActions', 'Active Actions')}</ChartTitle>
+                                    <ChartSubtitle type="secondary">{activeActions.length} active</ChartSubtitle>
                                 </Flex>
                             </Flex>
                         }
@@ -527,7 +679,7 @@ const RolloutsOverview: React.FC = () => {
                         {isLoading ? (
                             <Skeleton active paragraph={{ rows: 5 }} />
                         ) : activeActions.length > 0 ? (
-                            <div style={{ flex: 1, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                            <ActiveListContainer>
                                 <ActiveUpdatesCard
                                     items={activeActions.map(action => ({
                                         action,
@@ -537,11 +689,11 @@ const RolloutsOverview: React.FC = () => {
                                     showHistory={true}
                                     emptyText={t('actions:overview.noActiveActions', 'No active actions')}
                                 />
-                            </div>
+                            </ActiveListContainer>
                         ) : (
-                            <Flex justify="center" align="center" style={{ flex: 1 }}>
+                            <CenteredFlex justify="center" align="center">
                                 <Text type="secondary">{t('actions:overview.noActiveActions', 'No active actions')}</Text>
-                            </Flex>
+                            </CenteredFlex>
                         )}
                     </OverviewListCard>
                 </BottomRow>

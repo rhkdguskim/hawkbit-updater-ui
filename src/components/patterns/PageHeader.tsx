@@ -1,37 +1,46 @@
-import { Typography, Space, theme, Button, Flex } from 'antd';
+import { Typography, Space, Button, Flex } from 'antd';
 import styled from 'styled-components';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
-const { useToken } = theme;
-
-const HeaderContainer = styled.div<{ $paddingBottom: string }>`
+const HeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding-bottom: ${props => props.$paddingBottom};
+  padding-bottom: var(--ant-margin-xs, 8px);
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--ant-margin, 16px);
 `;
 
 const TitleSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--ant-margin-xs, 8px);
 `;
 
 const TitleRow = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--ant-margin-sm, 12px);
   flex-wrap: wrap;
+`;
+
+const HeaderTitle = styled(Title)`
+    margin: 0;
+    font-size: var(--ant-font-size-heading-2);
 `;
 
 const BackButton = styled(Button)`
     && {
-        padding: 4px 12px;
-        height: 32px;
+        padding: 0 var(--ant-padding-xs, 8px);
+        height: var(--ant-control-height-sm, 24px);
         font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const SubtitleText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size);
     }
 `;
 
@@ -40,6 +49,13 @@ const Description = styled(Text)`
         margin-left: 0;
         font-size: var(--ant-font-size);
         max-width: 800px;
+    }
+`;
+
+const Actions = styled(Space)`
+    && {
+        align-items: center;
+        min-height: var(--ant-control-height, 32px);
     }
 `;
 
@@ -75,10 +91,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     onBack,
     extra
 }) => {
-    const { token } = useToken();
-
     return (
-        <HeaderContainer $paddingBottom={`${token.marginXS}px`}>
+        <HeaderContainer>
             <TitleSection>
                 <TitleRow>
                     {onBack && (
@@ -87,9 +101,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                         </BackButton>
                     )}
                     {typeof title === 'string' ? (
-                        <Title level={2} style={{ margin: 0, fontSize: 'var(--ant-font-size-heading-2)' }}>
+                        <HeaderTitle level={2}>
                             {title}
-                        </Title>
+                        </HeaderTitle>
                     ) : (
                         title
                     )}
@@ -99,11 +113,11 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                 {(subtitle || subtitleExtra || description) && (
                     <Flex vertical gap={4}>
                         {(subtitle || subtitleExtra) && (
-                            <Space size={8} align="center">
+                            <Space size="small" align="center">
                                 {subtitle && (
-                                    <Text type="secondary" style={{ fontSize: token.fontSize }}>
+                                    <SubtitleText type="secondary">
                                         {subtitle}
-                                    </Text>
+                                    </SubtitleText>
                                 )}
                                 {subtitleExtra}
                             </Space>
@@ -117,9 +131,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                 )}
             </TitleSection>
             {actions && (
-                <Space size="middle" align="center" style={{ height: 32 }}>
+                <Actions size="middle" align="center">
                     {actions}
-                </Space>
+                </Actions>
             )}
         </HeaderContainer>
     );

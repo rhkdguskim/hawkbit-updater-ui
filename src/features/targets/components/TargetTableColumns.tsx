@@ -74,7 +74,6 @@ export const getTargetTableColumns = ({
             title: t('table.name'),
             dataIndex: 'name',
             key: 'name',
-            sorter: true,
             width: 180,
             render: (_: string, record) => (
                 <EditableCell

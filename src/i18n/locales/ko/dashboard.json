@@ -4,6 +4,7 @@
     "refresh": "새로고침",
     "pageTitle": "운영 인텔리전스 보드",
     "lastUpdated": "업데이트",
+    "updated": "업데이트",
     "polling": {
         "live": "실시간",
         "idle": "대기"

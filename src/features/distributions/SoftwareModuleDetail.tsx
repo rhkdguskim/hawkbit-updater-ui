@@ -16,9 +16,22 @@ import type { MgmtArtifact } from '@/api/generated/model';
 import ModuleMetadataTab from './components/ModuleMetadataTab';
 import { useTranslation } from 'react-i18next';
 import type { RcFile } from 'antd/es/upload';
-import { PageLayout } from '@/components/patterns';
+import { PageLayout, StandardModal } from '@/components/patterns';
 import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader } from '@/components/common';
+import styled from 'styled-components';
+
+const FullWidthSpace = styled(Space)`
+    width: 100%;
+`;
+
+const DetailBreadcrumb = styled(Breadcrumb)`
+    margin-bottom: 0;
+`;
+
+const ErrorHintIcon = styled(InfoCircleOutlined)`
+    color: var(--ant-color-error);
+`;
 
 const SoftwareModuleDetail: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
@@ -196,7 +209,7 @@ const SoftwareModuleDetail: React.FC = () => {
     );
 
     const artifactsTab = (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <FullWidthSpace direction="vertical" size="middle">
             {isAdmin && (
                 <Upload.Dragger
                     beforeUpload={handleBeforeUpload}
@@ -225,7 +238,7 @@ const SoftwareModuleDetail: React.FC = () => {
                                 <Badge status={badgeStatusMap[item.status]} text={t(`detail.uploadStatus.${item.status}`)} />
                                 {item.errorMessage && (
                                     <Tooltip title={item.errorMessage}>
-                                        <InfoCircleOutlined style={{ color: '#ff4d4f' }} />
+                                        <ErrorHintIcon />
                                     </Tooltip>
                                 )}
                             </Space>
@@ -316,12 +329,11 @@ const SoftwareModuleDetail: React.FC = () => {
     return (
         <PageLayout>
             {/* Breadcrumb */}
-            <Breadcrumb
+            <DetailBreadcrumb
                 items={[
                     { title: <Link to="/distributions/modules">{t('modules.title')}</Link> },
                     { title: moduleData?.name || id },
                 ]}
-                style={{ marginBottom: 0 }}
             />
 
             {/* Header */}
@@ -348,7 +360,7 @@ const SoftwareModuleDetail: React.FC = () => {
                 />
             </SectionCard>
 
-            <Modal
+            <StandardModal
                 title={t('detail.verification.title')}
                 open={isVerificationModalOpen}
                 onCancel={() => setIsVerificationModalOpen(false)}
@@ -362,7 +374,7 @@ const SoftwareModuleDetail: React.FC = () => {
                         softwareModuleId={softwareModuleId}
                     />
                 )}
-            </Modal>
+            </StandardModal>
         </PageLayout>
     );
 };

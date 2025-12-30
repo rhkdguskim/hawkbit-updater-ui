@@ -23,7 +23,7 @@ export const IntegratedKPIGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 10px;
+    gap: var(--ant-margin-xs, 8px);
     flex-shrink: 0;
     width: 520px;
     height: 100%;
@@ -31,7 +31,7 @@ export const IntegratedKPIGrid = styled.div`
 
 export const IntegratedTopRow = styled.div`
     display: flex;
-    gap: 16px;
+    gap: var(--ant-margin, 16px);
     flex: 1;
     min-height: 180px;
 `;
@@ -39,7 +39,7 @@ export const IntegratedTopRow = styled.div`
 export const IntegratedChartsGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: var(--ant-margin-sm, 12px);
     flex: 1;
     min-width: 0;
     min-height: 0;
@@ -53,7 +53,7 @@ export const IntegratedChartsGrid = styled.div`
 export const IntegratedBottomRow = styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr 2fr;
-    gap: 16px;
+    gap: var(--ant-margin, 16px);
     flex: 2;
     min-height: 300px;
 
@@ -81,8 +81,7 @@ export const IntegratedBottomRow = styled.div`
 
 export const ChartsContainer = styled.div`
     display: flex;
-    gap: 16px;
+    gap: var(--ant-margin, 16px);
     flex: 1;
     min-width: 0;
 `;
-

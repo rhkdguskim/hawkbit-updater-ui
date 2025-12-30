@@ -6,8 +6,67 @@ import { useGetDistributionSetTags, useAssignDistributionSets, useUnassignDistri
 import { useTranslation } from 'react-i18next';
 import { LeftOutlined } from '@ant-design/icons';
 import type { MgmtTag } from '@/api/generated/model';
+import styled, { css } from 'styled-components';
+import { PageHeader, PageLayout } from '@/components/patterns';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
+
+const AssignmentGrid = styled.div`
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: var(--ant-margin-lg, 24px);
+
+    @media (max-width: 1200px) {
+        grid-template-columns: 1fr;
+    }
+`;
+
+const FullWidthStack = styled(Space)`
+    && {
+        width: 100%;
+    }
+`;
+
+const TagWrap = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ant-margin-xs, 8px);
+`;
+
+const TagActions = styled.div`
+    margin-top: var(--ant-margin-lg, 24px);
+`;
+
+const ActionButton = styled(Button)`
+    && {
+        width: 100%;
+    }
+`;
+
+const PrimaryActionButton = styled(ActionButton)`
+    && {
+        margin-bottom: var(--ant-margin-sm, 12px);
+    }
+`;
+
+const MetaText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const ColorCheckableTag = styled(Tag.CheckableTag)<{ $color?: string }>`
+    border: 1px solid transparent;
+    padding: var(--ant-padding-xxs, 4px) var(--ant-padding-xs, 8px);
+
+    ${props => props.$color && css`
+        &.ant-tag-checkable-checked {
+            background: ${props.$color};
+            border-color: ${props.$color};
+            color: var(--ant-color-text-light-solid, #fff);
+        }
+    `}
+`;
 
 const DistributionBulkAssign: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
@@ -81,7 +140,7 @@ const DistributionBulkAssign: React.FC = () => {
     ];
 
     return (
-        <Space direction="vertical" style={{ width: '100%' }} size="large">
+        <PageLayout>
             <Breadcrumb
                 items={[
                     { title: t('pageTitle'), href: '/distributions' },
@@ -90,19 +149,13 @@ const DistributionBulkAssign: React.FC = () => {
                 ]}
             />
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Title level={3} style={{ margin: 0 }}>
-                    <Button
-                        type="text"
-                        icon={<LeftOutlined />}
-                        onClick={() => navigate('/distributions/sets')}
-                        style={{ marginRight: 8 }}
-                    />
-                    {t('bulkAssignment.bulkTagAssignment')}
-                </Title>
-            </div>
+            <PageHeader
+                title={t('bulkAssignment.bulkTagAssignment')}
+                backLabel={t('common:actions.back', { defaultValue: 'Back' })}
+                onBack={() => navigate('/distributions/sets')}
+            />
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24 }}>
+            <AssignmentGrid>
                 <Card title={t('bulkAssignment.step1')}>
                     <Table
                         rowSelection={{
@@ -120,39 +173,33 @@ const DistributionBulkAssign: React.FC = () => {
                 </Card>
 
                 <Card title={t('bulkAssignment.step2')}>
-                    <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                    <FullWidthStack direction="vertical" size="middle">
                         <Text strong>{t('bulkAssignment.availableTags')}</Text>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        <TagWrap>
                             {tags.map(tag => (
-                                <Tag.CheckableTag
+                                <ColorCheckableTag
                                     key={tag.id}
                                     checked={selectedTagId === tag.id}
                                     onChange={(checked) => setSelectedTagId(checked ? tag.id! : null)}
-                                    style={{
-                                        border: selectedTagId === tag.id ? `1px solid ${tag.colour}` : '1px solid transparent',
-                                        backgroundColor: selectedTagId === tag.id ? tag.colour : undefined,
-                                        color: selectedTagId === tag.id ? 'white' : undefined,
-                                        padding: '4px 8px'
-                                    }}
+                                    $color={tag.colour}
                                 >
                                     {tag.name}
-                                </Tag.CheckableTag>
+                                </ColorCheckableTag>
                             ))}
                             {tags.length === 0 && <Text type="secondary">{t('bulkAssignment.noTagsFound')}</Text>}
-                        </div>
+                        </TagWrap>
 
-                        <div style={{ marginTop: 24 }}>
-                            <Button
+                        <TagActions>
+                            <PrimaryActionButton
                                 type="primary"
                                 block
-                                style={{ marginBottom: 12 }}
                                 onClick={handleBulkAssign}
                                 loading={assignMutation.isPending}
                                 disabled={selectedSetIds.length === 0 || !selectedTagId}
                             >
                                 {t('bulkAssignment.assign')}
-                            </Button>
-                            <Button
+                            </PrimaryActionButton>
+                            <ActionButton
                                 danger
                                 block
                                 onClick={handleBulkUnassign}
@@ -160,16 +207,16 @@ const DistributionBulkAssign: React.FC = () => {
                                 disabled={selectedSetIds.length === 0 || !selectedTagId}
                             >
                                 {t('bulkAssignment.unassign')}
-                            </Button>
-                        </div>
+                            </ActionButton>
+                        </TagActions>
 
-                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                        <MetaText type="secondary">
                             {t('bulkAssignment.selectedCount', { count: selectedSetIds.length })}
-                        </Text>
-                    </Space>
+                        </MetaText>
+                    </FullWidthStack>
                 </Card>
-            </div>
-        </Space>
+            </AssignmentGrid>
+        </PageLayout>
     );
 };
 

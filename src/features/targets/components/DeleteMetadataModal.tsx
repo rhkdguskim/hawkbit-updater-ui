@@ -1,8 +1,14 @@
 import React from 'react';
-import { Modal, Space } from 'antd';
+import { Space } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { MgmtMetadata } from '@/api/generated/model';
+import styled from 'styled-components';
+import { StandardModal } from '@/components/patterns';
+
+const TitleIcon = styled(ExclamationCircleOutlined)`
+    color: var(--ant-color-error);
+`;
 
 interface DeleteMetadataModalProps {
     open: boolean;
@@ -19,19 +25,20 @@ const DeleteMetadataModal: React.FC<DeleteMetadataModalProps> = ({
     onConfirm,
     onCancel,
 }) => {
-    const { t } = useTranslation('targets');
+    const { t } = useTranslation(['targets', 'common']);
     return (
-        <Modal
+        <StandardModal
             title={
-                <Space>
-                    <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />
+                <Space size="small">
+                    <TitleIcon />
                     <span>{t('metadata.deleteTitle')}</span>
                 </Space>
             }
             open={open}
             onOk={onConfirm}
             onCancel={onCancel}
-            okText={t('actions.delete', { ns: 'common' })}
+            okText={t('common:actions.delete')}
+            cancelText={t('common:actions.cancel')}
             okButtonProps={{ danger: true }}
             confirmLoading={loading}
         >
@@ -39,7 +46,7 @@ const DeleteMetadataModal: React.FC<DeleteMetadataModalProps> = ({
                 {t('metadata.deleteConfirm', { key: metadata?.key })}
             </p>
             <p>{t('metadata.deleteDesc')}</p>
-        </Modal>
+        </StandardModal>
     );
 };
 

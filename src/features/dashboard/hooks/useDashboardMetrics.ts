@@ -20,27 +20,45 @@ export const useDashboardMetrics = () => {
     // Queries with differentiated polling intervals
     const { data: targetsData, isLoading: targetsLoading, refetch: refetchTargets, dataUpdatedAt } = useGetTargets(
         { limit: 1000 },
-        { query: { staleTime: 5000, refetchInterval: 5000 } }
+        {
+            query: { staleTime: 5000, refetchInterval: 5000 },
+            request: { skipGlobalError: true }
+        }
     );
     const { data: actionsData, isLoading: actionsLoading, refetch: refetchActions } = useGetActions(
         { limit: 100 },
-        { query: { staleTime: 5000, refetchInterval: 10000 } }
+        {
+            query: { staleTime: 5000, refetchInterval: 10000 },
+            request: { skipGlobalError: true }
+        }
     );
     const { data: rolloutsData, isLoading: rolloutsLoading, refetch: refetchRollouts } = useGetRollouts(
         { limit: 100 },
-        { query: { staleTime: 5000, refetchInterval: 10000 } }
+        {
+            query: { staleTime: 5000, refetchInterval: 10000 },
+            request: { skipGlobalError: true }
+        }
     );
     const { data: targetTypesData } = useGetTargetTypes(
         { limit: 100 },
-        { query: { staleTime: 60000 } } // Master data, slow
+        {
+            query: { staleTime: 60000 },
+            request: { skipGlobalError: true }
+        }
     );
     const { data: distributionSetsData, isLoading: dsLoading, refetch: refetchDS } = useGetDistributionSets(
         { limit: 500 },
-        { query: { staleTime: 30000, refetchInterval: 60000 } } // Less frequent
+        {
+            query: { staleTime: 30000, refetchInterval: 60000 },
+            request: { skipGlobalError: true }
+        }
     );
     const { data: softwareModulesData, isLoading: smLoading, refetch: refetchSM } = useGetSoftwareModules(
         { limit: 500 },
-        { query: { staleTime: 30000, refetchInterval: 60000 } } // Less frequent
+        {
+            query: { staleTime: 30000, refetchInterval: 60000 },
+            request: { skipGlobalError: true }
+        }
     );
 
     const isLoading = targetsLoading || actionsLoading || rolloutsLoading || dsLoading || smLoading;

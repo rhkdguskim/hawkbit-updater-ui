@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Tabs, Typography, Space, Breadcrumb } from 'antd';
+import { Card, Tabs, Space, Breadcrumb } from 'antd';
 import { AppstoreOutlined, BlockOutlined, HomeOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -9,47 +9,7 @@ import SoftwareModuleTypeList from '@/features/distributions/types/SoftwareModul
 import TargetTypeList from '@/features/targets/types/TargetTypeList';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Navigate } from 'react-router-dom';
-
-const { Title, Text } = Typography;
-
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    padding: 24px;
-    height: 100%;
-    overflow-y: auto;
-`;
-
-const HeaderSection = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-`;
-
-const PageHeader = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 16px;
-`;
-
-const TitleGroup = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-`;
-
-const GradientTitle = styled(Title)`
-    && {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin: 0;
-    }
-`;
+import { PageHeader, PageLayout } from '@/components/patterns';
 
 const StyledCard = styled(Card)`
     flex: 1;
@@ -60,7 +20,7 @@ const StyledCard = styled(Card)`
 `;
 
 const TabContent = styled.div`
-    padding: 24px;
+    padding: var(--ant-padding-lg, 24px);
 `;
 
 const TypeManagement: React.FC = () => {
@@ -120,31 +80,23 @@ const TypeManagement: React.FC = () => {
     ];
 
     return (
-        <PageContainer>
-            <HeaderSection>
-                <Breadcrumb>
-                    <Breadcrumb.Item>
-                        <Link to="/">
-                            <HomeOutlined /> {t('common:nav.home')}
-                        </Link>
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Item>
-                        <SettingOutlined /> {t('common:nav.system')}
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Item>{t('typeManagement.title')}</Breadcrumb.Item>
-                </Breadcrumb>
+        <PageLayout>
+            <Breadcrumb>
+                <Breadcrumb.Item>
+                    <Link to="/">
+                        <HomeOutlined /> {t('common:nav.home')}
+                    </Link>
+                </Breadcrumb.Item>
+                <Breadcrumb.Item>
+                    <SettingOutlined /> {t('common:nav.system')}
+                </Breadcrumb.Item>
+                <Breadcrumb.Item>{t('typeManagement.title')}</Breadcrumb.Item>
+            </Breadcrumb>
 
-                <PageHeader>
-                    <TitleGroup>
-                        <GradientTitle level={3}>
-                            {t('typeManagement.title')}
-                        </GradientTitle>
-                        <Text type="secondary">
-                            {t('typeManagement.description')}
-                        </Text>
-                    </TitleGroup>
-                </PageHeader>
-            </HeaderSection>
+            <PageHeader
+                title={t('typeManagement.title')}
+                description={t('typeManagement.description')}
+            />
 
             <StyledCard>
                 <Tabs
@@ -152,10 +104,9 @@ const TypeManagement: React.FC = () => {
                     onChange={setActiveTab}
                     items={tabItems}
                     type="card"
-                    style={{ margin: 16 }}
                 />
             </StyledCard>
-        </PageContainer>
+        </PageLayout>
     );
 };
 

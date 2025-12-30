@@ -26,6 +26,15 @@ import { useTranslation } from 'react-i18next';
 import { PageLayout } from '@/components/patterns';
 import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader } from '@/components/common';
+import styled from 'styled-components';
+
+const FullWidthSpace = styled(Space)`
+    width: 100%;
+`;
+
+const DetailBreadcrumb = styled(Breadcrumb)`
+    margin-bottom: 0;
+`;
 
 const DistributionSetDetail: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
@@ -84,6 +93,7 @@ const DistributionSetDetail: React.FC = () => {
             title: t('messages.invalidateConfirmTitle'),
             content: t('messages.invalidateConfirmDesc'),
             okText: t('actions.invalidate'),
+            cancelText: t('common:actions.cancel'),
             okType: 'danger',
             onOk: () => invalidateMutation.mutate({
                 distributionSetId,
@@ -179,7 +189,7 @@ const DistributionSetDetail: React.FC = () => {
     ];
 
     const modulesTab = (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <FullWidthSpace direction="vertical" size="middle">
             {isAdmin && (
                 <Button
                     type="primary"
@@ -203,7 +213,7 @@ const DistributionSetDetail: React.FC = () => {
                 isAssigning={assignMutation.isPending}
                 excludedModuleIds={assignedModulesData?.content?.map((m) => m.id).filter((id): id is number => id !== undefined) || []}
             />
-        </Space>
+        </FullWidthSpace>
     );
 
     const titleExtra = setData?.version ? (
@@ -233,12 +243,11 @@ const DistributionSetDetail: React.FC = () => {
     return (
         <PageLayout>
             {/* Breadcrumb */}
-            <Breadcrumb
+            <DetailBreadcrumb
                 items={[
                     { title: <Link to="/distributions/sets">{t('sets.title')}</Link> },
                     { title: setData?.name || id },
                 ]}
-                style={{ marginBottom: 0 }}
             />
 
             {/* Header */}

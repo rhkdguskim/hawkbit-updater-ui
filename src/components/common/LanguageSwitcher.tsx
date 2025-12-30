@@ -4,6 +4,13 @@ import { GlobalOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useLanguageStore } from '@/stores/useLanguageStore';
 import type { Language } from '@/stores/useLanguageStore';
+import styled from 'styled-components';
+
+const LanguageSelect = styled(Select)`
+    && {
+        width: 120px;
+    }
+`;
 
 interface LanguageSwitcherProps {
     className?: string;
@@ -19,12 +26,11 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
     ];
 
     return (
-        <Select
+        <LanguageSelect
             value={language}
             onChange={(value) => setLanguage(value as Language)}
             options={languageOptions}
             suffixIcon={<GlobalOutlined />}
-            style={{ width: 120 }}
             variant="borderless"
             className={className}
         />

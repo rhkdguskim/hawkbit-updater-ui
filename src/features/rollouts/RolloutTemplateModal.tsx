@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-    Modal,
     Card,
     Button,
     Space,
@@ -26,6 +25,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useRolloutTemplateStore, type RolloutTemplate } from '@/stores/useRolloutTemplateStore';
+import { StandardModal } from '@/components/patterns';
 
 const { Title, Text } = Typography;
 
@@ -47,12 +47,64 @@ const TemplateCard = styled(Card) <{ $isSelected?: boolean }>`
 const TemplateGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: var(--ant-margin, 16px);
+    margin-bottom: var(--ant-margin-lg, 24px);
 `;
 
 const ConfigTag = styled(Tag)`
     margin: 2px;
+`;
+
+const ActionRow = styled(Flex)`
+    margin-bottom: var(--ant-margin, 16px);
+`;
+
+const StarIcon = styled(StarOutlined)`
+    margin-right: var(--ant-margin-xs, 8px);
+    color: var(--ant-color-warning);
+`;
+
+const CopyIcon = styled(CopyOutlined)`
+    margin-right: var(--ant-margin-xs, 8px);
+`;
+
+const TemplateName = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-lg);
+    }
+`;
+
+const NameBadge = styled(Badge)`
+    && {
+        margin-left: var(--ant-margin-xs, 8px);
+    }
+`;
+
+const DescriptionText = styled(Text)`
+    && {
+        display: block;
+        margin-top: var(--ant-margin-xs, 8px);
+        margin-bottom: var(--ant-margin-sm, 12px);
+    }
+`;
+
+const ConfigRow = styled(Flex)`
+    gap: var(--ant-margin, 16px);
+`;
+
+const ConfigItem = styled(Form.Item)`
+    flex: 1;
+    min-width: 0;
+`;
+
+const FullWidthInputNumber = styled(InputNumber)`
+    && {
+        width: 100%;
+    }
+`;
+
+const EmptyState = styled(Empty)`
+    margin-bottom: var(--ant-margin-lg, 24px);
 `;
 
 interface RolloutTemplateModalProps {
@@ -127,7 +179,7 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
     const customTemplates = templates.filter(t => !t.isDefault);
 
     return (
-        <Modal
+        <StandardModal
             title={t('templates.title')}
             open={open}
             onCancel={onClose}
@@ -149,17 +201,17 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
                         <Form.Item name="description" label={t('templates.description')}>
                             <Input.TextArea rows={2} placeholder={t('templates.descriptionPlaceholder')} />
                         </Form.Item>
-                        <Flex gap={16}>
-                            <Form.Item name="amountGroups" label={t('wizard.groupSettings.amountGroups')} style={{ flex: 1 }}>
-                                <InputNumber min={1} max={100} style={{ width: '100%' }} />
-                            </Form.Item>
-                            <Form.Item name="successThreshold" label={t('wizard.groupSettings.successThreshold')} style={{ flex: 1 }}>
-                                <InputNumber min={0} max={100} formatter={v => `${v}%`} parser={v => v?.replace('%', '') as any} style={{ width: '100%' }} />
-                            </Form.Item>
-                            <Form.Item name="errorThreshold" label={t('wizard.groupSettings.errorThreshold')} style={{ flex: 1 }}>
-                                <InputNumber min={0} max={100} formatter={v => `${v}%`} parser={v => v?.replace('%', '') as any} style={{ width: '100%' }} />
-                            </Form.Item>
-                        </Flex>
+                        <ConfigRow>
+                            <ConfigItem name="amountGroups" label={t('wizard.groupSettings.amountGroups')}>
+                                <FullWidthInputNumber min={1} max={100} />
+                            </ConfigItem>
+                            <ConfigItem name="successThreshold" label={t('wizard.groupSettings.successThreshold')}>
+                                <FullWidthInputNumber min={0} max={100} formatter={v => `${v}%`} parser={v => v?.replace('%', '') as any} />
+                            </ConfigItem>
+                            <ConfigItem name="errorThreshold" label={t('wizard.groupSettings.errorThreshold')}>
+                                <FullWidthInputNumber min={0} max={100} formatter={v => `${v}%`} parser={v => v?.replace('%', '') as any} />
+                            </ConfigItem>
+                        </ConfigRow>
                         <Form.Item name="startImmediately" valuePropName="checked">
                             <Checkbox>{t('wizard.groupSettings.startImmediately')}</Checkbox>
                         </Form.Item>
@@ -173,16 +225,16 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
                 </div>
             ) : (
                 <>
-                    <Flex justify="flex-end" style={{ marginBottom: 16 }}>
+                    <ActionRow justify="flex-end">
                         {currentConfig && (
                             <Button icon={<SaveOutlined />} onClick={handleSaveCurrentConfig}>
                                 {t('templates.saveCurrentAsTemplate')}
                             </Button>
                         )}
-                    </Flex>
+                    </ActionRow>
 
                     <Title level={5}>
-                        <StarOutlined style={{ marginRight: 8, color: '#faad14' }} />
+                        <StarIcon />
                         {t('templates.defaultTemplates')}
                     </Title>
                     <TemplateGrid>
@@ -194,14 +246,14 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
                             >
                                 <Flex justify="space-between" align="flex-start">
                                     <div>
-                                        <Text strong style={{ fontSize: 16 }}>{template.name}</Text>
-                                        <Badge status="default" style={{ marginLeft: 8 }} />
+                                        <TemplateName strong>{template.name}</TemplateName>
+                                        <NameBadge status="default" />
                                     </div>
                                     <Tag color="gold">{t('templates.default')}</Tag>
                                 </Flex>
-                                <Text type="secondary" style={{ display: 'block', marginTop: 8, marginBottom: 12 }}>
+                                <DescriptionText type="secondary">
                                     {template.description}
-                                </Text>
+                                </DescriptionText>
                                 <Space wrap>
                                     <ConfigTag>
                                         {t('templates.groups')}: {template.config.amountGroups}
@@ -218,7 +270,7 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
                     </TemplateGrid>
 
                     <Title level={5}>
-                        <CopyOutlined style={{ marginRight: 8 }} />
+                        <CopyIcon />
                         {t('templates.customTemplates')}
                     </Title>
                     {customTemplates.length > 0 ? (
@@ -227,12 +279,12 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
                                 <TemplateCard
                                     key={template.id}
                                     hoverable
-                                    onClick={() => handleSelectTemplate(template)}
-                                >
-                                    <Flex justify="space-between" align="flex-start">
-                                        <Text strong style={{ fontSize: 16 }}>{template.name}</Text>
-                                        <Popconfirm
-                                            title={t('templates.deleteConfirm')}
+                                onClick={() => handleSelectTemplate(template)}
+                            >
+                                <Flex justify="space-between" align="flex-start">
+                                    <TemplateName strong>{template.name}</TemplateName>
+                                    <Popconfirm
+                                        title={t('templates.deleteConfirm')}
                                             onConfirm={(e) => {
                                                 e?.stopPropagation();
                                                 handleDeleteTemplate(template.id);
@@ -248,9 +300,9 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
                                             />
                                         </Popconfirm>
                                     </Flex>
-                                    <Text type="secondary" style={{ display: 'block', marginTop: 8, marginBottom: 12 }}>
+                                    <DescriptionText type="secondary">
                                         {template.description || t('templates.noDescription')}
-                                    </Text>
+                                    </DescriptionText>
                                     <Space wrap>
                                         <ConfigTag>
                                             {t('templates.groups')}: {template.config.amountGroups}
@@ -266,9 +318,8 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
                             ))}
                         </TemplateGrid>
                     ) : (
-                        <Empty
+                        <EmptyState
                             description={t('templates.noCustomTemplates')}
-                            style={{ marginBottom: 24 }}
                         >
                             <Button
                                 type="primary"
@@ -278,11 +329,11 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
                             >
                                 {t('templates.createFirst')}
                             </Button>
-                        </Empty>
+                        </EmptyState>
                     )}
                 </>
             )}
-        </Modal>
+        </StandardModal>
     );
 };
 

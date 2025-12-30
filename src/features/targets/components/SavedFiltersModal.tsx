@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { Button, Form, Input, Modal, Popconfirm, Space, Table, Tag, Typography, message, Select, Switch, InputNumber, Divider } from 'antd';
+import { Button, Form, Input, Popconfirm, Space, Table, Tag, Typography, message, Select, Switch, InputNumber, Divider } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import styled from 'styled-components';
 import {
     useCreateFilter,
     useDeleteFilter,
@@ -15,8 +16,15 @@ import type { MgmtDistributionSetAutoAssignment } from '@/api/generated/model';
 import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
 import { useTranslation } from 'react-i18next';
 import { buildWildcardSearch } from '@/utils/fiql';
+import { StandardModal } from '@/components/patterns';
 
 const { Text } = Typography;
+
+const FilterToggleRow = styled(Space)`
+    && {
+        margin-bottom: var(--ant-margin-sm, 12px);
+    }
+`;
 
 interface SavedFiltersModalProps {
     open: boolean;
@@ -31,7 +39,7 @@ const SavedFiltersModal: React.FC<SavedFiltersModalProps> = ({
     onApply,
     onClose,
 }) => {
-    const { t } = useTranslation('targets');
+    const { t } = useTranslation(['targets', 'common']);
     const [form] = Form.useForm();
     const [formOpen, setFormOpen] = useState(false);
     const [editingFilter, setEditingFilter] = useState<MgmtTargetFilterQuery | null>(null);
@@ -274,7 +282,7 @@ const SavedFiltersModal: React.FC<SavedFiltersModalProps> = ({
 
     return (
         <>
-            <Modal
+            <StandardModal
                 title={t('savedFilters.title')}
                 open={open}
                 onCancel={onClose}
@@ -291,10 +299,10 @@ const SavedFiltersModal: React.FC<SavedFiltersModalProps> = ({
                 width={900}
                 destroyOnHidden
             >
-                <Space style={{ marginBottom: 12 }}>
+                <FilterToggleRow>
                     <Switch checked={autoAssignOnly} onChange={setAutoAssignOnly} />
                     <Text>{t('savedFilters.autoAssignOnly')}</Text>
-                </Space>
+                </FilterToggleRow>
                 {filteredFilters.length === 0 ? (
                     <Tag>{t('savedFilters.empty')}</Tag>
                 ) : (
@@ -306,9 +314,9 @@ const SavedFiltersModal: React.FC<SavedFiltersModalProps> = ({
                         pagination={false}
                     />
                 )}
-            </Modal>
+            </StandardModal>
 
-            <Modal
+            <StandardModal
                 title={editingFilter ? t('savedFilters.editTitle') : t('savedFilters.createTitle')}
                 open={formOpen}
                 onCancel={() => {
@@ -319,6 +327,7 @@ const SavedFiltersModal: React.FC<SavedFiltersModalProps> = ({
                 onOk={handleSubmit}
                 confirmLoading={createMutation.isPending || updateMutation.isPending}
                 destroyOnHidden
+                cancelText={t('common:actions.cancel')}
             >
                 <Form form={form} layout="vertical">
                     <Form.Item
@@ -415,7 +424,7 @@ const SavedFiltersModal: React.FC<SavedFiltersModalProps> = ({
                         }
                     </Form.Item>
                 </Form>
-            </Modal>
+            </StandardModal>
         </>
     );
 };

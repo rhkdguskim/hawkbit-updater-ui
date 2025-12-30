@@ -1,5 +1,6 @@
 import React from 'react';
 import { Tag } from 'antd';
+import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { getStatusColor, getStatusLabel } from '@/utils/statusUtils';
 import {
@@ -46,6 +47,10 @@ const getStatusIcon = (status?: string) => {
     }
 };
 
+const StyledTag = styled(Tag)`
+    border-radius: var(--ant-border-radius-sm, 8px);
+`;
+
 export const StatusTag: React.FC<StatusTagProps> = ({ status, showIcon = false, style, className }) => {
     const { t } = useTranslation(['common']);
 
@@ -56,8 +61,8 @@ export const StatusTag: React.FC<StatusTagProps> = ({ status, showIcon = false, 
     const icon = showIcon ? getStatusIcon(status) : undefined;
 
     return (
-        <Tag color={color} icon={icon} style={{ borderRadius: 999, ...style }} className={className}>
+        <StyledTag color={color} icon={icon} style={style} className={className}>
             {label}
-        </Tag>
+        </StyledTag>
     );
 };

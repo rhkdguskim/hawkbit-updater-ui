@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-    Modal,
     Form,
     Select,
     Button,
@@ -17,6 +16,7 @@ import { SendOutlined } from '@ant-design/icons';
 import type { MgmtDistributionSet } from '@/api/generated/model';
 import type { MgmtMaintenanceWindowRequestBody } from '@/api/generated/model';
 import dayjs from 'dayjs';
+import { StandardModal } from '@/components/patterns';
 
 const { Text } = Typography;
 
@@ -134,7 +134,7 @@ const AssignDSModal: React.FC<AssignDSModalProps> = ({
         : assignTypeOptions.filter((opt) => opt.value !== 'forced' && opt.value !== 'timeforced');
 
     return (
-        <Modal
+        <StandardModal
             title={t('assign.title')}
             open={open}
             onCancel={onCancel}
@@ -287,7 +287,7 @@ const AssignDSModal: React.FC<AssignDSModalProps> = ({
                     />
                 )}
             </Form>
-        </Modal>
+        </StandardModal>
     );
 };
 

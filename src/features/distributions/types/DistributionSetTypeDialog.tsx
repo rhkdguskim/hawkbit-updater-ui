@@ -159,6 +159,7 @@ const DistributionSetTypeDialog: React.FC<DistributionSetTypeDialogProps> = ({
             confirmLoading={createMutation.isPending || updateMutation.isPending}
             destroyOnHidden
             width={600}
+            cancelText={t('common:actions.cancel')}
         >
             <Spin spinning={isLoadingModuleTypes}>
                 <Form form={form} layout="vertical">

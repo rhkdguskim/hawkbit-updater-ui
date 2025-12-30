@@ -101,6 +101,13 @@ const SettingsGroup = styled.div`
     border-radius: 10px;
 `;
 
+const HeaderDivider = styled(Divider)`
+    && {
+        height: var(--ant-control-height, 32px);
+        margin: 0 var(--ant-margin-xxs, 4px);
+    }
+`;
+
 const UserSection = styled.div`
     display: flex;
     align-items: center;
@@ -297,7 +304,7 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
                     <LanguageSwitcher />
                 </SettingsGroup>
 
-                <Divider orientation="vertical" style={{ height: 32, margin: '0 4px' }} />
+                <HeaderDivider type="vertical" />
 
                 <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow trigger={['click']}>
                     <UserSection>

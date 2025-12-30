@@ -33,6 +33,12 @@ const StyledTitle = styled(Title)`
   margin-bottom: 2rem !important;
 `;
 
+const FullWidthButton = styled(Button)`
+  && {
+      width: 100%;
+  }
+`;
+
 interface UserInfoResponse {
     tenant?: string;
     username?: string;
@@ -99,9 +105,9 @@ const LoginPage: React.FC = () => {
                         <Input.Password prefix={<LockOutlined />} placeholder={t('login.password')} />
                     </Form.Item>
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" style={{ width: '100%' }} loading={loading}>
+                        <FullWidthButton type="primary" htmlType="submit" loading={loading}>
                             {t('login.submit')}
-                        </Button>
+                        </FullWidthButton>
                     </Form.Item>
                 </Form>
             </FormContainer>

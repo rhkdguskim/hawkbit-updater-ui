@@ -23,6 +23,12 @@ const EmergencyButton = styled(Button)`
     &:active:not(:disabled) {
         background: linear-gradient(135deg, #cf1322 0%, #a8071a 100%);
     }
+
+    &:disabled {
+        background: rgba(0, 0, 0, 0.04);
+        box-shadow: none;
+        color: rgba(0, 0, 0, 0.25);
+    }
 `;
 
 const RolloutItem = styled.div`
@@ -77,9 +83,16 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
     const [results, setResults] = useState<PauseResult[]>([]);
     const [phase, setPhase] = useState<'confirm' | 'processing' | 'complete'>('confirm');
 
+    // Continuously fetch running rollouts to update button state
     const { data: rolloutData, isLoading, refetch } = useGetRollouts(
         { q: 'status==running', limit: 100 },
-        { query: { enabled: modalOpen, staleTime: 5000 } }
+        {
+            query: {
+                staleTime: 5000,
+                refetchInterval: 5000,
+                refetchOnWindowFocus: true
+            }
+        }
     );
 
     const pauseRollout = usePause();
@@ -88,6 +101,8 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
         (rolloutData?.content || []).filter(r => r.status === 'running'),
         [rolloutData]
     );
+
+    const hasRunningRollouts = runningRollouts.length > 0;
 
     const handleOpenModal = () => {
         setModalOpen(true);
@@ -104,7 +119,7 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
 
     const handleEmergencyStop = async () => {
         if (runningRollouts.length === 0) {
-            message.info(t('emergencyStop.noRunningRollouts', { defaultValue: 'No running rollouts to pause' }));
+            message.info(t('emergencyStop.noRunningRollouts'));
             return;
         }
 
@@ -142,17 +157,13 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
         const errorCount = updatedResults.filter(r => r.status === 'error').length;
 
         if (errorCount === 0) {
-            message.success(t('emergencyStop.allPaused', {
-                count: successCount,
-                defaultValue: `Successfully paused ${successCount} rollout(s)`
-            }));
+            message.success(t('emergencyStop.allPaused', { count: successCount }));
         } else {
-            message.warning(t('emergencyStop.partialSuccess', {
-                success: successCount,
-                error: errorCount,
-                defaultValue: `Paused ${successCount} rollout(s), ${errorCount} failed`
-            }));
+            message.warning(t('emergencyStop.partialSuccess', { success: successCount, error: errorCount }));
         }
+
+        // Refetch to update button state
+        refetch();
     };
 
     const completedCount = results.filter(r => r.status !== 'pending').length;
@@ -163,7 +174,7 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
     }
 
     const button = variant === 'icon' ? (
-        <Tooltip title={t('emergencyStop.button', { defaultValue: 'Emergency Stop' })}>
+        <Tooltip title={t('emergencyStop.button')}>
             <Badge count={runningRollouts.length} size="small" offset={[-2, 2]}>
                 <Button
                     type="primary"
@@ -172,6 +183,7 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                     icon={<PauseCircleOutlined />}
                     size={size}
                     onClick={handleOpenModal}
+                    disabled={!hasRunningRollouts}
                 />
             </Badge>
         </Tooltip>
@@ -182,8 +194,9 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
             icon={<PauseCircleOutlined />}
             size={size}
             onClick={handleOpenModal}
+            disabled={!hasRunningRollouts}
         >
-            {t('emergencyStop.button', { defaultValue: 'Emergency Stop' })}
+            {t('emergencyStop.button')}
         </Button>
     ) : (
         <EmergencyButton
@@ -192,9 +205,10 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
             icon={<PauseCircleOutlined />}
             size={size}
             onClick={handleOpenModal}
+            disabled={!hasRunningRollouts}
         >
-            {t('emergencyStop.button', { defaultValue: 'Emergency Stop' })}
-            {runningRollouts.length > 0 && (
+            {t('emergencyStop.button')}
+            {hasRunningRollouts && (
                 <Badge
                     count={runningRollouts.length}
                     style={{ marginLeft: 8, backgroundColor: '#fff', color: '#ff4d4f' }}
@@ -211,28 +225,28 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                 title={
                     <Space>
                         <WarningOutlined style={{ color: '#ff4d4f' }} />
-                        {t('emergencyStop.title', { defaultValue: 'Emergency Stop - Pause All Rollouts' })}
+                        {t('emergencyStop.title')}
                     </Space>
                 }
                 open={modalOpen}
                 onCancel={handleCloseModal}
                 footer={phase === 'complete' ? (
                     <Button onClick={handleCloseModal}>
-                        {t('emergencyStop.close', { defaultValue: 'Close' })}
+                        {t('emergencyStop.close')}
                     </Button>
                 ) : (
                     <>
                         <Button onClick={handleCloseModal} disabled={processing}>
-                            {t('emergencyStop.cancel', { defaultValue: 'Cancel' })}
+                            {t('emergencyStop.cancel')}
                         </Button>
                         <Button
                             type="primary"
                             danger
                             onClick={handleEmergencyStop}
                             loading={processing}
-                            disabled={isLoading || runningRollouts.length === 0}
+                            disabled={isLoading || !hasRunningRollouts}
                         >
-                            {t('emergencyStop.confirm', { defaultValue: 'Stop All Rollouts' })}
+                            {t('emergencyStop.confirm')}
                         </Button>
                     </>
                 )}
@@ -244,10 +258,8 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                             type="warning"
                             showIcon
                             icon={<ExclamationCircleOutlined />}
-                            message={t('emergencyStop.warning', { defaultValue: 'This action will pause all running rollouts' })}
-                            description={t('emergencyStop.warningDesc', {
-                                defaultValue: 'All deployments in progress will be suspended. You can resume them later.'
-                            })}
+                            message={t('emergencyStop.warning')}
+                            description={t('emergencyStop.warningDesc')}
                             style={{ marginBottom: 16 }}
                         />
 
@@ -255,24 +267,19 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                             <div style={{ textAlign: 'center', padding: 24 }}>
                                 <LoadingOutlined style={{ fontSize: 24 }} />
                                 <Text style={{ display: 'block', marginTop: 8 }}>
-                                    {t('emergencyStop.loading', { defaultValue: 'Checking running rollouts...' })}
+                                    {t('emergencyStop.loading')}
                                 </Text>
                             </div>
                         ) : runningRollouts.length === 0 ? (
                             <Result
                                 status="success"
-                                title={t('emergencyStop.noRollouts', { defaultValue: 'No Running Rollouts' })}
-                                subTitle={t('emergencyStop.noRolloutsDesc', {
-                                    defaultValue: 'There are no rollouts currently in progress.'
-                                })}
+                                title={t('emergencyStop.noRollouts')}
+                                subTitle={t('emergencyStop.noRolloutsDesc')}
                             />
                         ) : (
                             <>
                                 <Title level={5}>
-                                    {t('emergencyStop.affectedRollouts', {
-                                        count: runningRollouts.length,
-                                        defaultValue: `${runningRollouts.length} Running Rollout(s)`
-                                    })}
+                                    {t('emergencyStop.affectedRollouts', { count: runningRollouts.length })}
                                 </Title>
                                 <List
                                     dataSource={runningRollouts}
@@ -282,14 +289,11 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                                                 <Text strong>{rollout.name}</Text>
                                                 <br />
                                                 <Text type="secondary" style={{ fontSize: 12 }}>
-                                                    {t('emergencyStop.totalTargets', {
-                                                        count: rollout.totalTargets,
-                                                        defaultValue: `${rollout.totalTargets} targets`
-                                                    })}
+                                                    {t('emergencyStop.totalTargets', { count: rollout.totalTargets })}
                                                 </Text>
                                             </RolloutInfo>
                                             <Tag color="processing">
-                                                {t('status.running', { defaultValue: 'Running' })}
+                                                {t('status.running', { ns: 'common' })}
                                             </Tag>
                                         </RolloutItem>
                                     )}
@@ -325,9 +329,9 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                                         {result.status === 'success' && <CheckCircleOutlined />}
                                         {result.status === 'error' && <ExclamationCircleOutlined />}
                                         <Text style={{ color: 'inherit' }}>
-                                            {result.status === 'pending' && t('emergencyStop.pausing', { defaultValue: 'Pausing...' })}
-                                            {result.status === 'success' && t('emergencyStop.paused', { defaultValue: 'Paused' })}
-                                            {result.status === 'error' && t('emergencyStop.failed', { defaultValue: 'Failed' })}
+                                            {result.status === 'pending' && t('emergencyStop.pausing')}
+                                            {result.status === 'success' && t('emergencyStop.paused')}
+                                            {result.status === 'error' && t('emergencyStop.failed')}
                                         </Text>
                                     </StatusIndicator>
                                 </RolloutItem>

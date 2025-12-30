@@ -1,7 +1,18 @@
 import React from 'react';
-import { Modal } from 'antd';
 import { useTranslation } from 'react-i18next';
 import RolloutWizard from './RolloutWizard';
+import styled from 'styled-components';
+import { StandardModal } from '@/components/patterns';
+
+const WizardModal = styled(StandardModal)`
+    top: 40px;
+
+    .ant-modal-body {
+        height: calc(100vh - 160px);
+        padding: 0;
+        overflow: hidden;
+    }
+`;
 
 interface RolloutCreateModalProps {
     open: boolean;
@@ -17,20 +28,12 @@ const RolloutCreateModal: React.FC<RolloutCreateModalProps> = ({
     const { t } = useTranslation(['rollouts']);
 
     return (
-        <Modal
+        <WizardModal
             title={t('wizard.title')}
             open={open}
             onCancel={onClose}
             footer={null}
             width={1100}
-            style={{ top: 40 }}
-            styles={{
-                body: {
-                    height: 'calc(100vh - 160px)',
-                    padding: 0,
-                    overflow: 'hidden',
-                }
-            }}
             destroyOnClose
         >
             <RolloutWizard
@@ -38,7 +41,7 @@ const RolloutCreateModal: React.FC<RolloutCreateModalProps> = ({
                 onClose={onClose}
                 onSuccess={onSuccess}
             />
-        </Modal>
+        </WizardModal>
     );
 };
 

@@ -1,6 +1,15 @@
 import React from 'react';
-import { Modal, Form, Input, Alert } from 'antd';
+import { Form, Input, Alert } from 'antd';
 import type { MgmtTarget } from '@/api/generated/model';
+import styled from 'styled-components';
+import { StandardModal } from '@/components/patterns';
+
+const InfoAlert = styled(Alert)`
+    && {
+        margin-bottom: var(--ant-margin, 16px);
+        margin-top: calc(var(--ant-margin-xs, 8px) * -1);
+    }
+`;
 
 interface TargetFormModalProps {
     open: boolean;
@@ -37,12 +46,13 @@ const TargetFormModal: React.FC<TargetFormModalProps> = ({
     const isEdit = mode === 'edit';
 
     return (
-        <Modal
+        <StandardModal
             title={isEdit ? t('modal.editTitle') : t('modal.createTitle')}
             open={open}
             onOk={handleSubmit}
             onCancel={onCancel}
             okText={isEdit ? t('common:actions.update') : t('common:actions.create')}
+            cancelText={t('common:actions.cancel')}
             okButtonProps={{ loading }}
             cancelButtonProps={{ disabled: loading }}
             destroyOnHidden
@@ -89,10 +99,9 @@ const TargetFormModal: React.FC<TargetFormModalProps> = ({
                 </Form.Item>
 
                 {isEdit && (
-                    <Alert
+                    <InfoAlert
                         type="info"
                         message={t('form.controllerIdHelp')}
-                        style={{ marginBottom: 16, marginTop: -8 }}
                     />
                 )}
 
@@ -117,7 +126,7 @@ const TargetFormModal: React.FC<TargetFormModalProps> = ({
                     />
                 </Form.Item>
             </Form>
-        </Modal>
+        </StandardModal>
     );
 };
 

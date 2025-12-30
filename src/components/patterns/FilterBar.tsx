@@ -11,6 +11,13 @@ const BarContainer = styled.div<{ $gap: string }>`
   width: 100%;
 `;
 
+const BarRow = styled(Space)`
+    && {
+        width: 100%;
+        justify-content: space-between;
+    }
+`;
+
 export interface FilterBarProps {
     children: React.ReactNode;
     extra?: React.ReactNode;
@@ -26,7 +33,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({ children, extra }) => {
 
     return (
         <BarContainer $gap={`${token.marginXS}px`}>
-            <Space wrap size="middle" style={{ width: '100%', justifyContent: 'space-between' }}>
+            <BarRow wrap size="middle">
                 <Space wrap size="middle">
                     {children}
                 </Space>
@@ -35,7 +42,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({ children, extra }) => {
                         {extra}
                     </Space>
                 )}
-            </Space>
+            </BarRow>
         </BarContainer>
     );
 };

@@ -4,6 +4,7 @@
     "refresh": "Refresh",
     "pageTitle": "Dashboard Overview",
     "lastUpdated": "Updated",
+    "updated": "Updated",
     "polling": {
         "live": "Live",
         "idle": "Idle"

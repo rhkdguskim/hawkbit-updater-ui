@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, theme } from 'antd';
+import { Layout, theme, Spin } from 'antd';
 import { Outlet } from 'react-router-dom';
 import AppHeader from './AppHeader';
 import styled from 'styled-components';
@@ -25,7 +25,7 @@ const StyledContent = styled(Content) <{ $bg: string; $radius: number }>`
   flex-direction: column;
   background: ${(props) => props.$bg};
   border-radius: ${(props) => props.$radius}px;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  box-shadow: var(--shadow-xs);
   transition: all 0.3s ease;
   overflow: hidden;
   animation: fadeInUp 0.4s ease-out;
@@ -44,7 +44,7 @@ const StyledContent = styled(Content) <{ $bg: string; $radius: number }>`
 
 const MainLayout: React.FC = () => {
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { colorBgLayout, borderRadiusLG },
   } = theme.useToken();
 
   return (
@@ -52,10 +52,12 @@ const MainLayout: React.FC = () => {
       <ContentLayout>
         <AppHeader />
         <StyledContent
-          $bg={colorBgContainer}
+          $bg={colorBgLayout}
           $radius={borderRadiusLG}
         >
-          <Outlet />
+          <React.Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Spin size="large" /></div>}>
+            <Outlet />
+          </React.Suspense>
         </StyledContent>
       </ContentLayout>
     </StyledLayout>

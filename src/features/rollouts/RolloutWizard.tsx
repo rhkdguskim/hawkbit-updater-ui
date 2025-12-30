@@ -22,8 +22,9 @@ import {
     Col,
     Flex,
     Modal,
+    theme,
 } from 'antd';
-import { ArrowLeftOutlined, ReloadOutlined, AppstoreAddOutlined } from '@ant-design/icons';
+import { ReloadOutlined, AppstoreAddOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
@@ -37,41 +38,71 @@ import { useGetTargets } from '@/api/generated/targets/targets';
 import { useGetTargetTags } from '@/api/generated/target-tags/target-tags';
 import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import { useQueryClient } from '@tanstack/react-query';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { buildCondition, combineWithAnd, combineWithOr, escapeValue } from '@/utils/fiql';
+import { PageHeader, PageLayout } from '@/components/patterns';
 
 import RolloutTemplateModal from './RolloutTemplateModal';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { TextArea } = Input;
 
-const PageContainer = styled.div`
+const WizardLayout = styled(Flex)`
+    flex: 1;
+    min-height: 0;
+`;
+
+const WizardContent = styled(Flex)`
+    flex: 1;
+    min-height: 0;
+`;
+
+const WizardScrollable = styled.div`
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+`;
+
+const WizardShell = styled.div`
+    padding: var(--ant-padding-lg, 24px);
+    height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 24px;
 `;
 
-const HeaderRow = styled.div`
+const WizardRow = styled(Row)`
+    flex: 1;
+    min-height: 0;
+`;
+
+const WizardRightCol = styled(Col)`
+    height: 100%;
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    flex-direction: column;
+    min-height: 0;
 `;
 
-const TitleGroup = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 12px;
+const WizardCard = styled(Card) <{ $isModal?: boolean }>`
+    ${props => props.$isModal && css`
+        box-shadow: none;
+        border: none;
+        background: transparent;
+    `}
 `;
 
+const StepsCard = styled(Card)`
+    border-radius: var(--ant-border-radius, 12px);
+
+    .ant-card-body {
+        padding: var(--ant-padding, 16px) var(--ant-padding-lg, 24px);
+    }
+`;
 
 const ActionsBar = styled.div`
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
-    margin-top: 8px;
+    gap: var(--ant-margin-xs, 8px);
+    margin-top: var(--ant-margin-xs, 8px);
 `;
 
 interface WizardFormData {
@@ -202,6 +233,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
     const { t } = useTranslation(['rollouts', 'common']);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { token } = theme.useToken();
 
     const [currentStep, setCurrentStep] = useState(0);
     const [formData, setFormData] = useState<WizardFormData>({
@@ -505,7 +537,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
     };
 
     const renderBasicInfoStep = () => (
-        <Card title={t('wizard.basicInfo.title')} style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}>
+        <WizardCard title={t('wizard.basicInfo.title')} $isModal={isModal}>
             <Form
                 form={basicInfoForm}
                 layout="vertical"
@@ -528,12 +560,12 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                 </Form.Item>
             </Form>
             {isCheckingName && <Spin size="small" tip={t('wizard.basicInfo.checkingName')} />}
-        </Card>
+        </WizardCard>
     );
 
 
     const renderDistributionSetStep = () => (
-        <Card title={t('wizard.distributionSet.title')} style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}>
+        <WizardCard title={t('wizard.distributionSet.title')} $isModal={isModal}>
             <div style={{ marginBottom: 16 }}>
                 <Space.Compact style={{ width: '100%' }}>
                     <Select
@@ -588,7 +620,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                     },
                 ]}
             />
-        </Card>
+        </WizardCard>
     );
 
     const renderTargetFilterStep = () => {
@@ -600,7 +632,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
         ];
 
         return (
-            <Card title={t('wizard.targetFilter.title')} style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}>
+            <WizardCard title={t('wizard.targetFilter.title')} $isModal={isModal}>
                 <Space style={{ marginBottom: 16 }} wrap>
                     <Button
                         type={filterMode === 'builder' ? 'primary' : 'default'}
@@ -778,7 +810,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                         />
                     </div>
                 </div>
-            </Card>
+            </WizardCard>
         );
     };
 
@@ -790,14 +822,14 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
         const remainder = totalTargets % amountGroups;
 
         return (
-            <Card
+            <WizardCard
                 title={t('wizard.groupSettings.title')}
                 extra={
                     <Button icon={<AppstoreAddOutlined />} onClick={() => setTemplateModalOpen(true)}>
                         {t('wizard.loadTemplate')}
                     </Button>
                 }
-                style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}
+                $isModal={isModal}
             >
                 <Form
                     form={groupSettingsForm}
@@ -850,12 +882,12 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                         <Checkbox>{t('wizard.groupSettings.startImmediately')}</Checkbox>
                     </Form.Item>
                 </Form>
-            </Card>
+            </WizardCard>
         );
     };
 
     const renderReviewStep = () => (
-        <Card title={t('wizard.review.title')} style={isModal ? { boxShadow: 'none', border: 'none', background: 'transparent' } : undefined}>
+        <WizardCard title={t('wizard.review.title')} $isModal={isModal}>
             <Descriptions bordered column={1} size="small">
                 <Descriptions.Item label={t('wizard.review.name')}>{formData.name}</Descriptions.Item>
                 <Descriptions.Item label={t('wizard.review.description')}>{formData.description || '-'}</Descriptions.Item>
@@ -880,7 +912,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                     )}
                 </Descriptions.Item>
             </Descriptions>
-        </Card>
+        </WizardCard>
     );
 
     const renderStepContent = () => {
@@ -895,22 +927,21 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
     };
 
     const mainContent = (
-        <Flex vertical gap={24} style={{ height: '100%' }}>
-            <Card className="steps-card" styles={{ body: { padding: '16px 24px' } }}>
+        <WizardLayout vertical gap={token.marginLG}>
+            <StepsCard className="steps-card">
                 <Steps
                     current={currentStep}
                     items={steps}
-                    direction={isModal ? "horizontal" : "vertical"}
+                    direction={isModal ? 'horizontal' : 'vertical'}
                     size="small"
-                    style={!isModal ? { minHeight: 300 } : undefined}
                     responsive={false}
                 />
-            </Card>
+            </StepsCard>
 
-            <Flex vertical gap={20} style={{ flex: 1, minHeight: 0 }}>
-                <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+            <WizardContent vertical gap={token.marginLG}>
+                <WizardScrollable>
                     {renderStepContent()}
-                </div>
+                </WizardScrollable>
                 <ActionsBar>
                     <Space>
                         {currentStep > 0 && <Button onClick={handlePrev}>{t('wizard.buttons.previous')}</Button>}
@@ -928,60 +959,53 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                         )}
                     </Space>
                 </ActionsBar>
-            </Flex>
-        </Flex>
+            </WizardContent>
+        </WizardLayout>
     );
 
     if (isModal) {
         return (
-            <div style={{ padding: '20px 24px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <WizardShell>
                 {mainContent}
-            </div>
+            </WizardShell>
         );
     }
 
     return (
-        <PageContainer>
-            <HeaderRow>
-                <TitleGroup>
-                    <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/rollouts')}>
-                        {t('detail.back')}
-                    </Button>
-                    <Title level={4} style={{ margin: 0 }}>{t('wizard.title')}</Title>
-                </TitleGroup>
-            </HeaderRow>
-            <div style={{ flex: 1, overflow: 'hidden' }}>
-                {isModal ? mainContent : (
-                    <Row gutter={[24, 24]} style={{ height: '100%' }}>
-                        <Col xs={24} md={6}>
-                            <Card style={{ borderRadius: 12 }}>
-                                <Steps
-                                    current={currentStep}
-                                    items={steps}
-                                    direction="vertical"
-                                    size="small"
-                                />
-                            </Card>
-                        </Col>
-                        <Col xs={24} md={18} style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            {renderStepContent()}
-                            <ActionsBar>
-                                <Space>
-                                    {currentStep > 0 && <Button onClick={handlePrev}>{t('wizard.buttons.previous')}</Button>}
-                                    {currentStep < steps.length - 1 ? (
-                                        <Button type="primary" onClick={handleNext}>{t('wizard.buttons.next')}</Button>
-                                    ) : (
-                                        <Button type="primary" onClick={handleCreate} loading={createMutation.isPending || startMutation.isPending}>
-                                            {t('wizard.buttons.create')}
-                                        </Button>
-                                    )}
-                                    <Button onClick={() => navigate('/rollouts')}>{t('common:cancel')}</Button>
-                                </Space>
-                            </ActionsBar>
-                        </Col>
-                    </Row>
-                )}
-            </div>
+        <PageLayout>
+            <PageHeader
+                title={t('wizard.title')}
+                backLabel={t('detail.back')}
+                onBack={() => navigate('/rollouts')}
+            />
+            <WizardRow gutter={[token.marginLG, token.marginLG]}>
+                <Col xs={24} md={6}>
+                    <StepsCard>
+                        <Steps
+                            current={currentStep}
+                            items={steps}
+                            direction="vertical"
+                            size="small"
+                        />
+                    </StepsCard>
+                </Col>
+                <WizardRightCol xs={24} md={18}>
+                    {renderStepContent()}
+                    <ActionsBar>
+                        <Space>
+                            {currentStep > 0 && <Button onClick={handlePrev}>{t('wizard.buttons.previous')}</Button>}
+                            {currentStep < steps.length - 1 ? (
+                                <Button type="primary" onClick={handleNext}>{t('wizard.buttons.next')}</Button>
+                            ) : (
+                                <Button type="primary" onClick={handleCreate} loading={createMutation.isPending || startMutation.isPending}>
+                                    {t('wizard.buttons.create')}
+                                </Button>
+                            )}
+                            <Button onClick={() => navigate('/rollouts')}>{t('common:actions.cancel')}</Button>
+                        </Space>
+                    </ActionsBar>
+                </WizardRightCol>
+            </WizardRow>
 
             <RolloutTemplateModal
                 open={templateModalOpen}
@@ -994,7 +1018,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                     startImmediately: formData.startImmediately,
                 }}
             />
-        </PageContainer>
+        </PageLayout>
     );
 };
 

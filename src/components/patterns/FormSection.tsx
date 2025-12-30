@@ -12,7 +12,17 @@ const SectionContainer = styled.div<{ $marginBottom: string }>`
 const SectionHeader = styled.div<{ $marginBottom: string }>`
   margin-bottom: ${props => props.$marginBottom};
   border-bottom: 1px solid var(--ant-color-border-secondary);
-  padding-bottom: 8px;
+  padding-bottom: var(--ant-padding-xs, 8px);
+`;
+
+const SectionTitle = styled(Title)`
+    margin: 0;
+`;
+
+const SectionBody = styled(Space)`
+    && {
+        width: 100%;
+    }
 `;
 
 export interface FormSectionProps {
@@ -32,14 +42,14 @@ export const FormSection: React.FC<FormSectionProps> = ({ title, children }) => 
         <SectionContainer $marginBottom={`${token.marginLG}px`}>
             {title && (
                 <SectionHeader $marginBottom={`${token.marginMD}px`}>
-                    <Title level={4} style={{ margin: 0 }}>
+                    <SectionTitle level={4}>
                         {title}
-                    </Title>
+                    </SectionTitle>
                 </SectionHeader>
             )}
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <SectionBody direction="vertical" size="middle">
                 {children}
-            </Space>
+            </SectionBody>
         </SectionContainer>
     );
 };

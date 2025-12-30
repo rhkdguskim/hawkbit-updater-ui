@@ -1,11 +1,46 @@
 import React, { useState } from 'react';
-import { Modal, Select, message, Typography, Space, Button, Divider, Form, Input } from 'antd';
+import { Select, message, Typography, Space, Button, Divider, Form, Input } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAssignTargetType, getGetTargetsQueryKey } from '@/api/generated/targets/targets';
 import { useGetTargetTypes, useCreateTargetTypes, getGetTargetTypesQueryKey } from '@/api/generated/target-types/target-types';
 import type { MgmtTargetType } from '@/api/generated/model';
+import styled from 'styled-components';
+import { StandardModal } from '@/components/patterns';
+
+const FullWidthStack = styled(Space)`
+    && {
+        width: 100%;
+    }
+`;
+
+const FullWidthSelect = styled(Select)`
+    && {
+        width: 100%;
+    }
+`;
+
+const ColorSwatch = styled.span`
+    display: inline-block;
+    width: var(--ant-font-size-sm, 12px);
+    height: var(--ant-font-size-sm, 12px);
+    border-radius: 50%;
+    border: 1px solid var(--ant-color-border);
+`;
+
+const DropdownDivider = styled(Divider)`
+    && {
+        margin: var(--ant-margin-xs, 8px) 0;
+    }
+`;
+
+const DropdownButton = styled(Button)`
+    && {
+        width: 100%;
+        text-align: left;
+    }
+`;
 
 interface BulkAssignTypeModalProps {
     open: boolean;
@@ -91,7 +126,7 @@ const BulkAssignTypeModal: React.FC<BulkAssignTypeModalProps> = ({
 
     return (
         <>
-            <Modal
+            <StandardModal
                 title={t('bulkAssign.assignType')}
                 open={open}
                 onOk={handleOk}
@@ -100,31 +135,21 @@ const BulkAssignTypeModal: React.FC<BulkAssignTypeModalProps> = ({
                 okText={t('common:actions.assign')}
                 cancelText={t('common:actions.cancel')}
             >
-                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <FullWidthStack direction="vertical" size="middle">
                     <Typography.Text strong>
                         {t('bulkAssign.selectedTargetsCount', { count: targetIds.length })}
                     </Typography.Text>
-                    <Select
+                    <FullWidthSelect
                         placeholder={t('bulkAssign.selectTypePlaceholder')}
-                        style={{ width: '100%' }}
                         loading={typesLoading}
                         value={selectedTypeId}
-                        onChange={setSelectedTypeId}
+                        onChange={(val) => setSelectedTypeId(val as number)}
                         options={(typesData?.content as MgmtTargetType[] || []).map((type) => ({
                             value: type.id,
                             label: (
                                 <Space>
                                     {type.colour && (
-                                        <span
-                                            style={{
-                                                display: 'inline-block',
-                                                width: 12,
-                                                height: 12,
-                                                borderRadius: '50%',
-                                                backgroundColor: type.colour,
-                                                border: '1px solid var(--ant-color-border)',
-                                            }}
-                                        />
+                                        <ColorSwatch style={{ backgroundColor: type.colour }} />
                                     )}
                                     <span>{type.name}</span>
                                 </Space>
@@ -133,21 +158,20 @@ const BulkAssignTypeModal: React.FC<BulkAssignTypeModalProps> = ({
                         dropdownRender={(menu) => (
                             <>
                                 {menu}
-                                <Divider style={{ margin: '8px 0' }} />
-                                <Button
+                                <DropdownDivider />
+                                <DropdownButton
                                     type="text"
                                     icon={<PlusOutlined />}
                                     onClick={() => setCreateTypeModalOpen(true)}
-                                    style={{ width: '100%', textAlign: 'left' }}
                                 >
                                     {t('bulkAssign.createNewType', { defaultValue: 'Create New Type' })}
-                                </Button>
+                                </DropdownButton>
                             </>
                         )}
                     />
-                </Space>
-            </Modal>
-            <Modal
+                </FullWidthStack>
+            </StandardModal>
+            <StandardModal
                 title={t('bulkAssign.createNewType', { defaultValue: 'Create New Type' })}
                 open={createTypeModalOpen}
                 onOk={handleCreateType}
@@ -157,6 +181,7 @@ const BulkAssignTypeModal: React.FC<BulkAssignTypeModalProps> = ({
                 }}
                 confirmLoading={createTypeMutation.isPending}
                 destroyOnClose
+                cancelText={t('common:actions.cancel')}
             >
                 <Form form={form} layout="vertical">
                     <Form.Item
@@ -173,10 +198,9 @@ const BulkAssignTypeModal: React.FC<BulkAssignTypeModalProps> = ({
                         <Input.TextArea rows={3} placeholder={t('typeManagement.descPlaceholder', { defaultValue: 'Enter description (optional)' })} />
                     </Form.Item>
                 </Form>
-            </Modal>
+            </StandardModal>
         </>
     );
 };
 
 export default BulkAssignTypeModal;
-

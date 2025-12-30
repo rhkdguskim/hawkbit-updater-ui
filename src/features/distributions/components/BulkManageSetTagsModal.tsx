@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Select, Tag, Space, message, Typography, Radio } from 'antd';
+import { Select, Tag, Space, message, Typography, Radio } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -9,6 +9,20 @@ import {
 } from '@/api/generated/distribution-set-tags/distribution-set-tags';
 import { getGetDistributionSetsQueryKey } from '@/api/generated/distribution-sets/distribution-sets';
 import type { MgmtTag } from '@/api/generated/model';
+import styled from 'styled-components';
+import { StandardModal } from '@/components/patterns';
+
+const FullWidthStack = styled(Space)`
+    && {
+        width: 100%;
+    }
+`;
+
+const FullWidthSelect = styled(Select)`
+    && {
+        width: 100%;
+    }
+`;
 
 interface BulkManageSetTagsModalProps {
     open: boolean;
@@ -73,7 +87,7 @@ const BulkManageSetTagsModal: React.FC<BulkManageSetTagsModalProps> = ({
     };
 
     return (
-        <Modal
+        <StandardModal
             title={t('bulkAssignment.manageTags')}
             open={open}
             onOk={handleOk}
@@ -82,7 +96,7 @@ const BulkManageSetTagsModal: React.FC<BulkManageSetTagsModalProps> = ({
             okText={mode === 'assign' ? t('bulkAssignment.assign') : t('bulkAssignment.unassign')}
             cancelText={t('common:actions.cancel')}
         >
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <FullWidthStack direction="vertical" size="middle">
                 <Typography.Text strong>
                     {t('bulkAssignment.selectedSetsCount', { count: setIds.length })}
                 </Typography.Text>
@@ -95,10 +109,9 @@ const BulkManageSetTagsModal: React.FC<BulkManageSetTagsModalProps> = ({
                     </Radio.Group>
                 </div>
 
-                <Select
+                <FullWidthSelect
                     mode="multiple"
                     placeholder={t('bulkAssignment.selectTagsPlaceholder')}
-                    style={{ width: '100%' }}
                     value={selectedTagIds}
                     onChange={setSelectedTagIds}
                     loading={tagsLoading}
@@ -111,8 +124,8 @@ const BulkManageSetTagsModal: React.FC<BulkManageSetTagsModalProps> = ({
                         ),
                     }))}
                 />
-            </Space>
-        </Modal>
+            </FullWidthStack>
+        </StandardModal>
     );
 };
 

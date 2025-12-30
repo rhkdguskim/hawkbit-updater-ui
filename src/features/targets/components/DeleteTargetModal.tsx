@@ -34,6 +34,7 @@ const DeleteTargetModal: React.FC<DeleteTargetModalProps> = ({
             onOk={onConfirm}
             onCancel={onCancel}
             okText={t('actions.delete')}
+            cancelText={t('common:actions.cancel')}
             okButtonProps={{ danger: true, loading }}
             cancelButtonProps={{ disabled: loading }}
         >

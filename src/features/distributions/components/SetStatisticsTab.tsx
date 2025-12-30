@@ -9,6 +9,7 @@ import {
     GlobalOutlined
 } from '@ant-design/icons';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip, Legend } from 'recharts';
+import styled from 'styled-components';
 
 const { Text } = Typography;
 
@@ -16,21 +17,75 @@ interface SetStatisticsTabProps {
     distributionSetId: number;
 }
 
-const COLORS = {
-    finished: '#52c41a',
-    running: '#1890ff',
-    error: '#f5222d',
-    warning: '#faad14',
-    scheduled: '#13c2c2',
-    pending: '#bfbfbf',
-    canceled: '#000000'
+const STATUS_COLORS: Record<string, string> = {
+    finished: 'var(--ant-color-success)',
+    running: 'var(--ant-color-info)',
+    error: 'var(--ant-color-error)',
+    warning: 'var(--ant-color-warning)',
+    scheduled: 'var(--ant-color-primary)',
+    pending: 'var(--ant-color-text-quaternary)',
+    canceled: 'var(--ant-color-text-secondary)',
 };
+
+const LoadingContainer = styled.div`
+    text-align: center;
+    padding: var(--ant-padding-xl, 32px);
+`;
+
+const StatsWrapper = styled.div`
+    padding: var(--ant-padding-xs, 8px);
+`;
+
+const StatCard = styled(Card)<{ $bg: string }>`
+    border-radius: var(--ant-border-radius-lg, 12px);
+    background: ${props => props.$bg};
+    border: none;
+
+    .ant-card-body {
+        padding: var(--ant-padding-sm, 12px);
+    }
+`;
+
+const StatValue = styled(Statistic)<{ $color: string }>`
+    && {
+        .ant-statistic-content {
+            color: ${props => props.$color};
+            font-weight: 700;
+        }
+    }
+`;
+
+const ChartsRow = styled(Row)`
+    margin-top: var(--ant-margin-lg, 24px);
+`;
+
+const ChartCard = styled(Card)`
+    height: 100%;
+    border-radius: var(--ant-border-radius-lg, 12px);
+`;
+
+const ChartContainer = styled.div`
+    height: 300px;
+`;
+
+const FullWidthSpace = styled(Space)`
+    width: 100%;
+`;
+
+const CenteredBlock = styled.div`
+    text-align: center;
+    margin-bottom: var(--ant-margin, 16px);
+`;
+
+const ProgressCaption = styled.div`
+    margin-top: var(--ant-margin-xs, 8px);
+`;
 
 const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }) => {
     const { t } = useTranslation(['distributions', 'common']);
     const { data, isLoading } = useGetStatisticsForDistributionSet(distributionSetId);
 
-    if (isLoading) return <div style={{ textAlign: 'center', padding: '40px' }}><Spin size="large" /></div>;
+    if (isLoading) return <LoadingContainer><Spin size="large" /></LoadingContainer>;
     if (!data) return <Empty description={t('detail.noStatisticsAvailable')} />;
 
     const actions = data.actions || {};
@@ -48,55 +103,55 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
         }));
 
     return (
-        <div style={{ padding: '8px' }}>
+        <StatsWrapper>
             <Row gutter={[16, 16]}>
                 <Col span={6}>
-                    <Card variant="borderless" style={{ background: '#f6ffed', borderRadius: 12 }}>
-                        <Statistic
+                    <StatCard variant="borderless" $bg="var(--ant-color-success-bg)">
+                        <StatValue
                             title={t('detail.activeRollouts')}
                             value={totalRollouts}
                             prefix={<SyncOutlined spin={totalRollouts > 0} />}
-                            styles={{ content: { color: '#52c41a', fontWeight: 700 } }}
+                            $color="var(--ant-color-success)"
                         />
-                    </Card>
+                    </StatCard>
                 </Col>
                 <Col span={6}>
-                    <Card variant="borderless" style={{ background: '#e6f7ff', borderRadius: 12 }}>
-                        <Statistic
+                    <StatCard variant="borderless" $bg="var(--ant-color-info-bg)">
+                        <StatValue
                             title={t('detail.totalActions')}
                             value={totalActions}
                             prefix={<ClockCircleOutlined />}
-                            styles={{ content: { color: '#1890ff', fontWeight: 700 } }}
+                            $color="var(--ant-color-info)"
                         />
-                    </Card>
+                    </StatCard>
                 </Col>
                 <Col span={6}>
-                    <Card variant="borderless" style={{ background: '#f9f0ff', borderRadius: 12 }}>
-                        <Statistic
+                    <StatCard variant="borderless" $bg="var(--ant-color-primary-bg)">
+                        <StatValue
                             title={t('detail.autoAssignments')}
                             value={data.totalAutoAssignments || 0}
                             prefix={<GlobalOutlined />}
-                            styles={{ content: { color: '#722ed1', fontWeight: 700 } }}
+                            $color="var(--ant-color-primary)"
                         />
-                    </Card>
+                    </StatCard>
                 </Col>
                 <Col span={6}>
-                    <Card variant="borderless" style={{ background: '#fff7e6', borderRadius: 12 }}>
-                        <Statistic
+                    <StatCard variant="borderless" $bg="var(--ant-color-warning-bg)">
+                        <StatValue
                             title={t('detail.successRate')}
                             value={successRate}
                             suffix="%"
                             prefix={<CheckCircleOutlined />}
-                            styles={{ content: { color: '#fa8c16', fontWeight: 700 } }}
+                            $color="var(--ant-color-warning)"
                         />
-                    </Card>
+                    </StatCard>
                 </Col>
             </Row>
 
-            <Row gutter={24} style={{ marginTop: 24 }}>
+            <ChartsRow gutter={24}>
                 <Col span={12}>
-                    <Card title={t('detail.actionStatusDistribution')} style={{ height: '100%', borderRadius: 12 }}>
-                        <div style={{ height: 300 }}>
+                    <ChartCard title={t('detail.actionStatusDistribution')}>
+                        <ChartContainer>
                             {totalActions > 0 ? (
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
@@ -110,7 +165,7 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
                                             dataKey="value"
                                         >
                                             {chartData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={(COLORS as any)[entry.key] || '#8884d8'} />
+                                                <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.key] || 'var(--ant-color-primary)'} />
                                             ))}
                                         </Pie>
                                         <ReTooltip />
@@ -120,27 +175,27 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
                             ) : (
                                 <Empty description={t('detail.noActionsRecorded')} />
                             )}
-                        </div>
-                    </Card>
+                        </ChartContainer>
+                    </ChartCard>
                 </Col>
                 <Col span={12}>
-                    <Card title={t('detail.overallProgress')} style={{ height: '100%', borderRadius: 12 }}>
-                        <Space direction="vertical" style={{ width: '100%' }} size="large">
-                            <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                    <ChartCard title={t('detail.overallProgress')}>
+                        <FullWidthSpace direction="vertical" size="large">
+                            <CenteredBlock>
                                 <Progress
                                     type="dashboard"
                                     percent={successRate}
                                     strokeColor={{
-                                        '0%': '#108ee9',
-                                        '100%': '#87d068',
+                                        '0%': 'var(--ant-color-info)',
+                                        '100%': 'var(--ant-color-success)',
                                     }}
                                     width={120}
                                 />
-                                <div style={{ marginTop: 8 }}>
+                                <ProgressCaption>
                                     <Text strong>{t('detail.overallSuccessRate')}</Text>
-                                </div>
-                            </div>
-                            <Space direction="vertical" style={{ width: '100%' }}>
+                                </ProgressCaption>
+                            </CenteredBlock>
+                            <FullWidthSpace direction="vertical">
                                 {chartData.map((item) => (
                                     <div key={item.key}>
                                         <Flex justify="space-between" align="baseline">
@@ -151,17 +206,17 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
                                             percent={totalActions > 0 ? Math.round((item.value / totalActions) * 100) : 0}
                                             size="small"
                                             status={item.key === 'error' ? 'exception' : 'active'}
-                                            strokeColor={(COLORS as any)[item.key]}
+                                            strokeColor={STATUS_COLORS[item.key] || 'var(--ant-color-primary)'}
                                             showInfo={false}
                                         />
                                     </div>
                                 ))}
-                            </Space>
-                        </Space>
-                    </Card>
+                            </FullWidthSpace>
+                        </FullWidthSpace>
+                    </ChartCard>
                 </Col>
-            </Row>
-        </div>
+            </ChartsRow>
+        </StatsWrapper>
     );
 };
 

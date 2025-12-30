@@ -485,7 +485,7 @@ const TargetDetail: React.FC = () => {
                     activeKey={activeTab}
                     onChange={setActiveTab}
                     items={tabItems}
-                    size="large"
+                    
                 />
             </SectionCard>
 

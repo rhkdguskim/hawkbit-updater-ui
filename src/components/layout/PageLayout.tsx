@@ -4,12 +4,12 @@ import { Card } from 'antd';
 export const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--ant-margin, 16px);
     flex: 1;
     min-height: 0;
     height: 100%;
     overflow-y: auto;
-    padding: 24px;
+    padding: var(--ant-margin-lg, 24px);
 `;
 
 
@@ -18,19 +18,19 @@ export const HeaderRow = styled.div`
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
-    padding: 8px 0;
+    gap: var(--ant-margin-sm, 12px);
+    padding: var(--ant-padding-xs, 8px) 0;
 `;
 
 export const SectionCard = styled(Card)`
-    border-radius: 14px;
+    border-radius: var(--ant-border-radius-lg, 20px);
     flex: 1;
     min-height: 0;
     display: flex;
     flex-direction: column;
     
     .ant-card-head {
-        padding: 16px 24px;
+        padding: var(--ant-padding, 16px) var(--ant-padding-lg, 24px);
         min-height: auto;
     }
     
@@ -43,6 +43,6 @@ export const SectionCard = styled(Card)`
         flex: 1;
         min-height: 0;
         overflow-y: auto;
-        padding: 24px;
+        padding: var(--ant-padding-lg, 24px);
     }
 `;

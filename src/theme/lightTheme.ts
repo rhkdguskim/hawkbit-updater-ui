@@ -39,13 +39,13 @@ export const lightTheme: ThemeConfig = {
         fontSizeHeading2: 32,
         fontSizeHeading3: 26,
 
-        // Spacing
+        // Spacing (8/12/16/24/32 scale)
         marginXS: 8,
         marginSM: 12,
         margin: 16,
-        marginMD: 20,
-        marginLG: 28,
-        marginXL: 36,
+        marginMD: 16,
+        marginLG: 24,
+        marginXL: 32,
 
         // Motion
         motionDurationFast: '0.1s',

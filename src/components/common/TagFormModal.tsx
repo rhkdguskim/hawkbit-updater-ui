@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, ColorPicker } from 'antd';
+import { Form, Input, ColorPicker } from 'antd';
+import { StandardModal } from '@/components/patterns';
 import type { MgmtTag } from '@/api/generated/model';
 
 export interface TagFormValues {
@@ -31,6 +32,7 @@ export interface TagFormModalProps {
         descriptionLabel?: string;
         descriptionPlaceholder?: string;
         colourLabel?: string;
+        cancelText?: string;
     };
 }
 
@@ -43,6 +45,7 @@ const DEFAULT_TRANSLATIONS = {
     descriptionLabel: 'Description',
     descriptionPlaceholder: 'Enter description (optional)',
     colourLabel: 'Colour',
+    cancelText: 'Cancel',
 };
 
 /**
@@ -96,12 +99,13 @@ export const TagFormModal: React.FC<TagFormModalProps> = ({
     };
 
     return (
-        <Modal
+        <StandardModal
             title={mode === 'create' ? t.createTitle : t.editTitle}
             open={open}
             onOk={handleOk}
             onCancel={onCancel}
             confirmLoading={loading}
+            cancelText={t.cancelText}
             destroyOnHidden
         >
             <Form form={form} layout="vertical">
@@ -127,7 +131,7 @@ export const TagFormModal: React.FC<TagFormModalProps> = ({
                     <ColorPicker format="hex" />
                 </Form.Item>
             </Form>
-        </Modal>
+        </StandardModal>
     );
 };
 

@@ -1,11 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Select, Spin, Typography, Divider, Tag } from 'antd';
+import { Form, Input, Select, Spin, Typography, Divider, Tag, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import type { MgmtTargetType, MgmtTargetTypeRequestBodyPost, MgmtTargetTypeRequestBodyPut, MgmtDistributionSetType } from '@/api/generated/model';
 import { useGetDistributionSetTypes } from '@/api/generated/distribution-set-types/distribution-set-types';
 import { useGetCompatibleDistributionSets } from '@/api/generated/target-types/target-types';
+import styled from 'styled-components';
+import { StandardModal } from '@/components/patterns';
 
 const { Text } = Typography;
+
+const FullWidthSelect = styled(Select)`
+    && {
+        width: 100%;
+    }
+`;
+
+const ColorInput = styled(Input)`
+    && {
+        width: 60px;
+        padding: var(--ant-padding-xxs, 4px);
+    }
+`;
+
+const SectionDivider = styled(Divider)`
+    && {
+        margin: var(--ant-margin, 16px) 0;
+    }
+`;
+
+const HintText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const WarningText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+        display: block;
+        margin-top: var(--ant-margin-xxs, 4px);
+    }
+`;
+
+const DsTypeTag = styled(Tag)`
+    && {
+        margin-right: var(--ant-margin-xxs, 4px);
+    }
+`;
 
 interface TargetTypeDialogProps {
     open: boolean;
@@ -79,7 +120,7 @@ const TargetTypeDialog: React.FC<TargetTypeDialogProps> = ({
     };
 
     return (
-        <Modal
+        <StandardModal
             title={mode === 'create' ? t('typeManagement.createTitle') : t('typeManagement.editTitle')}
             open={open}
             onOk={handleOk}
@@ -87,6 +128,7 @@ const TargetTypeDialog: React.FC<TargetTypeDialogProps> = ({
             confirmLoading={loading}
             destroyOnHidden
             width={560}
+            cancelText={t('common:actions.cancel')}
         >
             <Form form={form} layout="vertical">
                 <Form.Item
@@ -118,28 +160,27 @@ const TargetTypeDialog: React.FC<TargetTypeDialogProps> = ({
                     name="colour"
                     label={t('typeManagement.colour')}
                 >
-                    <Input type="color" style={{ width: 60, padding: 2 }} />
+                    <ColorInput type="color" />
                 </Form.Item>
 
-                <Divider style={{ margin: '16px 0' }} />
+                <SectionDivider />
 
                 <Form.Item
                     label={
-                        <span>
-                            {t('typeManagement.compatibleDsTypes', 'Compatible Distribution Set Types')}
-                            <Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>
+                        <Space size="small">
+                            <span>{t('typeManagement.compatibleDsTypes', 'Compatible Distribution Set Types')}</span>
+                            <HintText type="secondary">
                                 ({t('typeManagement.compatibleDsTypesHint', 'Only these DS types can be deployed to targets of this type')})
-                            </Text>
-                        </span>
+                            </HintText>
+                        </Space>
                     }
                 >
                     <Spin spinning={isDsTypesLoading || isCompatibleLoading}>
-                        <Select
+                        <FullWidthSelect
                             mode="multiple"
                             placeholder={t('typeManagement.selectDsTypes', 'Select compatible DS types...')}
                             value={selectedDsTypes}
-                            onChange={handleDsTypeChange}
-                            style={{ width: '100%' }}
+                            onChange={(val) => handleDsTypeChange(val as number[])}
                             optionFilterProp="label"
                             options={dsTypes.map((dsType: MgmtDistributionSetType) => ({
                                 value: dsType.id,
@@ -148,26 +189,25 @@ const TargetTypeDialog: React.FC<TargetTypeDialogProps> = ({
                             tagRender={(props) => {
                                 const dsType = dsTypes.find((dt: MgmtDistributionSetType) => dt.id === props.value);
                                 return (
-                                    <Tag
+                                    <DsTypeTag
                                         color={dsType?.colour || 'blue'}
                                         closable={props.closable}
                                         onClose={props.onClose}
-                                        style={{ marginRight: 3 }}
                                     >
                                         {props.label}
-                                    </Tag>
+                                    </DsTypeTag>
                                 );
                             }}
                         />
                     </Spin>
                     {selectedDsTypes.length === 0 && (
-                        <Text type="warning" style={{ fontSize: 12, display: 'block', marginTop: 4 }}>
+                        <WarningText type="warning">
                             {t('typeManagement.noCompatibleWarning', 'If no DS types are selected, targets of this type will be incompatible with all deployments.')}
-                        </Text>
+                        </WarningText>
                     )}
                 </Form.Item>
             </Form>
-        </Modal>
+        </StandardModal>
     );
 };
 

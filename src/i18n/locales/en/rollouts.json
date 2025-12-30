@@ -260,6 +260,26 @@
             "targetMatchingError": "Matching target not found for the filter. Please check your filter."
         }
     },
+    "emergencyStop": {
+        "button": "Emergency Stop",
+        "title": "Emergency Stop - Pause All Rollouts",
+        "close": "Close",
+        "cancel": "Cancel",
+        "confirm": "Stop All Rollouts",
+        "noRunningRollouts": "No running rollouts to pause",
+        "allPaused": "Successfully paused {{count}} rollout(s)",
+        "partialSuccess": "Paused {{success}} rollout(s), {{error}} failed",
+        "warning": "This action will pause all running rollouts",
+        "warningDesc": "All deployments in progress will be suspended. You can resume them later.",
+        "loading": "Checking running rollouts...",
+        "noRollouts": "No Running Rollouts",
+        "noRolloutsDesc": "There are no rollouts currently in progress.",
+        "affectedRollouts": "{{count}} Running Rollout(s)",
+        "totalTargets": "{{count}} targets",
+        "pausing": "Pausing...",
+        "paused": "Paused",
+        "failed": "Failed"
+    },
     "approvalPolicy": {
         "confirmTitle": "Approval Required",
         "matchingRulesDesc": "The following local approval policies are applicable:",

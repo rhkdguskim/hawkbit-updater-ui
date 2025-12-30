@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card } from 'antd';
+import { Card, theme } from 'antd';
 import { PageLayout, PageHeader } from '@/components/patterns';
 import styled from 'styled-components';
 
-const ContentCard = styled(Card)`
+const ContentCard = styled(Card)<{ $bodyPadding: string }>`
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -13,7 +13,7 @@ const ContentCard = styled(Card)`
         flex: 1;
         display: flex;
         flex-direction: column;
-        padding: 0;
+        padding: ${props => props.$bodyPadding};
         min-height: 0;
     }
 `;
@@ -71,6 +71,9 @@ export const StandardListLayout: React.FC<StandardListLayoutProps> = ({
     children,
     noCardPadding = true,
 }) => {
+    const { token } = theme.useToken();
+    const bodyPadding = noCardPadding ? '0' : `${token.paddingLG}px`;
+
     return (
         <PageLayout>
             <PageHeader
@@ -85,7 +88,7 @@ export const StandardListLayout: React.FC<StandardListLayoutProps> = ({
 
             {bulkActionBar}
 
-            <ContentCard styles={{ body: { padding: noCardPadding ? 0 : 24 } }}>
+            <ContentCard $bodyPadding={bodyPadding}>
                 <TableWrapper>
                     {children}
                 </TableWrapper>

@@ -260,6 +260,26 @@
             "targetMatchingError": "선택한 필터와 일치하는 대상이 없습니다. 필터를 확인해주세요."
         }
     },
+    "emergencyStop": {
+        "button": "비상 정지",
+        "title": "비상 정지 - 모든 롤아웃 일시정지",
+        "close": "닫기",
+        "cancel": "취소",
+        "confirm": "모든 롤아웃 정지",
+        "noRunningRollouts": "일시정지할 실행 중인 롤아웃이 없습니다",
+        "allPaused": "{{count}}개의 롤아웃이 성공적으로 일시정지되었습니다",
+        "partialSuccess": "{{success}}개 일시정지됨, {{error}}개 실패",
+        "warning": "이 작업은 실행 중인 모든 롤아웃을 일시정지합니다",
+        "warningDesc": "진행 중인 모든 배포가 중단됩니다. 나중에 다시 재개할 수 있습니다.",
+        "loading": "실행 중인 롤아웃 확인 중...",
+        "noRollouts": "실행 중인 롤아웃 없음",
+        "noRolloutsDesc": "현재 진행 중인 롤아웃이 없습니다.",
+        "affectedRollouts": "{{count}}개의 실행 중인 롤아웃",
+        "totalTargets": "{{count}}개 타겟",
+        "pausing": "일시정지 중...",
+        "paused": "일시정지됨",
+        "failed": "실패"
+    },
     "approvalPolicy": {
         "confirmTitle": "승인 필요",
         "matchingRulesDesc": "다음의 로컬 승인 정책이 적용됩니다:",

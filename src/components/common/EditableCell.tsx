@@ -56,6 +56,19 @@ const EditWrapper = styled.div`
     }
 `;
 
+const EditInput = styled(Input)`
+    flex: 1;
+`;
+
+const EditTextArea = styled(Input.TextArea)`
+    flex: 1;
+`;
+
+const CellText = styled(Text)<{ $editable: boolean }>`
+    font-size: var(--ant-font-size-sm);
+    cursor: ${props => (props.$editable ? 'pointer' : 'default')};
+`;
+
 export interface EditableCellProps {
     /** Current value */
     value: string;
@@ -141,7 +154,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
 
     if (editing) {
-        const InputComponent = type === 'textarea' ? Input.TextArea : Input;
+        const InputComponent = type === 'textarea' ? EditTextArea : EditInput;
         return (
             <EditWrapper>
                 <InputComponent
@@ -152,7 +165,6 @@ export const EditableCell: React.FC<EditableCellProps> = ({
                     onKeyDown={handleKeyDown}
                     onBlur={handleSave}
                     maxLength={maxLength}
-                    style={{ flex: 1 }}
                     {...(type === 'textarea' ? { rows: 2, autoSize: { minRows: 1, maxRows: 3 } } : {})}
                 />
                 <CheckOutlined className="action-icon save-icon" onClick={handleSave} />
@@ -163,13 +175,13 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
     return (
         <CellWrapper onClick={handleStartEdit}>
-            <Text
+            <CellText
                 type={secondary ? 'secondary' : undefined}
-                style={{ fontSize: 'var(--ant-font-size-sm)', cursor: editable ? 'pointer' : 'default' }}
+                $editable={editable}
                 ellipsis={{ tooltip: value }}
             >
                 {value || placeholder}
-            </Text>
+            </CellText>
             {editable && <EditOutlined className="edit-icon" />}
         </CellWrapper>
     );

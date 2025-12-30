@@ -1,6 +1,18 @@
 import React from 'react';
 import { PageHeader } from '@/components/patterns';
-import { Skeleton } from 'antd';
+import { Skeleton, Space } from 'antd';
+import styled from 'styled-components';
+import { StatusTag } from './StatusTag';
+
+const TitleSkeleton = styled(Skeleton.Input)`
+    width: clamp(12rem, 26vw, 18rem);
+`;
+
+const ExtraGroup = styled(Space)`
+    && {
+        align-items: center;
+    }
+`;
 
 export interface DetailPageHeaderProps {
     /** Title of the page */
@@ -39,21 +51,13 @@ export const DetailPageHeader: React.FC<DetailPageHeaderProps> = ({
         <PageHeader
             onBack={onBack}
             backLabel={backLabel}
-            title={loading ? <Skeleton.Input active size="large" style={{ width: 200, height: 32 }} /> : title}
+            title={loading ? <TitleSkeleton active size="large" /> : title}
             description={description}
             extra={(status || extra) && (
-                <>
-                    {status && (
-                        <div style={{ marginLeft: 4 }}>
-                            {/* StatusTag logic is now handled by the caller, passing it as extra if needed, 
-                                but for DetailPageHeader we'll keep the StatusTag here for compatibility */}
-                            <div style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: 'var(--ant-font-size-sm)' }}>
-                                {status}
-                            </div>
-                        </div>
-                    )}
+                <ExtraGroup size="small">
+                    {status && <StatusTag status={status} />}
                     {extra}
-                </>
+                </ExtraGroup>
             )}
             actions={actions}
         />

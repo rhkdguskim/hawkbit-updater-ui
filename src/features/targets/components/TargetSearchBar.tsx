@@ -10,6 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { buildWildcardSearch } from '@/utils/fiql';
 import { FilterBar } from '@/components/patterns';
+import styled from 'styled-components';
 
 const { Search } = Input;
 
@@ -24,6 +25,30 @@ interface TargetSearchBarProps {
 }
 
 type SearchField = 'name' | 'description' | 'controllerId';
+
+const SearchSelect = styled(Select)`
+    && {
+        width: 140px;
+    }
+`;
+
+const SearchInput = styled(Search)`
+    && {
+        width: 300px;
+    }
+`;
+
+const AdvancedSearchInput = styled(Input.Search)`
+    && {
+        width: 450px;
+    }
+`;
+
+const FiqlPrefix = styled.span`
+    color: var(--ant-color-text-tertiary);
+    font-size: var(--ant-font-size-sm);
+    margin-right: var(--ant-margin-xxs, 4px);
+`;
 
 const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
     onSearch,
@@ -144,14 +169,13 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
                 </Tooltip>
                 {!isAdvancedMode ? (
                     <>
-                        <Select
+                        <SearchSelect
                             value={searchField}
                             onChange={setSearchField}
                             options={searchFieldOptions}
-                            style={{ width: 140 }}
                             suffixIcon={<FilterOutlined />}
                         />
-                        <Search
+                        <SearchInput
                             placeholder={t('search.placeholder', { field: searchFieldOptions.find(o => o.value === searchField)?.label })}
                             value={searchValue}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)}
@@ -159,12 +183,11 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
                             allowClear
                             onClear={handleClear}
                             enterButton={<SearchOutlined />}
-                            style={{ width: 300 }}
                             loading={loading}
                         />
                     </>
                 ) : (
-                    <Input.Search
+                    <AdvancedSearchInput
                         placeholder="FIQL Query (e.g. name==*test*;status==online)"
                         value={fiqlQuery}
                         onChange={(e) => setFiqlQuery(e.target.value)}
@@ -172,9 +195,8 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
                         allowClear
                         onClear={handleClear}
                         enterButton={<SearchOutlined />}
-                        style={{ width: 450 }}
                         loading={loading}
-                        prefix={<span style={{ color: '#aaa', fontSize: 12, marginRight: 4 }}>FIQL:</span>}
+                        prefix={<FiqlPrefix>FIQL:</FiqlPrefix>}
                     />
                 )}
             </Space>

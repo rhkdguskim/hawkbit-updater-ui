@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import {
-    Modal,
     Form,
     Select,
     Radio,
@@ -32,51 +31,30 @@ import {
 } from '@/api/generated/target-tags/target-tags';
 import { axiosInstance } from '@/api/axios-instance';
 import styled from 'styled-components';
+import { StandardModal } from '@/components/patterns';
 
 const { Text, Title } = Typography;
 
-const StyledModal = styled(Modal)`
-    .ant-modal-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 12px 12px 0 0;
-        padding: 20px 24px;
-        
-        .ant-modal-title {
-            color: white !important;
-        }
-    }
-    
-    .ant-modal-content {
-        border-radius: 12px;
-        overflow: hidden;
-        padding: 0;
-    }
-
-    .ant-modal-body {
-        padding: 24px;
-    }
-`;
-
 const ModeCard = styled.div<{ $selected: boolean }>`
-    padding: 16px;
-    border: 2px solid ${props => props.$selected ? '#667eea' : '#f0f0f0'};
-    border-radius: 12px;
+    padding: var(--ant-padding, 16px);
+    border: 2px solid ${props => props.$selected ? 'var(--ant-color-primary)' : 'var(--ant-color-border)'};
+    border-radius: var(--ant-border-radius, 12px);
     cursor: pointer;
     transition: all 0.2s ease;
-    background: ${props => props.$selected ? 'rgba(102, 126, 234, 0.05)' : 'white'};
+    background: ${props => props.$selected ? 'var(--ant-color-primary-bg)' : 'var(--ant-color-bg-container)'};
     
     &:hover {
-        border-color: #667eea;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+        border-color: var(--ant-color-primary);
+        box-shadow: 0 2px 8px rgba(var(--ant-color-primary-rgb), 0.1);
     }
 `;
 
 const TargetPreviewItem = styled.div`
-    padding: 8px 12px;
-    background: #f5f5f5;
-    border-radius: 6px;
-    margin-bottom: 4px;
-    font-size: 13px;
+    padding: var(--ant-padding-xs, 8px) var(--ant-padding-sm, 12px);
+    background: var(--ant-color-fill-tertiary);
+    border-radius: var(--ant-border-radius, 8px);
+    margin-bottom: var(--ant-margin-xxs, 4px);
+    font-size: var(--ant-font-size-sm);
 `;
 
 type BulkEditMode = 'merge' | 'replace';
@@ -411,7 +389,7 @@ const BulkEditMetadataModal: React.FC<BulkEditMetadataModalProps> = ({
     };
 
     return (
-        <StyledModal
+        <StandardModal
             open={open}
             title={
                 <Space>
@@ -474,7 +452,7 @@ const BulkEditMetadataModal: React.FC<BulkEditMetadataModalProps> = ({
                 size="small"
             />
             {renderStepContent()}
-        </StyledModal>
+        </StandardModal>
     );
 };
 

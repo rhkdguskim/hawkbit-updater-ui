@@ -70,10 +70,10 @@ const ListContainer = styled.div`
         width: 4px;
     }
     &::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.02);
+        background: var(--ant-color-fill-tertiary);
     }
     &::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.1);
+        background: var(--ant-color-fill);
         border-radius: 4px;
     }
 `;
@@ -107,9 +107,9 @@ const MainContent = styled.div`
 `;
 
 const IconBadge = styled.div<{ $status?: string }>`
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: var(--ant-control-height-lg, 40px);
+    height: var(--ant-control-height-lg, 40px);
+    border-radius: var(--ant-border-radius, 8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -147,11 +147,11 @@ const ExpandButton = styled.div`
     display: flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 8px;
+    padding: var(--ant-padding-xxs, 4px) var(--ant-padding-xs, 8px);
     font-size: var(--ant-font-size-sm);
     color: var(--ant-color-text-description, #6b7280);
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: var(--ant-border-radius-sm, 6px);
     transition: all 0.2s;
 
     &:hover {
@@ -161,17 +161,121 @@ const ExpandButton = styled.div`
 `;
 
 const HistoryPanel = styled.div`
-    margin-top: 12px;
-    padding: 12px;
+    margin-top: var(--ant-margin-sm, 12px);
+    padding: var(--ant-padding-sm, 12px);
     background: var(--ant-color-fill-quaternary, rgba(0, 0, 0, 0.02));
-    border-radius: 8px;
+    border-radius: var(--ant-border-radius, 8px);
     max-height: 200px;
     overflow-y: auto;
 `;
 
 const ProgressBar = styled.div`
-    margin-top: 8px;
-    padding: 0 4px;
+    margin-top: var(--ant-margin-xs, 8px);
+    padding: 0 var(--ant-padding-xxs, 4px);
+`;
+
+const PopoverContainer = styled.div`
+    max-width: 320px;
+    max-height: 300px;
+    overflow: auto;
+`;
+
+const PopoverHeader = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+        margin-bottom: var(--ant-margin-xxs, 4px);
+    }
+`;
+
+const PopoverRow = styled(Flex)<{ $withDivider?: boolean }>`
+    && {
+        padding: var(--ant-padding-xxs, 4px) 0;
+        border-bottom: ${props => props.$withDivider ? '1px solid var(--ant-color-border-secondary)' : 'none'};
+    }
+`;
+
+const PopoverTag = styled(Tag)`
+    && {
+        font-size: var(--ant-font-size-sm);
+        margin: 0;
+        flex-shrink: 0;
+    }
+`;
+
+const PopoverMessage = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+        word-break: break-word;
+    }
+`;
+
+const PopoverMore = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+        text-align: center;
+        margin-top: var(--ant-margin-xxs, 4px);
+        display: block;
+    }
+`;
+
+const PopoverEmpty = styled.div`
+    padding: var(--ant-padding-xs, 8px);
+    text-align: center;
+`;
+
+const RowContent = styled(Flex)`
+    flex: 1;
+    min-width: 0;
+`;
+
+const RowMeta = styled(Flex)`
+    flex: 1;
+    min-width: 0;
+`;
+
+const TargetName = styled(Text)`
+    && {
+        font-size: var(--ant-font-size);
+    }
+`;
+
+const TimeText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const StatusText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 200px;
+    }
+`;
+
+const HistoryTag = styled(Tag)`
+    && {
+        font-size: var(--ant-font-size-sm);
+        margin: 0;
+    }
+`;
+
+const HistoryMessage = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const EmptyState = styled(Flex)`
+    flex: 1;
+`;
+
+const StatusPopover = styled(Popover)`
+    .ant-popover-inner {
+        max-width: 350px;
+    }
 `;
 
 // Types
@@ -298,33 +402,33 @@ const ActiveUpdateRowComponent: React.FC<{
 
     // Popover content for hover - show detailed status history
     const popoverContent = messages && messages.length > 0 ? (
-        <div style={{ maxWidth: 320, maxHeight: 300, overflow: 'auto' }}>
+        <PopoverContainer>
             <Flex vertical gap={4}>
-                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', marginBottom: 4 }}>
+                <PopoverHeader strong>
                     {t('activeUpdates.statusHistory')}
-                </Text>
+                </PopoverHeader>
                 {messages.slice().reverse().slice(0, 8).map((msg: string, idx: number) => (
-                    <Flex key={idx} gap={8} align="flex-start" style={{ padding: '4px 0', borderBottom: idx < 7 && idx < messages.length - 1 ? '1px solid var(--ant-color-border-secondary, rgba(0,0,0,0.06))' : 'none' }}>
-                        <Tag color={idx === 0 ? 'blue' : 'default'} style={{ fontSize: 10, margin: 0, flexShrink: 0 }}>
+                    <PopoverRow key={idx} gap={8} align="flex-start" $withDivider={idx < 7 && idx < messages.length - 1}>
+                        <PopoverTag color={idx === 0 ? 'blue' : 'default'}>
                             {idx === 0 ? t('common:status.current') : `#${messages.length - idx}`}
-                        </Tag>
-                        <Text style={{ fontSize: 'var(--ant-font-size-sm)', wordBreak: 'break-word' }} type={idx === 0 ? undefined : 'secondary'}>
+                        </PopoverTag>
+                        <PopoverMessage type={idx === 0 ? undefined : 'secondary'}>
                             {msg}
-                        </Text>
-                    </Flex>
+                        </PopoverMessage>
+                    </PopoverRow>
                 ))}
                 {messages.length > 8 && (
-                    <Text type="secondary" style={{ fontSize: 10, textAlign: 'center', marginTop: 4 }}>
+                    <PopoverMore type="secondary">
                         +{messages.length - 8} {t('common:more')}...
-                    </Text>
+                    </PopoverMore>
                 )}
             </Flex>
-        </div>
+        </PopoverContainer>
     ) : (
         // Loading state or empty state if no messages
-        <div style={{ padding: 8, textAlign: 'center' }}>
+        <PopoverEmpty>
             {isHovered && !messages ? <SyncOutlined spin /> : <Text type="secondary">{t('common:messages.noData')}</Text>}
-        </div>
+        </PopoverEmpty>
     );
 
     // Show popover for running actions
@@ -335,7 +439,7 @@ const ActiveUpdateRowComponent: React.FC<{
     const rowContent = (
         <UpdateRow $isCompleting={isCompleting} $isExpanded={isExpanded}>
             <MainContent onClick={handleClick}>
-                <Flex align="center" gap={12} style={{ flex: 1, minWidth: 0 }}>
+                <RowContent align="center" gap={12}>
                     <div
                         onMouseEnter={() => setIsHovered(true)}
                         onMouseLeave={() => setIsHovered(false)}
@@ -344,31 +448,22 @@ const ActiveUpdateRowComponent: React.FC<{
                             {getStatusIcon()}
                         </IconBadge>
                     </div>
-                    <Flex vertical gap={2} style={{ flex: 1, minWidth: 0 }}>
+                    <RowMeta vertical gap={2}>
                         <Flex justify="space-between" align="center">
-                            <Text strong style={{ fontSize: 13 }}>
+                            <TargetName strong>
                                 {item.targetName || item.controllerId || `Action #${item.action.id}`}
-                            </Text>
-                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
+                            </TargetName>
+                            <TimeText type="secondary">
                                 {item.action.createdAt ? dayjs(item.action.createdAt).fromNow(true) : ''}
-                            </Text>
+                            </TimeText>
                         </Flex>
                         <Flex align="center" gap={6}>
-                            <Text
-                                type="secondary"
-                                style={{
-                                    fontSize: 'var(--ant-font-size-sm)',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    maxWidth: 200
-                                }}
-                            >
+                            <StatusText type="secondary">
                                 {displayStatus}
-                            </Text>
+                            </StatusText>
                         </Flex>
-                    </Flex>
-                </Flex>
+                    </RowMeta>
+                </RowContent>
 
                 <Flex align="center" gap={8}>
                     <ActionTimeline action={displayAction} />
@@ -396,13 +491,13 @@ const ActiveUpdateRowComponent: React.FC<{
                             children: (
                                 <Flex vertical gap={2}>
                                     <Flex align="center" gap={8}>
-                                        <Tag style={{ fontSize: 10, margin: 0 }}>
+                                        <HistoryTag>
                                             {idx === 0 ? t('common:status.current') : `${t('common:pagination.step')} ${messages.length - idx}`}
-                                        </Tag>
+                                        </HistoryTag>
                                     </Flex>
-                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
+                                    <HistoryMessage type="secondary">
                                         {msg}
-                                    </Text>
+                                    </HistoryMessage>
                                 </Flex>
                             ),
                         }))}
@@ -415,16 +510,15 @@ const ActiveUpdateRowComponent: React.FC<{
     // Wrap with Popover for hover effect on active actions
     if (showPopover) {
         return (
-            <Popover
+            <StatusPopover
                 content={popoverContent}
                 title={null}
                 placement="right" // Changed to right for better visibility usually, or auto
                 trigger="hover"
                 mouseEnterDelay={0.2} // Slightly faster to feel responsive
-                overlayStyle={{ maxWidth: 350 }}
             >
                 {rowContent}
-            </Popover>
+            </StatusPopover>
         );
     }
 
@@ -463,7 +557,7 @@ export const ActiveUpdatesCard: React.FC<ActiveUpdatesCardProps> = ({
     if (visibleItems.length === 0) {
         return (
             <Container>
-                <Flex justify="center" align="center" style={{ flex: 1 }}>
+                <EmptyState justify="center" align="center">
                     <Empty
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
                         description={
@@ -472,7 +566,7 @@ export const ActiveUpdatesCard: React.FC<ActiveUpdatesCardProps> = ({
                             </Text>
                         }
                     />
-                </Flex>
+                </EmptyState>
             </Container>
         );
     }

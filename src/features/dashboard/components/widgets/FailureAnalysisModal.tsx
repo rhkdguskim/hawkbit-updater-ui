@@ -1,10 +1,28 @@
 import React from 'react';
-import { Modal, List, Typography, Progress, Flex, Button } from 'antd';
+import { List, Typography, Progress, Flex, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { ExclamationCircleOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { StandardModal } from '@/components/patterns';
 
 const { Text } = Typography;
+
+const TitleRow = styled(Flex)`
+    && {
+        align-items: center;
+    }
+`;
+
+const TitleIcon = styled(ExclamationCircleOutlined)`
+    color: var(--ant-color-error);
+`;
+
+const MetaText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
 
 interface FailureAnalysisModalProps {
     visible: boolean;
@@ -26,12 +44,12 @@ export const FailureAnalysisModal: React.FC<FailureAnalysisModalProps> = ({
     const navigate = useNavigate();
 
     return (
-        <Modal
+        <StandardModal
             title={
-                <Flex align="center" gap={8}>
-                    <ExclamationCircleOutlined style={{ color: 'var(--ant-color-error)' }} />
+                <TitleRow gap="small">
+                    <TitleIcon />
                     <span>{t('charts.failureAnalysis')}</span>
-                </Flex>
+                </TitleRow>
             }
             open={visible}
             onCancel={onClose}
@@ -73,9 +91,9 @@ export const FailureAnalysisModal: React.FC<FailureAnalysisModalProps> = ({
                                         showInfo={false}
                                     />
                                     <Flex justify="space-between">
-                                        <Text type="secondary" style={{ fontSize: 12 }}>
+                                        <MetaText type="secondary">
                                             {item.percentage}% {t('common:labels.ofTotal', 'of total errors')}
-                                        </Text>
+                                        </MetaText>
                                     </Flex>
                                 </Flex>
                             }
@@ -83,6 +101,6 @@ export const FailureAnalysisModal: React.FC<FailureAnalysisModalProps> = ({
                     </List.Item>
                 )}
             />
-        </Modal>
+        </StandardModal>
     );
 };

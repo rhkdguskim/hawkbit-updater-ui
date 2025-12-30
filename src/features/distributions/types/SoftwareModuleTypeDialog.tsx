@@ -1,11 +1,19 @@
 import React from 'react';
-import { Modal, Form, Input, message, ColorPicker, InputNumber } from 'antd';
+import { Form, Input, message, ColorPicker, InputNumber } from 'antd';
 import { useTranslation } from 'react-i18next';
 import {
     useCreateSoftwareModuleTypes,
     useUpdateSoftwareModuleType,
 } from '@/api/generated/software-module-types/software-module-types';
 import type { MgmtSoftwareModuleType } from '@/api/generated/model';
+import styled from 'styled-components';
+import { StandardModal } from '@/components/patterns';
+
+const FullWidthInputNumber = styled(InputNumber)`
+    && {
+        width: 100%;
+    }
+`;
 
 interface SoftwareModuleTypeDialogProps {
     open: boolean;
@@ -95,13 +103,14 @@ const SoftwareModuleTypeDialog: React.FC<SoftwareModuleTypeDialogProps> = ({
     };
 
     return (
-        <Modal
+        <StandardModal
             title={isEditing ? t('typeManagement.editType') : t('typeManagement.addType')}
             open={open}
             onOk={handleOk}
             onCancel={onClose}
             confirmLoading={createMutation.isPending || updateMutation.isPending}
             destroyOnHidden
+            cancelText={t('common:actions.cancel')}
         >
             <Form form={form} layout="vertical">
                 <Form.Item
@@ -128,7 +137,7 @@ const SoftwareModuleTypeDialog: React.FC<SoftwareModuleTypeDialogProps> = ({
                     name="maxAssignments"
                     label={t('typeManagement.columns.maxAssignments')}
                 >
-                    <InputNumber min={1} disabled={isEditing} style={{ width: '100%' }} />
+                    <FullWidthInputNumber min={1} disabled={isEditing} />
                 </Form.Item>
                 <Form.Item
                     name="colour"
@@ -137,7 +146,7 @@ const SoftwareModuleTypeDialog: React.FC<SoftwareModuleTypeDialogProps> = ({
                     <ColorPicker format="hex" />
                 </Form.Item>
             </Form>
-        </Modal>
+        </StandardModal>
     );
 };
 
