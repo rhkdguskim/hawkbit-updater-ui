@@ -68,7 +68,7 @@ export const SavedFilterDropdown: React.FC<SavedFilterDropdownProps> = ({
 }) => {
     const { t } = useTranslation('targets');
     const { data, isLoading } = useGetFilters(
-        { limit: 20, sort: 'lastModifiedAt:DESC' },
+        { limit: 20, sort: undefined },
         { query: { staleTime: 30000 } }
     );
 

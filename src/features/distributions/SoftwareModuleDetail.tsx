@@ -319,7 +319,7 @@ const SoftwareModuleDetail: React.FC = () => {
                     },
                 ]}
             />
-        </Space>
+        </FullWidthSpace>
     );
 
     const titleExtra = moduleData?.version ? (

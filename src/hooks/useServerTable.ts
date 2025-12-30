@@ -35,7 +35,7 @@ export function useServerTable<T>({
     const [sort, setSort] = useState<string>(() => {
         if (syncToUrl) {
             const urlSort = searchParams.get('sort') || '';
-            // Validate sort field if allowedSortFields is provided
+            // Validate sort field if allowedSortFields is provided and not empty
             if (urlSort && allowedSortFields && allowedSortFields.length > 0) {
                 const sortField = urlSort.split(':')[0];
                 if (!allowedSortFields.includes(sortField)) {

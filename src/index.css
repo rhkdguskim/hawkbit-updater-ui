@@ -298,6 +298,18 @@ textarea {
     transform: translateY(0);
 }
 
+.ant-btn-dashed {
+    border-color: var(--ant-color-primary-border, var(--ant-color-primary));
+    color: var(--ant-color-primary);
+    background: var(--ant-color-primary-bg, rgba(94, 92, 230, 0.12));
+}
+
+.ant-btn-dashed:not(:disabled):hover {
+    border-color: var(--ant-color-primary-border-hover, var(--ant-color-primary-border, var(--ant-color-primary)));
+    color: var(--ant-color-primary-hover, var(--ant-color-primary));
+    background: var(--ant-color-primary-bg-hover, var(--ant-color-primary-bg, rgba(94, 92, 230, 0.16)));
+}
+
 /* Tag enhancements */
 .ant-tag {
     font-weight: 500;

@@ -34,13 +34,14 @@ export const useTargetListModel = () => {
     const {
         pagination,
         offset,
-        sort,
+        // sort,
         handleTableChange: serverTableChange,
         resetPagination,
         setPagination,
     } = useServerTable<MgmtTarget>({
         syncToUrl: true,
-        allowedSortFields: ['name'], // Only allow reliably sortable fields
+        defaultSort: undefined,
+        allowedSortFields: [], // Only allow reliably sortable fields
     });
 
     // State
@@ -143,7 +144,7 @@ export const useTargetListModel = () => {
         {
             offset,
             limit: pagination.pageSize,
-            sort: undefined, // Temporarily disable sort to fix 500 error
+            sort: undefined, // Always disable sort for now
             // sort: sort ? sort.replace(':', ',') : undefined,
             q: buildFinalQuery() || undefined,
         },

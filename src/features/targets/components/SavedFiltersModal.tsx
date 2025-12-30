@@ -47,10 +47,10 @@ const SavedFiltersModal: React.FC<SavedFiltersModalProps> = ({
     const [distributionSetQuery, setDistributionSetQuery] = useState('');
     const [distributionSetLimit, setDistributionSetLimit] = useState(50);
 
-    const { data, isLoading, refetch } = useGetFilters({ limit: 200, sort: 'name:ASC' });
+    const { data, isLoading, refetch } = useGetFilters({ limit: 200, sort: undefined });
     const { data: distributionSetsData, isLoading: distributionSetsLoading } = useGetDistributionSets({
         limit: distributionSetLimit,
-        sort: 'name:ASC',
+        sort: undefined,
         q: distributionSetQuery || undefined,
     });
 
