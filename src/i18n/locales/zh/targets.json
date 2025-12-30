@@ -1,0 +1,115 @@
+{
+    "title": "目标管理",
+    "subtitle": "监控与管理设备",
+    "list": {
+        "title": "目标列表",
+        "search": "搜索目标...",
+        "columns": {
+            "controllerId": "控制 ID",
+            "name": "名称",
+            "description": "描述",
+            "status": "状态",
+            "lastSeen": "最后上线",
+            "assignedDS": "已分配 DS",
+            "installedDS": "已安装 DS",
+            "actions": "操作"
+        },
+        "empty": "未找到目标"
+    },
+    "detail": {
+        "title": "目标详情",
+        "overview": "概览",
+        "attributes": "属性",
+        "tags": "标签",
+        "metadata": "元数据",
+        "actions": "操作历史",
+        "security": "安全",
+        "config": "配置",
+        "pollStatus": "轮询状态"
+    },
+    "status": {
+        "online": "在线",
+        "offline": "离线",
+        "unknown": "未知",
+        "updatePending": "更新挂起",
+        "updating": "更新中"
+    },
+    "actions": {
+        "edit": "编辑目标",
+        "delete": "删除目标",
+        "assign": "分配更新",
+        "cancel": "取消更新",
+        "message": "发送消息"
+    },
+    "attributes": {
+        "controllerId": "控制 ID",
+        "name": "名称",
+        "description": "描述",
+        "securityToken": "安全令牌",
+        "address": "地址",
+        "lastSeen": "最后上线时间"
+    },
+    "tags": {
+        "title": "标签",
+        "add": "添加标签",
+        "noTags": "未分配标签"
+    },
+    "filters": {
+        "saved": "保存的筛选器",
+        "save": "保存当前筛选器",
+        "manage": "管理筛选器"
+    },
+    "metadata": {
+        "key": "键",
+        "value": "值",
+        "emptyText": "无元数据"
+    },
+    "targetType": {
+        "current": "当前目标类型",
+        "noAssigned": "未分配目标类型",
+        "assign": "分配目标类型",
+        "select": "选择目标类型"
+    },
+    "typeManagement": {
+        "title": "目标类型管理",
+        "add": "添加目标类型",
+        "key": "键",
+        "keyPlaceholder": "输入唯一键",
+        "colour": "颜色",
+        "deleteConfirmTitle": "删除目标类型",
+        "deleteConfirmDesc": "确定要删除此目标类型吗？"
+    },
+    "tagManagement": {
+        "title": "目标标签管理",
+        "add": "添加目标标签",
+        "colour": "颜色",
+        "deleteConfirmTitle": "删除目标标签",
+        "deleteConfirmDesc": "确定要删除此目标标签吗？"
+    },
+    "bulkAssign": {
+        "title": "批量分配",
+        "selectedCount": "已选择 {{count}} 个目标",
+        "assignTag": "分配标签",
+        "assignType": "分配类型",
+        "tagAssignSuccess": "标签已分配给 {{count}} 个目标",
+        "typeAssignSuccess": "类型已分配给 {{count}} 个目标"
+    },
+    "bulkDelete": {
+        "title": "批量删除目标",
+        "button": "删除",
+        "confirmMessage": "确定要删除 {{count}} 个目标吗？",
+        "success": "成功删除 {{count}} 个目标"
+    },
+    "savedFilters": {
+        "title": "保存的筛选器",
+        "create": "新建筛选器",
+        "fields": {
+            "name": "名称",
+            "query": "FIQL 查询"
+        },
+        "placeholders": {
+            "name": "输入筛选器名称",
+            "query": "例如：name==device*;tag.name==prod"
+        }
+    }
+}

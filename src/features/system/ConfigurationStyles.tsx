@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import styled, { keyframes, css } from 'styled-components';
 import { Card, Typography } from 'antd';
 

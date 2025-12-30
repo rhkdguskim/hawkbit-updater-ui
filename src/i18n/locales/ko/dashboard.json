@@ -9,6 +9,14 @@
         "live": "실시간",
         "idle": "대기"
     },
+    "overview": {
+        "title": "개요",
+        "totalTargets": "전체 디바이스",
+        "onlineTargets": "온라인",
+        "activeRollouts": "활성 롤아웃",
+        "pendingActions": "대기 Action",
+        "percentOnline": "{{percent}}% 온라인"
+    },
     "kpi": {
         "totalTargets": "총 대상 기기",
         "totalDevices": "총 기기",

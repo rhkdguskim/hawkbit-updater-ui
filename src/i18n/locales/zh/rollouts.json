@@ -1,0 +1,74 @@
+{
+    "title": "发布管理",
+    "subtitle": "协调与调度更新",
+    "create": {
+        "title": "创建发布",
+        "name": "名称",
+        "description": "描述",
+        "distributionSet": "分发集",
+        "targetFilter": "目标筛选器",
+        "groups": "发布组",
+        "trigger": "触发器",
+        "strategy": "策略",
+        "schedule": "调度",
+        "success": "发布创建成功",
+        "error": "创建发布失败"
+    },
+    "list": {
+        "title": "发布列表",
+        "columns": {
+            "name": "名称",
+            "status": "状态",
+            "distribution": "分发集",
+            "progress": "进度",
+            "totalTargets": "总目标数",
+            "lastModified": "最后修改",
+            "actions": "操作"
+        },
+        "empty": "未找到发布"
+    },
+    "detail": {
+        "title": "发布详情",
+        "status": "状态",
+        "progress": "总体进度",
+        "groups": "组详情",
+        "targets": "目标状态",
+        "statistics": "统计信息",
+        "actions": {
+            "start": "开始",
+            "pause": "暂停",
+            "resume": "恢复",
+            "approve": "批准",
+            "delete": "删除"
+        }
+    },
+    "groups": {
+        "title": "发布组",
+        "name": "组名",
+        "targetCount": "目标数量",
+        "successRate": "成功率阈值",
+        "errorRate": "错误率阈值",
+        "status": "状态"
+    },
+    "wizard": {
+        "step1": "基本信息",
+        "step2": "选择分发集",
+        "step3": "目标选择",
+        "step4": "组配置",
+        "step5": "审核与确认",
+        "template": "从模板使用"
+    },
+    "templates": {
+        "title": "发布模板",
+        "save": "保存为模板",
+        "load": "加载模板",
+        "name": "模板名称"
+    },
+    "messages": {
+        "startSuccess": "发布启动成功",
+        "pauseSuccess": "发布暂停成功",
+        "resumeSuccess": "发布恢复成功",
+        "approveSuccess": "组已批准",
+        "deleteSuccess": "发布删除成功"
+    }
+}

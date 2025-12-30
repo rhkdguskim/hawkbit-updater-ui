@@ -1,0 +1,56 @@
+{
+    "title": "操作概览",
+    "subtitle": "监控更新操作的状态",
+    "status": {
+        "running": "运行中",
+        "finished": "已完成",
+        "pending": "挂起",
+        "scheduled": "已调度",
+        "canceling": "取消中",
+        "canceled": "已取消",
+        "error": "错误",
+        "retrieving": "检索中",
+        "downloading": "下载中",
+        "installing": "安装中",
+        "active": "活动",
+        "history": "历史"
+    },
+    "columns": {
+        "id": "ID",
+        "target": "目标",
+        "distribution": "分发集",
+        "status": "状态",
+        "type": "类型",
+        "force": "强制类型",
+        "created": "创建时间",
+        "lastModified": "最后修改"
+    },
+    "filter": {
+        "status": "状态",
+        "target": "目标",
+        "distribution": "分发集"
+    },
+    "messages": {
+        "cancelSuccess": "操作取消成功",
+        "cancelError": "取消操作失败",
+        "retrySuccess": "操作重试成功",
+        "retryError": "重试操作失败"
+    },
+    "overview": {
+        "statusDistribution": "操作状态分布",
+        "activeActions": "活动操作",
+        "noActiveActions": "当前没有活动操作"
+    },
+    "detail": {
+        "title": "操作详情",
+        "messages": "消息",
+        "technicalDetails": "技术详情",
+        "history": "状态历史",
+        "cancel": "取消操作",
+        "retry": "重试操作",
+        "forceType": "强制类型",
+        "maintenanceWindow": "维护窗口",
+        "execution": "执行"
+    },
+    "empty": "未找到操作"
+}

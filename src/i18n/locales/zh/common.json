@@ -1,0 +1,149 @@
+{
+    "app": {
+        "title": "HawkBit 更新管理器",
+        "description": "用于 HawkBit 服务器的现代管理 UI"
+    },
+    "nav": {
+        "dashboard": "仪表板",
+        "targets": "目标",
+        "distributions": "分发",
+        "rollouts": "发布",
+        "modules": "模块",
+        "artifacts": "构建产物",
+        "configuration": "系统配置",
+        "repositories": "软件仓库",
+        "distributionSets": "分发集",
+        "softwareModules": "软件模块",
+        "rolloutManagement": "发布管理",
+        "actions": "操作",
+        "rolloutOverview": "概览",
+        "list": "列表",
+        "overview": "概览",
+        "typeManagement": "类型管理"
+    },
+    "status": {
+        "active": "活动",
+        "inactive": "非活动",
+        "loading": "加载中...",
+        "success": "成功",
+        "error": "错误",
+        "warning": "警告",
+        "info": "信息",
+        "idle": "空闲",
+        "running": "运行中",
+        "finished": "已完成",
+        "paused": "已暂停",
+        "scheduled": "已调度",
+        "canceled": "已取消",
+        "pending": "等待中",
+        "in_sync": "已同步",
+        "unknown": "未知",
+        "ready": "准备就绪",
+        "creating": "创建中",
+        "starting": "启动中",
+        "stopped": "已停止",
+        "waiting_for_approval": "等待批准",
+        "update_in_progress": "更新进行中",
+        "installing": "安装中",
+        "downloading": "下载中"
+    },
+    "actions": {
+        "create": "创建",
+        "edit": "编辑",
+        "delete": "删除",
+        "save": "保存",
+        "cancel": "取消",
+        "confirm": "确认",
+        "refresh": "刷新",
+        "search": "搜索",
+        "filter": "筛选",
+        "clear": "清除",
+        "submit": "提交",
+        "reset": "重置",
+        "view": "查看",
+        "copy": "复制",
+        "download": "下载",
+        "upload": "上传",
+        "back": "返回",
+        "next": "下一步",
+        "finish": "完成",
+        "close": "关闭",
+        "details": "详情",
+        "logs": "日志",
+        "history": "历史",
+        "settings": "设置",
+        "more": "更多"
+    },
+    "messages": {
+        "success": "操作成功",
+        "error": "操作失败",
+        "saved": "已保存",
+        "deleted": "已删除",
+        "created": "已创建",
+        "updated": "已更新",
+        "confirmDelete": "您确定要删除此项目吗？",
+        "noData": "暂无数据",
+        "loading": "正在加载数据...",
+        "networkError": "网络错误，请稍后重试",
+        "sessionExpired": "会话已过期，请重新登录"
+    },
+    "filter": {
+        "title": "筛选",
+        "placeholder": "输入搜索关键词...",
+        "apply": "应用筛选",
+        "reset": "重置筛选",
+        "add": "添加筛选",
+        "field": "字段",
+        "operator": "运算符",
+        "value": "值",
+        "builder": {
+            "title": "高级筛选构建器",
+            "and": "并且 (AND)",
+            "or": "或者 (OR)",
+            "addGroup": "添加组",
+            "addRule": "添加规则"
+        }
+    },
+    "table": {
+        "rowsPerPage": "每页行数",
+        "total": "总计",
+        "of": "之于",
+        "selected": "已选择 {{count}} 项"
+    },
+    "time": {
+        "now": "刚刚",
+        "seconds": "{{count}} 秒前",
+        "minutes": "{{count}} 分钟前",
+        "hours": "{{count}} 小时前",
+        "days": "{{count}} 天前",
+        "weeks": "{{count}} 周前",
+        "months": "{{count}} 个月前",
+        "years": "{{count}} 年前"
+    },
+    "theme": {
+        "light": "浅色模式",
+        "dark": "深色模式",
+        "system": "跟随系统"
+    },
+    "languages": {
+        "en": "🇺🇸 English",
+        "ko": "🇰🇷 한국어",
+        "zh": "🇨🇳 中文"
+    },
+    "errors": {
+        "required": "必填项",
+        "invalid": "无效值",
+        "minLength": "最小长度为 {{count}}",
+        "maxLength": "最大长度为 {{count}}",
+        "pattern": "格式不正确",
+        "unique": "必须唯一"
+    },
+    "validation": {
+        "required": "此字段为必填项",
+        "email": "请输入有效的电子邮件地址",
+        "url": "请输入有效的 URL",
+        "number": "请输入有效的数字"
+    },
+    "updated": "更新于",
+    "created": "创建于"
+}

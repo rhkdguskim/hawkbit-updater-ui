@@ -1,0 +1,198 @@
+{
+    "title": "仪表板",
+    "subtitle": "系统概览与指标",
+    "overview": {
+        "title": "概览",
+        "totalTargets": "总目标数",
+        "onlineTargets": "在线目标",
+        "activeRollouts": "活动发布",
+        "pendingActions": "挂起操作",
+        "percentOnline": "{{percent}}% 在线"
+    },
+    "kpi": {
+        "connectivity": "连接性",
+        "onlineDevices": "在线设备",
+        "successRate": "成功率",
+        "pendingActions": "挂起操作",
+        "last24h": "过去 24 小时",
+        "errors": "错误",
+        "requiresAttention": "需要注意",
+        "allClear": "一切正常",
+        "totalDevices": "设备总数",
+        "online": "在线",
+        "inSync": "已同步",
+        "pending": "挂起",
+        "activeRollouts": "活动发布"
+    },
+    "charts": {
+        "rollouts": "发布状态",
+        "actions": "操作状态",
+        "targets": "目标状态",
+        "distribution": "分发概览"
+    },
+    "chart": {
+        "deviceStatus": "设备状态",
+        "total": "总计",
+        "online": "在线",
+        "offline": "离线",
+        "connectivityStatus": "连接状态",
+        "deploymentRate": "部署率",
+        "deploymentRateDesc": "目标完成率",
+        "targets": "目标",
+        "rolloutStatus": "发布状态",
+        "totalRollouts": "共 {{count}} 个发布",
+        "actionStatus": "操作状态 (24小时)",
+        "fragmentation": "目标更新状态",
+        "velocity": "部署速度",
+        "velocityDesc": "每分钟操作完成率"
+    },
+    "recentActivity": {
+        "title": "最近活动",
+        "viewAll": "查看全部",
+        "noActivity": "近期无活动"
+    },
+    "quickActions": {
+        "title": "快速操作",
+        "createRollout": "创建发布",
+        "registerTarget": "注册目标",
+        "uploadArtifact": "上传构建产物"
+    },
+    "systemStatus": {
+        "title": "系统状态",
+        "healthy": "健康",
+        "issues": "存在问题",
+        "maintenance": "维护中"
+    },
+    "deployment": {
+        "title": "部署概览",
+        "stats": {
+            "total": "总计",
+            "success": "成功",
+            "fail": "失败",
+            "inProgress": "进行中"
+        }
+    },
+    "updateActivity": {
+        "title": "更新活动",
+        "updates": "更新",
+        "errors": "错误"
+    },
+    "connectivity": {
+        "title": "连接性趋势",
+        "online": "在线",
+        "total": "总计"
+    },
+    "distributionCompleteness": {
+        "title": "分发完成度",
+        "installed": "已安装",
+        "assigned": "已分配"
+    },
+    "velocity": {
+        "title": "部署速度",
+        "current": "当前速度",
+        "actionsPerDay": "操作/天",
+        "trend": "趋势"
+    },
+    "fragmentation": {
+        "title": "软件碎片化",
+        "distribution": "版本分布"
+    },
+    "actionStatus": {
+        "title": "操作状态分布",
+        "ready": "准备就绪",
+        "scheduled": "已调度",
+        "finished": "已完成",
+        "error": "错误"
+    },
+    "progressLabel": "完成度",
+    "timelineLabel": "阶段时间轴",
+    "successCount": "成功",
+    "runningCount": "运行中",
+    "errorCount": "错误",
+    "stages": {
+        "scheduled": "已调度",
+        "waiting_for_approval": "等待批准",
+        "running": "运行中",
+        "finished": "已完成"
+    },
+    "status": {
+        "in_sync": "已同步",
+        "pending": "挂起",
+        "error": "错误",
+        "unknown": "未知"
+    },
+    "errors": {
+        "loadFailed": "数据加载失败",
+        "chartLoadFailed": "图表数据加载失败"
+    },
+    "empty": {
+        "noDevices": "没有注册设备",
+        "noActions": "没有注册操作"
+    },
+    "rolloutStatus": {
+        "title": "发布状态",
+        "ready": "准备就绪",
+        "running": "运行中",
+        "waitingApproval": "等待批准",
+        "error": "错误",
+        "approveAll": "全部批准"
+    },
+    "deviceStatus": {
+        "title": "设备状态",
+        "online": "在线",
+        "offline": "离线"
+    },
+    "actionFunnel": {
+        "title": "操作漏斗",
+        "pending": "挂起",
+        "running": "运行中",
+        "finished": "已完成"
+    },
+    "delayedActions": {
+        "title": "延迟操作 (>10m/30m)",
+        "target": "目标",
+        "distribution": "分发",
+        "forceType": "强制类型",
+        "elapsed": "耗时",
+        "noDelayed": "未监控到延迟操作"
+    },
+    "pendingApprovals": {
+        "title": "待批准",
+        "rollout": "发布",
+        "groups": "组",
+        "approve": "批准",
+        "noApprovals": "没有待批准项"
+    },
+    "targetTypeCoverage": {
+        "title": "目标类型覆盖率",
+        "type": "目标类型",
+        "count": "数量",
+        "percentage": "百分比",
+        "noTypes": "未找到目标类型"
+    },
+    "focus": {
+        "enter": "进入专注模式",
+        "exit": "退出专注模式"
+    },
+    "ticker": {
+        "title": "实时动态",
+        "empty": "过去 24 小时内无高优先级事件",
+        "type": {
+            "action": "操作",
+            "rollout": "发布",
+            "system": "系统",
+            "alert": "警报",
+            "info": "信息"
+        }
+    },
+    "version": {
+        "fragmentationTitle": "碎片化指数",
+        "fragmentationLabel": "{{score}}% · {{count}} 个版本"
+    },
+    "actionType": {
+        "update": "更新",
+        "cancel": "取消",
+        "download": "下载",
+        "deploy": "部署"
+    }
+}
