@@ -64,7 +64,7 @@ const EditTextArea = styled(Input.TextArea)`
     flex: 1;
 `;
 
-const CellText = styled(Text)<{ $editable: boolean }>`
+const CellText = styled(Text) <{ $editable: boolean }>`
     font-size: var(--ant-font-size-sm);
     cursor: ${props => (props.$editable ? 'pointer' : 'default')};
 `;
@@ -154,19 +154,27 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
 
     if (editing) {
-        const InputComponent = type === 'textarea' ? EditTextArea : EditInput;
+        const commonProps = {
+            ref: inputRef as never,
+            size: 'small' as const,
+            value: editValue,
+            onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setEditValue(e.target.value),
+            onKeyDown: handleKeyDown,
+            onBlur: handleSave,
+            maxLength: maxLength,
+        };
+
         return (
             <EditWrapper>
-                <InputComponent
-                    ref={inputRef as never}
-                    size="small"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    onBlur={handleSave}
-                    maxLength={maxLength}
-                    {...(type === 'textarea' ? { rows: 2, autoSize: { minRows: 1, maxRows: 3 } } : {})}
-                />
+                {type === 'textarea' ? (
+                    <EditTextArea
+                        {...commonProps}
+                        rows={2}
+                        autoSize={{ minRows: 1, maxRows: 3 }}
+                    />
+                ) : (
+                    <EditInput {...commonProps} />
+                )}
                 <CheckOutlined className="action-icon save-icon" onClick={handleSave} />
                 <CloseOutlined className="action-icon cancel-icon" onClick={handleCancel} />
             </EditWrapper>

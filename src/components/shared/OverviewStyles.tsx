@@ -52,24 +52,28 @@ export const OVERVIEW_THEMES = {
         accentLight: 'var(--ant-color-success-bg)',
         accentBorder: 'var(--ant-color-success-border)',
         iconBg: 'linear-gradient(135deg, var(--ant-color-success) 0%, var(--ant-color-success-active) 100%)',
+        color: 'var(--ant-color-success)',
     },
     deployment: {
         gradient: 'linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)',
         accentLight: 'var(--ant-color-primary-bg)',
         accentBorder: 'var(--ant-color-primary-border)',
         iconBg: 'linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)',
+        color: 'var(--ant-color-primary)',
     },
     fragmentation: {
-        gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)', // Still semi-hardcoded as there is no 'pink' in default antd tokens easily available like this
+        gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
         accentLight: 'rgba(236, 72, 153, 0.08)',
         accentBorder: 'rgba(236, 72, 153, 0.2)',
         iconBg: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+        color: '#ec4899',
     },
     activity: {
         gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
         accentLight: 'rgba(6, 182, 212, 0.08)',
         accentBorder: 'rgba(6, 182, 212, 0.2)',
         iconBg: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+        color: '#06b6d4',
     },
 };
 

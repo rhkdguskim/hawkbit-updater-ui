@@ -65,6 +65,7 @@
         "deploymentRateDesc": "Target completion rate",
         "targets": "targets",
         "rolloutStatus": "Rollout Status",
+        "totalRollouts": "Total {{count}} rollouts",
         "actionStatus": "Action Status (24h)",
         "fragmentation": "Target Update Status",
         "velocity": "Deployment Velocity",

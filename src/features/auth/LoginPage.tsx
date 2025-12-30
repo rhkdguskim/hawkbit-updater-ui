@@ -85,7 +85,7 @@ const LoginPage: React.FC = () => {
     return (
         <Container>
             <FormContainer>
-                <StyledTitle level={3}>{import.meta.env.VITE_LOGIN_TITLE || t('login.mireroProductManager')}</StyledTitle>
+                <StyledTitle level={3}>{import.meta.env.VITE_LOGIN_TITLE || import.meta.env.VITE_APP_TITLE || 'Updater UI'}</StyledTitle>
                 <Form
                     name="login_form"
                     initialValues={{ remember: true }}

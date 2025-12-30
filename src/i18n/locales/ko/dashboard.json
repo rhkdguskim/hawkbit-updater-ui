@@ -65,6 +65,7 @@
         "deploymentRateDesc": "대상 완료 비율",
         "targets": "대상",
         "rolloutStatus": "롤아웃 상태",
+        "totalRollouts": "총 {{count}}개 롤아웃",
         "actionStatus": "액션 상태 (24시간)",
         "fragmentation": "타겟 업데이트 상태",
         "velocity": "배포 속도 (분/완료)",

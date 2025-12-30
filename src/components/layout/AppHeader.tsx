@@ -285,7 +285,7 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
                     <div className="logo-icon">
                         <MdRocketLaunch />
                     </div>
-                    <span className="logo-text">{t('common:appName')}</span>
+                    <span className="logo-text">{import.meta.env.VITE_LOGIN_TITLE || 'Updater UI'}</span>
                 </LogoContainer>
 
                 <StyledMenu

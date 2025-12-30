@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { Space, Button, Typography, Progress, Tooltip } from 'antd';
+import { Space, Button, Typography, Progress, Tooltip, message } from 'antd';
 import { EyeOutlined, EditOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useGetRollouts } from '@/api/generated/rollouts/rollouts';
+import { useGetRollouts, usePause, useResume } from '@/api/generated/rollouts/rollouts';
 import type { MgmtRolloutResponseBody } from '@/api/generated/model';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -24,6 +24,39 @@ const RolloutList: React.FC = () => {
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    // Pause/Resume mutations
+    const pauseMutation = usePause({
+        mutation: {
+            onSuccess: () => {
+                message.success(t('detail.messages.pauseSuccess'));
+                refetch();
+            },
+            onError: () => {
+                message.error(t('detail.messages.pauseError'));
+            },
+        },
+    });
+
+    const resumeMutation = useResume({
+        mutation: {
+            onSuccess: () => {
+                message.success(t('detail.messages.resumeSuccess'));
+                refetch();
+            },
+            onError: () => {
+                message.error(t('detail.messages.resumeError'));
+            },
+        },
+    });
+
+    const handlePauseResume = (record: MgmtRolloutResponseBody) => {
+        if (record.status === 'paused') {
+            resumeMutation.mutate({ rolloutId: record.id! });
+        } else if (record.status === 'running') {
+            pauseMutation.mutate({ rolloutId: record.id! });
+        }
+    };
 
     const {
         pagination,
@@ -188,12 +221,14 @@ const RolloutList: React.FC = () => {
                             onClick={() => navigate(`/rollouts/${record.id}`)}
                         />
                     </Tooltip>
-                    {isAdmin && (
+                    {isAdmin && (record.status === 'running' || record.status === 'paused') && (
                         <Tooltip title={record.status === 'paused' ? t('actions.resume') : t('actions.pause')}>
                             <Button
                                 type="text"
                                 size="small"
                                 icon={record.status === 'paused' ? <PlayCircleOutlined /> : <PauseCircleOutlined />}
+                                onClick={() => handlePauseResume(record)}
+                                loading={pauseMutation.isPending || resumeMutation.isPending}
                             />
                         </Tooltip>
                     )}
