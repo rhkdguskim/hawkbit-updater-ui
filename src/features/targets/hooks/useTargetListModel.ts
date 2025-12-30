@@ -73,7 +73,7 @@ export const useTargetListModel = () => {
     // Filter Building
     const filterFields: FilterField[] = useMemo(() => [
         { key: 'name', label: t('table.name'), type: 'text' },
-        { key: 'controllerId', label: 'Controller ID', type: 'text' },
+        { key: 'controllerId', label: t('table.controllerId'), type: 'text' },
         {
             key: 'targetType',
             label: t('table.targetType'),
@@ -124,7 +124,7 @@ export const useTargetListModel = () => {
         handleFiltersChange([{
             id: `saved-${Date.now()}`,
             field: 'query',
-            fieldLabel: t('filter.savedFilter', { defaultValue: 'Saved Filter' }),
+            fieldLabel: t('filters.query'),
             operator: 'equals',
             operatorLabel: '=',
             value: query,

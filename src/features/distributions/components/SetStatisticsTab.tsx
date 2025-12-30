@@ -95,7 +95,7 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
 
             <Row gutter={24} style={{ marginTop: 24 }}>
                 <Col span={12}>
-                    <Card title={t('detail.actionStatusDistribution') || 'Action Status Distribution'} style={{ height: '100%', borderRadius: 12 }}>
+                    <Card title={t('detail.actionStatusDistribution')} style={{ height: '100%', borderRadius: 12 }}>
                         <div style={{ height: 300 }}>
                             {totalActions > 0 ? (
                                 <ResponsiveContainer width="100%" height="100%">
@@ -124,7 +124,7 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
                     </Card>
                 </Col>
                 <Col span={12}>
-                    <Card title={t('detail.overallProgress') || 'Overall Progress'} style={{ height: '100%', borderRadius: 12 }}>
+                    <Card title={t('detail.overallProgress')} style={{ height: '100%', borderRadius: 12 }}>
                         <Space direction="vertical" style={{ width: '100%' }} size="large">
                             <div style={{ textAlign: 'center', marginBottom: 16 }}>
                                 <Progress

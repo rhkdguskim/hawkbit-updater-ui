@@ -44,6 +44,7 @@ import { useTranslation } from 'react-i18next';
 import { PageLayout } from '@/components/patterns';
 import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader, StatusTag } from '@/components/common';
+import { getStatusLabel } from '@/utils/statusUtils';
 
 const { Text } = Typography;
 
@@ -404,7 +405,7 @@ const RolloutDetail: React.FC = () => {
             <DetailPageHeader
                 title={rolloutData?.name || rolloutId}
                 description={t('detail.description')}
-                status={rolloutData?.status}
+                status={rolloutData?.status ? getStatusLabel(rolloutData.status, t) : undefined}
                 backLabel={t('detail.back')}
                 onBack={() => navigate('/rollouts')}
                 actions={headerActions}

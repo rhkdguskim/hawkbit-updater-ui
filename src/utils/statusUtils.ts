@@ -68,8 +68,8 @@ export const getStatusLabel = (
     status: string | undefined,
     t: (key: string, options?: StatusLabelOptions) => string
 ): string => {
-    if (!status) return t('common:status.unknown', { defaultValue: 'UNKNOWN' });
+    if (!status) return t('common:status.unknown');
     const key = status.toLowerCase();
-    return t(`common:status.${key}`, { defaultValue: status.replace(/_/g, ' ').toUpperCase() });
+    return t(`common:status.${key}`);
 };
 

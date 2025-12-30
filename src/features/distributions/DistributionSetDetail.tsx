@@ -70,20 +70,20 @@ const DistributionSetDetail: React.FC = () => {
     const invalidateMutation = useInvalidateDistributionSet({
         mutation: {
             onSuccess: () => {
-                message.success(t('messages.invalidateSuccess') || 'Distribution set invalidated successfully');
+                message.success(t('messages.invalidateSuccess'));
                 navigate('/distributions/sets');
             },
             onError: (error) => {
-                message.error((error as Error).message || 'Failed to invalidate distribution set');
+                message.error((error as Error).message || t('common:messages.error'));
             }
         }
     });
 
     const handleInvalidate = () => {
         Modal.confirm({
-            title: t('messages.invalidateConfirmTitle') || 'Invalidate Distribution Set',
-            content: t('messages.invalidateConfirmDesc') || 'Once invalidated, this set cannot be used for new deployments. This action is permanent.',
-            okText: t('actions.invalidate') || 'Invalidate',
+            title: t('messages.invalidateConfirmTitle'),
+            content: t('messages.invalidateConfirmDesc'),
+            okText: t('actions.invalidate'),
             okType: 'danger',
             onOk: () => invalidateMutation.mutate({
                 distributionSetId,
@@ -101,10 +101,10 @@ const DistributionSetDetail: React.FC = () => {
     const handleClone = async () => {
         if (!setData) return;
         try {
-            const newName = `${setData.name}_copy`;
+            const newName = `${setData.name}_${t('messages.cloneSuffix')}`;
             const payload: MgmtDistributionSetRequestBodyPost = {
                 name: newName,
-                version: `${setData.version}_clone`,
+                version: `${setData.version}_${t('messages.clonedVersionSuffix')}`,
                 type: setData.type,
                 description: setData.description,
                 requiredMigrationStep: setData.requiredMigrationStep,
@@ -118,10 +118,10 @@ const DistributionSetDetail: React.FC = () => {
                 await assignMutation.mutateAsync({ distributionSetId: newDsId, data: moduleIds });
             }
 
-            message.success(t('messages.cloneSuccess') || 'Distribution set cloned successfully');
+            message.success(t('messages.cloneSuccess'));
             navigate(`/distributions/sets/${newDsId}`);
         } catch (error) {
-            message.error('Failed to clone distribution set');
+            message.error(t('common:messages.error'));
         }
     };
 
@@ -217,7 +217,7 @@ const DistributionSetDetail: React.FC = () => {
                 onClick={handleClone}
                 loading={createDsMutation.isPending}
             >
-                {t('actions.clone') || 'Clone'}
+                {t('actions.clone')}
             </Button>
             <Button
                 danger
@@ -225,7 +225,7 @@ const DistributionSetDetail: React.FC = () => {
                 onClick={handleInvalidate}
                 loading={invalidateMutation.isPending}
             >
-                {t('actions.invalidate') || 'Invalidate'}
+                {t('actions.invalidate')}
             </Button>
         </>
     ) : undefined;
@@ -247,7 +247,7 @@ const DistributionSetDetail: React.FC = () => {
                 backLabel={t('sets.title')}
                 title={setData?.name || id}
                 description={t('detail.description')}
-                status={setData?.complete ? 'COMPLETE' : 'INCOMPLETE'}
+                status={setData?.complete ? t('status.complete') : t('status.incomplete')}
                 loading={isSetLoading}
                 extra={titleExtra}
                 actions={headerActions}
@@ -263,8 +263,8 @@ const DistributionSetDetail: React.FC = () => {
                         { key: 'modules', label: t('detail.assignedModules'), children: modulesTab },
                         { key: 'metadata', label: t('detail.metadata'), children: <SetMetadataTab distributionSetId={distributionSetId} isAdmin={isAdmin} /> },
                         { key: 'tags', label: t('detail.tags'), children: <SetTagsTab distributionSetId={distributionSetId} isAdmin={isAdmin} /> },
-                        { key: 'statistics', label: t('detail.statistics') || 'Statistics', children: <SetStatisticsTab distributionSetId={distributionSetId} /> },
-                        { key: 'targets', label: t('detail.targets') || 'Targets', children: <SetTargetsTab distributionSetId={distributionSetId} /> },
+                        { key: 'statistics', label: t('detail.statistics'), children: <SetStatisticsTab distributionSetId={distributionSetId} /> },
+                        { key: 'targets', label: t('detail.targets'), children: <SetTargetsTab distributionSetId={distributionSetId} /> },
                     ]}
                 />
             </SectionCard>

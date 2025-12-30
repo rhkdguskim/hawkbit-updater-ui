@@ -255,7 +255,7 @@ const SoftwareModuleDetail: React.FC = () => {
                         title: t('detail.artifactsColumns.size'),
                         dataIndex: 'size',
                         key: 'size',
-                        render: (size) => size ? `${(size / 1024).toFixed(2)} KB` : '-',
+                        render: (size) => size ? `${(size / 1024).toFixed(2)} ${t('common:units.kb')}` : '-',
                     },
                     {
                         title: t('detail.artifactsColumns.hashes'),
@@ -331,7 +331,7 @@ const SoftwareModuleDetail: React.FC = () => {
                 onBack={() => navigate('/distributions/modules')}
                 loading={isModuleLoading}
                 extra={titleExtra}
-                status={moduleData?.locked ? 'locked' : undefined}
+                status={moduleData?.locked ? t('status.locked') : undefined}
                 description={t('detail.moduleDescription')}
             />
 

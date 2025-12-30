@@ -37,6 +37,7 @@
         "delete": "삭제",
         "edit": "편집",
         "create": "생성",
+        "update": "업데이트",
         "no": "아니오",
         "dsSearch": "DS 검색",
         "groupDistributionPreview": "그룹 배포 미리보기",
@@ -74,6 +75,14 @@
         "stopped": "중지됨",
         "canceling": "취소 중",
         "retrieving": "수신 중",
+        "retrieved": "수신됨",
+        "downloading": "다운로드 중",
+        "processing": "처리 중",
+        "warning": "경고",
+        "timeout": "시간 초과",
+        "failed": "실패",
+        "completed": "완료",
+        "success": "성공",
         "registered": "등록됨",
         "live": "실시간",
         "idle": "대기",
@@ -88,7 +97,8 @@
         "notFound": "찾을 수 없습니다.",
         "unauthorized": "인증이 필요합니다.",
         "forbidden": "접근 권한이 없습니다.",
-        "conflict": "충돌이 발생했습니다. 새로고침 후 다시 시도해주세요."
+        "conflict": "충돌이 발생했습니다. 새로고침 후 다시 시도해주세요.",
+        "warning": "주의"
     },
     "apiErrors": {
         "ENTITY_NOT_FOUND": "요청하신 항목을 찾을 수 없습니다.",
@@ -134,7 +144,13 @@
         "total": "전체 {{total}}개 중 {{from}}-{{to}}",
         "itemsPerPage": "페이지당 항목"
     },
+    "units": {
+        "kb": "KB",
+        "mb": "MB",
+        "gb": "GB"
+    },
     "table": {
+        "id": "ID",
         "actions": "작업",
         "noResults": "결과가 없습니다."
     },

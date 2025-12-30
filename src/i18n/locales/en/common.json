@@ -37,6 +37,7 @@
         "delete": "Delete",
         "edit": "Edit",
         "create": "Create",
+        "update": "Update",
         "no": "No",
         "dsSearch": "DS Search",
         "groupDistributionPreview": "Group Distribution Preview",
@@ -74,6 +75,14 @@
         "stopped": "Stopped",
         "canceling": "Canceling",
         "retrieving": "Retrieving",
+        "retrieved": "Retrieved",
+        "downloading": "Downloading",
+        "processing": "Processing",
+        "warning": "Warning",
+        "timeout": "Timeout",
+        "failed": "Failed",
+        "completed": "Completed",
+        "success": "Success",
         "registered": "Registered",
         "live": "Live",
         "idle": "Idle",
@@ -88,7 +97,8 @@
         "notFound": "Not found.",
         "unauthorized": "Authentication required.",
         "forbidden": "Access denied.",
-        "conflict": "Conflict occurred. Please refresh and try again."
+        "conflict": "Conflict occurred. Please refresh and try again.",
+        "warning": "Warning"
     },
     "apiErrors": {
         "ENTITY_NOT_FOUND": "The requested item was not found.",
@@ -134,7 +144,13 @@
         "total": "{{from}}-{{to}} of {{total}}",
         "itemsPerPage": "Items per page"
     },
+    "units": {
+        "kb": "KB",
+        "mb": "MB",
+        "gb": "GB"
+    },
     "table": {
+        "id": "ID",
         "actions": "Actions",
         "noResults": "No results found."
     },

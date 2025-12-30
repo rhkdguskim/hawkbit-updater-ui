@@ -182,6 +182,7 @@ const ArtifactPreview: React.FC<{ distributionSetId: number }> = ({ distribution
 };
 
 const ModuleArtifacts: React.FC<{ softwareModuleId: number }> = ({ softwareModuleId }) => {
+    const { t } = useTranslation(['common']);
     const { data: artifactsData, isLoading } = useGetArtifacts(softwareModuleId);
 
     if (isLoading) return <Spin size="small" style={{ marginLeft: 8 }} />;
@@ -191,7 +192,7 @@ const ModuleArtifacts: React.FC<{ softwareModuleId: number }> = ({ softwareModul
     return (
         <ul style={{ margin: '4px 0 8px 16px', fontSize: '12px', color: '#666' }}>
             {artifacts.map((art: any) => (
-                <li key={art.sha1}>{art.filename} ({Math.round((art.size || 0) / 1024)} KB)</li>
+                <li key={art.sha1}>{art.filename} ({Math.round((art.size || 0) / 1024)} {t('common:units.kb')})</li>
             ))}
         </ul>
     );
@@ -366,7 +367,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                 // Use current form value directly for validation
                 const existingRollouts = await getRollouts({ q: `name==${escapeValue(values.name)}` });
                 if (existingRollouts && existingRollouts.total && existingRollouts.total > 0) {
-                    setNameError(t('wizard.basicInfo.nameDuplicate', { defaultValue: 'Rollout name already exists' }));
+                    setNameError(t('wizard.basicInfo.nameDuplicate'));
                     setIsCheckingName(false);
                     return;
                 }
@@ -484,14 +485,14 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
 
         if (matchingRules.length > 0) {
             Modal.confirm({
-                title: t('approvalPolicy.confirmTitle', { defaultValue: 'Approval Required' }),
+                title: t('approvalPolicy.confirmTitle'),
                 content: (
                     <Flex vertical gap={12}>
-                        <Text>{t('approvalPolicy.matchingRulesDesc', { defaultValue: 'The following local approval policies are applicable:' })}</Text>
+                        <Text>{t('approvalPolicy.matchingRulesDesc')}</Text>
                         <ul>
                             {matchingRules.map((r, i) => <li key={i}><Text strong>{r}</Text></li>)}
                         </ul>
-                        <Text type="secondary">{t('approvalPolicy.proceedConfirm', { defaultValue: 'Do you want to proceed anyway? Note: Final approval requirement depends on server configuration.' })}</Text>
+                        <Text type="secondary">{t('approvalPolicy.proceedConfirm')}</Text>
                     </Flex>
                 ),
                 okText: t('common:confirm'),
@@ -526,7 +527,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                     <TextArea rows={4} placeholder={t('wizard.basicInfo.descriptionPlaceholder')} />
                 </Form.Item>
             </Form>
-            {isCheckingName && <Spin size="small" tip="Checking name..." />}
+            {isCheckingName && <Spin size="small" tip={t('wizard.basicInfo.checkingName')} />}
         </Card>
     );
 
@@ -539,9 +540,9 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                         value={dsSearchField}
                         onChange={setDsSearchField}
                         options={[
-                            { label: t('wizard.distributionSet.searchName', { defaultValue: 'Name' }), value: 'name' },
-                            { label: t('wizard.distributionSet.searchVersion', { defaultValue: 'Version' }), value: 'version' },
-                            { label: t('wizard.distributionSet.searchDescription', { defaultValue: 'Description' }), value: 'description' },
+                            { label: t('wizard.distributionSet.searchName'), value: 'name' },
+                            { label: t('wizard.distributionSet.searchVersion'), value: 'version' },
+                            { label: t('wizard.distributionSet.searchDescription'), value: 'description' },
                         ]}
                         style={{ width: 120 }}
                     />
@@ -818,7 +819,6 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                             <div style={{ marginTop: 30 }}>
                                 <Text type="secondary">
                                     {t('wizard.groupSettings.preview', {
-                                        defaultValue: 'Group Distribution Preview: {{count}} groups, approx. {{size}} targets/group',
                                         count: amountGroups,
                                         size: groupSize,
                                     })}
@@ -829,7 +829,6 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
 
                     <Alert
                         message={t('wizard.groupSettings.distributionHint', {
-                            defaultValue: 'Targets will be divided into {{count}} groups. {{exact}} groups of {{size}}, and {{extraCount}} groups of {{extraSize}}.',
                             count: amountGroups,
                             exact: amountGroups - remainder,
                             size: groupSize,
@@ -875,9 +874,9 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                 <Descriptions.Item label={t('wizard.review.errorThreshold')}>{formData.errorThreshold}%</Descriptions.Item>
                 <Descriptions.Item label={t('wizard.groupSettings.startImmediately')}>
                     {formData.startImmediately ? (
-                        <Tag color="blue">{t('common:yes', { defaultValue: 'Yes' })}</Tag>
+                        <Tag color="blue">{t('common:yes')}</Tag>
                     ) : (
-                        <Tag>{t('common:no', { defaultValue: 'No' })}</Tag>
+                        <Tag>{t('common:no')}</Tag>
                     )}
                 </Descriptions.Item>
             </Descriptions>

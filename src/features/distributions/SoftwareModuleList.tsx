@@ -158,7 +158,7 @@ const SoftwareModuleList: React.FC = () => {
     const updateMutation = useUpdateSoftwareModule({
         mutation: {
             onSuccess: () => {
-                message.success(t('messages.updateSuccess', { defaultValue: 'Updated' }));
+                message.success(t('messages.updateSuccess'));
                 queryClient.invalidateQueries({ queryKey: getGetSoftwareModulesQueryKey() });
             },
             onError: (error) => {
@@ -175,6 +175,13 @@ const SoftwareModuleList: React.FC = () => {
     }, [updateMutation]);
 
     const columns: ColumnsType<MgmtSoftwareModule> = [
+        {
+            title: t('common:table.id'),
+            dataIndex: 'id',
+            key: 'id',
+            width: 80,
+            render: (id: number) => <Text style={{ fontSize: 'var(--ant-font-size-sm)', color: '#666' }}>{id}</Text>,
+        },
         {
             title: t('list.columns.name'),
             dataIndex: 'name',
@@ -240,7 +247,7 @@ const SoftwareModuleList: React.FC = () => {
             ),
         },
         {
-            title: t('list.columns.actions', { defaultValue: 'Actions' }),
+            title: t('common:table.actions'),
             key: 'actions',
             width: 100,
             fixed: 'right',
@@ -254,7 +261,7 @@ const SoftwareModuleList: React.FC = () => {
                             onClick={() => navigate(`/distributions/modules/${record.id}`)}
                         />
                     </Tooltip>
-                    <Tooltip title={t('actions.edit', { defaultValue: 'Edit' })}>
+                    <Tooltip title={t('common:actions.edit')}>
                         <Button
                             type="text"
                             size="small"

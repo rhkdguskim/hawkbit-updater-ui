@@ -203,8 +203,8 @@
         }
     },
     "filters": {
-        "savedFilter": "저장 필터: {{name}}",
         "query": "검색 쿼리",
+        "savedFilter": "저장 필터: {{name}}",
         "tag": "태그: {{name}}",
         "type": "유형: {{name}}",
         "clearAll": "전체 해제"
@@ -265,7 +265,8 @@
         "createSuccess": "타겟 유형이 생성되었습니다.",
         "updateSuccess": "타겟 유형이 업데이트되었습니다.",
         "deleteSuccess": "타겟 유형이 삭제되었습니다.",
-        "deleteConfirm": "정말로 이 타겟 유형을 삭제하시겠습니까?",
+        "deleteConfirmTitle": "타겟 유형 삭제",
+        "deleteConfirmDesc": "정말로 이 타겟 유형을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
         "compatibleDsTypes": "호환 배포 세트 유형",
         "compatibleDsTypesHint": "이 타겟 유형에는 선택한 DS 유형만 배포 가능합니다",
         "selectDsTypes": "호환 DS 유형 선택...",
@@ -277,10 +278,11 @@
         "colour": "색상",
         "createTitle": "타겟 태그 생성",
         "editTitle": "타겟 태그 편집",
-        "createSuccess": "타겟 태그가 생성되었습니다.",
-        "updateSuccess": "타겟 태그가 업데이트되었습니다.",
-        "deleteSuccess": "타겟 태그가 삭제되었습니다.",
-        "deleteConfirm": "정말로 이 타겟 태그를 삭제하시겠습니까?"
+        "createSuccess": "타겟 태그 생성에 성공했습니다.",
+        "updateSuccess": "타겟 태그 수정에 성공했습니다.",
+        "deleteSuccess": "타겟 태그 삭제에 성공했습니다.",
+        "deleteConfirmTitle": "타겟 태그 삭제",
+        "deleteConfirmDesc": "정말로 이 타겟 태그를 삭제하시겠습니까? 관련 타겟들의 태그 정보도 모두 제거됩니다."
     },
     "tagsAndTypes": {
         "title": "태그 & 유형"

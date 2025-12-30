@@ -255,7 +255,8 @@
         "createSuccess": "Target type created successfully.",
         "updateSuccess": "Target type updated successfully.",
         "deleteSuccess": "Target type deleted successfully.",
-        "deleteConfirm": "Are you sure you want to delete this target type?",
+        "deleteConfirmTitle": "Delete Target Type",
+        "deleteConfirmDesc": "Are you sure you want to delete this target type? This action cannot be undone.",
         "compatibleDsTypes": "Compatible Distribution Set Types",
         "compatibleDsTypesHint": "Only these DS types can be deployed to targets of this type",
         "selectDsTypes": "Select compatible DS types...",
@@ -270,7 +271,8 @@
         "createSuccess": "Target tag created successfully.",
         "updateSuccess": "Target tag updated successfully.",
         "deleteSuccess": "Target tag deleted successfully.",
-        "deleteConfirm": "Are you sure you want to delete this target tag?"
+        "deleteConfirmTitle": "Delete Target Tag",
+        "deleteConfirmDesc": "Are you sure you want to delete this target tag? It will be removed from all assigned targets."
     },
     "tagsAndTypes": {
         "title": "Tags & Types"

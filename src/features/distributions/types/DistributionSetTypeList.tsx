@@ -85,7 +85,7 @@ const DistributionSetTypeList: React.FC = () => {
 
     const columns: ColumnsType<MgmtDistributionSetType> = [
         {
-            title: 'ID',
+            title: t('common:id', { defaultValue: 'ID' }),
             dataIndex: 'id',
             key: 'id',
             width: 60,

@@ -129,7 +129,7 @@ const DistributionSetTagList: React.FC = () => {
 
     const columns: ColumnsType<MgmtTag> = [
         {
-            title: 'ID',
+            title: t('common:id', { defaultValue: 'ID' }),
             dataIndex: 'id',
             key: 'id',
             width: 60,

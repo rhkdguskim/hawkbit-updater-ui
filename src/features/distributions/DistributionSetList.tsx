@@ -160,7 +160,7 @@ const DistributionSetList: React.FC = () => {
     const updateMutation = useUpdateDistributionSet({
         mutation: {
             onSuccess: () => {
-                message.success(t('messages.updateSuccess', { defaultValue: 'Updated' }));
+                message.success(t('messages.updateSuccess'));
                 queryClient.invalidateQueries({ queryKey: getGetDistributionSetsQueryKey() });
             },
             onError: (error) => {
@@ -177,6 +177,13 @@ const DistributionSetList: React.FC = () => {
     }, [updateMutation]);
 
     const columns: ColumnsType<MgmtDistributionSet> = [
+        {
+            title: t('common:table.id'),
+            dataIndex: 'id',
+            key: 'id',
+            width: 80,
+            render: (id: number) => <Text style={{ fontSize: 'var(--ant-font-size-sm)', color: '#666' }}>{id}</Text>,
+        },
         {
             title: t('list.columns.name'),
             dataIndex: 'name',
@@ -248,7 +255,7 @@ const DistributionSetList: React.FC = () => {
             ),
         },
         {
-            title: t('list.columns.actions', { defaultValue: 'Actions' }),
+            title: t('common:table.actions'),
             key: 'actions',
             width: 100,
             fixed: 'right',
@@ -262,7 +269,7 @@ const DistributionSetList: React.FC = () => {
                             onClick={() => navigate(`/distributions/sets/${record.id}`)}
                         />
                     </Tooltip>
-                    <Tooltip title={t('actions.edit', { defaultValue: 'Edit' })}>
+                    <Tooltip title={t('common:actions.edit')}>
                         <Button
                             type="text"
                             size="small"

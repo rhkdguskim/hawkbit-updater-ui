@@ -82,7 +82,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
     const cards: KPICardConfig[] = [
         {
             key: 'totalDevices',
-            label: t('kpi.totalDevices', 'Total Devices'),
+            label: t('kpi.totalDevices'),
             value: totalDevices,
             icon: <AppstoreOutlined />,
             color: 'var(--ant-color-primary, #3b82f6)',
@@ -91,7 +91,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
         },
         {
             key: 'online',
-            label: t('kpi.online', 'Online'),
+            label: t('kpi.online'),
             value: onlineCount,
             icon: <ApiOutlined />,
             color: COLORS.online,
@@ -100,7 +100,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
         },
         {
             key: 'inSync',
-            label: t('kpi.inSync', 'In Sync'),
+            label: t('kpi.inSync'),
             value: inSyncCount,
             icon: <CheckCircleOutlined />,
             color: COLORS.inSync,
@@ -109,7 +109,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
         },
         {
             key: 'pending',
-            label: t('kpi.pending', 'Pending'),
+            label: t('kpi.pending'),
             value: pendingCount,
             icon: <ClockCircleOutlined />,
             color: COLORS.pending,
@@ -119,7 +119,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
         },
         {
             key: 'velocity',
-            label: t('velocity.current', 'Current Speed'),
+            label: t('velocity.current'),
             value: `${currentVelocity}`,
             icon: <ThunderboltOutlined />,
             color: 'var(--ant-color-primary)',
@@ -129,7 +129,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
         },
         {
             key: 'rollouts',
-            label: t('kpi.activeRollouts', 'Running'),
+            label: t('kpi.activeRollouts'),
             value: runningRolloutCount,
             icon: <RocketOutlined />,
             color: COLORS.offline,
@@ -139,7 +139,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
         },
         {
             key: 'successRate',
-            label: t('kpi.successRate', 'Success'),
+            label: t('kpi.successRate'),
             value: successRate !== null ? `${successRate}%` : '-',
             icon: <ThunderboltOutlined />,
             color: COLORS.finished,
@@ -148,7 +148,7 @@ export const IntegratedKPICards: React.FC<IntegratedKPICardsProps> = ({
         },
         {
             key: 'errors',
-            label: t('kpi.errors', 'Errors'),
+            label: t('kpi.errors'),
             value: errorCount,
             icon: <ExclamationCircleOutlined />,
             color: errorCount > 0 ? COLORS.error : 'var(--ant-color-text-description)',

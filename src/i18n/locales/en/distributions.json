@@ -38,7 +38,8 @@
     },
     "status": {
         "complete": "Complete",
-        "incomplete": "Incomplete"
+        "incomplete": "Incomplete",
+        "locked": "Locked"
     },
     "list": {
         "title": "Distribution Sets",
@@ -66,12 +67,14 @@
             "name": "Name",
             "version": "Version",
             "description": "Description"
-        }
+        },
+        "empty": "No distribution sets found."
     },
     "moduleList": {
         "title": "Software Modules",
         "description": "Manage individual software modules and their versioned artifacts",
-        "selectedCount": "{{count}} modules selected"
+        "selectedCount": "{{count}} modules selected",
+        "empty": "No software modules found."
     },
     "tags": {
         "complete": "Complete",
@@ -90,10 +93,10 @@
     "messages": {
         "deleteSetSuccess": "Distribution Set deleted successfully",
         "deleteSetConfirmTitle": "Delete Distribution Set",
-        "deleteSetConfirmDesc": "Are you sure you want to delete this Distribution Set?",
+        "deleteSetConfirmDesc": "Are you sure you want to delete this Distribution Set? This action cannot be undone.",
         "deleteModuleSuccess": "Software Module deleted successfully",
         "deleteModuleConfirmTitle": "Delete Software Module",
-        "deleteModuleConfirmDesc": "Are you sure you want to delete this Software Module?",
+        "deleteModuleConfirmDesc": "Are you sure you want to delete this Software Module? This action cannot be undone.",
         "deleteSetError": "Failed to delete Distribution Set",
         "deleteModuleError": "Failed to delete Software Module",
         "createSetSuccess": "Distribution Set created successfully",
@@ -107,7 +110,10 @@
         "invalidateConfirmTitle": "Invalidate Distribution Set",
         "invalidateConfirmDesc": "Once invalidated, this set cannot be used for new deployments. This action is permanent.",
         "cloneSuccess": "Distribution set cloned successfully",
-        "tagsUpdated": "Distribution set tags updated successfully"
+        "cloneSuffix": "copy",
+        "clonedVersionSuffix": "clone",
+        "tagsUpdated": "Distribution set tags updated successfully",
+        "updateSuccess": "Update successful"
     },
     "modal": {
         "createSetTitle": "Create Distribution Set",

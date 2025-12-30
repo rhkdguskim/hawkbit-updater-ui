@@ -62,6 +62,7 @@
         "name": "Name",
         "status": "Status",
         "totalTargets": "Total Targets",
+        "createdAt": "Created At",
         "progress": "Progress",
         "progressLabel": "{{percent}}% complete",
         "actions": "Actions"
@@ -87,7 +88,10 @@
         "range": "{{start}}-{{end}} of {{total}} rollouts"
     },
     "actions": {
-        "view": "View"
+        "view": "View",
+        "edit": "Edit",
+        "pause": "Pause",
+        "resume": "Resume"
     },
     "detail": {
         "description": "Real-time rollout progress, deployment groups, and control actions",
@@ -160,7 +164,8 @@
             "nameRequired": "Please enter a rollout name",
             "nameDuplicate": "Rollout name already exists",
             "description": "Description",
-            "descriptionPlaceholder": "Enter description (optional)"
+            "descriptionPlaceholder": "Enter description (optional)",
+            "checkingName": "Checking name..."
         },
         "distributionSet": {
             "title": "Select Distribution Set",
@@ -253,6 +258,25 @@
             "createError": "Failed to create rollout",
             "cannotStartImmediately": "Rollout created but cannot start immediately. Please start manually.",
             "targetMatchingError": "Matching target not found for the filter. Please check your filter."
+        }
+    },
+    "approvalPolicy": {
+        "confirmTitle": "Approval Required",
+        "matchingRulesDesc": "The following local approval policies are applicable:",
+        "proceedConfirm": "Do you want to proceed anyway? Note: Final approval requirement depends on server configuration.",
+        "rules": {
+            "target_count": {
+                "title": "Target count threshold exceeded"
+            },
+            "tag": {
+                "title": "Restricted tag included"
+            },
+            "target_type": {
+                "title": "Restricted target type included"
+            },
+            "time_range": {
+                "title": "Restricted time range"
+            }
         }
     }
 }

@@ -99,7 +99,7 @@ const RolloutList: React.FC = () => {
 
     const columns: ColumnsType<MgmtRolloutResponseBody> = [
         {
-            title: 'ID',
+            title: t('common:id'),
             dataIndex: 'id',
             key: 'id',
             width: 60,
@@ -116,7 +116,7 @@ const RolloutList: React.FC = () => {
             ),
         },
         {
-            title: t('columns.totalTargets', { defaultValue: 'Total Targets' }),
+            title: t('columns.totalTargets'),
             dataIndex: 'totalTargets',
             key: 'totalTargets',
             width: 100,
@@ -132,7 +132,7 @@ const RolloutList: React.FC = () => {
             render: (status: string) => <StatusTag status={status} />,
         },
         {
-            title: t('common:createdAt', { defaultValue: 'Created At' }),
+            title: t('common:table.createdAt'),
             dataIndex: 'createdAt',
             key: 'createdAt',
             width: 120,
@@ -180,7 +180,7 @@ const RolloutList: React.FC = () => {
                             onClick={() => navigate(`/rollouts/${record.id}`)}
                         />
                     </Tooltip>
-                    <Tooltip title={t('actions.edit', { defaultValue: 'Edit' })}>
+                    <Tooltip title={t('actions.edit')}>
                         <Button
                             type="text"
                             size="small"
@@ -189,7 +189,7 @@ const RolloutList: React.FC = () => {
                         />
                     </Tooltip>
                     {isAdmin && (
-                        <Tooltip title={record.status === 'paused' ? t('actions.resume', { defaultValue: 'Resume' }) : t('actions.pause', { defaultValue: 'Pause' })}>
+                        <Tooltip title={record.status === 'paused' ? t('actions.resume') : t('actions.pause')}>
                             <Button
                                 type="text"
                                 size="small"

@@ -87,7 +87,7 @@ const SoftwareModuleTypeList: React.FC = () => {
 
     const columns: ColumnsType<MgmtSoftwareModuleType> = [
         {
-            title: 'ID',
+            title: t('common:id', { defaultValue: 'ID' }),
             dataIndex: 'id',
             key: 'id',
             width: 60,
