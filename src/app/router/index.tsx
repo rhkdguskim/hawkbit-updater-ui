@@ -6,10 +6,9 @@
 
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Spin } from 'antd';
 import MainLayout from '@/components/layout/MainLayout';
 import { ROUTES } from './routes';
-import styled from 'styled-components';
+import RouteLoader from '@/components/common/RouteLoader';
 
 // Lazy load feature components for code splitting
 const Dashboard = React.lazy(() => import('@/features/dashboard/Dashboard'));
@@ -23,20 +22,9 @@ const TypeManagement = React.lazy(() => import('@/features/system/TypeManagement
 const LoginPage = React.lazy(() => import('@/features/auth/LoginPage'));
 const AuthGuard = React.lazy(() => import('@/features/auth/AuthGuard'));
 
-const GlobalLoadingContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    width: 100vw;
-    background: var(--ant-color-bg-layout);
-`;
-
-// Global loading fallback component
+// Global loading fallback component using RouteLoader
 const GlobalLoadingFallback: React.FC = () => (
-    <GlobalLoadingContainer>
-        <Spin size="large" />
-    </GlobalLoadingContainer>
+    <RouteLoader fullScreen />
 );
 
 const AppRouter: React.FC = () => {

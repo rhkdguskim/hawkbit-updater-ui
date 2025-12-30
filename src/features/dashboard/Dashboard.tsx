@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { IntegratedDashboardGrid } from './components/layouts/DashboardGrid';
 import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import { DashboardHeader } from './components/widgets/DashboardHeader';
@@ -10,8 +10,6 @@ import { ActiveRolloutsWidget } from './components/widgets/ActiveRolloutsWidget'
 import { RecentActivityWidget } from './components/widgets/RecentActivityWidget';
 import { DeploymentVelocityWidget } from './components/widgets/DeploymentVelocityWidget';
 import { FailureAnalysisModal } from './components/widgets/FailureAnalysisModal';
-import DeviceCardGrid from './components/DeviceCardGrid';
-import { useState } from 'react';
 
 const Dashboard: React.FC = () => {
     const metrics = useDashboardMetrics();
@@ -78,11 +76,6 @@ const Dashboard: React.FC = () => {
                         <RecentActivityWidget
                             isLoading={metrics.isLoading}
                             data={metrics.recentActivities}
-                        />
-                        <DeviceCardGrid
-                            targets={metrics.targets}
-                            actions={metrics.actions}
-                            targetTypeColorMap={metrics.targetTypeColorMap}
                         />
                     </>
                 }

@@ -113,7 +113,7 @@ const BulkManageSetTagsModal: React.FC<BulkManageSetTagsModalProps> = ({
                     mode="multiple"
                     placeholder={t('bulkAssignment.selectTagsPlaceholder')}
                     value={selectedTagIds}
-                    onChange={setSelectedTagIds}
+                    onChange={(val) => setSelectedTagIds(val as number[])}
                     loading={tagsLoading}
                     options={(tagsData?.content as MgmtTag[] || []).map((tag) => ({
                         value: tag.id,

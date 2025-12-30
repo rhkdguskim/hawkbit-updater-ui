@@ -52,30 +52,22 @@ export const IntegratedChartsGrid = styled.div`
 
 export const IntegratedBottomRow = styled.div`
     display: grid;
-    grid-template-columns: 1fr 1fr 2fr;
+    grid-template-columns: 1fr 2fr;
     gap: var(--ant-margin, 16px);
     flex: 2;
     min-height: 300px;
 
     @media (max-width: 1200px) {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(2, 280px);
         flex: none;
         height: auto;
-        
-        & > *:last-child {
-            grid-column: 1 / -1;
-        }
     }
 
     @media (max-width: 768px) {
         grid-template-columns: 1fr;
-        grid-template-rows: repeat(3, 280px);
+        grid-template-rows: repeat(2, 280px);
         height: auto;
-        
-        & > *:last-child {
-            grid-column: auto;
-        }
     }
 `;
 

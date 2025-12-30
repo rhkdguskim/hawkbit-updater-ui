@@ -40,9 +40,17 @@ const getActionDisplayStatus = (action: MgmtAction) => {
     return action.status || 'unknown';
 };
 
-const isActiveStatus = (status?: string) => {
+const isCancelableStatus = (status?: string) => {
     const normalized = status?.toLowerCase() || '';
-    return ['running', 'pending', 'canceling', 'wait_for_confirmation', 'waiting_for_confirmation', 'scheduled', 'retrieving'].includes(normalized);
+    return [
+        'running',
+        'pending',
+        'scheduled',
+        'retrieving',
+        'downloading',
+        'wait_for_confirmation',
+        'waiting_for_confirmation',
+    ].includes(normalized);
 };
 
 const ActionList: React.FC = () => {
@@ -57,6 +65,7 @@ const ActionList: React.FC = () => {
     } = useServerTable<MgmtAction>({ syncToUrl: true });
 
     const [selectedActionIds, setSelectedActionIds] = useState<React.Key[]>([]);
+    const [selectedActions, setSelectedActions] = useState<MgmtAction[]>([]);
     const [selectedTargetIdsMap, setSelectedTargetIdsMap] = useState<Record<number, string>>({});
     const [filters, setFilters] = useState<FilterValue[]>([]);
 
@@ -145,14 +154,23 @@ const ActionList: React.FC = () => {
     const cancelMutation = useCancelAction();
 
     const handleBulkCancel = useCallback(async () => {
-        if (selectedActionIds.length === 0) return;
+        if (selectedActions.length === 0) return;
 
-        const promises = selectedActionIds.map(id => {
-            const targetId = selectedTargetIdsMap[id as number];
+        const cancelableIds = selectedActions
+            .filter(action => isCancelableStatus(action.status))
+            .map(action => action.id)
+            .filter((id): id is number => typeof id === 'number');
+
+        if (cancelableIds.length === 0) {
+            return;
+        }
+
+        const promises = cancelableIds.map(id => {
+            const targetId = selectedTargetIdsMap[id];
             if (!targetId) {
                 return Promise.reject(new Error(`Target ID not found for action ${id}`));
             }
-            return cancelMutation.mutateAsync({ targetId, actionId: id as number });
+            return cancelMutation.mutateAsync({ targetId, actionId: id });
         });
 
         try {
@@ -164,6 +182,7 @@ const ActionList: React.FC = () => {
                 message.success(t('bulk.cancelSuccess', { count: successCount }));
                 refetch();
                 setSelectedActionIds([]);
+                setSelectedActions([]);
                 setSelectedTargetIdsMap({});
             }
 
@@ -174,13 +193,18 @@ const ActionList: React.FC = () => {
             console.error('Bulk cancel failed:', error);
             message.error(t('common:apiErrors.generic.unknown'));
         }
-    }, [selectedActionIds, selectedTargetIdsMap, cancelMutation, t, refetch]);
+    }, [selectedActions, selectedTargetIdsMap, cancelMutation, t, refetch]);
 
     // Handle filter change
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
         setFilters(newFilters);
         resetPagination();
     }, [resetPagination]);
+
+    const cancelableSelectionCount = useMemo(
+        () => selectedActions.filter(action => isCancelableStatus(action.status)).length,
+        [selectedActions]
+    );
 
     // Selection toolbar actions
     const selectionActions: ToolbarAction[] = useMemo(() => [
@@ -190,6 +214,7 @@ const ActionList: React.FC = () => {
             icon: <StopOutlined />,
             onClick: handleBulkCancel,
             danger: true,
+            disabled: cancelableSelectionCount === 0,
         },
         {
             key: 'force',
@@ -198,7 +223,7 @@ const ActionList: React.FC = () => {
             onClick: () => { },
             disabled: true,
         },
-    ], [t, handleBulkCancel]);
+    ], [t, handleBulkCancel, cancelableSelectionCount]);
 
     const columns: ColumnsType<MgmtAction> = [
         {
@@ -287,7 +312,7 @@ const ActionList: React.FC = () => {
                             size="small"
                             danger
                             icon={<StopOutlined />}
-                            disabled={!isActiveStatus(record.status)}
+                            disabled={!isCancelableStatus(record.status)}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 const targetId = getTargetId(record);
@@ -312,6 +337,7 @@ const ActionList: React.FC = () => {
 
     const handleSelectionChange = useCallback((keys: React.Key[], selectedRows: MgmtAction[]) => {
         setSelectedActionIds(keys);
+        setSelectedActions(selectedRows);
         const finalMap: Record<number, string> = {};
         selectedRows.forEach(row => {
             const tid = getTargetId(row);

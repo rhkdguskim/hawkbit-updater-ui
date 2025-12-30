@@ -82,7 +82,7 @@ const LegendLabel = styled(Text)`
     }
 `;
 
-const LegendValue = styled(Text)<{ $color: string }>`
+const LegendValue = styled(Text) <{ $color: string }>`
     && {
         font-size: var(--ant-font-size-sm);
         color: ${props => props.$color};
@@ -101,16 +101,16 @@ const UpdatedText = styled(Text)`
     }
 `;
 
+/* const TinyText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`; */
+
 const StatCaption = styled(Text)`
     && {
         font-size: var(--ant-font-size-sm);
         text-align: center;
-    }
-`;
-
-const TinyText = styled(Text)`
-    && {
-        font-size: var(--ant-font-size-sm);
     }
 `;
 
@@ -568,15 +568,15 @@ const RolloutsOverview: React.FC = () => {
                         $theme="rollouts"
                         title={
                             <Flex align="center" gap={10}>
-                                    <IconBadge $theme="rollouts">
-                                        <RocketOutlined />
-                                    </IconBadge>
-                                    <Flex vertical gap={0}>
-                                        <ChartTitle>{t('overview.activeRollouts', 'Active Rollouts')}</ChartTitle>
-                                        <ChartSubtitle type="secondary">{activeRollouts.length} active</ChartSubtitle>
-                                    </Flex>
+                                <IconBadge $theme="rollouts">
+                                    <RocketOutlined />
+                                </IconBadge>
+                                <Flex vertical gap={0}>
+                                    <ChartTitle>{t('overview.activeRollouts', 'Active Rollouts')}</ChartTitle>
+                                    <ChartSubtitle type="secondary">{activeRollouts.length} active</ChartSubtitle>
                                 </Flex>
-                            }
+                            </Flex>
+                        }
                         extra={
                             <Button type="link" size="small" onClick={() => navigate('/rollouts/list')}>
                                 {t('overview.viewAll', 'View All')}

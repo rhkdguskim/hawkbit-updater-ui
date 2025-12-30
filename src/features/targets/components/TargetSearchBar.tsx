@@ -171,7 +171,7 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
                     <>
                         <SearchSelect
                             value={searchField}
-                            onChange={setSearchField}
+                            onChange={(val) => setSearchField(val as SearchField)}
                             options={searchFieldOptions}
                             suffixIcon={<FilterOutlined />}
                         />

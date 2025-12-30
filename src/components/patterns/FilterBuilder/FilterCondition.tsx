@@ -153,7 +153,7 @@ export const FilterCondition: React.FC<FilterConditionProps> = ({
                         size="small"
                         style={{ width: 150 }}
                         value={value as string}
-                        onChange={(v) => setValue(v as string)}
+                        onChange={(v: any) => setValue(v)}
                         options={currentField.options}
                         showSearch
                         filterOption={(input, option) =>
@@ -176,7 +176,7 @@ export const FilterCondition: React.FC<FilterConditionProps> = ({
                         size="small"
                         style={{ width: 100 }}
                         value={value as string}
-                        onChange={(v) => setValue(v as string)}
+                        onChange={(v: any) => setValue(v)}
                         options={[
                             { value: 'true', label: t('yes') },
                             { value: 'false', label: t('no') },
@@ -195,8 +195,8 @@ export const FilterCondition: React.FC<FilterConditionProps> = ({
                     placeholder={t('filter.selectField')}
                     size="small"
                     value={selectedField}
-                    onChange={(v) => {
-                        setSelectedField(v as string);
+                    onChange={(v: any) => {
+                        setSelectedField(v);
                         setSelectedOperator(undefined);
                         setValue(null);
                     }}
@@ -211,7 +211,7 @@ export const FilterCondition: React.FC<FilterConditionProps> = ({
                         placeholder={t('filter.condition')}
                         size="small"
                         value={selectedOperator}
-                        onChange={(v) => setSelectedOperator(v as string)}
+                        onChange={(v: any) => setSelectedOperator(v)}
                         options={getOperators().map(op => ({ ...op, label: t(op.label) }))}
                     />
                 )}

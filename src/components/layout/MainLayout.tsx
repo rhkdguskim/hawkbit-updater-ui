@@ -1,8 +1,9 @@
 import React from 'react';
-import { Layout, theme, Spin } from 'antd';
+import { Layout, theme } from 'antd';
 import { Outlet } from 'react-router-dom';
 import AppHeader from './AppHeader';
 import styled from 'styled-components';
+import RouteLoader from '../common/RouteLoader';
 
 const { Content } = Layout;
 
@@ -55,7 +56,7 @@ const MainLayout: React.FC = () => {
           $bg={colorBgLayout}
           $radius={borderRadiusLG}
         >
-          <React.Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Spin size="large" /></div>}>
+          <React.Suspense fallback={<RouteLoader />}>
             <Outlet />
           </React.Suspense>
         </StyledContent>

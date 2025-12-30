@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Form, Input, message, ColorPicker, Select, Divider, Typography, Spin } from 'antd';
+import { Form, Input, message, ColorPicker, Select, Divider, Typography, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import {
     useCreateDistributionSetTypes,
@@ -9,8 +9,30 @@ import {
 } from '@/api/generated/distribution-set-types/distribution-set-types';
 import { useGetTypes } from '@/api/generated/software-module-types/software-module-types';
 import type { MgmtDistributionSetType } from '@/api/generated/model';
+import styled from 'styled-components';
+import { StandardModal } from '@/components/patterns';
 
 const { Text } = Typography;
+
+const SectionDivider = styled(Divider)`
+    && {
+        margin: var(--ant-margin, 16px) 0;
+    }
+`;
+
+const HintText = styled(Text)`
+    && {
+        display: block;
+        margin-bottom: var(--ant-margin, 16px);
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const FullWidthSelect = styled(Select)`
+    && {
+        width: 100%;
+    }
+`;
 
 interface DistributionSetTypeDialogProps {
     open: boolean;
@@ -151,7 +173,7 @@ const DistributionSetTypeDialog: React.FC<DistributionSetTypeDialogProps> = ({
     const isLoadingModuleTypes = isEditing && (mandatoryLoading || optionalLoading);
 
     return (
-        <Modal
+        <StandardModal
             title={isEditing ? t('typeManagement.editType') : t('typeManagement.addType')}
             open={open}
             onOk={handleOk}
@@ -190,19 +212,19 @@ const DistributionSetTypeDialog: React.FC<DistributionSetTypeDialogProps> = ({
                         <ColorPicker format="hex" />
                     </Form.Item>
 
-                    <Divider />
-                    <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
+                    <SectionDivider />
+                    <HintText type="secondary">
                         {isEditing
                             ? t('typeManagement.moduleTypesReadonly')
                             : t('typeManagement.moduleTypesHint')}
-                    </Text>
+                    </HintText>
 
                     <Form.Item
                         name="mandatoryModuleTypeIds"
                         label={t('typeManagement.mandatoryModuleTypes')}
                         tooltip={t('typeManagement.mandatoryModuleTypesTooltip')}
                     >
-                        <Select
+                        <FullWidthSelect
                             mode="multiple"
                             placeholder={t('typeManagement.selectModuleTypes')}
                             options={smTypeOptions}
@@ -219,7 +241,7 @@ const DistributionSetTypeDialog: React.FC<DistributionSetTypeDialogProps> = ({
                         label={t('typeManagement.optionalModuleTypes')}
                         tooltip={t('typeManagement.optionalModuleTypesTooltip')}
                     >
-                        <Select
+                        <FullWidthSelect
                             mode="multiple"
                             placeholder={t('typeManagement.selectModuleTypes')}
                             options={smTypeOptions}
@@ -232,7 +254,7 @@ const DistributionSetTypeDialog: React.FC<DistributionSetTypeDialogProps> = ({
                     </Form.Item>
                 </Form>
             </Spin>
-        </Modal>
+        </StandardModal>
     );
 };
 

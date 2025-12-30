@@ -21,6 +21,7 @@ export function useServerTable<T>({
     allowedSortFields,
 }: UseServerTableProps = {}) {
     const [searchParams, setSearchParams] = useSearchParams();
+    const sortDisabled = Array.isArray(allowedSortFields) && allowedSortFields.length === 0;
 
     // Initialize state from URL if enabled
     const [pagination, setPagination] = useState<PaginationState>(() => {
@@ -34,6 +35,7 @@ export function useServerTable<T>({
 
     const [sort, setSort] = useState<string>(() => {
         if (syncToUrl) {
+            if (sortDisabled) return '';
             const urlSort = searchParams.get('sort') || '';
             // Validate sort field if allowedSortFields is provided and not empty
             if (urlSort && allowedSortFields && allowedSortFields.length > 0) {
@@ -88,10 +90,19 @@ export function useServerTable<T>({
             pageSize: newPagination.pageSize || prev.pageSize,
         }));
 
+        if (sortDisabled) {
+            setSort('');
+            return;
+        }
+
         if (Array.isArray(sorter)) {
             // Handle multiple sorters not implemented for this simple hook yet
         } else if (sorter.field && sorter.order) {
             const field = sorter.field as string;
+            if (allowedSortFields && allowedSortFields.length > 0 && !allowedSortFields.includes(field)) {
+                setSort('');
+                return;
+            }
             const order = sorter.order === 'ascend' ? 'ASC' : 'DESC';
             setSort(`${field}:${order}`);
         } else {

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
 import { useGetDistributionSetTags, useAssignDistributionSets, useUnassignDistributionSets } from '@/api/generated/distribution-set-tags/distribution-set-tags';
 import { useTranslation } from 'react-i18next';
-import { LeftOutlined } from '@ant-design/icons';
+// import { LeftOutlined } from '@ant-design/icons';
 import type { MgmtTag } from '@/api/generated/model';
 import styled, { css } from 'styled-components';
 import { PageHeader, PageLayout } from '@/components/patterns';
@@ -55,7 +55,7 @@ const MetaText = styled(Text)`
     }
 `;
 
-const ColorCheckableTag = styled(Tag.CheckableTag)<{ $color?: string }>`
+const ColorCheckableTag = styled(Tag.CheckableTag) <{ $color?: string }>`
     border: 1px solid transparent;
     padding: var(--ant-padding-xxs, 4px) var(--ant-padding-xs, 8px);
 

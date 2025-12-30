@@ -29,8 +29,38 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { ColorSwatch } from '@/components/common';
 import { EnhancedTable } from '@/components/patterns';
 import TargetTypeDialog from './TargetTypeDialog';
+import styled from 'styled-components';
 
 const { Text } = Typography;
+
+const ListStack = styled(Space)`
+    width: 100%;
+`;
+
+const ActionRow = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+`;
+
+const SmallText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const SmallSecondaryText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const NameTag = styled(Tag)`
+    && {
+        margin: 0;
+        font-size: var(--ant-font-size-sm);
+    }
+`;
 
 const TargetTypeList: React.FC = () => {
     const queryClient = useQueryClient();
@@ -184,7 +214,7 @@ const TargetTypeList: React.FC = () => {
             key: 'id',
             width: 60,
             sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
-            render: (id) => <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{id}</Text>,
+            render: (id) => <SmallText>{id}</SmallText>,
         },
         {
             title: t('table.name'),
@@ -195,11 +225,11 @@ const TargetTypeList: React.FC = () => {
             render: (name: string, record) => (
                 <Space size={4}>
                     {record.colour && (
-                        <Tag color={record.colour} style={{ fontSize: 'var(--ant-font-size-sm)', margin: 0 }}>
+                        <NameTag color={record.colour}>
                             {name}
-                        </Tag>
+                        </NameTag>
                     )}
-                    {!record.colour && <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>{name}</Text>}
+                    {!record.colour && <SmallText strong>{name}</SmallText>}
                 </Space>
             ),
         },
@@ -209,7 +239,7 @@ const TargetTypeList: React.FC = () => {
             key: 'key',
             width: 150,
             sorter: (a, b) => (a.key ?? '').localeCompare(b.key ?? ''),
-            render: (key) => <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{key}</Text>,
+            render: (key) => <SmallText>{key}</SmallText>,
         },
         {
             title: t('form.description'),
@@ -217,7 +247,7 @@ const TargetTypeList: React.FC = () => {
             key: 'description',
             ellipsis: true,
             sorter: (a, b) => (a.description ?? '').localeCompare(b.description ?? ''),
-            render: (desc) => <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{desc || '-'}</Text>,
+            render: (desc) => <SmallSecondaryText type="secondary">{desc || '-'}</SmallSecondaryText>,
         },
         {
             title: t('tagManagement.colour'),
@@ -266,8 +296,8 @@ const TargetTypeList: React.FC = () => {
         addCompatibleMutation.isPending || removeCompatibleMutation.isPending;
 
     return (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <ListStack direction="vertical" size="middle">
+            <ActionRow>
                 <Space>
                     <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>
                         {t('common:actions.refresh')}
@@ -285,7 +315,7 @@ const TargetTypeList: React.FC = () => {
                         </Button>
                     )}
                 </Space>
-            </div>
+            </ActionRow>
 
             <EnhancedTable<MgmtTargetType>
                 columns={columns}
@@ -313,7 +343,7 @@ const TargetTypeList: React.FC = () => {
                     setEditingType(null);
                 }}
             />
-        </Space>
+        </ListStack>
     );
 };
 

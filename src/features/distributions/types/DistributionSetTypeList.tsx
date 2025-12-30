@@ -13,8 +13,39 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { EnhancedTable } from '@/components/patterns';
 import DistributionSetTypeDialog from './DistributionSetTypeDialog';
+import { ColorSwatch } from '@/components/common';
+import styled from 'styled-components';
 
 const { Text } = Typography;
+
+const ListStack = styled(Space)`
+    width: 100%;
+`;
+
+const ActionRow = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+`;
+
+const SmallText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const SmallSecondaryText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const KeyTag = styled(Tag)`
+    && {
+        font-size: var(--ant-font-size-sm);
+        margin: 0;
+    }
+`;
 
 const DistributionSetTypeList: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
@@ -90,52 +121,35 @@ const DistributionSetTypeList: React.FC = () => {
             key: 'id',
             width: 60,
             sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
-            render: (id) => <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{id}</Text>,
+            render: (id) => <SmallText>{id}</SmallText>,
         },
         {
             title: t('typeManagement.columns.name'),
             dataIndex: 'name',
             key: 'name',
             width: 180,
-            render: (text) => <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>{text}</Text>,
+            render: (text) => <SmallText strong>{text}</SmallText>,
         },
         {
             title: t('typeManagement.columns.key'),
             dataIndex: 'key',
             key: 'key',
             width: 150,
-            render: (text) => <Tag style={{ fontSize: 'var(--ant-font-size-sm)' }}>{text}</Tag>,
+            render: (text) => <KeyTag>{text}</KeyTag>,
         },
         {
             title: t('typeManagement.columns.description'),
             dataIndex: 'description',
             key: 'description',
             ellipsis: true,
-            render: (text) => <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{text || '-'}</Text>,
+            render: (text) => <SmallSecondaryText type="secondary">{text || '-'}</SmallSecondaryText>,
         },
         {
             title: t('typeManagement.columns.colour'),
             dataIndex: 'colour',
             key: 'colour',
             width: 120,
-            render: (colour) => colour ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{
-                        width: 20,
-                        height: 20,
-                        backgroundColor: colour,
-                        borderRadius: 4,
-                        border: '1px solid rgba(0,0,0,0.1)',
-                    }} />
-                    <span style={{
-                        fontSize: 'var(--ant-font-size-sm)',
-                        fontFamily: 'monospace',
-                        color: '#666',
-                    }}>
-                        {colour}
-                    </span>
-                </div>
-            ) : <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>-</Text>,
+            render: (colour) => <ColorSwatch color={colour} size="small" />,
         },
         {
             title: t('typeManagement.columns.lastModified'),
@@ -143,9 +157,9 @@ const DistributionSetTypeList: React.FC = () => {
             key: 'lastModifiedAt',
             width: 150,
             render: (val: number) => (
-                <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>
+                <SmallText>
                     {val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}
-                </Text>
+                </SmallText>
             ),
         },
         {
@@ -182,8 +196,8 @@ const DistributionSetTypeList: React.FC = () => {
     ];
 
     return (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <ListStack direction="vertical" size="middle">
+            <ActionRow>
                 <Space>
                     <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>
                         {t('common:actions.refresh')}
@@ -194,7 +208,7 @@ const DistributionSetTypeList: React.FC = () => {
                         </Button>
                     )}
                 </Space>
-            </div>
+            </ActionRow>
             <EnhancedTable<MgmtDistributionSetType>
                 columns={columns}
                 dataSource={data?.content || []}
@@ -215,7 +229,7 @@ const DistributionSetTypeList: React.FC = () => {
                 onClose={handleDialogClose}
                 onSuccess={handleDialogSuccess}
             />
-        </Space>
+        </ListStack>
     );
 };
 

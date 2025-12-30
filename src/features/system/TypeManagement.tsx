@@ -1,27 +1,15 @@
 import React, { useState } from 'react';
-import { Card, Tabs, Space, Breadcrumb } from 'antd';
+import { Tabs, Space, Breadcrumb } from 'antd';
 import { AppstoreOutlined, BlockOutlined, HomeOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import DistributionSetTypeList from '@/features/distributions/types/DistributionSetTypeList';
 import SoftwareModuleTypeList from '@/features/distributions/types/SoftwareModuleTypeList';
 import TargetTypeList from '@/features/targets/types/TargetTypeList';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Navigate } from 'react-router-dom';
 import { PageHeader, PageLayout } from '@/components/patterns';
-
-const StyledCard = styled(Card)`
-    flex: 1;
-    
-    .ant-card-body {
-        padding: 0;
-    }
-`;
-
-const TabContent = styled.div`
-    padding: var(--ant-padding-lg, 24px);
-`;
+import { SectionCard } from '@/components/layout/PageLayout';
 
 const TypeManagement: React.FC = () => {
     const { t } = useTranslation(['system', 'distributions', 'common', 'targets']);
@@ -43,11 +31,7 @@ const TypeManagement: React.FC = () => {
                     {t('typeManagement.targetTypes', { defaultValue: 'Target Types' })}
                 </Space>
             ),
-            children: (
-                <TabContent>
-                    <TargetTypeList />
-                </TabContent>
-            ),
+            children: <TargetTypeList />,
         },
         {
             key: 'ds-types',
@@ -57,11 +41,7 @@ const TypeManagement: React.FC = () => {
                     {t('typeManagement.distributionSetTypes')}
                 </Space>
             ),
-            children: (
-                <TabContent>
-                    <DistributionSetTypeList />
-                </TabContent>
-            ),
+            children: <DistributionSetTypeList />,
         },
         {
             key: 'sw-types',
@@ -71,11 +51,7 @@ const TypeManagement: React.FC = () => {
                     {t('typeManagement.softwareModuleTypes')}
                 </Space>
             ),
-            children: (
-                <TabContent>
-                    <SoftwareModuleTypeList />
-                </TabContent>
-            ),
+            children: <SoftwareModuleTypeList />,
         },
     ];
 
@@ -98,14 +74,13 @@ const TypeManagement: React.FC = () => {
                 description={t('typeManagement.description')}
             />
 
-            <StyledCard>
+            <SectionCard>
                 <Tabs
                     activeKey={activeTab}
                     onChange={setActiveTab}
                     items={tabItems}
-                    type="card"
                 />
-            </StyledCard>
+            </SectionCard>
         </PageLayout>
     );
 };

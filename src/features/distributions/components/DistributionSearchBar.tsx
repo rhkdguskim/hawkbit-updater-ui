@@ -81,7 +81,7 @@ const DistributionSearchBar: React.FC<DistributionSearchBarProps> = ({
                         { value: 'version', label: t('list.searchFields.version') },
                         { value: 'description', label: t('list.searchFields.description') },
                     ]}
-                    onChange={setSearchField}
+                    onChange={(val) => setSearchField(val as string)}
                 />
                 <SearchInput
                     placeholder={displayPlaceholder}

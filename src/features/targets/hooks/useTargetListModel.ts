@@ -144,8 +144,6 @@ export const useTargetListModel = () => {
         {
             offset,
             limit: pagination.pageSize,
-            sort: undefined, // Always disable sort for now
-            // sort: sort ? sort.replace(':', ',') : undefined,
             q: buildFinalQuery() || undefined,
         },
         { query: { placeholderData: keepPreviousData, refetchOnWindowFocus: false, refetchOnReconnect: false } }
