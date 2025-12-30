@@ -49,8 +49,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/rhkdguskim/updater-ui.git
-cd updater-ui
+git clone https://github.com/rhkdguskim/hawkbit-updater-ui.git
+cd hawkbit-updater-ui
 
 # Install dependencies
 npm install
