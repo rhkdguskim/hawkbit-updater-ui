@@ -24,7 +24,7 @@ import {
     Modal,
     theme,
 } from 'antd';
-import { AppstoreAddOutlined } from '@ant-design/icons';
+
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
@@ -42,7 +42,7 @@ import styled, { css } from 'styled-components';
 import { buildCondition, combineWithAnd, combineWithOr, escapeValue } from '@/utils/fiql';
 import { PageHeader, PageLayout } from '@/components/patterns';
 
-import RolloutTemplateModal from './RolloutTemplateModal';
+
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -250,24 +250,6 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
         updateStatuses: [],
         searchKeyword: '',
     });
-
-    const [templateModalOpen, setTemplateModalOpen] = useState(false);
-
-    const handleTemplateSelect = (template: any) => {
-        setFormData((prev) => ({
-            ...prev,
-            amountGroups: template.config.amountGroups,
-            successThreshold: template.config.successThreshold,
-            errorThreshold: template.config.errorThreshold,
-            startImmediately: template.config.startImmediately,
-        }));
-        groupSettingsForm.setFieldsValue({
-            amountGroups: template.config.amountGroups,
-            successThreshold: template.config.successThreshold,
-            errorThreshold: template.config.errorThreshold,
-            startImmediately: template.config.startImmediately,
-        });
-    };
 
     useEffect(() => {
         if (filterMode === 'builder') {
@@ -757,6 +739,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                             size="small"
                             pagination={false}
                             loading={isLoadingTargets}
+                            scroll={{ y: 200 }}
                             style={{ marginTop: 8 }}
                             footer={() => (
                                 <div style={{ textAlign: 'right', fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>
@@ -780,11 +763,6 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
         return (
             <WizardCard
                 title={t('wizard.groupSettings.title')}
-                extra={
-                    <Button icon={<AppstoreAddOutlined />} onClick={() => setTemplateModalOpen(true)}>
-                        {t('wizard.loadTemplate')}
-                    </Button>
-                }
                 $isModal={isModal}
             >
                 <Form
@@ -868,6 +846,26 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                     )}
                 </Descriptions.Item>
             </Descriptions>
+
+            {/* Target Preview List */}
+            <div style={{ marginTop: 16 }}>
+                <Text strong style={{ marginBottom: 8, display: 'block' }}>
+                    {t('wizard.targetFilter.preview')} ({targetsData?.total || 0})
+                </Text>
+                <Table
+                    dataSource={targetsData?.content || []}
+                    columns={[
+                        { title: t('wizard.targetFilter.previewColumns.controllerId'), dataIndex: 'controllerId', key: 'controllerId' },
+                        { title: t('wizard.targetFilter.previewColumns.name'), dataIndex: 'name', key: 'name' },
+                        { title: t('wizard.targetFilter.previewColumns.type'), dataIndex: 'targetTypeName', key: 'type' },
+                    ]}
+                    rowKey="id"
+                    size="small"
+                    pagination={false}
+                    scroll={{ y: 150 }}
+                    loading={isLoadingTargets}
+                />
+            </div>
         </WizardCard>
     );
 
@@ -909,9 +907,9 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                             </Button>
                         )}
                         {isModal ? (
-                            <Button onClick={onClose}>{t('common:cancel')}</Button>
+                            <Button onClick={onClose}>{t('common:actions.cancel')}</Button>
                         ) : (
-                            <Button onClick={() => navigate('/rollouts')}>{t('common:cancel')}</Button>
+                            <Button onClick={() => navigate('/rollouts')}>{t('common:actions.cancel')}</Button>
                         )}
                     </Space>
                 </ActionsBar>
@@ -963,17 +961,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                 </WizardRightCol>
             </WizardRow>
 
-            <RolloutTemplateModal
-                open={templateModalOpen}
-                onClose={() => setTemplateModalOpen(false)}
-                onSelect={handleTemplateSelect}
-                currentConfig={{
-                    amountGroups: formData.amountGroups,
-                    successThreshold: formData.successThreshold,
-                    errorThreshold: formData.errorThreshold,
-                    startImmediately: formData.startImmediately,
-                }}
-            />
+
         </PageLayout>
     );
 };

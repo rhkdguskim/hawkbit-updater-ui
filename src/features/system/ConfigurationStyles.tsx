@@ -19,11 +19,11 @@ const pulse = keyframes`
 
 // Theme for System Configuration
 export const SYSTEM_THEME = {
-    gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-    accentLight: 'rgba(99, 102, 241, 0.08)',
-    accentBorder: 'rgba(99, 102, 241, 0.2)',
-    iconBg: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-    color: '#6366f1',
+    gradient: 'linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)',
+    accentLight: 'var(--ant-color-primary-bg)',
+    accentBorder: 'var(--ant-color-primary-border)',
+    iconBg: 'linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)',
+    color: 'var(--ant-color-primary)',
 };
 
 // Group color themes
@@ -78,11 +78,11 @@ export type GroupThemeKey = keyof typeof GROUP_THEMES;
 export const ConfigPageContainer = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--ant-margin, 16px);
     height: 100%;
-    min-height: calc(100vh - 120px);
+    min-height: 0;
     animation: ${fadeInUp} 0.5s ease-out;
-    padding: 0 4px;
+    padding: var(--ant-margin-lg, 24px);
     overflow: hidden;
 `;
 
@@ -115,8 +115,9 @@ export const GradientTitle = styled(Typography.Title)`
         background-clip: text;
     }
     
+    [data-theme='dark'] &,
     .dark-mode & {
-        background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+        background: linear-gradient(135deg, var(--ant-color-primary-hover) 0%, var(--ant-color-primary-bg-hover) 100%);
         -webkit-background-clip: text;
         background-clip: text;
     }
@@ -151,11 +152,23 @@ export const StatusIndicator = styled.div<{ $isEdit?: boolean }>`
 export const ConfigGroupsContainer = styled.div`
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 16px;
+    gap: var(--ant-margin, 16px);
     flex: 1;
     overflow-y: auto;
-    padding-bottom: 16px;
+    padding-bottom: var(--ant-margin, 16px);
     align-content: flex-start;
+    
+    /* Custom scrollbar */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: var(--ant-color-primary-bg-hover, rgba(99, 102, 241, 0.1));
+        border-radius: 10px;
+    }
     
     @media (max-width: 860px) {
         grid-template-columns: 1fr;
@@ -165,15 +178,15 @@ export const ConfigGroupsContainer = styled.div`
 // Group Card
 export const ConfigGroupCard = styled(Card) <{ $themeKey?: GroupThemeKey; $delay?: number }>`
     border: none;
-    border-radius: 16px;
+    border-radius: var(--ant-border-radius-lg, 16px);
     background: ${props => {
         const theme = props.$themeKey ? GROUP_THEMES[props.$themeKey] : null;
         return theme
-            ? `linear-gradient(145deg, ${theme.light} 0%, rgba(255, 255, 255, 0.98) 30%, rgba(255, 255, 255, 0.95) 100%)`
-            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%)';
+            ? `linear-gradient(145deg, ${theme.light} 0%, var(--ant-color-bg-container) 30%, var(--ant-color-bg-container) 100%)`
+            : 'var(--ant-color-bg-container)';
     }};
     backdrop-filter: blur(20px);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
     animation: ${fadeInUp} 0.5s ease-out;
     animation-delay: ${props => (props.$delay || 0) * 0.08}s;
     animation-fill-mode: both;
@@ -195,48 +208,45 @@ export const ConfigGroupCard = styled(Card) <{ $themeKey?: GroupThemeKey; $delay
         const theme = props.$themeKey ? GROUP_THEMES[props.$themeKey] : null;
         return theme?.gradient || SYSTEM_THEME.gradient;
     }};
-        border-radius: 16px 0 0 16px;
+        border-radius: var(--ant-border-radius-lg, 16px) 0 0 var(--ant-border-radius-lg, 16px);
     }
     
     &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-md);
     }
     
     .ant-card-head {
         border-bottom: 1px solid ${props => {
         const theme = props.$themeKey ? GROUP_THEMES[props.$themeKey] : null;
-        return theme?.border || 'rgba(0, 0, 0, 0.04)';
+        return theme?.border || 'var(--ant-color-border-secondary)';
     }};
         flex-shrink: 0;
-        padding: 14px 20px;
+        padding: var(--ant-padding-sm, 12px) var(--ant-padding, 16px);
         min-height: auto;
         background: transparent;
     }
     
     .ant-card-head-title {
-        font-size: 0.95rem;
+        font-size: var(--ant-font-size);
         font-weight: 600;
-        color: #1e293b;
+        color: var(--ant-color-text);
         padding: 0;
     }
     
     .ant-card-body {
-        padding: 12px 16px;
+        padding: var(--ant-padding-sm, 12px) var(--ant-padding, 16px);
         overflow-y: auto;
         flex: 1;
         min-height: 0;
     }
     
+    [data-theme='dark'] &,
     .dark-mode & {
-        background: linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
+        border: 1px solid var(--ant-color-border-secondary);
         
         .ant-card-head {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        
-        .ant-card-head-title {
-            color: #e2e8f0;
+            border-bottom: 1px solid var(--ant-color-border-secondary);
         }
     }
 `;
