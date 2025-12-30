@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Table } from 'antd';
 import type { TableProps } from 'antd';
 import styled from 'styled-components';
@@ -84,6 +84,35 @@ const TableContainer = styled.div`
     /* Ant Design's internal scroll container */
     .ant-table-body {
         flex: 1;
+        
+        /* Custom scrollbar styling for better visibility */
+        &::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: var(--ant-color-bg-layout, #f5f5f5);
+            border-radius: 6px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: var(--ant-color-border, #d9d9d9);
+            border-radius: 6px;
+            border: 2px solid var(--ant-color-bg-layout, #f5f5f5);
+            
+            &:hover {
+                background: var(--ant-color-primary-border, #91caff);
+            }
+
+            &:active {
+                background: var(--ant-color-primary, #1677ff);
+            }
+        }
+
+        /* Firefox scrollbar styling */
+        scrollbar-width: auto;
+        scrollbar-color: var(--ant-color-border, #d9d9d9) var(--ant-color-bg-layout, #f5f5f5);
     }
 
     /* Prevent tbody rows from stretching - rows should only be as tall as their content */
@@ -133,6 +162,34 @@ export function EnhancedTable<T extends object>({
     rowKeyField = 'id',
     ...tableProps
 }: EnhancedTableProps<T>) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [scrollY, setScrollY] = useState<number | undefined>(undefined);
+
+    useEffect(() => {
+        const calculateScrollHeight = () => {
+            if (containerRef.current) {
+                const containerHeight = containerRef.current.clientHeight;
+                // Approximate heights: toolbar (~48px if visible), pagination (~40px), header (~40px)
+                const toolbarHeight = selectedRowKeys.length > 0 ? 48 : 0;
+                const paginationHeight = tableProps.pagination !== false ? 40 : 0;
+                const headerHeight = 40;
+                const calculatedHeight = containerHeight - toolbarHeight - paginationHeight - headerHeight - 16; // 16px for margins
+                setScrollY(calculatedHeight > 100 ? calculatedHeight : undefined);
+            }
+        };
+
+        calculateScrollHeight();
+        window.addEventListener('resize', calculateScrollHeight);
+
+        // Recalculate when selection changes (toolbar appears/disappears)
+        const timer = setTimeout(calculateScrollHeight, 0);
+
+        return () => {
+            window.removeEventListener('resize', calculateScrollHeight);
+            clearTimeout(timer);
+        };
+    }, [selectedRowKeys.length, tableProps.pagination]);
+
     const handleClearSelection = () => {
         onSelectionChange?.([], []);
     };
@@ -145,14 +202,15 @@ export function EnhancedTable<T extends object>({
         }
         : undefined;
 
-    // Use internal scroll if not provided, allowing table to fill its container
+    // Merge calculated scroll.y with user-provided scroll settings
     const scroll = {
-        y: '100%',
-        ...tableProps.scroll
+        x: 'max-content',
+        ...(scrollY && { y: scrollY }),
+        ...tableProps.scroll,
     };
 
     return (
-        <TableContainer>
+        <TableContainer ref={containerRef}>
             <SelectionToolbar
                 selectedCount={selectedRowKeys.length}
                 actions={selectionActions}
