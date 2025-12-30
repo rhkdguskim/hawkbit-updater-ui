@@ -327,9 +327,7 @@ const ActionList: React.FC = () => {
 
     return (
         <StandardListLayout
-            title={t('pageTitle')}
-            subtitle={t('subtitle')}
-            description={t('list.description')}
+            title={t('list.description')}
             headerExtra={
                 <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                     {t('lastUpdated', { defaultValue: 'Updated' })}: {lastUpdated}

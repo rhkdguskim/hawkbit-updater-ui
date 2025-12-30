@@ -2,6 +2,7 @@
     "typeManagement": {
         "title": "Type Management",
         "description": "Manage Distribution Set Types and Software Module Types to standardize update packages.",
+        "targetTypes": "Target Types",
         "distributionSetTypes": "Distribution Set Types",
         "softwareModuleTypes": "Software Module Types",
         "addType": "Add Type",

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Card, Tabs, Typography, Space, Breadcrumb } from 'antd';
-import { AppstoreOutlined, BlockOutlined, HomeOutlined, SettingOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BlockOutlined, HomeOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import DistributionSetTypeList from '@/features/distributions/types/DistributionSetTypeList';
 import SoftwareModuleTypeList from '@/features/distributions/types/SoftwareModuleTypeList';
+import TargetTypeList from '@/features/targets/types/TargetTypeList';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Navigate } from 'react-router-dom';
 
@@ -63,10 +64,10 @@ const TabContent = styled.div`
 `;
 
 const TypeManagement: React.FC = () => {
-    const { t } = useTranslation(['system', 'distributions', 'common']);
+    const { t } = useTranslation(['system', 'distributions', 'common', 'targets']);
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
-    const [activeTab, setActiveTab] = useState('ds-types');
+    const [activeTab, setActiveTab] = useState('target-types');
 
     // Admin only access
     if (!isAdmin) {
@@ -74,6 +75,20 @@ const TypeManagement: React.FC = () => {
     }
 
     const tabItems = [
+        {
+            key: 'target-types',
+            label: (
+                <Space>
+                    <UserOutlined />
+                    {t('typeManagement.targetTypes', { defaultValue: 'Target Types' })}
+                </Space>
+            ),
+            children: (
+                <TabContent>
+                    <TargetTypeList />
+                </TabContent>
+            ),
+        },
         {
             key: 'ds-types',
             label: (

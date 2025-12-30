@@ -2,6 +2,7 @@
     "typeManagement": {
         "title": "타입 관리",
         "description": "배포 세트 타입과 소프트웨어 모듈 타입을 관리하여 업데이트 패키지를 표준화합니다.",
+        "targetTypes": "타겟 타입",
         "distributionSetTypes": "배포 세트 타입",
         "softwareModuleTypes": "소프트웨어 모듈 타입",
         "addType": "타입 추가",

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Table, Tag, Tooltip, Space, Button, message, Modal } from 'antd';
+import { Tag, Tooltip, Space, Button, message, Modal, Typography } from 'antd';
 import type { TableProps } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
 import {
     useGetTypes,
     useDeleteSoftwareModuleType,
@@ -10,7 +11,10 @@ import type { MgmtSoftwareModuleType } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { EnhancedTable } from '@/components/patterns';
 import SoftwareModuleTypeDialog from './SoftwareModuleTypeDialog';
+
+const { Text } = Typography;
 
 
 
@@ -81,74 +85,83 @@ const SoftwareModuleTypeList: React.FC = () => {
         }));
     };
 
-    const columns: TableProps<MgmtSoftwareModuleType>['columns'] = [
+    const columns: ColumnsType<MgmtSoftwareModuleType> = [
         {
             title: t('typeManagement.columns.name'),
             dataIndex: 'name',
             key: 'name',
+            width: 180,
+            render: (text) => <Text strong style={{ fontSize: 12 }}>{text}</Text>,
         },
         {
             title: t('typeManagement.columns.key'),
             dataIndex: 'key',
             key: 'key',
-            render: (text) => <Tag>{text}</Tag>,
+            width: 150,
+            render: (text) => <Tag style={{ fontSize: 12 }}>{text}</Tag>,
         },
         {
             title: t('typeManagement.columns.description'),
             dataIndex: 'description',
             key: 'description',
             ellipsis: true,
+            render: (text) => <Text type="secondary" style={{ fontSize: 12 }}>{text || '-'}</Text>,
         },
         {
             title: t('typeManagement.columns.maxAssignments'),
             dataIndex: 'maxAssignments',
             key: 'maxAssignments',
-            width: 120,
-            render: (val) => val ?? 1,
+            width: 100,
+            render: (val) => <Text style={{ fontSize: 12 }}>{val ?? 1}</Text>,
         },
         {
             title: t('typeManagement.columns.colour'),
             dataIndex: 'colour',
             key: 'colour',
-            width: 140,
+            width: 120,
             render: (colour) => colour ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{
-                        width: 28,
-                        height: 28,
+                        width: 20,
+                        height: 20,
                         backgroundColor: colour,
-                        borderRadius: 6,
-                        border: '2px solid rgba(0,0,0,0.1)',
-                        boxShadow: `0 2px 8px ${colour}40`,
+                        borderRadius: 4,
+                        border: '1px solid rgba(0,0,0,0.1)',
                     }} />
                     <span style={{
-                        fontSize: 12,
+                        fontSize: 11,
                         fontFamily: 'monospace',
                         color: '#666',
                     }}>
                         {colour}
                     </span>
                 </div>
-            ) : <span style={{ color: '#999' }}>-</span>,
+            ) : <Text type="secondary" style={{ fontSize: 12 }}>-</Text>,
         },
         {
             title: t('typeManagement.columns.lastModified'),
             dataIndex: 'lastModifiedAt',
             key: 'lastModifiedAt',
-            width: 180,
-            render: (val: number) => (val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'),
+            width: 150,
+            render: (val: number) => (
+                <Text style={{ fontSize: 12 }}>
+                    {val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}
+                </Text>
+            ),
         },
         {
             title: t('common:table.actions'),
             key: 'actions',
-            width: 120,
+            width: 100,
+            fixed: 'right',
             render: (_, record) => (
-                <Space size="small">
+                <Space size={0} className="action-cell">
                     {isAdmin && (
                         <>
                             <Tooltip title={t('common:actions.edit')}>
                                 <Button
                                     type="text"
+                                    size="small"
                                     icon={<EditOutlined />}
                                     onClick={() => handleEdit(record)}
                                 />
@@ -156,6 +169,7 @@ const SoftwareModuleTypeList: React.FC = () => {
                             <Tooltip title={t('common:actions.delete')}>
                                 <Button
                                     type="text"
+                                    size="small"
                                     danger
                                     icon={<DeleteOutlined />}
                                     onClick={() => handleDelete(record.id)}
@@ -182,7 +196,7 @@ const SoftwareModuleTypeList: React.FC = () => {
                     )}
                 </Space>
             </div>
-            <Table
+            <EnhancedTable<MgmtSoftwareModuleType>
                 columns={columns}
                 dataSource={data?.content || []}
                 rowKey="id"
@@ -193,7 +207,7 @@ const SoftwareModuleTypeList: React.FC = () => {
                 }}
                 loading={isLoading}
                 onChange={handleTableChange}
-                size="small"
+                scroll={{ x: 900 }}
             />
             <SoftwareModuleTypeDialog
                 open={dialogOpen}

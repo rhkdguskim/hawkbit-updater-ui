@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import {
-    Table,
     Button,
     Space,
     message,
     Popconfirm,
     Tag,
+    Typography,
+    Tooltip,
 } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next'
@@ -25,8 +26,10 @@ import {
 import type { MgmtTargetType, MgmtTargetTypeRequestBodyPost, MgmtTargetTypeRequestBodyPut } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { ColorSwatch } from '@/components/common';
+import { EnhancedTable } from '@/components/patterns';
 import TargetTypeDialog from './TargetTypeDialog';
 
+const { Text } = Typography;
 
 const TargetTypeList: React.FC = () => {
     const queryClient = useQueryClient();
@@ -164,22 +167,24 @@ const TargetTypeList: React.FC = () => {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
-            width: 80,
+            width: 60,
             sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
+            render: (id) => <Text style={{ fontSize: 12 }}>{id}</Text>,
         },
         {
             title: t('table.name'),
             dataIndex: 'name',
             key: 'name',
+            width: 180,
             sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
             render: (name: string, record) => (
-                <Space>
+                <Space size={4}>
                     {record.colour && (
-                        <Tag color={record.colour} style={{ marginRight: 0 }}>
+                        <Tag color={record.colour} style={{ fontSize: 12, margin: 0 }}>
                             {name}
                         </Tag>
                     )}
-                    {!record.colour && name}
+                    {!record.colour && <Text strong style={{ fontSize: 12 }}>{name}</Text>}
                 </Space>
             ),
         },
@@ -187,7 +192,9 @@ const TargetTypeList: React.FC = () => {
             title: t('typeManagement.key'),
             dataIndex: 'key',
             key: 'key',
+            width: 150,
             sorter: (a, b) => (a.key ?? '').localeCompare(b.key ?? ''),
+            render: (key) => <Text style={{ fontSize: 12 }}>{key}</Text>,
         },
         {
             title: t('form.description'),
@@ -195,37 +202,44 @@ const TargetTypeList: React.FC = () => {
             key: 'description',
             ellipsis: true,
             sorter: (a, b) => (a.description ?? '').localeCompare(b.description ?? ''),
+            render: (desc) => <Text type="secondary" style={{ fontSize: 12 }}>{desc || '-'}</Text>,
         },
         {
             title: t('tagManagement.colour'),
             dataIndex: 'colour',
             key: 'colour',
-            width: 140,
+            width: 100,
             render: (colour: string) => <ColorSwatch color={colour} />,
         },
         {
             title: t('table.actions'),
             key: 'actions',
-            width: 150,
+            width: 100,
+            fixed: 'right',
             render: (_, record) => (
-                <Space>
+                <Space size={0} className="action-cell">
                     {isAdmin && (
                         <>
-                            <Button
-                                type="text"
-                                icon={<EditOutlined />}
-                                onClick={() => {
-                                    setEditingType(record);
-                                    setDialogOpen(true);
-                                }}
-                            />
+                            <Tooltip title={t('common:edit')}>
+                                <Button
+                                    type="text"
+                                    size="small"
+                                    icon={<EditOutlined />}
+                                    onClick={() => {
+                                        setEditingType(record);
+                                        setDialogOpen(true);
+                                    }}
+                                />
+                            </Tooltip>
                             <Popconfirm
                                 title={t('typeManagement.deleteConfirm')}
                                 onConfirm={() => handleDelete(record.id)}
                                 okText={t('common:confirm')}
                                 cancelText={t('common:cancel')}
                             >
-                                <Button type="text" danger icon={<DeleteOutlined />} />
+                                <Tooltip title={t('common:delete')}>
+                                    <Button type="text" size="small" danger icon={<DeleteOutlined />} />
+                                </Tooltip>
                             </Popconfirm>
                         </>
                     )}
@@ -254,7 +268,7 @@ const TargetTypeList: React.FC = () => {
                 )}
             </div>
 
-            <Table<MgmtTargetType>
+            <EnhancedTable<MgmtTargetType>
                 columns={columns}
                 dataSource={data?.content || []}
                 rowKey="id"
@@ -267,7 +281,7 @@ const TargetTypeList: React.FC = () => {
                     pageSizeOptions: ['10', '20', '50'],
                     onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
                 }}
-                size="small"
+                scroll={{ x: 800 }}
             />
 
             <TargetTypeDialog
