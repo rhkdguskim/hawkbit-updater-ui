@@ -1,74 +1,248 @@
 {
     "title": "目标管理",
-    "subtitle": "监控与管理设备",
     "list": {
         "title": "目标列表",
-        "search": "搜索目标...",
-        "columns": {
-            "controllerId": "控制 ID",
-            "name": "名称",
-            "description": "描述",
-            "status": "状态",
-            "lastSeen": "最后上线",
-            "assignedDS": "已分配 DS",
-            "installedDS": "已安装 DS",
-            "actions": "操作"
-        },
-        "empty": "未找到目标"
+        "description": "搜索、筛选并管理物联网目标及其部署状态",
+        "addTarget": "添加目标",
+        "addType": "添加类型",
+        "addTag": "添加标签",
+        "editType": "编辑类型",
+        "selectType": "选择类型",
+        "editTags": "编辑标签",
+        "selectTags": "选择标签",
+        "searchPlaceholder": "输入搜索关键词",
+        "filterByTag": "按标签筛选",
+        "savedFilters": "保存的筛选器"
     },
+    "quickFilters": "快速筛选",
+    "manageFilters": "管理",
     "detail": {
         "title": "目标详情",
-        "overview": "概览",
-        "attributes": "属性",
-        "tags": "标签",
-        "metadata": "元数据",
-        "actions": "操作历史",
-        "security": "安全",
-        "config": "配置",
-        "pollStatus": "轮询状态"
+        "description": "查看此目标的详细信息、已安装软件和执行历史记录",
+        "tabs": {
+            "overview": "概览",
+            "actions": "操作",
+            "attributes": "属性",
+            "distribution": "分发集",
+            "metadata": "元数据",
+            "tags": "标签",
+            "autoConfirm": "自动确认",
+            "targetType": "目标类型"
+        },
+        "notFoundTitle": "未找到目标",
+        "notFoundDesc": "请求的目标不存在，或者您没有权限查看。",
+        "backToTargets": "返回目标列表",
+        "assignDS": "分配分发集"
     },
-    "status": {
-        "online": "在线",
-        "offline": "离线",
-        "unknown": "未知",
-        "updatePending": "更新挂起",
-        "updating": "更新中"
-    },
-    "actions": {
-        "edit": "编辑目标",
-        "delete": "删除目标",
-        "assign": "分配更新",
-        "cancel": "取消更新",
-        "message": "发送消息"
-    },
-    "attributes": {
+    "table": {
         "controllerId": "控制 ID",
         "name": "名称",
-        "description": "描述",
-        "securityToken": "安全令牌",
-        "address": "地址",
-        "lastSeen": "最后上线时间"
+        "ipAddress": "IP 地址",
+        "status": "状态",
+        "updateStatus": "更新状态",
+        "installedDS": "已安装分发集",
+        "lastControllerRequest": "最近请求",
+        "autoConfirm": "自动确认",
+        "lastModified": "最后修改",
+        "lastPollTime": "最近轮询",
+        "actions": "操作",
+        "id": "ID",
+        "type": "类型",
+        "targetType": "目标类型",
+        "tags": "标签",
+        "forceType": "强制类型",
+        "started": "开始时间",
+        "devices": "设备",
+        "empty": "没有找到目标",
+        "pagination": "显示 {{start}}-{{end}} 共 {{total}} 个目标"
     },
-    "tags": {
-        "title": "标签",
-        "add": "添加标签",
-        "noTags": "未分配标签"
+    "form": {
+        "controllerId": "控制 ID",
+        "controllerIdPlaceholder": "输入唯一控制 ID",
+        "controllerIdHelp": "创建后无法更改控制 ID。",
+        "name": "名称",
+        "namePlaceholder": "输入显示名称（可选）",
+        "description": "描述",
+        "descriptionPlaceholder": "输入描述（可选）",
+        "validation": {
+            "controllerIdPattern": "仅允许字母数字、下划线和连字符",
+            "nameMaxLength": "名称不能超过 128 个字符",
+            "descriptionMaxLength": "描述不能超过 512 个字符"
+        }
+    },
+    "modal": {
+        "createTitle": "添加新目标",
+        "editTitle": "编辑目标",
+        "deleteTitle": "删除目标",
+        "deleteConfirm": "确定要删除目标 '{{name}}' 吗？所有相关数据将被移除。"
+    },
+    "messages": {
+        "createSuccess": "目标创建成功。",
+        "updateSuccess": "目标更新成功。",
+        "deleteSuccess": "目标删除成功。",
+        "assignSuccess": "分发集分配成功。",
+        "metadataCreateSuccess": "元数据创建成功。",
+        "metadataUpdateSuccess": "元数据更新成功。",
+        "metadataDeleteSuccess": "元数据删除成功。",
+        "typeUpdated": "目标类型更新成功。",
+        "typeRemoved": "目标类型移除成功。",
+        "tagsUpdated": "目标标签更新成功。",
+        "targetTypeAssigned": "目标类型分配成功。",
+        "targetTypeRemoved": "目标类型移除成功。",
+        "notFound": "未找到目标。",
+        "deleteFailed": "删除目标失败。",
+        "createFailed": "创建目标失败。",
+        "targetExists": "具有此控制 ID 的目标已存在。",
+        "loadFailed": "加载目标失败。"
+    },
+    "assign": {
+        "title": "分配分发集",
+        "targetLabel": "正在分配给目标：",
+        "selectDS": "选择分发集",
+        "assignType": "分配类型",
+        "soft": "软分配 (Soft)",
+        "softDesc": "设备将在方便时更新。",
+        "forced": "强制分配 (Forced)",
+        "forcedDesc": "设备将立即更新。",
+        "timeforced": "定时强制 (Time Forced)",
+        "timeforcedDesc": "设备将在预定时间强制更新。",
+        "downloadOnly": "仅下载",
+        "downloadOnlyDesc": "仅下载，不安装。",
+        "forcedWarning": "强制分配需要管理员权限。",
+        "advancedOptions": "高级选项",
+        "advancedDesc": "配置确认、权重和维护窗口。",
+        "confirmationRequired": "需要确认",
+        "weight": "分配权重",
+        "forcetime": "强制时间",
+        "forcetimeRequired": "定时强制分配需要指定时间。",
+        "forcetimePlaceholder": "选择日期和时间",
+        "maintenanceSchedule": "维护计划 (Cron)",
+        "maintenanceSchedulePlaceholder": "0 15 10 * * ?",
+        "maintenanceDuration": "维护持续时间",
+        "maintenanceDurationPlaceholder": "02:00:00",
+        "maintenanceTimezone": "维护时区",
+        "maintenanceTimezonePlaceholder": "+02:00"
+    },
+    "autoConfirm": {
+        "title": "自动确认",
+        "enabled": "已启用",
+        "disabled": "已禁用",
+        "enabledDesc": "所有操作将自动确认，无需人工干预。",
+        "disabledDesc": "执行前需要人工确认操作。",
+        "activate": "激活自动确认",
+        "deactivate": "停用自动确认",
+        "activatedSuccess": "自动确认已激活。",
+        "deactivatedSuccess": "自动确认已停用。"
+    },
+    "overview": {
+        "title": "设备监控",
+        "subtitle": "实时设备状态概览",
+        "status": "状态",
+        "updateStatus": "更新状态",
+        "lastPoll": "最近轮询",
+        "nextPoll": "下次轮询",
+        "never": "从未",
+        "address": "地址",
+        "securityToken": "安全令牌",
+        "created": "创建时间",
+        "lastModified": "最后修改",
+        "requestAttributes": "请求属性",
+        "requested": "已请求",
+        "notRequested": "未请求",
+        "targetType": "目标类型",
+        "deviceStatusDistribution": "设备状态分布",
+        "connectivityStatus": "目标连接状态",
+        "updateStatusDistribution": "更新状态",
+        "totalDevices": "设备总数",
+        "recentActivity": "近期设备活动",
+        "awaitingConnection": "等待首次连接",
+        "percentOfDevices": "{{percent}}% 的设备",
+        "noDescription": "无描述",
+        "deviceGrid": "设备状态",
+        "targetTypeDistribution": "目标类型分布",
+        "percentOnline": "{{percent}}% 在线",
+        "typesCount": "{{count}} 个类型",
+        "devicesCount": "{{count}} 个设备"
+    },
+    "status": {
+        "inSync": "已同步",
+        "pending": "挂起",
+        "error": "错误",
+        "unknown": "未知",
+        "online": "在线",
+        "offline": "离线",
+        "neverConnected": "从未连接",
+        "connectivity": "连接性"
+    },
+    "actions": {
+        "viewDetails": "查看详情",
+        "delete": "删除",
+        "refresh": "刷新",
+        "filter": "筛选",
+        "force": "强制更新",
+        "cancel": "取消",
+        "addTarget": "添加目标",
+        "edit": "编辑"
+    },
+    "search": {
+        "placeholder": "按{{field}}搜索",
+        "fields": {
+            "name": "名称",
+            "description": "描述",
+            "controllerId": "控制 ID"
+        }
     },
     "filters": {
-        "saved": "保存的筛选器",
-        "save": "保存当前筛选器",
-        "manage": "管理筛选器"
+        "savedFilter": "保存的筛选器：{{name}}",
+        "query": "搜索查询",
+        "tag": "标签：{{name}}",
+        "type": "类型：{{name}}",
+        "clearAll": "清除全部"
+    },
+    "attributes": {
+        "key": "键",
+        "value": "值",
+        "category": "类别",
+        "noAttributes": "未找到属性"
+    },
+    "ds": {
+        "installed": "已安装分发集",
+        "assigned": "已分配分发集",
+        "current": "当前",
+        "pending": "挂起",
+        "modules": "模块",
+        "softwareModules": "软件模块",
+        "requiredMigration": "需要迁移",
+        "noInstalled": "没有已安装的分发集",
+        "noAssigned": "没有已分配的分发集",
+        "noConfigured": "未配置分发集",
+        "yes": "是",
+        "no": "否"
     },
     "metadata": {
         "key": "键",
         "value": "值",
-        "emptyText": "无元数据"
+        "noMetadata": "未找到元数据",
+        "add": "添加元数据",
+        "edit": "编辑元数据",
+        "deleteTitle": "删除元数据",
+        "deleteConfirm": "确定要删除元数据条目 '{{key}}' 吗？",
+        "deleteDesc": "此操作无法撤销。",
+        "emptyText": "无元数据。点击“添加元数据”以创建。"
+    },
+    "tags": {
+        "noTags": "此目标未分配标签"
     },
     "targetType": {
         "current": "当前目标类型",
         "noAssigned": "未分配目标类型",
         "assign": "分配目标类型",
-        "select": "选择目标类型"
+        "change": "更改类型",
+        "remove": "移除类型",
+        "select": "选择目标类型",
+        "assignTitle": "分配目标类型",
+        "removeTitle": "移除目标类型",
+        "removeConfirm": "确定要从该目标移除目标类型 '{{name}}' 吗？"
     },
     "typeManagement": {
         "title": "目标类型管理",
@@ -76,33 +250,111 @@
         "key": "键",
         "keyPlaceholder": "输入唯一键",
         "colour": "颜色",
+        "createTitle": "创建目标类型",
+        "editTitle": "编辑目标类型",
+        "createSuccess": "目标类型创建成功。",
+        "updateSuccess": "目标类型更新成功。",
+        "deleteSuccess": "目标类型删除成功。",
         "deleteConfirmTitle": "删除目标类型",
-        "deleteConfirmDesc": "确定要删除此目标类型吗？"
+        "deleteConfirmDesc": "确定要删除此目标类型吗？此操作无法撤销。",
+        "compatibleDsTypes": "兼容的分发集类型",
+        "compatibleDsTypesHint": "只有这些 DS 类型可以部署到此类型的目标",
+        "selectDsTypes": "选择兼容的 DS 类型...",
+        "noCompatibleWarning": "如果未选择 DS 类型，此类型的目标将与所有部署不兼容。"
     },
     "tagManagement": {
         "title": "目标标签管理",
         "add": "添加目标标签",
         "colour": "颜色",
+        "createTitle": "创建目标标签",
+        "editTitle": "编辑目标标签",
+        "createSuccess": "目标标签创建成功。",
+        "updateSuccess": "目标标签更新成功。",
+        "deleteSuccess": "目标标签删除成功。",
         "deleteConfirmTitle": "删除目标标签",
-        "deleteConfirmDesc": "确定要删除此目标标签吗？"
+        "deleteConfirmDesc": "确定要删除此目标标签吗？它将从所有分配的目标中移除。"
+    },
+    "tagsAndTypes": {
+        "title": "标签与类型"
     },
     "bulkAssign": {
         "title": "批量分配",
+        "selectTargets": "选择目标",
         "selectedCount": "已选择 {{count}} 个目标",
+        "selectBoth": "请选择目标和分配选项。",
         "assignTag": "分配标签",
+        "selectTag": "选择一个标签",
+        "assignTagButton": "分配标签给选中项",
+        "tagAssignSuccess": "标签已分配给 {{count}} 个目标。",
         "assignType": "分配类型",
-        "tagAssignSuccess": "标签已分配给 {{count}} 个目标",
-        "typeAssignSuccess": "类型已分配给 {{count}} 个目标"
+        "selectType": "选择一个类型",
+        "assignTypeButton": "分配类型给选中项",
+        "typeAssignSuccess": "类型已分配给 {{count}} 个目标。"
+    },
+    "bulkEdit": {
+        "title": "批量标签操作",
+        "selectedTargets": "已选目标",
+        "targets": "个目标",
+        "more": "更多",
+        "selectMode": "选择操作模式",
+        "mergeMode": "合并模式 (默认)",
+        "mergeModeDesc": "在保留现有标签的同时添加新标签。",
+        "replaceMode": "替换模式",
+        "replaceModeDesc": "移除所有现有标签并用新标签替换。",
+        "replaceWarning": "替换标签将从所选目标中永久移除所有当前分配的标签。",
+        "selectTags": "要应用的标签",
+        "selectTagsPlaceholder": "选择要添加/替换的标签",
+        "tagRequired": "请至少选择一个标签",
+        "preview": "操作预览",
+        "previewDesc": "以下标签将应用于 {{count}} 个目标：",
+        "processing": "正在处理批量更新...",
+        "complete": "操作完成",
+        "completeDesc": "已完成 {{count}} 个目标的批量更新。",
+        "partialCompleteTitle": "操作完成但有警告",
+        "partialCompleteDesc": "部分目标无法更新。请查看下方列表。",
+        "step1": "配置",
+        "step2": "标签选择",
+        "step3": "执行",
+        "apply": "执行批量更新",
+        "successMessage": "成功更新 {{count}} 个目标的标签。",
+        "partialSuccess": "更新了 {{success}} 个目标。{{failed}} 个失败。"
     },
     "bulkDelete": {
         "title": "批量删除目标",
         "button": "删除",
         "confirmMessage": "确定要删除 {{count}} 个目标吗？",
-        "success": "成功删除 {{count}} 个目标"
+        "confirmDesc": "此操作无法撤销。",
+        "processing": "正在删除目标...",
+        "success": "成功删除 {{count}} 个目标。",
+        "partialSuccess": "删除了 {{success}} 个目标。{{failed}} 个失败。",
+        "failed": "删除目标失败。",
+        "errorTitle": "部分删除失败",
+        "andMore": "...以及 {{count}} 个更多"
     },
     "savedFilters": {
         "title": "保存的筛选器",
         "create": "新建筛选器",
+        "edit": "编辑",
+        "delete": "删除",
+        "apply": "应用",
+        "close": "关闭",
+        "empty": "没有保存的筛选器",
+        "untitled": "无标题",
+        "totalCount": "{{count}} 个保存的筛选器",
+        "manage": "管理",
+        "quickAccess": "保存的筛选器",
+        "active": "已应用保存的筛选器：{{name}}",
+        "clear": "清除",
+        "createTitle": "创建保存的筛选器",
+        "editTitle": "编辑保存的筛选器",
+        "deleteConfirmTitle": "删除保存的筛选器",
+        "deleteConfirmDesc": "确定要删除此保存的筛选器吗？",
+        "createSuccess": "保存的筛选器创建成功。",
+        "updateSuccess": "保存的筛选器更新成功。",
+        "deleteSuccess": "保存的筛选器删除成功。",
+        "createError": "创建保存的筛选器失败。",
+        "updateError": "更新保存的筛选器失败。",
+        "deleteError": "删除保存的筛选器失败。",
         "fields": {
             "name": "名称",
             "query": "FIQL 查询"
@@ -110,6 +362,50 @@
         "placeholders": {
             "name": "输入筛选器名称",
             "query": "例如：name==device*;tag.name==prod"
+        },
+        "validation": {
+            "name": "名称是必填项。",
+            "query": "查询是必填项。"
+        },
+        "columns": {
+            "name": "名称",
+            "query": "查询",
+            "autoAssign": "自动分配",
+            "updated": "更新时间",
+            "actions": "操作"
+        },
+        "autoAssignOnly": "仅自动分配",
+        "autoAssign": {
+            "title": "自动分配分发集",
+            "distributionSet": "分发集",
+            "distributionSetPlaceholder": "选择分发集",
+            "actionType": "操作类型",
+            "weight": "操作权重",
+            "confirmationRequired": "需要确认",
+            "loadMore": "加载更多分发集",
+            "saveSuccess": "自动分配保存成功。",
+            "saveError": "保存自动分配失败。",
+            "removeSuccess": "自动分配移除成功。",
+            "removeError": "移除自动分配失败。",
+            "validation": {
+                "distributionSet": "分发集是必填项。",
+                "actionType": "操作类型是必填项。"
+            }
         }
+    },
+    "filterPreview": {
+        "title": "筛选预览",
+        "loading": "正在分析筛选...",
+        "highWarning": "大规模操作",
+        "highWarningDesc": "此筛选将影响 {{count}} 个目标。请仔细检查。",
+        "mediumWarning": "中等规模",
+        "mediumWarningDesc": "此筛选将影响 {{count}} 个目标。",
+        "safeOperation": "安全操作",
+        "safeOperationDesc": "此筛选将影响 {{count}} 个目标。",
+        "affectedTargets": "受影响的目标",
+        "query": "查询：",
+        "cancel": "取消",
+        "confirm": "应用筛选",
+        "confirmAnyway": "仍然应用"
     }
 }

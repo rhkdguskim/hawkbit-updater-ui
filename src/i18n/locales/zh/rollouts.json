@@ -1,74 +1,305 @@
 {
-    "title": "发布管理",
-    "subtitle": "协调与调度更新",
-    "create": {
-        "title": "创建发布",
-        "name": "名称",
+    "templates": {
+        "title": "Rollout 模板",
+        "createNew": "创建新模板",
+        "saveCurrentAsTemplate": "保存当前配置为模板",
+        "defaultTemplates": "默认模板",
+        "customTemplates": "我的模板",
+        "name": "模板名称",
+        "namePlaceholder": "例如：标准分阶段 Rollout",
+        "nameRequired": "请输入模板名称。",
         "description": "描述",
-        "distributionSet": "分发集",
-        "targetFilter": "目标筛选器",
-        "groups": "发布组",
-        "trigger": "触发器",
-        "strategy": "策略",
-        "schedule": "调度",
-        "success": "发布创建成功",
-        "error": "创建发布失败"
+        "descriptionPlaceholder": "简要描述 Rollout 策略",
+        "default": "默认",
+        "groups": "分组",
+        "success": "成功",
+        "error": "错误",
+        "createSuccess": "模板创建成功。",
+        "deleteSuccess": "模板已删除。",
+        "applySuccess": "模板 '{{name}}' 已应用。",
+        "noConfigToSave": "没有可保存的配置。请先设置分组。",
+        "noCustomTemplates": "暂无自定义模板。创建一个或保存当前配置！",
+        "noDescription": "无描述",
+        "saveTemplate": "保存模板",
+        "deleteConfirm": "确定要删除此模板吗？",
+        "createFirst": "创建您的第一个模板"
     },
+    "pageTitle": "Rollouts",
     "list": {
-        "title": "发布列表",
-        "columns": {
-            "name": "名称",
-            "status": "状态",
-            "distribution": "分发集",
-            "progress": "进度",
-            "totalTargets": "总目标数",
-            "lastModified": "最后修改",
-            "actions": "操作"
-        },
-        "empty": "未找到发布"
+        "title": "Rollout 列表",
+        "description": "监控和管理大规模多目标部署 Rollout"
+    },
+    "subtitle": "概览 Rollout 状态和进度",
+    "empty": "未找到 Rollout",
+    "overview": {
+        "title": "Rollout 管理",
+        "subtitle": "部署 Rollout 概览和监控",
+        "totalRollouts": "总 Rollouts",
+        "running": "运行中",
+        "finished": "已完成",
+        "errorStopped": "错误/停止",
+        "createRollout": "创建 Rollout",
+        "viewAll": "查看全部",
+        "statusDistribution": "Rollout 状态分布",
+        "activeRollouts": "活动 Rollouts",
+        "noRollouts": "暂无 Rollouts",
+        "noActiveRollouts": "无活动 Rollouts",
+        "createFirst": "创建第一个 Rollout",
+        "allTargets": "所有目标",
+        "total": "总计",
+        "rolloutsCount": "{{count}} 个 Rollouts",
+        "activeCount": "{{count}} 个活动",
+        "completedCount": "{{count}} 个已完成",
+        "targetsCount": "{{count}} 个目标",
+        "recentFinished": "最近完成",
+        "noFinishedRollouts": "没有已完成的 Rollouts",
+        "summaryStatus": "状态摘要"
+    },
+    "refresh": "刷新",
+    "createRollout": "创建 Rollout",
+    "columns": {
+        "id": "ID",
+        "name": "名称",
+        "status": "状态",
+        "totalTargets": "总目标数",
+        "createdAt": "创建时间",
+        "progress": "进度",
+        "progressLabel": "{{percent}}% 完成",
+        "actions": "操作"
+    },
+    "filter": {
+        "placeholder": "按状态筛选",
+        "creating": "创建中",
+        "ready": "就绪",
+        "starting": "启动中",
+        "running": "运行中",
+        "paused": "已暂停",
+        "finished": "已完成",
+        "error": "错误",
+        "waitingForApproval": "等待批准",
+        "scheduled": "已计划",
+        "clearFilters": "清除筛选"
+    },
+    "search": {
+        "placeholder": "按名称搜索"
+    },
+    "pagination": {
+        "total": "共 {{count}} 个 Rollout",
+        "range": "显示 {{start}}-{{end}} 共 {{total}} 个 Rollout"
+    },
+    "actions": {
+        "view": "查看",
+        "edit": "编辑",
+        "pause": "暂停",
+        "resume": "恢复"
     },
     "detail": {
-        "title": "发布详情",
-        "status": "状态",
-        "progress": "总体进度",
-        "groups": "组详情",
-        "targets": "目标状态",
-        "statistics": "统计信息",
-        "actions": {
+        "description": "实时 Rollout 进度、部署分组和控制操作",
+        "back": "返回",
+        "backToRollouts": "返回 Rollout 列表",
+        "notFound": "未找到 Rollout",
+        "notFoundDesc": "请求的 Rollout 不存在。",
+        "controlsTitle": "Rollout 控制",
+        "overviewTitle": "概览",
+        "deployGroupsTitle": "部署分组",
+        "noActions": "此状态无可用操作",
+        "labels": {
+            "id": "ID",
+            "name": "名称",
+            "status": "状态",
+            "totalTargets": "总目标数",
+            "finishedTargets": "已完成目标",
+            "errorTargets": "错误目标",
+            "overallProgress": "总体进度",
+            "createdAt": "创建时间",
+            "lastModified": "最后修改",
+            "description": "描述"
+        },
+        "emptyGroups": "无可用部署分组",
+        "controls": {
             "start": "开始",
+            "startConfirm": "开始此 Rollout？",
             "pause": "暂停",
+            "pauseConfirm": "暂停此 Rollout？",
             "resume": "恢复",
             "approve": "批准",
-            "delete": "删除"
+            "deny": "拒绝",
+            "retry": "重试",
+            "retryConfirm": "重试此 Rollout？",
+            "delete": "删除",
+            "deleteConfirm": "删除此 Rollout？",
+            "deleteDesc": "此操作无法撤销。"
+        },
+        "messages": {
+            "startSuccess": "Rollout 已开始",
+            "startError": "开始 Rollout 失败",
+            "pauseSuccess": "Rollout 已暂停",
+            "pauseError": "暂停 Rollout 失败",
+            "resumeSuccess": "Rollout 已恢复",
+            "resumeError": "恢复 Rollout 失败",
+            "approveSuccess": "Rollout 已批准",
+            "approveError": "批准 Rollout 失败",
+            "denySuccess": "Rollout 已拒绝",
+            "denyError": "拒绝 Rollout 失败",
+            "retrySuccess": "Rollout 重试已启动",
+            "retryError": "重试 Rollout 失败",
+            "deleteSuccess": "Rollout 已删除",
+            "deleteError": "删除 Rollout 失败"
         }
     },
-    "groups": {
-        "title": "发布组",
-        "name": "组名",
-        "targetCount": "目标数量",
-        "successRate": "成功率阈值",
-        "errorRate": "错误率阈值",
-        "status": "状态"
-    },
     "wizard": {
-        "step1": "基本信息",
-        "step2": "选择分发集",
-        "step3": "目标选择",
-        "step4": "组配置",
-        "step5": "审核与确认",
-        "template": "从模板使用"
+        "title": "创建 Rollout",
+        "loadTemplate": "加载模板",
+        "steps": {
+            "basicInfo": "基本信息",
+            "distributionSet": "分发集",
+            "targetFilter": "目标筛选",
+            "groupSettings": "分组设置",
+            "review": "审查"
+        },
+        "basicInfo": {
+            "title": "基本信息",
+            "name": "Rollout 名称",
+            "namePlaceholder": "输入 Rollout 名称",
+            "nameRequired": "请输入 Rollout 名称",
+            "nameDuplicate": "Rollout 名称已存在",
+            "description": "描述",
+            "descriptionPlaceholder": "输入描述（可选）",
+            "checkingName": "正在检查名称..."
+        },
+        "distributionSet": {
+            "title": "选择分发集",
+            "selectDS": "选择一个分发集",
+            "searchPlaceholder": "按选定字段搜索",
+            "searchName": "名称",
+            "searchVersion": "版本",
+            "searchDescription": "描述",
+            "selectionRequired": "请选择一个分发集",
+            "selected": "已选",
+            "noSelection": "未选择分发集",
+            "softwareModules": "软件模块",
+            "columns": {
+                "id": "ID",
+                "name": "名称",
+                "version": "版本",
+                "type": "类型"
+            }
+        },
+        "targetFilter": {
+            "title": "目标筛选",
+            "builderMode": "简单筛选构建器",
+            "advancedMode": "高级 FIQL",
+            "tags": "目标标签",
+            "tagsPlaceholder": "选择标签",
+            "selectTags": "选择标签",
+            "anyTag": "匹配任意选定标签",
+            "allTag": "匹配所有选定标签",
+            "targetTypes": "目标类型",
+            "targetTypePlaceholder": "选择目标类型",
+            "selectTypes": "选择类型",
+            "anyType": "匹配任意选定类型",
+            "allType": "匹配所有选定类型",
+            "pollingStatus": "轮询状态",
+            "statusOnline": "在线",
+            "statusOffline": "离线",
+            "updateStatus": "更新状态",
+            "updateStatusPlaceholder": "选择更新状态",
+            "updateStatusInSync": "已同步",
+            "updateStatusPending": "挂起",
+            "updateStatusError": "错误",
+            "updateStatusUnknown": "未知",
+            "updateStatusRegistered": "已注册",
+            "currentFilter": "当前筛选查询",
+            "controllerId": "控制 ID 包含",
+            "controllerPlaceholder": "例如：device-",
+            "nameKeyword": "设备名称包含",
+            "namePlaceholder": "输入关键字",
+            "builderHint": "组合标签、目标类型和设备状态来定义 Rollout 范围。",
+            "advancedHint": "手动输入 FIQL。例如：tags.id==1;targettype.key==gateway",
+            "filterQuery": "目标筛选查询 (FIQL)",
+            "filterPlaceholder": "例如：name==device*",
+            "preview": "预览目标",
+            "targetCount": "匹配目标数：{{count}}",
+            "required": "请输入目标筛选查询 (FIQL)。",
+            "allTargets": "部署到所有目标（无筛选）",
+            "allTargetsHint": "Rollout 将部署到所有已注册的目标。",
+            "previewColumns": {
+                "controllerId": "控制 ID",
+                "name": "名称",
+                "type": "类型"
+            }
+        },
+        "groupSettings": {
+            "title": "分组设置",
+            "amountGroups": "分组数量",
+            "preview": "分组分布预览：{{count}} 个组，约 {{size}} 个目标/组",
+            "distributionHint": "目标将被分为 {{count}} 个组。{{exact}} 个组包含 {{size}} 个目标，{{extraCount}} 个组包含 {{extraSize}} 个目标。",
+            "successThreshold": "成功阈值 (%)",
+            "errorThreshold": "错误阈值 (%)",
+            "startImmediately": "创建后立即开始"
+        },
+        "review": {
+            "title": "审查与创建",
+            "summary": "Rollout 摘要",
+            "name": "名称",
+            "description": "描述",
+            "distributionSet": "分发集",
+            "targetFilter": "目标筛选",
+            "groups": "分组",
+            "successThreshold": "成功阈值",
+            "errorThreshold": "错误阈值",
+            "allTargets": "所有目标"
+        },
+        "buttons": {
+            "next": "下一步",
+            "previous": "上一步",
+            "create": "创建 Rollout",
+            "cancel": "取消"
+        },
+        "messages": {
+            "createSuccess": "Rollout 创建成功",
+            "createError": "创建 Rollout 失败",
+            "cannotStartImmediately": "Rollout 已创建但无法立即开始。请手动开始。",
+            "targetMatchingError": "未找到匹配筛选器的目标。请检查您的筛选器。"
+        }
     },
-    "templates": {
-        "title": "发布模板",
-        "save": "保存为模板",
-        "load": "加载模板",
-        "name": "模板名称"
+    "emergencyStop": {
+        "button": "紧急停止",
+        "title": "紧急停止 - 暂停所有 Rollouts",
+        "close": "关闭",
+        "cancel": "取消",
+        "confirm": "停止所有 Rollouts",
+        "noRunningRollouts": "没有正在运行的 Rollouts 可暂停",
+        "allPaused": "成功暂停了 {{count}} 个 Rollout(s)",
+        "partialSuccess": "暂停了 {{success}} 个 Rollout(s)，{{error}} 个失败",
+        "warning": "此操作将暂停所有正在运行的 Rollouts",
+        "warningDesc": "所有进行中的部署都将暂停。您可以稍后恢复它们。",
+        "loading": "正在检查运行中的 Rollouts...",
+        "noRollouts": "无运行中的 Rollouts",
+        "noRolloutsDesc": "当前没有正在进行的 Rollouts。",
+        "affectedRollouts": "{{count}} 个运行中的 Rollout(s)",
+        "totalTargets": "{{count}} 个目标",
+        "pausing": "正在暂停...",
+        "paused": "已暂停",
+        "failed": "失败"
     },
-    "messages": {
-        "startSuccess": "发布启动成功",
-        "pauseSuccess": "发布暂停成功",
-        "resumeSuccess": "发布恢复成功",
-        "approveSuccess": "组已批准",
-        "deleteSuccess": "发布删除成功"
+    "approvalPolicy": {
+        "confirmTitle": "需要批准",
+        "matchingRulesDesc": "以下本地批准策略适用：",
+        "proceedConfirm": "确定要继续吗？注意：最终批准要求取决于服务器配置。",
+        "rules": {
+            "target_count": {
+                "title": "已超过目标数量阈值"
+            },
+            "tag": {
+                "title": "包含受限标签"
+            },
+            "target_type": {
+                "title": "包含受限目标类型"
+            },
+            "time_range": {
+                "title": "受限时间范围"
+            }
+        }
     }
 }
