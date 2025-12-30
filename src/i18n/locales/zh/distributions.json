@@ -1,0 +1,79 @@
+{
+    "title": "分发集",
+    "subtitle": "管理软件更新包",
+    "create": {
+        "title": "创建分发集",
+        "name": "名称",
+        "version": "版本",
+        "description": "描述",
+        "type": "类型",
+        "required": "必填",
+        "optional": "可选",
+        "success": "分发集创建成功",
+        "error": "创建分发集失败"
+    },
+    "list": {
+        "title": "分发集列表",
+        "columns": {
+            "name": "名称",
+            "version": "版本",
+            "description": "描述",
+            "type": "类型",
+            "modules": "模块",
+            "createdBy": "创建者",
+            "lastModified": "最后修改",
+            "actions": "操作"
+        },
+        "empty": "未找到分发集"
+    },
+    "detail": {
+        "title": "分发集详情",
+        "modules": "软件模块",
+        "assignedTargets": "已分配目标",
+        "installedTargets": "已安装目标",
+        "artifacts": "构建产物",
+        "meta": "元数据",
+        "delete": "删除分发集",
+        "edit": "编辑分发集",
+        "assign": "分配给目标"
+    },
+    "modules": {
+        "title": "软件模块",
+        "create": "创建模块",
+        "list": "模块列表",
+        "upload": "上传构建产物",
+        "type": "类型",
+        "version": "版本",
+        "vendor": "供应商",
+        "columns": {
+            "name": "名称",
+            "type": "类型",
+            "version": "版本",
+            "vendor": "供应商",
+            "description": "描述"
+        }
+    },
+    "artifacts": {
+        "title": "构建产物",
+        "upload": "上传",
+        "download": "下载",
+        "delete": "删除",
+        "filename": "文件名",
+        "size": "大小",
+        "hash": "哈希 (MD5/SHA1/SHA256)",
+        "hashes": "哈希值"
+    },
+    "verification": {
+        "title": "完整性验证",
+        "complete": "完整",
+        "incomplete": "不完整",
+        "missingArtifacts": "缺少构建产物",
+        "signatureVerified": "签名已验证"
+    },
+    "types": {
+        "os": "操作系统",
+        "app": "应用程序",
+        "firmware": "固件",
+        "container": "容器"
+    }
+}

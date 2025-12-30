@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
+import 'dayjs/locale/zh-cn';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
@@ -17,7 +18,6 @@ import koDashboard from './locales/ko/dashboard.json';
 import koSystem from './locales/ko/system.json';
 import koActions from './locales/ko/actions.json';
 
-
 // English translations
 import enCommon from './locales/en/common.json';
 import enTargets from './locales/en/targets.json';
@@ -27,6 +27,16 @@ import enRollouts from './locales/en/rollouts.json';
 import enDashboard from './locales/en/dashboard.json';
 import enSystem from './locales/en/system.json';
 import enActions from './locales/en/actions.json';
+
+// Chinese translations
+import zhCommon from './locales/zh/common.json';
+import zhTargets from './locales/zh/targets.json';
+import zhAuth from './locales/zh/auth.json';
+import zhDistributions from './locales/zh/distributions.json';
+import zhRollouts from './locales/zh/rollouts.json';
+import zhDashboard from './locales/zh/dashboard.json';
+import zhSystem from './locales/zh/system.json';
+import zhActions from './locales/zh/actions.json';
 
 
 const resources = {
@@ -39,7 +49,6 @@ const resources = {
         dashboard: koDashboard,
         system: koSystem,
         actions: koActions,
-
     },
     en: {
         common: enCommon,
@@ -50,13 +59,26 @@ const resources = {
         dashboard: enDashboard,
         system: enSystem,
         actions: enActions,
-
+    },
+    zh: {
+        common: zhCommon,
+        targets: zhTargets,
+        auth: zhAuth,
+        distributions: zhDistributions,
+        rollouts: zhRollouts,
+        dashboard: zhDashboard,
+        system: zhSystem,
+        actions: zhActions,
     },
 };
 
 // Sync dayjs locale with i18n language
 const syncDayjsLocale = (lng: string) => {
-    dayjs.locale(lng === 'ko' ? 'ko' : 'en');
+    if (lng === 'zh') {
+        dayjs.locale('zh-cn');
+    } else {
+        dayjs.locale(lng === 'ko' ? 'ko' : 'en');
+    }
 };
 
 i18n

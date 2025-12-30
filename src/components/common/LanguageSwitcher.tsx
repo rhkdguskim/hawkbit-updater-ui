@@ -23,6 +23,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
     const languageOptions = [
         { value: 'ko', label: t('languages.ko') },
         { value: 'en', label: t('languages.en') },
+        { value: 'zh', label: t('languages.zh') },
     ];
 
     return (

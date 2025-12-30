@@ -1,0 +1,122 @@
+{
+    "typeManagement": {
+        "title": "类型管理",
+        "description": "管理分发集类型和软件模块类型，以标准化更新包。",
+        "targetTypes": "目标类型",
+        "distributionSetTypes": "分发集类型",
+        "softwareModuleTypes": "软件模块类型",
+        "addType": "添加类型",
+        "deleteSuccess": "类型删除成功。",
+        "deleteError": "删除类型失败。",
+        "deleteConfirmTitle": "删除类型",
+        "deleteConfirmDesc": "您确定要删除此类型吗？此操作无法撤销。",
+        "columns": {
+            "name": "名称",
+            "key": "键",
+            "description": "描述",
+            "colour": "颜色",
+            "lastModified": "最后修改",
+            "maxAssignments": "最大分配数"
+        }
+    },
+    "pageTitle": "系统配置",
+    "subtitle": "管理您的租户设置",
+    "readOnly": "只读",
+    "editMode": "编辑模式",
+    "refresh": "刷新",
+    "edit": "编辑",
+    "save": "保存更改",
+    "cancel": "取消",
+    "saving": "正在保存...",
+    "columns": {
+        "key": "配置键",
+        "value": "值",
+        "description": "描述"
+    },
+    "values": {
+        "enabled": "已启用",
+        "disabled": "已禁用"
+    },
+    "groups": {
+        "pollingConnection": "轮询与连接",
+        "pollingConnectionDesc": "设备通信和连接设置",
+        "authSecurity": "认证与安全",
+        "authSecurityDesc": "安全令牌和认证方法",
+        "rolloutPolicy": "发布策略",
+        "rolloutPolicyDesc": "发布行为和批准设置",
+        "repoMaintenance": "仓库维护",
+        "repoMaintenanceDesc": "操作清理和保留策略",
+        "downloadSettings": "下载设置",
+        "downloadSettingsDesc": "构建产物下载权限",
+        "assignmentSettings": "分配设置",
+        "assignmentSettingsDesc": "目标分配配置",
+        "otherSettings": "其他设置",
+        "otherSettingsDesc": "杂项配置键",
+        "versionInfo": "版本信息",
+        "versionInfoDesc": "应用程序版本和构建信息"
+    },
+    "placeholders": {
+        "array": "值1, 值2, ..."
+    },
+    "descriptions": {
+        "pollingTime": "目标默认轮询间隔 (HH:mm:ss)",
+        "pollingOverdueTime": "目标被视为离线的时间 (HH:mm:ss)",
+        "minPollingTime": "最小允许轮询间隔 (HH:mm:ss)",
+        "authTargetToken": "启用目标令牌认证",
+        "authGatewayToken": "启用网关令牌认证",
+        "authHeader": "启用基于头部的认证",
+        "authHeaderAuthority": "头部授权名称",
+        "authGatewayTokenKey": "网关安全令牌键",
+        "authCertificate": "启用基于证书的认证",
+        "rolloutApproval": "发布需要批准",
+        "rolloutAutostart": "启用自动发布启动",
+        "userConfirmationFlow": "分发集分配需要确认",
+        "actionsAutoclose": "有新分发集分配时自动关闭操作",
+        "maintenanceWindowPollCount": "维护窗口期间的轮询次数",
+        "anonymousDownload": "允许匿名下载构建产物",
+        "multiAssignments": "启用多重分发集分配",
+        "batchAssignments": "启用批量分配",
+        "actionCleanupEnabled": "启用自动操作清理",
+        "actionCleanupExpiry": "清理操作的过期时间 (毫秒)",
+        "actionCleanupStatus": "要清理的操作状态",
+        "implicitLock": "分配时隐式锁定分发集",
+        "appVersion": "当前应用程序版本",
+        "buildTime": "构建时间戳"
+    },
+    "validation": {
+        "invalidTime": "无效的时间格式。请使用 HH:mm:ss",
+        "invalidNumber": "请输入有效的数字",
+        "required": "此字段为必填项"
+    },
+    "messages": {
+        "saveSuccess": "配置保存成功",
+        "saveError": "保存配置失败",
+        "noChanges": "没有更改需要保存"
+    },
+    "errors": {
+        "loadFailed": "加载配置失败",
+        "loadFailedDesc": "无法获取系统配置。请检查您的权限。"
+    },
+    "approvalPolicy": {
+        "title": "批准策略 (本地)",
+        "desc": "定义由 UI 管理层执行的额外批准规则。",
+        "rules": {
+            "target_count": {
+                "title": "目标限制",
+                "desc": "如果目标数量超过阈值，则需要批准"
+            },
+            "tag": {
+                "title": "受限标签",
+                "desc": "如果目标具有特定标签（例如 production），则需要批准"
+            },
+            "target_type": {
+                "title": "受限类型",
+                "desc": "如果目标属于特定类型，则需要批准"
+            },
+            "time_range": {
+                "title": "非工作时间",
+                "desc": "如果发布安排在特定时间窗口内，则需要批准"
+            }
+        }
+    }
+}
