@@ -110,10 +110,6 @@ const CenteredFlex = styled(Flex)`
     flex: 1;
 `;
 
-const ShadowCell = styled(Cell)`
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-`;
-
 const FullWidthBottomRow = styled(BottomRow)`
     display: block;
 `;
@@ -124,11 +120,25 @@ const TargetsOverview: React.FC = () => {
 
     const { data: allTargets, isLoading: targetsLoading, refetch: refetchTargets, dataUpdatedAt } = useGetTargets(
         { limit: 500 },
-        { query: { staleTime: 2000, refetchInterval: 2000 } }
+        {
+            query: {
+                staleTime: 10000,
+                refetchInterval: 10000,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+            },
+        }
     );
     const { data: actionsData, isLoading: actionsLoading, refetch: refetchActions } = useGetActions(
         { limit: 100 },
-        { query: { staleTime: 2000, refetchInterval: 2000 } }
+        {
+            query: {
+                staleTime: 10000,
+                refetchInterval: 10000,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+            },
+        }
     );
     const { data: targetTypesData } = useGetTargetTypes(
         { limit: 100 },
@@ -138,6 +148,17 @@ const TargetsOverview: React.FC = () => {
     const targets = allTargets?.content || [];
     const actions = actionsData?.content || [];
     const totalDevices = allTargets?.total ?? 0;
+    const gridCols = 5;
+    const gridRows = 4;
+    const gridTargetLimit = gridCols * gridRows * 3;
+
+    const gridTargets = useMemo(() => {
+        if (!targets.length) return [];
+        // Keep the device grid light to avoid rendering hundreds of cards on each poll.
+        return [...targets]
+            .sort((a, b) => (b.pollStatus?.lastRequestAt || 0) - (a.pollStatus?.lastRequestAt || 0))
+            .slice(0, gridTargetLimit);
+    }, [targets, gridTargetLimit]);
     const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';
     const isLoading = targetsLoading || actionsLoading;
 
@@ -364,7 +385,11 @@ const TargetsOverview: React.FC = () => {
                                         <PieChart>
                                             <Pie data={connectivityPieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
                                                 {connectivityPieData.map((entry, index) => (
-                                                    <ShadowCell key={`cell-${index}`} fill={entry.color} />
+                                                    <Cell
+                                                        key={`cell-${index}`}
+                                                        fill={entry.color}
+                                                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                                                    />
                                                 ))}
                                             </Pie>
                                             <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
@@ -402,7 +427,11 @@ const TargetsOverview: React.FC = () => {
                                         <PieChart>
                                             <Pie data={targetTypePieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
                                                 {targetTypePieData.map((entry, index) => (
-                                                    <ShadowCell key={`cell-${index}`} fill={entry.color} />
+                                                    <Cell
+                                                        key={`cell-${index}`}
+                                                        fill={entry.color}
+                                                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                                                    />
                                                 ))}
                                             </Pie>
                                             <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
@@ -440,7 +469,11 @@ const TargetsOverview: React.FC = () => {
                                         <PieChart>
                                             <Pie data={updateStatusPieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
                                                 {updateStatusPieData.map((entry, index) => (
-                                                    <ShadowCell key={`cell-${index}`} fill={entry.color} />
+                                                    <Cell
+                                                        key={`cell-${index}`}
+                                                        fill={entry.color}
+                                                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                                                    />
                                                 ))}
                                             </Pie>
                                             <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
@@ -460,13 +493,13 @@ const TargetsOverview: React.FC = () => {
                 {/* Bottom Row: Device Grid (Full Width) */}
                 <FullWidthBottomRow>
                     <DeviceCardGrid
-                        targets={targets}
+                        targets={gridTargets}
                         actions={actions}
                         loading={isLoading}
                         title={t('overview.deviceGrid', 'Device Status Grid')}
                         delay={7}
-                        cols={5}
-                        rows={4}
+                        cols={gridCols}
+                        rows={gridRows}
                         gap={8}
                         rowHeight={90}
                         targetTypeColorMap={targetTypeColorMap}

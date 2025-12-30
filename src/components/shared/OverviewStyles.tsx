@@ -299,15 +299,27 @@ export const IconBadge = styled.div<{ $theme?: keyof typeof OVERVIEW_THEMES; $co
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: ${props => {
+        const theme = props.$theme ? OVERVIEW_THEMES[props.$theme] : null;
+        return theme?.color || 'var(--ant-color-primary, #3b82f6)';
+    }};
     background: ${props => {
         if (props.$color) return props.$color;
         const theme = props.$theme ? OVERVIEW_THEMES[props.$theme] : null;
         return theme?.iconBg || 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
     }};
-    color: white;
+    color: var(--ant-color-text-light-solid, #fff);
     font-size: 1.1rem;
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
     box-shadow: var(--shadow-sm);
     flex-shrink: 0;
+
+    .anticon,
+    svg {
+        color: inherit;
+        display: block;
+    }
 `;
 
 export const BigNumber = styled.div<{ $color?: string }>`

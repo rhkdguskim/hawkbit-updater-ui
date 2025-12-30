@@ -14,10 +14,9 @@ import {
     UpOutlined,
 } from '@ant-design/icons';
 import { useGetAction1 } from '@/api/generated/actions/actions';
-import { useGetActionStatus } from '@/hooks/useActionStatus';
+import { useGetActionStatusList } from '@/api/generated/targets/targets';
 import type { MgmtAction } from '@/api/generated/model';
 import { ActionTimeline } from './ActionTimeline';
-import { StatusTag } from './StatusTag';
 
 dayjs.extend(relativeTime);
 
@@ -181,32 +180,6 @@ const PopoverContainer = styled.div`
     overflow: auto;
 `;
 
-const DetailList = styled.div`
-    display: grid;
-    grid-template-columns: 110px 1fr;
-    gap: var(--ant-margin-xxs, 4px) var(--ant-margin-sm, 12px);
-    align-items: center;
-`;
-
-const DetailLabel = styled(Text)`
-    && {
-        font-size: var(--ant-font-size-sm);
-        color: var(--ant-color-text-secondary);
-    }
-`;
-
-const DetailValue = styled.div`
-    font-size: var(--ant-font-size-sm);
-    color: var(--ant-color-text);
-    min-width: 0;
-`;
-
-const DetailValueText = styled(Text)`
-    && {
-        font-size: var(--ant-font-size-sm);
-    }
-`;
-
 const PopoverHeader = styled(Text)`
     && {
         font-size: var(--ant-font-size-sm);
@@ -349,46 +322,41 @@ const ActiveUpdateRowComponent: React.FC<{
     const status = displayAction.status?.toLowerCase() || '';
     const showPopover = ['running', 'pending', 'scheduled', 'retrieving', 'retrieved', 'downloading'].includes(status);
 
+    const targetLink = (displayAction._links as any)?.target;
+    const targetId = item.controllerId || targetLink?.href?.split('/')?.pop();
+
     // Fetch granular status history on hover
-    const { data: statusData } = useGetActionStatus(
+    const { data: statusData } = useGetActionStatusList(
+        targetId || '',
         item.action.id!,
+        { limit: 10 },
         {
             query: {
-                enabled: !!item.action.id && popoverOpen && showPopover,
+                enabled: !!targetId && !!item.action.id && popoverOpen && showPopover,
                 staleTime: 5000 // Cache for 5s
             }
         }
     );
 
-    // Prioritize messages fetched from status endpoint, fallback to action messages if any
-    const messages = (statusData?.messages || (displayAction as any).messages) as string[] | undefined;
-    const lastMessage = messages && messages.length > 0 ? messages[messages.length - 1] : undefined;
+    const statusHistory = (statusData?.content || []).slice().sort((a, b) => {
+        const aTime = a.reportedAt || a.timestamp || 0;
+        const bTime = b.reportedAt || b.timestamp || 0;
+        return bTime - aTime;
+    });
+
+    const historyMessages = statusHistory.flatMap((entry) => entry.messages || []);
+    const fallbackMessages = (displayAction as any).messages as string[] | undefined;
+    const messages = historyMessages.length > 0 ? historyMessages : fallbackMessages;
+    const lastMessage = historyMessages.length > 0
+        ? historyMessages[0]
+        : messages && messages.length > 0 ? messages[messages.length - 1] : undefined;
     const displayStatus = lastMessage || displayAction.detailStatus || status;
-
-    const formatTimestamp = (value?: number) => (
-        value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'
-    );
-
-    const getActionTypeLabel = (type?: string) => {
-        if (!type) return '-';
-        const key = type.toLowerCase();
-        return t(`actions:typeLabels.${key}`, { defaultValue: type.toUpperCase() });
-    };
-
-    const getForceTypeLabel = (forceType?: string) => {
-        if (!forceType) return '-';
-        const key = forceType.toLowerCase();
-        return t(`actions:forceTypes.${key}`, { defaultValue: forceType.toUpperCase() });
-    };
-
-    const targetLink = (displayAction._links as any)?.target;
-    const targetId = targetLink?.href?.split('/')?.pop();
-    const targetLabel = item.targetName
-        ? item.controllerId ? `${item.targetName} (${item.controllerId})` : item.targetName
-        : item.controllerId || targetLink?.name || targetId || '-';
-
-    const dsLink = (displayAction._links as any)?.distributionset || (displayAction._links as any)?.distributionSet;
-    const dsLabel = dsLink?.name || dsLink?.title || dsLink?.href?.split('/')?.pop() || '-';
+    const statusLabel = status
+        ? t(`common:status.${status}`, { defaultValue: status })
+        : '-';
+    const resolvedStatus = displayStatus && displayStatus.toLowerCase() === status
+        ? statusLabel
+        : displayStatus || statusLabel;
 
     // Handle completion animation
     useEffect(() => {
@@ -448,65 +416,38 @@ const ActiveUpdateRowComponent: React.FC<{
     // Calculate progress if available
     const progress = (displayAction as any).progress as number | undefined;
 
-    const detailRows: { label: string; value: React.ReactNode }[] = [
-        {
-            label: t('actions:detail.labels.id'),
-            value: <DetailValueText>{displayAction.id ? `#${displayAction.id}` : '-'}</DetailValueText>,
-        },
-        {
-            label: t('actions:detail.labels.status'),
-            value: displayAction.status ? <StatusTag status={displayAction.status} showIcon /> : <DetailValueText type="secondary">-</DetailValueText>,
-        },
-        {
-            label: t('actions:detail.labels.detailStatus'),
-            value: <DetailValueText type="secondary">{displayStatus || '-'}</DetailValueText>,
-        },
-        {
-            label: t('actions:detail.labels.type'),
-            value: <DetailValueText>{getActionTypeLabel(displayAction.type)}</DetailValueText>,
-        },
-        ...(displayAction.forceType ? [{
-            label: t('actions:detail.labels.forceType'),
-            value: <DetailValueText>{getForceTypeLabel(displayAction.forceType)}</DetailValueText>,
-        }] : []),
-        {
-            label: t('actions:detail.labels.target'),
-            value: <DetailValueText>{targetLabel}</DetailValueText>,
-        },
-        {
-            label: t('actions:detail.labels.distributionSet'),
-            value: <DetailValueText>{dsLabel}</DetailValueText>,
-        },
-        {
-            label: t('actions:detail.labels.createdAt'),
-            value: <DetailValueText>{formatTimestamp(displayAction.createdAt)}</DetailValueText>,
-        },
-        {
-            label: t('actions:detail.labels.lastModified'),
-            value: <DetailValueText>{formatTimestamp(displayAction.lastModifiedAt)}</DetailValueText>,
-        },
-    ];
-
-    // Popover content for hover - action detail summary + status history
+    // Popover content for hover - status history only
     const popoverContent = (
         <PopoverContainer>
             <Flex vertical gap={8}>
                 <PopoverHeader strong>
-                    {t('actions:detail.pageTitle')}
+                    {t('activeUpdates.statusHistory')}
                 </PopoverHeader>
-                <DetailList>
-                    {detailRows.map((row) => (
-                        <React.Fragment key={row.label}>
-                            <DetailLabel>{row.label}</DetailLabel>
-                            <DetailValue>{row.value}</DetailValue>
-                        </React.Fragment>
-                    ))}
-                </DetailList>
-                {showHistory && messages && messages.length > 0 && (
+                {showHistory && statusHistory.length > 0 ? (
                     <Flex vertical gap={4}>
-                        <PopoverHeader strong>
-                            {t('activeUpdates.statusHistory')}
-                        </PopoverHeader>
+                        {statusHistory.slice(0, 6).map((entry, idx) => {
+                            const statusKey = entry.type?.toLowerCase() || 'unknown';
+                            const statusLabelText = t(`common:status.${statusKey}`, { defaultValue: entry.type || '-' });
+                            const messageText = entry.messages?.[0] || statusLabelText;
+                            return (
+                                <PopoverRow key={`${entry.id ?? idx}`} gap={8} align="flex-start" $withDivider={idx < 5 && idx < statusHistory.length - 1}>
+                                    <PopoverTag color={idx === 0 ? 'blue' : 'default'}>
+                                        {statusLabelText}
+                                    </PopoverTag>
+                                    <PopoverMessage type={idx === 0 ? undefined : 'secondary'}>
+                                        {messageText}
+                                    </PopoverMessage>
+                                </PopoverRow>
+                            );
+                        })}
+                        {statusHistory.length > 6 && (
+                            <PopoverMore type="secondary">
+                                +{statusHistory.length - 6} {t('common:more')}...
+                            </PopoverMore>
+                        )}
+                    </Flex>
+                ) : showHistory && messages && messages.length > 0 ? (
+                    <Flex vertical gap={4}>
                         {messages.slice().reverse().slice(0, 6).map((msg: string, idx: number) => (
                             <PopoverRow key={idx} gap={8} align="flex-start" $withDivider={idx < 5 && idx < messages.length - 1}>
                                 <PopoverTag color={idx === 0 ? 'blue' : 'default'}>
@@ -523,6 +464,10 @@ const ActiveUpdateRowComponent: React.FC<{
                             </PopoverMore>
                         )}
                     </Flex>
+                ) : (
+                    <Text type="secondary">
+                        {t('activeUpdates.noHistory')}
+                    </Text>
                 )}
             </Flex>
         </PopoverContainer>
@@ -546,7 +491,7 @@ const ActiveUpdateRowComponent: React.FC<{
                         </Flex>
                         <Flex align="center" gap={6}>
                             <StatusText type="secondary">
-                                {displayStatus}
+                                {resolvedStatus}
                             </StatusText>
                         </Flex>
                     </RowMeta>

@@ -41,7 +41,7 @@
         "errorStopped": "오류/중지",
         "createRollout": "롤아웃 생성",
         "viewAll": "전체 보기",
-        "statusDistribution": "상태 분포",
+        "statusDistribution": "롤아웃 상태 분포",
         "activeRollouts": "활성 롤아웃",
         "noRollouts": "롤아웃이 없습니다",
         "noActiveRollouts": "활성 롤아웃이 없습니다",

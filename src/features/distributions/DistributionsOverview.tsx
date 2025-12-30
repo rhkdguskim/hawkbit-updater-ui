@@ -17,6 +17,7 @@ import { useGetDistributionSets } from '@/api/generated/distribution-sets/distri
 import { useGetSoftwareModules } from '@/api/generated/software-modules/software-modules';
 import { useGetDistributionSetTags } from '@/api/generated/distribution-set-tags/distribution-set-tags';
 import { useGetDistributionSetTypes } from '@/api/generated/distribution-set-types/distribution-set-types';
+import { useGetTypes } from '@/api/generated/software-module-types/software-module-types';
 import { AirportSlideList } from '@/components/common';
 import type { MgmtDistributionSet, MgmtSoftwareModule } from '@/api/generated/model';
 import { PageLayout, PageHeader } from '@/components/patterns';
@@ -50,30 +51,88 @@ const DistributionsOverview: React.FC = () => {
     const { data: setsData, isLoading: setsLoading, refetch: refetchSets, dataUpdatedAt } = useGetDistributionSets({ limit: 500 });
     const { data: modulesData, isLoading: modulesLoading, refetch: refetchModules } = useGetSoftwareModules({ limit: 500 });
     const { data: tagsData, isLoading: tagsLoading, refetch: refetchTags } = useGetDistributionSetTags({ limit: 100 });
-    const { data: typesData, isLoading: typesLoading, refetch: refetchTypes } = useGetDistributionSetTypes({ limit: 100 });
+    const { data: distributionTypesData, isLoading: distributionTypesLoading, refetch: refetchDistributionTypes } = useGetDistributionSetTypes({ limit: 100 });
+    const { data: moduleTypesData, isLoading: moduleTypesLoading, refetch: refetchModuleTypes } = useGetTypes({ limit: 100 });
 
-    const isLoading = setsLoading || modulesLoading || tagsLoading || typesLoading;
-    const refetch = () => { refetchSets(); refetchModules(); refetchTags(); refetchTypes(); };
+    const isLoading = setsLoading || modulesLoading || tagsLoading || distributionTypesLoading || moduleTypesLoading;
+    const refetch = () => { refetchSets(); refetchModules(); refetchTags(); refetchDistributionTypes(); refetchModuleTypes(); };
     const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';
 
     const setsCount = setsData?.total ?? 0;
     const modulesCount = modulesData?.total ?? 0;
     const tagsCount = tagsData?.total ?? 0;
-    const typesCount = typesData?.total ?? 0;
+    const typesCount = distributionTypesData?.total ?? 0;
+
+    const typeColorMap = React.useMemo(() => {
+        const map = new Map<string, string>();
+        distributionTypesData?.content?.forEach(type => {
+            if (type?.name && type?.colour) {
+                map.set(type.name, type.colour);
+            }
+        });
+        return map;
+    }, [distributionTypesData]);
+
+    const moduleTypeColorMap = React.useMemo(() => {
+        const map = new Map<string, string>();
+        moduleTypesData?.content?.forEach(type => {
+            if (!type?.colour) return;
+            if (type.name) map.set(type.name, type.colour);
+            if (type.key) map.set(type.key, type.colour);
+        });
+        return map;
+    }, [moduleTypesData]);
 
     // Distribution by type for pie chart
     const typeDistribution = React.useMemo(() => {
-        const counts: Record<string, number> = {};
+        const counts = new Map<string, number>();
+        const unknownLabel = t('common:status.unknown');
+
         setsData?.content?.forEach(ds => {
-            const typeName = ds.typeName || t('common:status.unknown');
-            counts[typeName] = (counts[typeName] || 0) + 1;
+            const typeName = ds.typeName || unknownLabel;
+            counts.set(typeName, (counts.get(typeName) || 0) + 1);
         });
-        return Object.entries(counts).map(([name, value], index) => ({
-            name,
-            value,
-            color: PIE_COLORS[index % PIE_COLORS.length],
-        }));
-    }, [setsData, t]);
+
+        let fallbackIndex = 0;
+        return Array.from(counts.entries()).map(([name, value]) => {
+            const mappedColor = typeColorMap.get(name);
+            let color = mappedColor;
+
+            if (!color) {
+                color = name === unknownLabel
+                    ? COLORS.unknown
+                    : PIE_COLORS[fallbackIndex % PIE_COLORS.length];
+                fallbackIndex += 1;
+            }
+
+            return { name, value, color };
+        });
+    }, [setsData, t, typeColorMap]);
+
+    const moduleTypeDistribution = React.useMemo(() => {
+        const counts = new Map<string, number>();
+        const unknownLabel = t('common:status.unknown');
+
+        modulesData?.content?.forEach(module => {
+            const typeName = module.typeName || module.type || unknownLabel;
+            counts.set(typeName, (counts.get(typeName) || 0) + 1);
+        });
+
+        let fallbackIndex = 0;
+        return Array.from(counts.entries()).map(([name, value]) => {
+            const mappedColor = moduleTypeColorMap.get(name);
+            let color = mappedColor;
+
+            if (!color) {
+                color = name === unknownLabel
+                    ? COLORS.unknown
+                    : PIE_COLORS[fallbackIndex % PIE_COLORS.length];
+                fallbackIndex += 1;
+            }
+
+            return { name, value, color };
+        });
+    }, [modulesData, t, moduleTypeColorMap]);
 
     // Completeness distribution
     const completenessData = React.useMemo(() => {
@@ -146,7 +205,7 @@ const DistributionsOverview: React.FC = () => {
             />
 
             <OverviewScrollContent>
-                {/* Top Row: KPI Cards + 2 Pie Charts */}
+                {/* Top Row: KPI Cards + 3 Pie Charts */}
                 <TopRow>
                     <KPIGridContainer>
                         <OverviewStatsCard
@@ -262,6 +321,44 @@ const DistributionsOverview: React.FC = () => {
                             $theme="distributions"
                             title={
                                 <Flex align="center" gap={10}>
+                                    <IconBadge $color="linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)">
+                                        <CodeOutlined />
+                                    </IconBadge>
+                                    <Flex vertical gap={0}>
+                                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.softwareByType', 'Software by Type')}</span>
+                                        <Text type="secondary" style={{ fontSize: 11 }}>{t('overview.modulesCount', { count: modulesCount })}</Text>
+                                    </Flex>
+                                </Flex>
+                            }
+                            $delay={6}
+                        >
+                            {isLoading ? (
+                                <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
+                            ) : moduleTypeDistribution.length > 0 ? (
+                                <Flex vertical style={{ flex: 1 }}>
+                                    <ResponsiveContainer width="100%" height={100}>
+                                        <PieChart>
+                                            <Pie data={moduleTypeDistribution} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
+                                                {moduleTypeDistribution.map((entry, index) => (
+                                                    <Cell key={`module-cell-${index}`} fill={entry.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+                                                ))}
+                                            </Pie>
+                                            <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                    {renderCustomLegend(moduleTypeDistribution.slice(0, 3))}
+                                </Flex>
+                            ) : (
+                                <Flex justify="center" align="center" style={{ flex: 1 }}>
+                                    <Text type="secondary">{t('common:messages.noData')}</Text>
+                                </Flex>
+                            )}
+                        </OverviewChartCard>
+
+                        <OverviewChartCard
+                            $theme="distributions"
+                            title={
+                                <Flex align="center" gap={10}>
                                     <IconBadge $color="linear-gradient(135deg, #10b981 0%, #34d399 100%)">
                                         <AppstoreOutlined />
                                     </IconBadge>
@@ -271,7 +368,7 @@ const DistributionsOverview: React.FC = () => {
                                     </Flex>
                                 </Flex>
                             }
-                            $delay={6}
+                            $delay={7}
                         >
                             {isLoading ? (
                                 <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
@@ -313,7 +410,7 @@ const DistributionsOverview: React.FC = () => {
                                 </Flex>
                             </Flex>
                         }
-                        $delay={7}
+                        $delay={8}
                     >
                         {isLoading ? (
                             <Skeleton active paragraph={{ rows: 5 }} />
@@ -375,7 +472,7 @@ const DistributionsOverview: React.FC = () => {
                                 </Flex>
                             </Flex>
                         }
-                        $delay={8}
+                        $delay={9}
                     >
                         {isLoading ? (
                             <Skeleton active paragraph={{ rows: 5 }} />

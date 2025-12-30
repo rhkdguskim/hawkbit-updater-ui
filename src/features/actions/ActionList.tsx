@@ -321,8 +321,11 @@ const ActionList: React.FC = () => {
                                         { targetId, actionId: record.id },
                                         {
                                             onSuccess: () => {
-                                                message.success(t('messages.cancelSuccess'));
+                                                message.success(t('detail.messages.cancelSuccess'));
                                                 refetch();
+                                            },
+                                            onError: () => {
+                                                message.error(t('detail.messages.cancelError'));
                                             },
                                         }
                                     );

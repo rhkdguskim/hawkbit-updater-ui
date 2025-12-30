@@ -285,7 +285,9 @@ textarea {
 }
 
 .ant-btn-primary {
-    background: var(--gradient-primary);
+    background-color: var(--ant-color-primary, #5E5CE6);
+    background-image: var(--gradient-primary);
+    color: var(--ant-color-text-light-solid, #fff);
     border: none;
 }
 
@@ -296,6 +298,14 @@ textarea {
 
 .ant-btn-primary:active {
     transform: translateY(0);
+}
+
+.ant-btn-primary:disabled,
+.ant-btn-primary[disabled] {
+    background-color: var(--ant-color-bg-container-disabled, #f5f5f5);
+    background-image: none;
+    color: var(--ant-color-text-disabled, #bfbfbf);
+    box-shadow: none;
 }
 
 .ant-btn-dashed {

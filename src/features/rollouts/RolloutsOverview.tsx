@@ -3,13 +3,14 @@ import { Typography, Button, Flex, Skeleton, Progress, Tag } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-    RocketOutlined,
+    AppstoreOutlined,
     PlayCircleOutlined,
     CheckCircleOutlined,
     PlusOutlined,
     ClockCircleOutlined,
     ReloadOutlined,
     PauseCircleOutlined,
+    RocketOutlined,
     ThunderboltOutlined,
     SyncOutlined,
 } from '@ant-design/icons';
@@ -220,10 +221,6 @@ const StatusIcon = styled.span<{ $color: string }>`
     color: ${props => props.$color};
 `;
 
-const ShadowCell = styled(Cell)`
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-`;
-
 const statusColorMap: Record<string, string> = {
     running: 'blue',
     ready: 'cyan',
@@ -406,7 +403,7 @@ const RolloutsOverview: React.FC = () => {
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
                                     <IconBadge $theme="rollouts">
-                                        <RocketOutlined />
+                                        <AppstoreOutlined />
                                     </IconBadge>
                                     <BigNumber $color={COLORS.rollouts}>{totalRollouts}</BigNumber>
                                     <StatCaption type="secondary">
@@ -426,7 +423,7 @@ const RolloutsOverview: React.FC = () => {
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
                                     <IconBadge $color="var(--gradient-info)">
-                                        <PlayCircleOutlined />
+                                        <RocketOutlined />
                                     </IconBadge>
                                     <BigNumber $color={ROLLOUT_COLORS.running}>{runningRollouts}</BigNumber>
                                     <StatCaption type="secondary">
@@ -487,7 +484,7 @@ const RolloutsOverview: React.FC = () => {
                             title={
                                 <Flex align="center" gap={10}>
                                     <IconBadge $theme="rollouts">
-                                        <RocketOutlined />
+                                        <PlayCircleOutlined />
                                     </IconBadge>
                                     <Flex vertical gap={0}>
                                         <ChartTitle>{t('overview.statusDistribution', 'Rollout Status')}</ChartTitle>
@@ -505,7 +502,11 @@ const RolloutsOverview: React.FC = () => {
                                         <PieChart>
                                             <Pie data={rolloutPieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
                                                 {rolloutPieData.map((entry, index) => (
-                                                    <ShadowCell key={`rollout-cell-${index}`} fill={entry.color} />
+                                                    <Cell
+                                                        key={`rollout-cell-${index}`}
+                                                        fill={entry.color}
+                                                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                                                    />
                                                 ))}
                                             </Pie>
                                             <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
@@ -544,7 +545,11 @@ const RolloutsOverview: React.FC = () => {
                                         <PieChart>
                                             <Pie data={actionPieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
                                                 {actionPieData.map((entry, index) => (
-                                                    <ShadowCell key={`action-cell-${index}`} fill={entry.color} />
+                                                    <Cell
+                                                        key={`action-cell-${index}`}
+                                                        fill={entry.color}
+                                                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                                                    />
                                                 ))}
                                             </Pie>
                                             <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />

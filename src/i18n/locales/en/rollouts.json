@@ -40,7 +40,7 @@
         "errorStopped": "Error/Stopped",
         "createRollout": "Create Rollout",
         "viewAll": "View All",
-        "statusDistribution": "Status Distribution",
+        "statusDistribution": "Rollout Status Distribution",
         "activeRollouts": "Active Rollouts",
         "noRollouts": "No rollouts yet",
         "noActiveRollouts": "No active rollouts",

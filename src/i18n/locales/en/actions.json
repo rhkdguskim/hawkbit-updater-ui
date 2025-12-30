@@ -27,7 +27,8 @@
         "update": "Update",
         "download_only": "Download Only",
         "download": "Download",
-        "install": "Install"
+        "install": "Install",
+        "cancel": "Cancel"
     },
     "filter": {
         "searchPlaceholder": "Search by target...",
@@ -147,7 +148,7 @@
         "subtitle": "Deployment actions and status overview",
         "totalActions": "Total Actions",
         "successRate": "Success Rate",
-        "statusDistribution": "Status Distribution",
+        "statusDistribution": "Action Status Distribution",
         "activeSummary": "Active Summary",
         "activeActions": "Active Actions",
         "recentActions": "Recent Actions (24h)",

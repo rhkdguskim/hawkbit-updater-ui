@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import NProgress from 'nprogress';
 import { Spin } from 'antd';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 // Configure NProgress
 NProgress.configure({
@@ -46,7 +47,10 @@ interface RouteLoaderProps {
     tip?: string;
 }
 
-const RouteLoader: React.FC<RouteLoaderProps> = ({ fullScreen = false, tip = "Loading..." }) => {
+const RouteLoader: React.FC<RouteLoaderProps> = ({ fullScreen = false, tip }) => {
+    const { t } = useTranslation('common');
+    const displayTip = tip ?? t('messages.loading');
+
     useEffect(() => {
         NProgress.start();
 
@@ -58,7 +62,7 @@ const RouteLoader: React.FC<RouteLoaderProps> = ({ fullScreen = false, tip = "Lo
     return (
         <LoaderContainer $fullScreen={fullScreen}>
             <StyledSpin size="large" />
-            {tip && <LoadingText>{tip}</LoadingText>}
+            {displayTip && <LoadingText>{displayTip}</LoadingText>}
         </LoaderContainer>
     );
 };

@@ -27,7 +27,8 @@
         "update": "업데이트",
         "download_only": "다운로드 전용",
         "download": "다운로드",
-        "install": "설치"
+        "install": "설치",
+        "cancel": "취소"
     },
     "filter": {
         "searchPlaceholder": "대상으로 검색...",
@@ -147,7 +148,7 @@
         "subtitle": "배포 작업 및 상태 개요",
         "totalActions": "전체 작업",
         "successRate": "성공률",
-        "statusDistribution": "상태 분포",
+        "statusDistribution": "액션 상태 분포",
         "activeSummary": "활성 요약",
         "activeActions": "진행 중인 작업",
         "recentActions": "최근 작업 (24시간)",

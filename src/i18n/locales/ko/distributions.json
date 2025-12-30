@@ -14,6 +14,8 @@
         "tags": "태그",
         "types": "유형",
         "distributionByType": "유형별 배포",
+        "softwareByType": "유형별 소프트웨어",
+        "modulesCount": "{{count}}개 모듈",
         "recentSets": "최근 배포 세트",
         "recentModules": "최근 소프트웨어 모듈",
         "total": "총",

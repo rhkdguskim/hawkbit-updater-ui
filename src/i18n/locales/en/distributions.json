@@ -14,6 +14,8 @@
         "tags": "Tags",
         "types": "Types",
         "distributionByType": "Distribution by Type",
+        "softwareByType": "Software by Type",
+        "modulesCount": "{{count}} modules",
         "recentSets": "Recent Distribution Sets",
         "recentModules": "Recent Software Modules",
         "total": "total",
