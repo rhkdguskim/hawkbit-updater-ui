@@ -51,7 +51,10 @@
         "reset": "초기화",
         "apply": "적용",
         "view": "보기",
-        "assign": "할당"
+        "assign": "할당",
+        "select": "선택",
+        "import": "가져오기",
+        "export": "내보내기"
     },
     "status": {
         "online": "온라인",
@@ -140,6 +143,10 @@
         "account": "계정",
         "logout": "로그아웃"
     },
+    "languages": {
+        "ko": "🇰🇷 한국어",
+        "en": "🇺🇸 English"
+    },
     "pagination": {
         "total": "전체 {{total}}개 중 {{from}}-{{to}}",
         "itemsPerPage": "페이지당 항목"
@@ -175,7 +182,15 @@
         "sameDay": "같은 날",
         "selected": "개 선택됨",
         "selectField": "필드 선택",
-        "condition": "조건"
+        "condition": "조건",
+        "operators": {
+            "equals": "=",
+            "notEquals": "≠",
+            "gt": ">",
+            "gte": "≥",
+            "lt": "<",
+            "lte": "≤"
+        }
     },
     "yes": "예",
     "no": "아니오",

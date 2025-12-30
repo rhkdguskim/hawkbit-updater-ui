@@ -339,6 +339,10 @@
         "apply": "Apply",
         "close": "Close",
         "empty": "No saved filters",
+        "untitled": "Untitled",
+        "totalCount": "{{count}} saved filters",
+        "manage": "Manage",
+        "quickAccess": "Saved Filters",
         "active": "Saved filter applied: {{name}}",
         "clear": "Clear",
         "createTitle": "Create Saved Filter",
@@ -388,5 +392,20 @@
                 "actionType": "Action Type is required."
             }
         }
+    },
+    "filterPreview": {
+        "title": "Filter Preview",
+        "loading": "Analyzing filter...",
+        "highWarning": "Large Scale Operation",
+        "highWarningDesc": "This filter affects {{count}} targets. Please review carefully.",
+        "mediumWarning": "Moderate Scale",
+        "mediumWarningDesc": "This filter affects {{count}} targets.",
+        "safeOperation": "Safe Operation",
+        "safeOperationDesc": "This filter affects {{count}} targets.",
+        "affectedTargets": "Affected Targets",
+        "query": "Query:",
+        "cancel": "Cancel",
+        "confirm": "Apply Filter",
+        "confirmAnyway": "Apply Anyway"
     }
 }

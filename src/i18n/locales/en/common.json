@@ -51,7 +51,10 @@
         "reset": "Reset",
         "apply": "Apply",
         "view": "View",
-        "assign": "Assign"
+        "assign": "Assign",
+        "select": "Select",
+        "import": "Import",
+        "export": "Export"
     },
     "status": {
         "online": "Online",
@@ -140,6 +143,10 @@
         "account": "Account",
         "logout": "Logout"
     },
+    "languages": {
+        "ko": "🇰🇷 한국어",
+        "en": "🇺🇸 English"
+    },
     "pagination": {
         "total": "{{from}}-{{to}} of {{total}}",
         "itemsPerPage": "Items per page"
@@ -175,7 +182,15 @@
         "sameDay": "the same day",
         "selected": "selected",
         "selectField": "Select Field",
-        "condition": "Condition"
+        "condition": "Condition",
+        "operators": {
+            "equals": "=",
+            "notEquals": "≠",
+            "gt": ">",
+            "gte": "≥",
+            "lt": "<",
+            "lte": "≤"
+        }
     },
     "yes": "Yes",
     "no": "No",

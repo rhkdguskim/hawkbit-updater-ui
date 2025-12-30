@@ -67,11 +67,11 @@ const ActionList: React.FC = () => {
             label: t('columns.status'),
             type: 'select',
             options: [
-                { value: 'running', label: 'Running' },
-                { value: 'pending', label: 'Pending' },
-                { value: 'finished', label: 'Finished' },
-                { value: 'error', label: 'Error' },
-                { value: 'canceled', label: 'Canceled' },
+                { value: 'running', label: t('common:status.running') },
+                { value: 'pending', label: t('common:status.pending') },
+                { value: 'finished', label: t('common:status.finished') },
+                { value: 'error', label: t('common:status.error') },
+                { value: 'canceled', label: t('common:status.canceled') },
             ],
         },
         {
@@ -79,9 +79,9 @@ const ActionList: React.FC = () => {
             label: t('columns.type'),
             type: 'select',
             options: [
-                { value: 'update', label: 'Update' },
-                { value: 'forced', label: 'Forced' },
-                { value: 'download_only', label: 'Download Only' },
+                { value: 'update', label: t('typeLabels.update') },
+                { value: 'forced', label: t('typeLabels.forced') },
+                { value: 'download_only', label: t('typeLabels.download_only') },
             ],
         },
     ], [t]);

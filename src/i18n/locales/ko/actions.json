@@ -24,6 +24,8 @@
     "typeLabels": {
         "forced": "강제",
         "soft": "소프트",
+        "update": "업데이트",
+        "download_only": "다운로드 전용",
         "download": "다운로드",
         "install": "설치"
     },
@@ -73,7 +75,8 @@
         "system": "시스템"
     },
     "actions": {
-        "view": "보기",
+        "view": "상세 보기",
+        "cancel": "취소",
         "addAction": "액션 추가",
         "addActionComingSoon": "액션 생성 기능은 곧 제공됩니다."
     },

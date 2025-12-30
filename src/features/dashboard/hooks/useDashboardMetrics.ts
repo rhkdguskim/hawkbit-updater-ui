@@ -158,7 +158,7 @@ export const useDashboardMetrics = () => {
             };
 
             // Use the ACTUAL detailStatus from the action - this contains real messages like
-            // "Disabling service recovery", "업데이트 프로세스 시작", etc.
+            // "Disabling service recovery", "Starting update process" (e.g. "업데이트 프로세스 시작"), etc.
             return {
                 target,
                 action: {

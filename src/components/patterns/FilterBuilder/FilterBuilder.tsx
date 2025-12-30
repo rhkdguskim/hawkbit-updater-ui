@@ -93,17 +93,17 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     const [pendingFilters, setPendingFilters] = useState<FilterValue[] | null>(null);
 
     const operatorLabels: Record<string, string> = {
-        contains: t('filter.contains'),
-        equals: '=',
-        notEquals: '≠',
-        startsWith: t('filter.startsWith'),
-        endsWith: t('filter.endsWith'),
-        gt: '>',
-        gte: '≥',
-        lt: '<',
-        lte: '≤',
-        before: t('filter.before'),
-        after: t('filter.after'),
+        'equals': t('filter.operators.equals', { defaultValue: '=' }),
+        'notEquals': t('filter.operators.notEquals', { defaultValue: '≠' }),
+        'greaterThan': t('filter.operators.gt', { defaultValue: '>' }),
+        'greaterThanOrEquals': t('filter.operators.gte', { defaultValue: '≥' }),
+        'lessThan': t('filter.operators.lt', { defaultValue: '<' }),
+        'lessThanOrEquals': t('filter.operators.lte', { defaultValue: '≤' }),
+        'contains': t('filter.contains', { defaultValue: 'contains' }),
+        'startsWith': t('filter.startsWith', { defaultValue: 'starts with' }),
+        'endsWith': t('filter.endsWith', { defaultValue: 'ends with' }),
+        'before': t('filter.before', { defaultValue: 'before' }),
+        'after': t('filter.after', { defaultValue: 'after' }),
     };
 
     const handleAddFilter = useCallback((condition: FilterConditionValue) => {

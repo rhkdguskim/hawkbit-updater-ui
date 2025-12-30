@@ -40,11 +40,11 @@ const textOperators: FilterOperator[] = [
 ];
 
 const numberOperators: FilterOperator[] = [
-    { value: 'equals', label: '=' },
-    { value: 'gt', label: '>' },
-    { value: 'gte', label: '>=' },
-    { value: 'lt', label: '<' },
-    { value: 'lte', label: '<=' },
+    { value: 'equals', label: 'filter.operators.equals' },
+    { value: 'gt', label: 'filter.operators.gt' },
+    { value: 'gte', label: 'filter.operators.gte' },
+    { value: 'lt', label: 'filter.operators.lt' },
+    { value: 'lte', label: 'filter.operators.lte' },
 ];
 
 const selectOperators: FilterOperator[] = [

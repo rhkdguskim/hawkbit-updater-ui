@@ -84,14 +84,14 @@ const TargetList: React.FC = () => {
                                 onClick={() => model.setImportModalOpen(true)}
                                 disabled={!isAdmin}
                             >
-                                {t('actions.import', { defaultValue: 'Import' })}
+                                {t('common:actions.import', { defaultValue: 'Import' })}
                             </Button>
                             <Button
                                 icon={<DownloadOutlined />}
                                 onClick={model.handleExport}
                                 disabled={!model.targetsData?.content?.length}
                             >
-                                {t('actions.export', { defaultValue: 'Export' })}
+                                {t('common:actions.export', { defaultValue: 'Export' })}
                             </Button>
                         </>
                     }

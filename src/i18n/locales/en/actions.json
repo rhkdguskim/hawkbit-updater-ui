@@ -24,6 +24,8 @@
     "typeLabels": {
         "forced": "Forced",
         "soft": "Soft",
+        "update": "Update",
+        "download_only": "Download Only",
         "download": "Download",
         "install": "Install"
     },
@@ -74,6 +76,7 @@
     },
     "actions": {
         "view": "View",
+        "cancel": "Cancel",
         "addAction": "Add Action",
         "addActionComingSoon": "Action creation will be available soon."
     },

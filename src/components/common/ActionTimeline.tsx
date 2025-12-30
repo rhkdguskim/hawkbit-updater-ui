@@ -124,7 +124,7 @@ export const ActionTimeline: React.FC<ActionTimelineProps> = ({ action }) => {
     const detail = lastMessage || action.detailStatus || '';
 
     // Determine state based on status and detailStatus
-    // If detailStatus has content like "다운로드 중", "업데이트 중", etc., treat as running
+    // If detailStatus has content like "Downloading", "Updating", etc. (e.g. in Korean "다운로드 중", "업데이트 중"), treat as running
     type State = 'pending' | 'scheduled' | 'running' | 'finished' | 'error';
     let state: State = 'pending';
 
@@ -166,7 +166,7 @@ export const ActionTimeline: React.FC<ActionTimelineProps> = ({ action }) => {
             case 1: return t('timeline.queued');
             case 2: {
                 // Show the actual detailStatus message from the server directly
-                // This contains messages like "Disabling service recovery", "업데이트 프로세스 시작", etc.
+                // This contains messages like "Disabling service recovery", "Starting update process" (e.g. "업데이트 프로세스 시작"), etc.
                 if (state === 'running' && detail) {
                     return detail;
                 }
