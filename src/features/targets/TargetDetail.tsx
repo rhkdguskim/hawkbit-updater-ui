@@ -19,7 +19,6 @@ import {
     DistributionSetTab,
     TagsTab,
     AutoConfirmTab,
-    TargetTypeTab,
 } from './tabs';
 import {
     DeleteTargetModal,
@@ -46,8 +45,6 @@ import {
     useCreateMetadata,
     useUpdateMetadata,
     useDeleteMetadata,
-    useAssignTargetType,
-    useUnassignTargetType,
     getGetTargetQueryKey,
     getGetMetadataQueryKey,
 } from '@/api/generated/targets/targets';
@@ -234,30 +231,7 @@ const TargetDetail: React.FC = () => {
         },
     });
 
-    // Target Type Mutations
-    const assignTargetTypeMutation = useAssignTargetType({
-        mutation: {
-            onSuccess: () => {
-                message.success(t('messages.targetTypeAssigned'));
-                queryClient.invalidateQueries({ queryKey: getGetTargetQueryKey(targetId) });
-            },
-            onError: (error) => {
-                message.error((error as Error).message || t('common:messages.error'));
-            },
-        },
-    });
 
-    const unassignTargetTypeMutation = useUnassignTargetType({
-        mutation: {
-            onSuccess: () => {
-                message.success(t('messages.targetTypeRemoved'));
-                queryClient.invalidateQueries({ queryKey: getGetTargetQueryKey(targetId) });
-            },
-            onError: (error) => {
-                message.error((error as Error).message || t('common:messages.error'));
-            },
-        },
-    });
 
     // Handlers
     const handleUpdateTarget = useCallback(
@@ -361,24 +335,7 @@ const TargetDetail: React.FC = () => {
         }
     }, [targetId, metadataToDelete, deleteMetadataMutation]);
 
-    // Target Type Handlers
-    const handleAssignTargetType = useCallback(
-        (targetTypeId: number) => {
-            if (targetId) {
-                assignTargetTypeMutation.mutate({
-                    targetId,
-                    data: { id: targetTypeId },
-                });
-            }
-        },
-        [targetId, assignTargetTypeMutation]
-    );
 
-    const handleUnassignTargetType = useCallback(() => {
-        if (targetId) {
-            unassignTargetTypeMutation.mutate({ targetId });
-        }
-    }, [targetId, unassignTargetTypeMutation]);
 
     // Error State
     if (targetError) {
@@ -464,23 +421,6 @@ const TargetDetail: React.FC = () => {
                             actionLoading={
                                 activateAutoConfirmMutation.isPending ||
                                 deactivateAutoConfirmMutation.isPending
-                            }
-                        />
-                    ),
-                },
-                {
-                    key: 'targettype',
-                    label: t('detail.tabs.targetType'),
-                    children: (
-                        <TargetTypeTab
-                            target={targetData}
-                            loading={targetLoading}
-                            canEdit={isAdmin}
-                            onAssign={handleAssignTargetType}
-                            onUnassign={handleUnassignTargetType}
-                            actionLoading={
-                                assignTargetTypeMutation.isPending ||
-                                unassignTargetTypeMutation.isPending
                             }
                         />
                     ),

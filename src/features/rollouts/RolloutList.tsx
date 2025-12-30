@@ -111,13 +111,17 @@ const RolloutList: React.FC = () => {
             key: 'name',
             width: 200,
             sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
-            render: (value: string, record) => (
-                <Space direction="vertical" size={0}>
-                    <Text strong style={{ fontSize: 12 }}>{value}</Text>
-                    <Text type="secondary" style={{ fontSize: 11 }}>
-                        {t('columns.totalTargets')}: {record.totalTargets || 0}
-                    </Text>
-                </Space>
+            render: (value: string) => (
+                <Text strong style={{ fontSize: 12 }}>{value}</Text>
+            ),
+        },
+        {
+            title: t('columns.totalTargets', { defaultValue: 'Total Targets' }),
+            dataIndex: 'totalTargets',
+            key: 'totalTargets',
+            width: 100,
+            render: (value: number) => (
+                <Text style={{ fontSize: 12 }}>{value || 0}</Text>
             ),
         },
         {

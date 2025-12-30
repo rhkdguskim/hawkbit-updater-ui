@@ -196,8 +196,8 @@ const DistributionSetList: React.FC = () => {
             dataIndex: 'version',
             key: 'version',
             sorter: true,
-            width: 80,
-            render: (text) => <Text style={{ fontSize: 12 }}>{text}</Text>,
+            width: 100,
+            render: (text) => <Tag color="blue">{text}</Tag>,
         },
         {
             title: t('list.columns.type'),

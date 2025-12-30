@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { TagOutlined, AppstoreOutlined, DeleteOutlined, UploadOutlined, DownloadOutlined, TagsOutlined } from '@ant-design/icons';
+import { TagOutlined, AppstoreOutlined, DeleteOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import {
@@ -11,7 +11,6 @@ import {
     BulkDeleteTargetModal,
     SavedFiltersModal,
     ImportTargetsModal,
-    BulkEditMetadataModal,
 } from './components';
 import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction } from '@/components/patterns';
 import { useTargetListModel } from './hooks/useTargetListModel';
@@ -37,12 +36,7 @@ const TargetList: React.FC = () => {
                 icon: <AppstoreOutlined />,
                 onClick: () => model.setBulkTypeModalOpen(true),
             },
-            {
-                key: 'bulkEditTags',
-                label: t('bulkEdit.title'),
-                icon: <TagsOutlined />,
-                onClick: () => model.setBulkEditModalOpen(true),
-            },
+
         ];
         if (isAdmin) {
             actions.push({
@@ -129,7 +123,7 @@ const TargetList: React.FC = () => {
                         position: ['topRight'],
                     }}
                     onChange={model.handleTableChange}
-                    scroll={{ x: 1200 }}
+                    scroll={{ x: 1340 }}
                     locale={{ emptyText: t('noTargets') }}
                 />
             </DataView>
@@ -230,16 +224,6 @@ const TargetList: React.FC = () => {
                 }}
             />
 
-            <BulkEditMetadataModal
-                open={model.bulkEditModalOpen}
-                targetIds={model.selectedTargetIds as string[]}
-                onCancel={() => model.setBulkEditModalOpen(false)}
-                onSuccess={() => {
-                    model.setBulkEditModalOpen(false);
-                    model.setSelectedTargetIds([]);
-                    model.refetchTargets();
-                }}
-            />
         </StandardListLayout>
     );
 };

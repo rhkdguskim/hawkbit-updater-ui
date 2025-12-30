@@ -75,20 +75,24 @@ export const getTargetTableColumns = ({
             dataIndex: 'name',
             key: 'name',
             sorter: true,
-            width: 200,
+            width: 180,
             render: (_: string, record) => (
-                <Space direction="vertical" size={0}>
-                    <EditableCell
-                        value={record.name || record.controllerId || ''}
-                        onSave={(val) => onInlineUpdate(record.controllerId!, val)}
-                        editable={isAdmin}
-                    />
-                    {record.ipAddress && (
-                        <Text type="secondary" style={{ fontSize: 11 }}>
-                            {record.ipAddress}
-                        </Text>
-                    )}
-                </Space>
+                <EditableCell
+                    value={record.name || record.controllerId || ''}
+                    onSave={(val) => onInlineUpdate(record.controllerId!, val)}
+                    editable={isAdmin}
+                />
+            ),
+        },
+        {
+            title: t('table.ipAddress', { defaultValue: 'IP Address' }),
+            dataIndex: 'ipAddress',
+            key: 'ipAddress',
+            width: 140,
+            render: (ipAddress: string | undefined) => (
+                <Text style={{ fontSize: 12 }}>
+                    {ipAddress || '-'}
+                </Text>
             ),
         },
         {
@@ -143,17 +147,17 @@ export const getTargetTableColumns = ({
             },
         },
         {
-            title: t('table.lastModified'),
-            dataIndex: 'lastModifiedAt',
-            key: 'lastModifiedAt',
-            sorter: true,
+            title: t('table.lastPollTime', { defaultValue: 'Last Poll' }),
+            key: 'lastPollTime',
             width: 130,
-            render: (value: number | undefined) =>
-                value ? (
-                    <Text style={{ fontSize: 12 }}>{dayjs(value).format('YYYY-MM-DD HH:mm')}</Text>
+            render: (_: any, record: MgmtTarget) => {
+                const lastPollTime = record.pollStatus?.lastRequestAt;
+                return lastPollTime ? (
+                    <Text style={{ fontSize: 12 }}>{dayjs(lastPollTime).format('YYYY-MM-DD HH:mm')}</Text>
                 ) : (
                     <Text type="secondary" style={{ fontSize: 12 }}>-</Text>
-                ),
+                );
+            },
         },
         {
             title: t('table.actions'),

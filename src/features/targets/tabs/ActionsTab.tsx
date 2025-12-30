@@ -1,6 +1,5 @@
 import React from 'react';
-import { Table, Tag, Typography, Skeleton, Empty, Button, Space, Tooltip, Modal, Timeline, Radio, Badge } from 'antd';
-import type { TableProps } from 'antd';
+import { Tag, Typography, Skeleton, Empty, Button, Space, Tooltip, Modal, Timeline, Radio, Badge } from 'antd';
 import {
     CheckCircleOutlined,
     CloseCircleOutlined,
@@ -12,10 +11,12 @@ import {
     ThunderboltOutlined,
 } from '@ant-design/icons';
 import type { MgmtAction, PagedListMgmtAction } from '@/api/generated/model';
+import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { useGetActionStatusList } from '@/api/generated/targets/targets';
 import styled from 'styled-components';
+import { EnhancedTable } from '@/components/patterns';
 
 const Label = styled(Tag)`
     background: var(--ant-color-info-bg);
@@ -293,13 +294,13 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
         return t(`actions:typeLabels.${key}`, { defaultValue: type.toUpperCase() });
     };
 
-    const columns: TableProps<MgmtAction>['columns'] = [
+    const columns: ColumnsType<MgmtAction> = [
         {
             title: t('table.id'),
             dataIndex: 'id',
             key: 'id',
             width: 80,
-            render: (id: number) => <Text strong>#{id}</Text>,
+            render: (id: number) => <Text strong style={{ fontSize: 12 }}>#{id}</Text>,
         },
         {
             title: t('table.status'),
@@ -313,7 +314,7 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
             dataIndex: 'type',
             key: 'type',
             width: 100,
-            render: (type: string) => <Tag>{getTypeLabel(type)}</Tag>,
+            render: (type: string) => <Tag style={{ fontSize: 12 }}>{getTypeLabel(type)}</Tag>,
         },
         {
             title: t('table.forceType'),
@@ -326,29 +327,39 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
             title: t('table.started'),
             dataIndex: 'createdAt',
             key: 'createdAt',
-            render: (value: number) =>
-                value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-',
+            width: 130,
+            render: (value: number) => (
+                <Text style={{ fontSize: 12 }}>
+                    {value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'}
+                </Text>
+            ),
         },
         {
             title: t('table.lastModified'),
             dataIndex: 'lastModifiedAt',
             key: 'lastModifiedAt',
-            render: (value: number) =>
-                value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-',
+            width: 130,
+            render: (value: number) => (
+                <Text style={{ fontSize: 12 }}>
+                    {value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'}
+                </Text>
+            ),
         },
         {
             title: t('table.actions'),
             key: 'actions',
-            width: 150,
-            render: (_, record) => {
+            width: 100,
+            fixed: 'right',
+            render: (_: any, record: MgmtAction) => {
                 const isActive = record.status === 'running' || record.status === 'pending';
                 const canBeForced = record.forceType !== 'forced' && isActive;
 
                 return (
-                    <Space size="small">
+                    <Space size={0} className="action-cell">
                         <Tooltip title={t('actions.viewDetails')}>
                             <Button
                                 type="text"
+                                size="small"
                                 icon={<EyeOutlined />}
                                 onClick={() => {
                                     setSelectedAction(record);
@@ -360,6 +371,7 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
                             <Tooltip title={t('actions.force')}>
                                 <Button
                                     type="text"
+                                    size="small"
                                     icon={<ThunderboltOutlined />}
                                     onClick={() => onForceAction(record)}
                                 />
@@ -369,6 +381,7 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
                             <Tooltip title={t('actions.cancel')}>
                                 <Button
                                     type="text"
+                                    size="small"
                                     danger
                                     icon={<StopOutlined />}
                                     onClick={() => onCancelAction(record)}
@@ -391,12 +404,12 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
 
     return (
         <>
-            <Table<MgmtAction>
+            <EnhancedTable<MgmtAction>
                 columns={columns}
                 dataSource={data.content}
                 rowKey="id"
                 pagination={false}
-                size="middle"
+                scroll={{ x: 800 }}
             />
             <Modal
                 title={

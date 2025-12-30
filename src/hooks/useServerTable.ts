@@ -7,6 +7,7 @@ interface UseServerTableProps {
     defaultPageSize?: number;
     defaultSort?: string;
     syncToUrl?: boolean;
+    allowedSortFields?: string[]; // List of fields that can be sorted
 }
 
 interface PaginationState {
@@ -17,6 +18,7 @@ interface PaginationState {
 export function useServerTable<T>({
     defaultPageSize = 10,
     syncToUrl = false,
+    allowedSortFields,
 }: UseServerTableProps = {}) {
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -32,7 +34,15 @@ export function useServerTable<T>({
 
     const [sort, setSort] = useState<string>(() => {
         if (syncToUrl) {
-            return searchParams.get('sort') || '';
+            const urlSort = searchParams.get('sort') || '';
+            // Validate sort field if allowedSortFields is provided
+            if (urlSort && allowedSortFields && allowedSortFields.length > 0) {
+                const sortField = urlSort.split(':')[0];
+                if (!allowedSortFields.includes(sortField)) {
+                    return ''; // Invalid sort field, ignore it
+                }
+            }
+            return urlSort;
         }
         return '';
     });

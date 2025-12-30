@@ -44,6 +44,7 @@
         "lastControllerRequest": "마지막 컨트롤러 요청",
         "autoConfirm": "자동 확인",
         "lastModified": "최종 수정일",
+        "lastPollTime": "마지막 폴링",
         "actions": "액션",
         "id": "ID",
         "type": "유형",

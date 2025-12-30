@@ -1,5 +1,5 @@
-import React from 'react';
-import { Descriptions, Tag, Typography, Skeleton, Empty, Card, Row, Col, Statistic } from 'antd';
+import React, { useState } from 'react';
+import { Descriptions, Tag, Typography, Skeleton, Empty, Card, Row, Col, Statistic, Select, Space, message } from 'antd';
 import {
     CheckCircleOutlined,
     CloseCircleOutlined,
@@ -10,6 +10,10 @@ import type { MgmtTarget } from '@/api/generated/model';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import styled from 'styled-components';
+import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
+import { useAssignTargetType, useUnassignTargetType } from '@/api/generated/targets/targets';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 dayjs.extend(relativeTime);
 
@@ -36,6 +40,15 @@ import { useTranslation } from 'react-i18next';
 
 const OverviewTab: React.FC<OverviewTabProps> = ({ target, loading }) => {
     const { t } = useTranslation('targets');
+    const queryClient = useQueryClient();
+    const { role } = useAuthStore();
+    const isAdmin = role === 'Admin';
+    const [changingType, setChangingType] = useState(false);
+
+    const { data: typesData } = useGetTargetTypes({ limit: 100 });
+    const assignTypeMutation = useAssignTargetType();
+    const unassignTypeMutation = useUnassignTargetType();
+
     if (loading) {
         return <Skeleton active paragraph={{ rows: 6 }} />;
     }
@@ -45,6 +58,31 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ target, loading }) => {
     }
 
     const isOnline = !target.pollStatus?.overdue;
+
+    const currentType = typesData?.content?.find(type => type.id === target.targetType);
+
+    const handleTypeChange = async (value: number | null) => {
+        if (!target.controllerId) return;
+
+        setChangingType(true);
+        try {
+            if (value === null) {
+                await unassignTypeMutation.mutateAsync({ targetId: target.controllerId });
+                message.success(t('messages.targetTypeRemoved'));
+            } else {
+                await assignTypeMutation.mutateAsync({
+                    targetId: target.controllerId,
+                    data: { id: value },
+                });
+                message.success(t('messages.targetTypeAssigned'));
+            }
+            queryClient.invalidateQueries();
+        } catch (error) {
+            message.error((error as Error).message || t('common:messages.error'));
+        } finally {
+            setChangingType(false);
+        }
+    };
 
     return (
         <>
@@ -150,8 +188,53 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ target, loading }) => {
                     </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label={t('overview.targetType')}>
-                    {target.targetType ? (
-                        <Tag color="purple">{target.targetType}</Tag>
+                    {isAdmin ? (
+                        <Select
+                            style={{ minWidth: 200 }}
+                            value={target.targetType || null}
+                            onChange={handleTypeChange}
+                            loading={changingType}
+                            allowClear
+                            placeholder={t('targetType.select')}
+                            options={[
+                                ...(typesData?.content || []).map(type => ({
+                                    value: type.id,
+                                    label: (
+                                        <Space>
+                                            {type.colour && (
+                                                <span
+                                                    style={{
+                                                        display: 'inline-block',
+                                                        width: 12,
+                                                        height: 12,
+                                                        borderRadius: '50%',
+                                                        backgroundColor: type.colour,
+                                                        border: '1px solid var(--ant-color-border)',
+                                                    }}
+                                                />
+                                            )}
+                                            <span>{type.name}</span>
+                                        </Space>
+                                    ),
+                                })),
+                            ]}
+                        />
+                    ) : currentType ? (
+                        <Space>
+                            {currentType.colour && (
+                                <span
+                                    style={{
+                                        display: 'inline-block',
+                                        width: 12,
+                                        height: 12,
+                                        borderRadius: '50%',
+                                        backgroundColor: currentType.colour,
+                                        border: '1px solid var(--ant-color-border)',
+                                    }}
+                                />
+                            )}
+                            <Tag color={currentType.colour || 'default'}>{currentType.name}</Tag>
+                        </Space>
                     ) : (
                         <Text type="secondary">-</Text>
                     )}

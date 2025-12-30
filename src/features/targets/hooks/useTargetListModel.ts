@@ -38,7 +38,10 @@ export const useTargetListModel = () => {
         handleTableChange: serverTableChange,
         resetPagination,
         setPagination,
-    } = useServerTable<MgmtTarget>({ syncToUrl: true });
+    } = useServerTable<MgmtTarget>({
+        syncToUrl: true,
+        allowedSortFields: ['name'], // Only allow sorting by name field
+    });
 
     // State
     const [filters, setFilters] = useState<FilterValue[]>([]);

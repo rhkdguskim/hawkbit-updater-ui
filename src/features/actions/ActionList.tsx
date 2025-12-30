@@ -10,7 +10,6 @@ import { useGetActions } from '@/api/generated/actions/actions';
 import { useCancelAction } from '@/api/generated/targets/targets';
 import type { MgmtAction } from '@/api/generated/model';
 import { useTranslation } from 'react-i18next';
-import styled, { keyframes } from 'styled-components';
 import { keepPreviousData } from '@tanstack/react-query';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import dayjs from 'dayjs';
@@ -25,27 +24,7 @@ dayjs.extend(relativeTime);
 
 const { Text } = Typography;
 
-const pulse = keyframes`
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-`;
 
-const LiveIndicator = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: var(--ant-font-size-sm);
-    color: var(--ant-color-text-secondary, #64748b);
-
-    &::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--ant-color-success, #10b981);
-        animation: ${pulse} 1.5s ease-in-out infinite;
-    }
-`;
 
 const isActionErrored = (action: MgmtAction) => {
     const status = action.status?.toLowerCase() || '';
@@ -142,7 +121,6 @@ const ActionList: React.FC = () => {
     );
 
     const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';
-    const isActivePolling = hasRunningActions(data?.content);
 
     const getTypeLabel = useCallback((type?: string) => {
         if (!type) return '-';
@@ -352,11 +330,6 @@ const ActionList: React.FC = () => {
             title={t('pageTitle')}
             subtitle={t('subtitle')}
             description={t('list.description')}
-            headerSubtitleExtra={
-                <LiveIndicator>
-                    {isActivePolling ? t('polling.live', { defaultValue: 'Live (5s)' }) : t('polling.idle', { defaultValue: 'Idle (30s)' })}
-                </LiveIndicator>
-            }
             headerExtra={
                 <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                     {t('lastUpdated', { defaultValue: 'Updated' })}: {lastUpdated}

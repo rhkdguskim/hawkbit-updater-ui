@@ -112,7 +112,23 @@ const BulkAssignTypeModal: React.FC<BulkAssignTypeModalProps> = ({
                         onChange={setSelectedTypeId}
                         options={(typesData?.content as MgmtTargetType[] || []).map((type) => ({
                             value: type.id,
-                            label: type.name,
+                            label: (
+                                <Space>
+                                    {type.colour && (
+                                        <span
+                                            style={{
+                                                display: 'inline-block',
+                                                width: 12,
+                                                height: 12,
+                                                borderRadius: '50%',
+                                                backgroundColor: type.colour,
+                                                border: '1px solid var(--ant-color-border)',
+                                            }}
+                                        />
+                                    )}
+                                    <span>{type.name}</span>
+                                </Space>
+                            ),
                         }))}
                         dropdownRender={(menu) => (
                             <>
