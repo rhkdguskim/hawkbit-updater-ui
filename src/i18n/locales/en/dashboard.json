@@ -9,6 +9,14 @@
         "live": "Live",
         "idle": "Idle"
     },
+    "overview": {
+        "title": "Overview",
+        "totalTargets": "Total Devices",
+        "onlineTargets": "Online Devices",
+        "activeRollouts": "Active Rollouts",
+        "pendingActions": "Pending Actions",
+        "percentOnline": "{{percent}}% Online"
+    },
     "kpi": {
         "totalTargets": "Total Targets",
         "totalDevices": "Total Devices",

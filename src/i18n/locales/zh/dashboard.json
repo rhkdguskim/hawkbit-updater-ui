@@ -6,7 +6,8 @@
         "totalTargets": "总目标数",
         "onlineTargets": "在线目标",
         "activeRollouts": "活动发布",
-        "pendingActions": "挂起操作"
+        "pendingActions": "挂起操作",
+        "percentOnline": "{{percent}}% 在线"
     },
     "kpi": {
         "connectivity": "连接性",
@@ -28,6 +29,22 @@
         "actions": "操作状态",
         "targets": "目标状态",
         "distribution": "分发概览"
+    },
+    "chart": {
+        "deviceStatus": "设备状态",
+        "total": "总计",
+        "online": "在线",
+        "offline": "离线",
+        "connectivityStatus": "连接状态",
+        "deploymentRate": "部署率",
+        "deploymentRateDesc": "目标完成率",
+        "targets": "目标",
+        "rolloutStatus": "发布状态",
+        "totalRollouts": "共 {{count}} 个发布",
+        "actionStatus": "操作状态 (24小时)",
+        "fragmentation": "目标更新状态",
+        "velocity": "部署速度",
+        "velocityDesc": "每分钟操作完成率"
     },
     "recentActivity": {
         "title": "最近活动",
