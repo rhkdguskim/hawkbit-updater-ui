@@ -152,7 +152,6 @@ const TargetTable: React.FC<TargetTableProps> = ({
     loading,
     total,
     pagination,
-    scrollY: _scrollY,
     onPaginationChange,
     onSortChange,
     onView,

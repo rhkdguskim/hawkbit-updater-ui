@@ -160,7 +160,7 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
             key: 'actions',
             width: 100,
             fixed: 'right',
-            render: (_: any, record: MgmtAction) => {
+            render: (_, record: MgmtAction) => {
                 const isActive = record.status === 'running' || record.status === 'pending';
                 const canBeForced = record.forceType !== 'forced' && isActive;
 

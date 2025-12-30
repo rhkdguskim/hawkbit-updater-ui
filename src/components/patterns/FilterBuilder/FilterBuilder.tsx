@@ -92,7 +92,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     const [previewOpen, setPreviewOpen] = useState(false);
     const [pendingFilters, setPendingFilters] = useState<FilterValue[] | null>(null);
 
-    const operatorLabels: Record<string, string> = {
+    const operatorLabels: Record<string, string> = React.useMemo(() => ({
         'equals': t('filter.operators.equals', { defaultValue: '=' }),
         'notEquals': t('filter.operators.notEquals', { defaultValue: '≠' }),
         'greaterThan': t('filter.operators.gt', { defaultValue: '>' }),
@@ -104,7 +104,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
         'endsWith': t('filter.endsWith', { defaultValue: 'ends with' }),
         'before': t('filter.before', { defaultValue: 'before' }),
         'after': t('filter.after', { defaultValue: 'after' }),
-    };
+    }), [t]);
 
     const handleAddFilter = useCallback((condition: FilterConditionValue) => {
         const field = fields.find(f => f.key === condition.field);

@@ -15,7 +15,7 @@ import type { UpdateStatus } from '../shared';
  * Determines if a target is currently online based on its poll status.
  * A target is considered online if it polled within the expected interval.
  */
-export const isTargetOnline = (target: Target): boolean => {
+export const isTargetOnline = (target: { pollStatus?: { overdue?: boolean; nextExpectedRequestAt?: number } }): boolean => {
     if (!target.pollStatus) return false;
     return target.pollStatus.overdue === false && !isOverdueByExpectedTime(target.pollStatus);
 };

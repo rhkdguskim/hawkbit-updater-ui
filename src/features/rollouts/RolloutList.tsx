@@ -99,7 +99,7 @@ const RolloutList: React.FC = () => {
             if (f.operator === 'contains') val = `*${val}*`;
 
             // HawkBit uses == for all comparisons including wildcards
-            const op: '==' = '==';
+            const op = '==' as const;
 
             return buildCondition({ field: f.field, operator: op, value: val });
         });
@@ -128,7 +128,7 @@ const RolloutList: React.FC = () => {
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
         setFilters(newFilters);
         resetPagination();
-    }, [resetPagination]);
+    }, [resetPagination, setFilters]);
 
     const columns: ColumnsType<MgmtRolloutResponseBody> = [
         {

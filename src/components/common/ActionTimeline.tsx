@@ -119,7 +119,7 @@ export const ActionTimeline: React.FC<ActionTimelineProps> = ({ action }) => {
     const status = action.status?.toLowerCase() || '';
 
     // Extract messages (often not in type definition but present in API response)
-    const messages = (action as any).messages as string[] | undefined;
+    const messages = (action as Record<string, unknown>).messages as string[] | undefined;
     const lastMessage = messages && messages.length > 0 ? messages[messages.length - 1] : undefined;
     const detail = lastMessage || action.detailStatus || '';
 

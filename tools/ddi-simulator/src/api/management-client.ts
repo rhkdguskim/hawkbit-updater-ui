@@ -82,7 +82,7 @@ export class ManagementClient {
                     logger.warn(`Target ${controllerId} may already exist, fetching...`);
                     try {
                         return await this.getTarget(controllerId);
-                    } catch (fetchError) {
+                    } catch {
                         // If we can't fetch either, throw original error
                         throw error;
                     }

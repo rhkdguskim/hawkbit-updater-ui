@@ -131,6 +131,7 @@ const DistributionSetDetail: React.FC = () => {
             message.success(t('messages.cloneSuccess'));
             navigate(`/distributions/sets/${newDsId}`);
         } catch (error) {
+            console.error('Clone error', error);
             message.error(t('common:messages.error'));
         }
     };

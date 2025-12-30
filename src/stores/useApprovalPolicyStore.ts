@@ -7,22 +7,18 @@ export type ApprovalRuleCondition =
     | { targetType: string }
     | { start: string; end: string };
 
-export interface ApprovalRule {
-    id: string;
-    type: 'target_count' | 'tag' | 'target_type' | 'time_range';
-    enabled: boolean;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    condition: any; // Using any for flexibility in store but we will cast in components or use better union
-    priority: number;
-}
+export type ApprovalRule =
+    | { id: string; type: 'target_count'; enabled: boolean; condition: { threshold: number }; priority: number }
+    | { id: string; type: 'tag'; enabled: boolean; condition: { tag: string }; priority: number }
+    | { id: string; type: 'target_type'; enabled: boolean; condition: { targetType: string }; priority: number }
+    | { id: string; type: 'time_range'; enabled: boolean; condition: { start: string; end: string }; priority: number };
 
 interface ApprovalPolicyState {
     globalEnabled: boolean;
     rules: ApprovalRule[];
     setGlobalEnabled: (enabled: boolean) => void;
     toggleRule: (id: string, enabled: boolean) => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    updateRule: (id: string, condition: any) => void;
+    updateRule: (id: string, condition: ApprovalRuleCondition) => void;
 }
 
 export const useApprovalPolicyStore = create<ApprovalPolicyState>()(
@@ -66,7 +62,7 @@ export const useApprovalPolicyStore = create<ApprovalPolicyState>()(
                 })),
             updateRule: (id, condition) =>
                 set((state) => ({
-                    rules: state.rules.map((r) => (r.id === id ? { ...r, condition } : r)),
+                    rules: state.rules.map((r) => (r.id === id ? { ...r, condition } as ApprovalRule : r)),
                 })),
         }),
         {

@@ -4,12 +4,18 @@
  * Pure functions for Action domain logic.
  */
 
-import type { Action } from './types';
+
+
+interface ActionLike {
+    status?: string | null;
+    detailStatus?: string | null;
+    lastStatusCode?: number | null;
+}
 
 /**
  * Checks if an action has an error state.
  */
-export const isActionErrored = (action: Action): boolean => {
+export const isActionErrored = (action: ActionLike): boolean => {
     const status = (action.status as string)?.toLowerCase() || '';
     const detail = action.detailStatus?.toLowerCase() || '';
 
@@ -23,7 +29,7 @@ export const isActionErrored = (action: Action): boolean => {
 /**
  * Checks if an action is in a terminal state (finished, error, canceled).
  */
-export const isTerminalState = (action: Action): boolean => {
+export const isTerminalState = (action: ActionLike): boolean => {
     const status = (action.status as string)?.toLowerCase() || '';
     return ['finished', 'error', 'canceled'].includes(status);
 };
@@ -31,7 +37,7 @@ export const isTerminalState = (action: Action): boolean => {
 /**
  * Checks if an action is currently active.
  */
-export const isActive = (action: Action): boolean => {
+export const isActive = (action: ActionLike): boolean => {
     const status = (action.status as string)?.toLowerCase() || '';
     const activeStatuses = ['scheduled', 'pending', 'retrieving', 'running', 'waiting_for_confirmation', 'downloading'];
     return activeStatuses.includes(status) && !isActionErrored(action);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Typography, Button, Flex, Skeleton, Progress, Tag } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -253,25 +253,25 @@ const RolloutsOverview: React.FC = () => {
     );
 
     const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';
-    const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const isLoading = isRolloutsLoading || isActionsLoading;
 
     // Rollout stats
-    const rollouts = allRollouts?.content || [];
+    const rollouts = useMemo(() => allRollouts?.content || [], [allRollouts?.content]);
     const totalRollouts = rollouts.length;
-    const runningRollouts = rollouts.filter(r => r.status === 'running').length;
-    const finishedRollouts = rollouts.filter(r => r.status === 'finished').length;
-    const pausedRollouts = rollouts.filter(r => r.status === 'paused').length;
-    const errorRollouts = rollouts.filter(r => r.status === 'error' || r.status === 'stopped').length;
-    const scheduledRollouts = rollouts.filter(r => r.status === 'scheduled' || r.status === 'ready').length;
+    const runningRollouts = rollouts.filter((r: MgmtRolloutResponseBody) => r.status === 'running').length;
+    const finishedRollouts = rollouts.filter((r: MgmtRolloutResponseBody) => r.status === 'finished').length;
+    const pausedRollouts = rollouts.filter((r: MgmtRolloutResponseBody) => r.status === 'paused').length;
+    const errorRollouts = rollouts.filter((r: MgmtRolloutResponseBody) => r.status === 'error' || r.status === 'stopped').length;
+    const scheduledRollouts = rollouts.filter((r: MgmtRolloutResponseBody) => r.status === 'scheduled' || r.status === 'ready').length;
 
     // Action stats
-    const actions = allActions?.content || [];
+    const actions = useMemo(() => allActions?.content || [], [allActions?.content]);
     const totalActions = allActions?.total ?? actions.length;
-    const runningActions = actions.filter(a => a.status === 'running').length;
-    const finishedActions = actions.filter(a => a.status === 'finished').length;
-    const pendingActions = actions.filter(a => a.status === 'pending' || a.status === 'scheduled').length;
-    const errorActions = actions.filter(a => a.status === 'error').length;
+    const runningActions = actions.filter((a: MgmtAction) => a.status === 'running').length;
+    const finishedActions = actions.filter((a: MgmtAction) => a.status === 'finished').length;
+    const pendingActions = actions.filter((a: MgmtAction) => a.status === 'pending' || a.status === 'scheduled').length;
+    const errorActions = actions.filter((a: MgmtAction) => a.status === 'error').length;
 
     // Success rate
     const completedActions = finishedActions + errorActions;
@@ -280,16 +280,16 @@ const RolloutsOverview: React.FC = () => {
     // Active rollouts for list
     const activeRollouts = React.useMemo(() => {
         return rollouts
-            .filter(r => r.status === 'running' || r.status === 'paused' || r.status === 'scheduled' || r.status === 'ready')
-            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+            .filter((r: MgmtRolloutResponseBody) => r.status === 'running' || r.status === 'paused' || r.status === 'scheduled' || r.status === 'ready')
+            .sort((a: MgmtRolloutResponseBody, b: MgmtRolloutResponseBody) => (b.createdAt || 0) - (a.createdAt || 0))
             .slice(0, 10);
     }, [rollouts]);
 
     // Active actions for list
     const activeActions = React.useMemo(() => {
         return actions
-            .filter(a => a.status === 'running' || a.status === 'pending' || a.status === 'scheduled')
-            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+            .filter((a: MgmtAction) => a.status === 'running' || a.status === 'pending' || a.status === 'scheduled')
+            .sort((a: MgmtAction, b: MgmtAction) => (b.createdAt || 0) - (a.createdAt || 0))
             .slice(0, 10);
     }, [actions]);
 
@@ -686,7 +686,7 @@ const RolloutsOverview: React.FC = () => {
                         ) : activeActions.length > 0 ? (
                             <ActiveListContainer>
                                 <ActiveUpdatesCard
-                                    items={activeActions.map(action => ({
+                                    items={activeActions.map((action: MgmtAction) => ({
                                         action,
                                         controllerId: getTargetId(action),
                                     }))}

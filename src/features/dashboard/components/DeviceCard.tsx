@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { Typography, Flex, Tooltip, Tag } from 'antd';
 import {
@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { MgmtTarget, MgmtAction } from '@/api/generated/model';
 import dayjs from 'dayjs';
+import type { TFunction } from 'i18next';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
@@ -185,13 +186,13 @@ const getStatusIcon = (status?: string) => {
     return <ClockCircleFilled style={{ fontSize: 10 }} />;
 };
 
-const getStatusLabel = (status?: string, t?: any) => {
+const getStatusLabel = (status?: string, t?: TFunction) => {
     const s = status?.toLowerCase();
-    if (s === 'in_sync') return t('status.inSync');
-    if (s === 'pending') return t('status.pending');
-    if (s === 'error') return t('status.error');
-    if (s === 'registered') return t('status.registered');
-    return t('status.unknown');
+    if (s === 'in_sync') return t ? t('status.inSync') : 'In Sync';
+    if (s === 'pending') return t ? t('status.pending') : 'Pending';
+    if (s === 'error') return t ? t('status.error') : 'Error';
+    if (s === 'registered') return t ? t('status.registered') : 'Registered';
+    return t ? t('status.unknown') : 'Unknown';
 };
 
 const getActionIcon = (status?: string) => {
@@ -206,9 +207,11 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ target, recentAction, targetTyp
     const { t } = useTranslation(['targets', 'common']);
     const navigate = useNavigate();
 
+    const [now] = useState(() => Date.now());
+
     const isOnline = target.pollStatus?.lastRequestAt !== undefined &&
         !target.pollStatus?.overdue &&
-        !(target.pollStatus?.nextExpectedRequestAt && Date.now() > target.pollStatus.nextExpectedRequestAt);
+        !(target.pollStatus?.nextExpectedRequestAt && now > target.pollStatus.nextExpectedRequestAt);
 
     const lastSeen = target.pollStatus?.lastRequestAt
         ? dayjs(target.pollStatus.lastRequestAt).fromNow()

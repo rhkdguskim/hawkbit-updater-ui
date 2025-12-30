@@ -36,7 +36,7 @@ const StatsWrapper = styled.div`
     padding: var(--ant-padding-xs, 8px);
 `;
 
-const StatCard = styled(Card)<{ $bg: string }>`
+const StatCard = styled(Card) <{ $bg: string }>`
     border-radius: var(--ant-border-radius-lg, 12px);
     background: ${props => props.$bg};
     border: none;
@@ -46,7 +46,7 @@ const StatCard = styled(Card)<{ $bg: string }>`
     }
 `;
 
-const StatValue = styled(Statistic)<{ $color: string }>`
+const StatValue = styled(Statistic) <{ $color: string }>`
     && {
         .ant-statistic-content {
             color: ${props => props.$color};
@@ -91,11 +91,11 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
     const actions = data.actions || {};
     const totalRollouts = Object.values(data.rollouts || {}).reduce((a, b) => a + b, 0);
     const totalActions = Object.values(actions).reduce((a, b) => a + (b as number), 0);
-    const successActions = (actions as any).finished || 0;
+    const successActions = (actions as Record<string, number>)['finished'] || 0;
     const successRate = totalActions > 0 ? Math.round((successActions / totalActions) * 100) : 0;
 
     const chartData = Object.entries(actions)
-        .filter(([_, value]) => (value as number) > 0)
+        .filter(([, value]) => (value as number) > 0)
         .map(([key, value]) => ({
             name: t(`common:status.${key.toLowerCase()}`, key),
             value: value as number,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     Typography,
     Spin,
@@ -180,15 +180,14 @@ const Configuration: React.FC = () => {
     const [editedValues, setEditedValues] = useState<Record<string, unknown>>({});
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-    // Initialize edited values from API data
-    useEffect(() => {
-        if (data) {
-            const initialValues: Record<string, unknown> = {};
-            Object.entries(data).forEach(([key, value]) => {
-                initialValues[key] = extractValue(value);
-            });
-            setEditedValues(initialValues);
-        }
+    // Derived initial values from API data
+    const initialConfigValues = useMemo(() => {
+        if (!data) return {} as Record<string, unknown>;
+        const vals: Record<string, unknown> = {};
+        Object.entries(data).forEach(([key, value]) => {
+            vals[key] = extractValue(value);
+        });
+        return vals;
     }, [data]);
 
     // Calculate dynamic groups for unknown keys
@@ -280,22 +279,15 @@ const Configuration: React.FC = () => {
         }
 
         // Prepare update payload - only include changed values
-        const changedValues: Record<string, unknown> = {};
-        Object.entries(editedValues).forEach(([key, value]) => {
-            const originalValue = extractValue(data?.[key as keyof typeof data]);
-            if (JSON.stringify(value) !== JSON.stringify(originalValue)) {
-                changedValues[key] = value;
-            }
-        });
-
-        if (Object.keys(changedValues).length === 0) {
+        if (Object.keys(editedValues).length === 0) {
             messageApi.info(t('messages.noChanges'));
             return;
         }
 
         try {
-            await updateMutation.mutateAsync({ data: changedValues as Parameters<typeof updateMutation.mutateAsync>[0]['data'] });
+            await updateMutation.mutateAsync({ data: editedValues as Parameters<typeof updateMutation.mutateAsync>[0]['data'] });
             messageApi.success(t('messages.saveSuccess'));
+            setEditedValues({});
             setIsEditMode(false);
             refetch();
         } catch {
@@ -304,20 +296,14 @@ const Configuration: React.FC = () => {
     };
 
     const handleCancel = () => {
-        // Reset to original values
-        if (data) {
-            const initialValues: Record<string, unknown> = {};
-            Object.entries(data).forEach(([key, value]) => {
-                initialValues[key] = extractValue(value);
-            });
-            setEditedValues(initialValues);
-        }
+        // Reset dirty values
+        setEditedValues({});
         setValidationErrors({});
         setIsEditMode(false);
     };
 
     const renderValue = (item: ConfigItem): React.ReactNode => {
-        const value = editedValues[item.key];
+        const value = item.key in editedValues ? editedValues[item.key] : initialConfigValues[item.key];
         const hasError = validationErrors[item.key];
         const themeColor = GROUP_THEMES.polling.color;
 

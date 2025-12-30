@@ -60,7 +60,7 @@ const LegendLabel = styled(Text)`
     }
 `;
 
-const LegendValue = styled(Text)<{ $color: string }>`
+const LegendValue = styled(Text) <{ $color: string }>`
     && {
         font-size: var(--ant-font-size-sm);
         color: ${props => props.$color};
@@ -145,8 +145,8 @@ const TargetsOverview: React.FC = () => {
         { query: { staleTime: 30000 } }
     );
 
-    const targets = allTargets?.content || [];
-    const actions = actionsData?.content || [];
+    const targets = useMemo(() => allTargets?.content || [], [allTargets?.content]);
+    const actions = useMemo(() => actionsData?.content || [], [actionsData?.content]);
     const totalDevices = allTargets?.total ?? 0;
     const gridCols = 5;
     const gridRows = 4;
@@ -175,9 +175,10 @@ const TargetsOverview: React.FC = () => {
     const refetch = () => { refetchTargets(); refetchActions(); };
 
     // Offline check
+    const now = dataUpdatedAt || 0;
     const isOverdueByExpectedTime = (pollStatus?: { nextExpectedRequestAt?: number }) => {
         if (!pollStatus?.nextExpectedRequestAt) return false;
-        return Date.now() > pollStatus.nextExpectedRequestAt;
+        return now > pollStatus.nextExpectedRequestAt;
     };
 
     // --- Update Status ---

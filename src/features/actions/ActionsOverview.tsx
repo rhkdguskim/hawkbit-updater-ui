@@ -54,12 +54,13 @@ const ActionsOverview: React.FC = () => {
     const { t } = useTranslation(['actions', 'common']);
     const navigate = useNavigate();
 
+    const [now] = React.useState(() => Date.now());
     const { data: actionsData, isLoading, refetch, dataUpdatedAt } = useGetActions(
         { limit: 500 },
         { query: { staleTime: 5000 } }
     );
 
-    const actions = actionsData?.content || [];
+    const actions = React.useMemo(() => actionsData?.content || [], [actionsData?.content]);
     const totalActions = actionsData?.total ?? 0;
     const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';
 
@@ -85,12 +86,12 @@ const ActionsOverview: React.FC = () => {
 
     // Recent actions (last 24 hours)
     const recentActions = React.useMemo(() => {
-        const yesterday = Date.now() - 24 * 60 * 60 * 1000;
+        const yesterday = now - 24 * 60 * 60 * 1000;
         return actions
             .filter(a => (a.createdAt ?? 0) > yesterday)
             .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
             .slice(0, 10);
-    }, [actions]);
+    }, [actions, now]);
 
     // Running/Pending actions
     const activeActions = React.useMemo(() => {

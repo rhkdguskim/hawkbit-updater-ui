@@ -314,7 +314,7 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
                     <LanguageSwitcher />
                 </SettingsGroup>
 
-                <HeaderDivider type="vertical" />
+                <HeaderDivider orientation="vertical" />
 
                 <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow trigger={['click']}>
                     <UserSection>

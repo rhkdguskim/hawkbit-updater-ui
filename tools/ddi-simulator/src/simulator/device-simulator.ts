@@ -1,10 +1,7 @@
 import { DdiClient } from '../api/ddi-client.js';
 import type {
-    DdiControllerBase,
     DdiDeploymentBase,
     DdiActionFeedback,
-    DdiChunk,
-    DdiArtifact,
 } from '../types/ddi.js';
 import { logger } from '../utils/logger.js';
 

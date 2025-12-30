@@ -26,7 +26,7 @@ export const axiosInstance = <T>(
         cancelToken: source.token,
     }).then(({ data }) => data);
 
-    // @ts-ignore
+    // @ts-expect-error: axiosInstance returns a Promise that is augmented with a cancel method internally
     promise.cancel = () => {
         source.cancel('Query was cancelled');
     };

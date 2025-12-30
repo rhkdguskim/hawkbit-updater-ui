@@ -74,15 +74,14 @@ const TargetSearchBar: React.FC<TargetSearchBarProps> = ({
         { value: 'controllerId', label: t('search.fields.controllerId') },
     ];
 
-    useEffect(() => {
-        if (resetSignal === undefined) {
-            return;
-        }
+    const [prevResetSignal, setPrevResetSignal] = useState(resetSignal);
+    if (resetSignal !== prevResetSignal) {
+        setPrevResetSignal(resetSignal);
         setSearchValue('');
         if (!isAdvancedMode) {
             setSearchField('name');
         }
-    }, [resetSignal, isAdvancedMode]);
+    }
 
     const handleSearch = (value: string) => {
         setSearchValue(value);

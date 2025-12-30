@@ -41,6 +41,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 import { buildCondition, combineWithAnd, combineWithOr, escapeValue } from '@/utils/fiql';
 import { PageHeader, PageLayout } from '@/components/patterns';
+import type { MgmtSoftwareModule, MgmtArtifact, MgmtRolloutRestRequestBodyPost } from '@/api/generated/model';
 
 
 
@@ -192,7 +193,7 @@ const ArtifactPreview: React.FC<{ distributionSetId: number }> = ({ distribution
         <div style={{ padding: '8px 24px' }}>
             <Typography.Title level={5}>{t('wizard.distributionSet.softwareModules')}</Typography.Title>
             <Space direction="vertical" style={{ width: '100%' }}>
-                {modules.map((mod: any) => (
+                {modules.map((mod: MgmtSoftwareModule) => (
                     <div key={mod.id}>
                         <Text strong>{mod.name} ({mod.version})</Text>
                         <ModuleArtifacts softwareModuleId={mod.id} />
@@ -213,8 +214,8 @@ const ModuleArtifacts: React.FC<{ softwareModuleId: number }> = ({ softwareModul
 
     return (
         <ul style={{ margin: '4px 0 8px 16px', fontSize: '12px', color: '#666' }}>
-            {artifacts.map((art: any) => (
-                <li key={art.sha1}>{art.filename} ({Math.round((art.size || 0) / 1024)} {t('common:units.kb')})</li>
+            {artifacts.map((art: MgmtArtifact) => (
+                <li key={art.hashes?.sha1}>{art.providedFilename} ({Math.round((art.size || 0) / 1024)} {t('common:units.kb')})</li>
             ))}
         </ul>
     );
@@ -411,7 +412,8 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                 const values = await groupSettingsForm.validateFields();
                 setFormData((prev) => ({ ...prev, ...values }));
                 setCurrentStep(currentStep + 1);
-            } catch {
+            } catch (err) {
+                console.error('Validation error', err);
             }
         }
     };
@@ -434,24 +436,24 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
 
         for (const rule of activeRules) {
             if (rule.type === 'target_count') {
-                const threshold = (rule.condition as any).threshold;
+                const threshold = rule.condition.threshold;
                 if ((targetsData?.total || 0) > threshold) {
-                    matchingRules.push(t('approvalPolicy.rules.target_count.title'));
+                    matchingRules.push(t('approvalPolicy.rules.count.title', { count: threshold }));
                 }
             } else if (rule.type === 'tag') {
-                const tag = (rule.condition as any).tag;
+                const tag = rule.condition.tag;
                 if (builderState.tags.includes(tag)) {
-                    matchingRules.push(t('approvalPolicy.rules.tag.title'));
+                    matchingRules.push(t('approvalPolicy.rules.tag.title', { tag }));
                 }
             } else if (rule.type === 'target_type') {
-                const targetType = (rule.condition as any).targetType;
+                const targetType = rule.condition.targetType;
                 if (builderState.targetTypes.includes(targetType)) {
-                    matchingRules.push(t('approvalPolicy.rules.target_type.title'));
+                    matchingRules.push(t('approvalPolicy.rules.type.title', { type: targetType }));
                 }
             } else if (rule.type === 'time_range') {
                 const now = dayjs();
-                const startStr = (rule.condition as any).start;
-                const endStr = (rule.condition as any).end;
+                const startStr = rule.condition.start;
+                const endStr = rule.condition.end;
                 const [startH, startM] = startStr.split(':').map(Number);
                 const [endH, endM] = endStr.split(':').map(Number);
                 const start = dayjs().hour(startH).minute(startM);
@@ -465,7 +467,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                 }
 
                 if (isInside) {
-                    matchingRules.push(t('approvalPolicy.rules.time_range.title'));
+                    matchingRules.push(t('approvalPolicy.rules.time.title', { start: startStr, end: endStr }));
                 }
             }
         }
@@ -475,7 +477,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                 ? 'controllerId==*'
                 : formData.targetFilterQuery?.trim();
 
-            const payload: any = {
+            const payload: MgmtRolloutRestRequestBodyPost = {
                 name: formData.name,
                 description: formData.description || '',
                 distributionSetId: formData.distributionSetId,
@@ -807,10 +809,10 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                     />
 
                     <Form.Item name="successThreshold" label={t('wizard.groupSettings.successThreshold')} rules={[{ required: true }]}>
-                        <InputNumber min={0} max={100} formatter={value => `${value}%`} parser={value => value?.replace('%', '') as any} style={{ width: '100%' }} />
+                        <InputNumber<number> min={0} max={100} formatter={value => `${value}%`} parser={value => value?.replace('%', '') as unknown as number} style={{ width: '100%' }} />
                     </Form.Item>
                     <Form.Item name="errorThreshold" label={t('wizard.groupSettings.errorThreshold')} rules={[{ required: true }]}>
-                        <InputNumber min={0} max={100} formatter={value => `${value}%`} parser={value => value?.replace('%', '') as any} style={{ width: '100%' }} />
+                        <InputNumber<number> min={0} max={100} formatter={value => `${value}%`} parser={value => value?.replace('%', '') as unknown as number} style={{ width: '100%' }} />
                     </Form.Item>
                     <Form.Item name="startImmediately" valuePropName="checked">
                         <Checkbox>{t('wizard.groupSettings.startImmediately')}</Checkbox>

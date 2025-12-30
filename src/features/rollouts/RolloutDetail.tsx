@@ -248,7 +248,7 @@ const RolloutDetail: React.FC = () => {
     const finishedTargets = statusPerTarget.finished || 0;
     const errorTargets = statusPerTarget.error || 0;
     // If rollout is finished, always show 100%
-    let overallProgress = rolloutData?.status === 'finished'
+    const overallProgress = rolloutData?.status === 'finished'
         ? 100
         : (totalTargets > 0 ? Math.round((finishedTargets / totalTargets) * 100) : 0);
 

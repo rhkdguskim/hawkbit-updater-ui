@@ -61,7 +61,7 @@ const SoftwareModuleList: React.FC = () => {
             if (f.operator === 'contains') val = `*${val}*`;
 
             // HawkBit uses == for all comparisons including wildcards
-            const op: '==' = '==';
+            const op = '==' as const;
 
             return buildCondition({ field: f.field, operator: op, value: val });
         });

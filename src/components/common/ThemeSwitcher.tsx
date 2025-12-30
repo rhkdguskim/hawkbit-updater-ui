@@ -13,20 +13,20 @@ interface ThemeSwitcherProps {
 const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ className }) => {
     const { t } = useTranslation();
     const { mode, setMode, getResolvedTheme } = useThemeStore();
-    const [resolvedTheme, setResolvedTheme] = useState(getResolvedTheme());
+    // Use state to trigger re-renders on system theme changes when in 'system' mode
+    const [, setTick] = useState(0);
 
-    // Update resolved theme when mode or system preference changes
+    // Listen for system theme changes if mode is 'system'
     useEffect(() => {
-        setResolvedTheme(getResolvedTheme());
-
-        // Listen for system theme changes if mode is 'system'
         if (mode === 'system') {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const handleChange = () => setResolvedTheme(getResolvedTheme());
+            const handleChange = () => setTick(t => t + 1);
             mediaQuery.addEventListener('change', handleChange);
             return () => mediaQuery.removeEventListener('change', handleChange);
         }
-    }, [mode, getResolvedTheme]);
+    }, [mode]);
+
+    const resolvedTheme = getResolvedTheme();
 
     const items: MenuProps['items'] = [
         {

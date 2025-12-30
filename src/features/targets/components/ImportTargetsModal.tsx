@@ -131,7 +131,7 @@ export const ImportTargetsModal: React.FC<ImportTargetsModalProps> = ({ open, on
         {
             title: 'Status',
             key: 'status',
-            render: (_: any, record: CSVRow) => {
+            render: (_: unknown, record: CSVRow) => {
                 if (record._errors && record._errors.length > 0) {
                     return <Text type="danger">{record._errors.join(', ')}</Text>;
                 }

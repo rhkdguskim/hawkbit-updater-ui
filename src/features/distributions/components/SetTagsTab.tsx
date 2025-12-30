@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Tag, Button, message, Space, Modal, Table, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +30,7 @@ const SetTagsTab: React.FC<SetTagsTabProps> = ({
     // For each tag, we need to check if this DS is assigned
     // We'll compute assigned tags from the allTagsData by checking each tag's assigned DS list
     // This is a simplified approach; in production you might want a dedicated endpoint
-    const allTags = allTagsData?.content || [];
+    const allTags = useMemo(() => allTagsData?.content || [], [allTagsData?.content]);
 
     // We'll track which tags are assigned by querying each tag's assignments
     // This is inefficient but works given API constraints
@@ -39,7 +39,7 @@ const SetTagsTab: React.FC<SetTagsTabProps> = ({
     const [loadingAssignments, setLoadingAssignments] = useState(true);
 
     // Fetch assignments on mount
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchAssignments = async () => {
             if (!allTags.length) {
                 setLoadingAssignments(false);
@@ -69,7 +69,7 @@ const SetTagsTab: React.FC<SetTagsTabProps> = ({
             setLoadingAssignments(false);
         };
         fetchAssignments();
-    }, [allTags.length, distributionSetId]);
+    }, [allTags, distributionSetId, token]);
 
     // Assign tag mutation
     const assignMutation = useAssignDistributionSet({

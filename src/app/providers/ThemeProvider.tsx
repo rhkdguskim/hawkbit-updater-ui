@@ -1,7 +1,4 @@
-/**
- * Theme Provider
- * 
- * Re-exports the existing ThemeProvider for use in app providers.
- */
+import ThemeProvider from '@/providers/ThemeProvider';
 
-export { ThemeProvider, default } from '@/providers/ThemeProvider';
+export { ThemeProvider };
+export default ThemeProvider;

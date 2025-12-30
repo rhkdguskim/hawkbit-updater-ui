@@ -108,7 +108,7 @@ export const FilterPreview: React.FC<FilterPreviewProps> = ({
             }),
             color: '#52c41a',
         },
-    }), [severity, totalCount, t]);
+    }), [totalCount, t]);
 
     const config = severityConfig[severity];
 

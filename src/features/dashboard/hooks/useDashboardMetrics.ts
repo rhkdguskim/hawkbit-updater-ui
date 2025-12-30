@@ -8,7 +8,7 @@ import { useGetRollouts } from '@/api/generated/rollouts/rollouts';
 import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
 import { useGetSoftwareModules } from '@/api/generated/software-modules/software-modules';
-import type { MgmtDistributionSet, MgmtSoftwareModule, MgmtRolloutResponseBody } from '@/api/generated/model';
+import type { MgmtDistributionSet, MgmtSoftwareModule, MgmtRolloutResponseBody, MgmtAction } from '@/api/generated/model';
 
 import { isTargetOnline, isActionErrored } from '@/entities';
 
@@ -85,11 +85,11 @@ export const useDashboardMetrics = () => {
     // 1. Device Connectivity
     const onlineCount = targets.filter(t =>
         t.pollStatus?.lastRequestAt !== undefined &&
-        isTargetOnline(t as any)
+        isTargetOnline(t)
     ).length;
     const offlineCount = targets.filter(t =>
         t.pollStatus?.lastRequestAt !== undefined &&
-        !isTargetOnline(t as any)
+        !isTargetOnline(t)
     ).length;
 
     // 2. Rollouts Stats
@@ -105,16 +105,16 @@ export const useDashboardMetrics = () => {
     ).length, [rollouts]);
 
     // 3. Actions Stats (Latest 100)
-    const actions = actionsData?.content || [];
+    const actions = useMemo(() => actionsData?.content || [], [actionsData]);
     // Use all fetched actions (limit 100) as "recent" instead of strict 24h window
     // This ensures data is valid even if the system was idle for a while.
     const recentActions = [...actions].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     const pendingCount = recentActions.filter(a =>
         ['scheduled', 'pending', 'retrieving', 'running', 'waiting_for_confirmation'].includes(a.status?.toLowerCase() || '') &&
-        !isActionErrored(a as any)
+        !isActionErrored(a)
     ).length;
-    const finishedCount = recentActions.filter(a => a.status?.toLowerCase() === 'finished' && !isActionErrored(a as any)).length;
-    const errorCount = recentActions.filter(a => isActionErrored(a as any)).length;
+    const finishedCount = recentActions.filter(a => a.status?.toLowerCase() === 'finished' && !isActionErrored(a)).length;
+    const errorCount = recentActions.filter(a => isActionErrored(a)).length;
 
     // 4. Success Rate
     const successRate = finishedCount + errorCount > 0
@@ -151,7 +151,7 @@ export const useDashboardMetrics = () => {
         const activeActions = [...actions]
             .filter(a => {
                 const status = a.status?.toLowerCase() || '';
-                return activeStatuses.includes(status) && !isActionErrored(a as any);
+                return activeStatuses.includes(status) && !isActionErrored(a);
             })
             .sort((a, b) => (b.lastModifiedAt || b.createdAt || 0) - (a.lastModifiedAt || a.createdAt || 0))
             .slice(0, 10);
@@ -186,7 +186,7 @@ export const useDashboardMetrics = () => {
                 }
             };
         });
-    }, [actions, targets, isActionErrored]);
+    }, [actions, targets]);
 
 
     // 7. Recent Devices (Original List for fallback)
@@ -295,7 +295,7 @@ export const useDashboardMetrics = () => {
             a.status?.toLowerCase() === 'warning'
         );
 
-        const groups: Record<string, { count: number; actions: any[] }> = {};
+        const groups: Record<string, { count: number; actions: MgmtAction[] }> = {};
 
         errorActions.forEach(a => {
             const cause = a.detailStatus || 'Unknown Error';
@@ -372,6 +372,6 @@ export const useDashboardMetrics = () => {
 
         // Helper
         isActionErrored,
-        isActionFinished: (a: any) => a.status?.toLowerCase() === 'finished',
+        isActionFinished: (a: { status?: string }) => a.status?.toLowerCase() === 'finished',
     };
 };

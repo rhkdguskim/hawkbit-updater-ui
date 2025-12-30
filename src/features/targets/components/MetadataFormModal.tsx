@@ -38,7 +38,7 @@ const MetadataFormModal: React.FC<MetadataFormModalProps> = ({
         try {
             const values = await form.validateFields();
             onSubmit(values);
-        } catch (error) {
+        } catch {
             // Validation error
         }
     };

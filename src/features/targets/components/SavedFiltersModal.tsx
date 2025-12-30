@@ -129,7 +129,7 @@ const SavedFiltersModal: React.FC<SavedFiltersModalProps> = ({
             });
         }
         return options;
-    }, [distributionSetsData?.content, editingFilter?.autoAssignDistributionSet]);
+    }, [distributionSetsData?.content, editingFilter]);
     const hasMoreDistributionSets = useMemo(() => {
         if (!distributionSetsData) {
             return false;

@@ -19,7 +19,7 @@ import { isTargetOnline } from '@/entities';
 const { Text } = Typography;
 
 interface GetColumnsProps {
-    t: any;
+    t: (key: string, options?: Record<string, unknown>) => string;
     isAdmin: boolean;
     availableTypes: MgmtTargetType[];
     onView: (target: MgmtTarget) => void;
@@ -54,14 +54,14 @@ export const getTargetTableColumns = ({
         if (!record.pollStatus || record.pollStatus.lastRequestAt === undefined) {
             return <Tag color="default">{t('status.neverConnected')}</Tag>;
         }
-        if (isTargetOnline(record as any)) {
+        if (isTargetOnline(record)) {
             return <Tag color="green">{t('status.online')}</Tag>;
         }
         return <Tag color="red">{t('status.offline')}</Tag>;
     };
 
     const getInstalledDsInfo = (record: MgmtTarget) => {
-        const link = record._links?.installedDS as any;
+        const link = record._links?.installedDS;
         if (!link) return undefined;
         const resolved = Array.isArray(link) ? link[0] : link;
         const id = resolved?.href?.split('/').pop();
@@ -149,7 +149,7 @@ export const getTargetTableColumns = ({
             title: t('table.lastPollTime', { defaultValue: 'Last Poll' }),
             key: 'lastPollTime',
             width: 130,
-            render: (_: any, record: MgmtTarget) => {
+            render: (_: unknown, record: MgmtTarget) => {
                 const lastPollTime = record.pollStatus?.lastRequestAt;
                 return lastPollTime ? (
                     <Text style={{ fontSize: 12 }}>{dayjs(lastPollTime).format('YYYY-MM-DD HH:mm')}</Text>

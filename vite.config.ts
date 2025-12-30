@@ -26,8 +26,8 @@ export default defineConfig({
         target: 'http://localhost:8081',
         changeOrigin: true,
         secure: false,
-        configure: (proxy, _options) => {
-          proxy.on('proxyRes', (proxyRes, _req, _res) => {
+        configure: (proxy) => {
+          proxy.on('proxyRes', (proxyRes) => {
             if (proxyRes.statusCode === 401) {
               // Remove WWW-Authenticate header to prevent browser popup
               delete proxyRes.headers['www-authenticate'];

@@ -187,7 +187,7 @@ const PopoverHeader = styled(Text)`
     }
 `;
 
-const PopoverRow = styled(Flex)<{ $withDivider?: boolean }>`
+const PopoverRow = styled(Flex) <{ $withDivider?: boolean }>`
     && {
         padding: var(--ant-padding-xxs, 4px) 0;
         border-bottom: ${props => props.$withDivider ? '1px solid var(--ant-color-border-secondary)' : 'none'};
@@ -322,7 +322,7 @@ const ActiveUpdateRowComponent: React.FC<{
     const status = displayAction.status?.toLowerCase() || '';
     const showPopover = ['running', 'pending', 'scheduled', 'retrieving', 'retrieved', 'downloading'].includes(status);
 
-    const targetLink = (displayAction._links as any)?.target;
+    const targetLink = (displayAction._links as Record<string, unknown> | undefined)?.target as { href?: string } | undefined;
     const targetId = item.controllerId || targetLink?.href?.split('/')?.pop();
 
     // Fetch granular status history on hover
@@ -345,7 +345,7 @@ const ActiveUpdateRowComponent: React.FC<{
     });
 
     const historyMessages = statusHistory.flatMap((entry) => entry.messages || []);
-    const fallbackMessages = (displayAction as any).messages as string[] | undefined;
+    const fallbackMessages = (displayAction as Record<string, unknown>).messages as string[] | undefined;
     const messages = historyMessages.length > 0 ? historyMessages : fallbackMessages;
     const lastMessage = historyMessages.length > 0
         ? historyMessages[0]
@@ -414,7 +414,7 @@ const ActiveUpdateRowComponent: React.FC<{
     };
 
     // Calculate progress if available
-    const progress = (displayAction as any).progress as number | undefined;
+    const progress = (displayAction as Record<string, unknown>).progress as number | undefined;
 
     // Popover content for hover - status history only
     const popoverContent = (

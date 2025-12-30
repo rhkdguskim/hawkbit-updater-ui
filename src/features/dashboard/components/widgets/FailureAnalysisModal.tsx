@@ -31,7 +31,7 @@ interface FailureAnalysisModalProps {
         cause: string;
         count: number;
         percentage: number;
-        actions: any[];
+        actions: import('@/api/generated/model').MgmtAction[];
     }[];
 }
 

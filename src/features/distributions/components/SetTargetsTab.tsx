@@ -70,7 +70,7 @@ const SetTargetsTab: React.FC<SetTargetsTabProps> = ({ distributionSetId }) => {
                     ]}
                     value={view}
                     onChange={(val) => {
-                        setView(val as any);
+                        setView(val as 'assigned' | 'installed');
                         setPagination({ ...pagination, current: 1 });
                     }}
                 />

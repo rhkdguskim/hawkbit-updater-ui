@@ -108,7 +108,7 @@ export function useServerTable<T>({
         } else {
             setSort('');
         }
-    }, []);
+    }, [allowedSortFields, sortDisabled]);
 
     const handleSearch = useCallback((query: string) => {
         setSearchQuery(query);

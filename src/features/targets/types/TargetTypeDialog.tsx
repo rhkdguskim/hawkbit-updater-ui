@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Form, Input, Select, Spin, Typography, Divider, Tag, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import type { MgmtTargetType, MgmtTargetTypeRequestBodyPost, MgmtTargetTypeRequestBodyPut, MgmtDistributionSetType } from '@/api/generated/model';
@@ -83,7 +83,9 @@ const TargetTypeDialog: React.FC<TargetTypeDialogProps> = ({
 
     const dsTypes = dsTypesData?.content || [];
 
-    useEffect(() => {
+    const [prevOpen, setPrevOpen] = useState(open);
+    if (open !== prevOpen) {
+        setPrevOpen(open);
         if (open) {
             if (mode === 'edit' && initialData) {
                 form.setFieldsValue({
@@ -97,14 +99,16 @@ const TargetTypeDialog: React.FC<TargetTypeDialogProps> = ({
                 setSelectedDsTypes([]); // Clear selection on create mode
             }
         }
-    }, [open, mode, initialData, form]);
+    }
 
     // Update selected types when data loads
-    useEffect(() => {
-        if (open && mode === 'edit' && compatibleDsTypes) {
+    const [prevCompatibleDsTypes, setPrevCompatibleDsTypes] = useState(compatibleDsTypes);
+    if (compatibleDsTypes !== prevCompatibleDsTypes) {
+        setPrevCompatibleDsTypes(compatibleDsTypes);
+        if (mode === 'edit' && compatibleDsTypes) {
             setSelectedDsTypes(compatibleDsTypes.map(dt => dt.id));
         }
-    }, [open, mode, compatibleDsTypes]);
+    }
 
     const handleOk = async () => {
         try {

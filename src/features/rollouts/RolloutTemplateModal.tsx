@@ -206,10 +206,10 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
                                 <FullWidthInputNumber min={1} max={100} />
                             </ConfigItem>
                             <ConfigItem name="successThreshold" label={t('wizard.groupSettings.successThreshold')}>
-                                <FullWidthInputNumber min={0} max={100} formatter={v => `${v}%`} parser={v => v?.replace('%', '') as any} />
+                                <FullWidthInputNumber min={0} max={100} formatter={v => `${v}%`} parser={v => Number(v?.replace('%', ''))} />
                             </ConfigItem>
                             <ConfigItem name="errorThreshold" label={t('wizard.groupSettings.errorThreshold')}>
-                                <FullWidthInputNumber min={0} max={100} formatter={v => `${v}%`} parser={v => v?.replace('%', '') as any} />
+                                <FullWidthInputNumber min={0} max={100} formatter={v => `${v}%`} parser={v => Number(v?.replace('%', ''))} />
                             </ConfigItem>
                         </ConfigRow>
                         <Form.Item name="startImmediately" valuePropName="checked">
@@ -279,12 +279,12 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
                                 <TemplateCard
                                     key={template.id}
                                     hoverable
-                                onClick={() => handleSelectTemplate(template)}
-                            >
-                                <Flex justify="space-between" align="flex-start">
-                                    <TemplateName strong>{template.name}</TemplateName>
-                                    <Popconfirm
-                                        title={t('templates.deleteConfirm')}
+                                    onClick={() => handleSelectTemplate(template)}
+                                >
+                                    <Flex justify="space-between" align="flex-start">
+                                        <TemplateName strong>{template.name}</TemplateName>
+                                        <Popconfirm
+                                            title={t('templates.deleteConfirm')}
                                             onConfirm={(e) => {
                                                 e?.stopPropagation();
                                                 handleDeleteTemplate(template.id);

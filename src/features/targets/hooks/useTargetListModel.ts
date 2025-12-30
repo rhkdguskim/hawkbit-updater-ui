@@ -17,7 +17,7 @@ import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useServerTable } from '@/hooks/useServerTable';
 import { appendFilter, buildCondition } from '@/utils/fiql';
-import type { MgmtTarget, MgmtTag, MgmtTargetType, MgmtDistributionSetAssignment, MgmtDistributionSetAssignments } from '@/api/generated/model';
+import type { MgmtTarget, MgmtTag, MgmtTargetType, MgmtDistributionSetAssignment, MgmtDistributionSetAssignments, MgmtDistributionSetAssignmentType } from '@/api/generated/model';
 import type { FilterValue, FilterField } from '@/components/patterns';
 import type { AssignPayload } from '../components';
 import Papa from 'papaparse';
@@ -214,7 +214,7 @@ export const useTargetListModel = () => {
     });
 
     // Handlers
-    const handleTableChange = (paginationConfig: TableProps<MgmtTarget>['pagination'], tableFilters: Record<string, any>, sorter: any, extra: any) => {
+    const handleTableChange: TableProps<MgmtTarget>['onChange'] = (paginationConfig, tableFilters, sorter, extra) => {
         serverTableChange(paginationConfig || {}, tableFilters, sorter, extra);
     };
 
@@ -257,7 +257,7 @@ export const useTargetListModel = () => {
         if (targetToAssign?.controllerId) {
             const assignment: MgmtDistributionSetAssignment = {
                 id: payload.dsId,
-                type: payload.type as any,
+                type: payload.type as MgmtDistributionSetAssignmentType,
                 confirmationRequired: payload.confirmationRequired,
                 weight: payload.weight,
                 forcetime: payload.forcetime,

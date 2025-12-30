@@ -99,6 +99,7 @@ const DistributionBulkAssign: React.FC = () => {
             message.success(t('bulkAssignment.assignSuccess'));
             setSelectedSetIds([]);
         } catch (error) {
+            console.error('Assign error', error);
             message.error(t('bulkAssignment.assignError'));
         }
     };
@@ -117,6 +118,7 @@ const DistributionBulkAssign: React.FC = () => {
             message.success(t('bulkAssignment.unassignSuccess'));
             setSelectedSetIds([]);
         } catch (error) {
+            console.error('Unassign error', error);
             message.error(t('bulkAssignment.unassignError'));
         }
     };

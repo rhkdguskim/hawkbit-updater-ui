@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Timeline, Typography, Tag, Space, Empty } from 'antd';
 import {
     CheckCircleOutlined,
@@ -99,11 +99,11 @@ interface ActionStatusTimelineProps {
 export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ statuses, emptyText }) => {
     const { t } = useTranslation(['actions', 'common']);
 
-    const getStatusLabel = (status?: string) => {
+    const getStatusLabel = useCallback((status?: string) => {
         if (!status) return t('common:status.unknown');
         const key = status.toLowerCase();
         return t(`common:status.${key}`, { defaultValue: status.toUpperCase() });
-    };
+    }, [t]);
 
     const getStatusTone = (status?: string, code?: number) => {
         const normalized = status?.toLowerCase() || '';
@@ -132,7 +132,7 @@ export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ stat
         }
     };
 
-    const translateStatusMessage = (message: string) => {
+    const translateStatusMessage = useCallback((message: string) => {
         const trimmed = message.trim();
         // Basic translations for common hawkBit messages
         if (/^Update failed, rollback performed$/i.test(trimmed)) return t('statusMessages.updateFailedRollback');
@@ -143,7 +143,7 @@ export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ stat
         if (/^Creating backup$/i.test(trimmed)) return t('statusMessages.creatingBackup');
         if (/^Starting update process$/i.test(trimmed)) return t('statusMessages.startingUpdateProcess');
         return message;
-    };
+    }, [t]);
 
     const timelineItems = useMemo(() => {
         if (!statuses?.length) return [];
@@ -189,7 +189,7 @@ export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ stat
                     ),
                 };
             });
-    }, [statuses, t]);
+    }, [statuses, t, getStatusLabel, translateStatusMessage]);
 
     if (!statuses?.length) {
         return <Empty description={emptyText || t('actions:statusHistoryEmpty')} />;
