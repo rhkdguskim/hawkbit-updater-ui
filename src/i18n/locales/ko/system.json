@@ -51,7 +51,9 @@
         "assignmentSettings": "할당 설정",
         "assignmentSettingsDesc": "대상 할당 구성",
         "otherSettings": "기타 설정",
-        "otherSettingsDesc": "기타 구성 항목"
+        "otherSettingsDesc": "기타 구성 항목",
+        "versionInfo": "버전 정보",
+        "versionInfoDesc": "애플리케이션 버전 및 빌드 정보"
     },
     "placeholders": {
         "array": "값1, 값2, ..."
@@ -77,7 +79,9 @@
         "actionCleanupEnabled": "자동 액션 정리 활성화",
         "actionCleanupExpiry": "정리를 위한 액션 만료 시간 (ms)",
         "actionCleanupStatus": "정리할 액션 상태",
-        "implicitLock": "할당 시 DS 암시적 잠금"
+        "implicitLock": "할당 시 DS 암시적 잠금",
+        "appVersion": "현재 애플리케이션 버전",
+        "buildTime": "빌드 시간"
     },
     "validation": {
         "invalidTime": "잘못된 시간 형식입니다. HH:mm:ss 형식을 사용하세요",

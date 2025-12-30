@@ -74,6 +74,16 @@ const LogoContainer = styled.div`
     letter-spacing: -0.01em;
     color: var(--text-main);
   }
+
+  .version-badge {
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--ant-color-primary-bg);
+    color: var(--ant-color-primary);
+    border: 1px solid var(--ant-color-primary-border);
+  }
 `;
 
 const StyledMenu = styled(Menu)`

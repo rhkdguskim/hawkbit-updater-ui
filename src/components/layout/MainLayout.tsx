@@ -5,7 +5,7 @@ import AppHeader from './AppHeader';
 import styled from 'styled-components';
 import RouteLoader from '../common/RouteLoader';
 
-const { Content } = Layout;
+const { Content, Footer } = Layout;
 
 const StyledLayout = styled(Layout)`
   height: 100vh;
@@ -43,10 +43,37 @@ const StyledContent = styled(Content) <{ $bg: string; $radius: number }>`
   }
 `;
 
+const StyledFooter = styled(Footer)`
+  padding: 8px 24px;
+  background: transparent;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--ant-color-text-quaternary);
+  flex-shrink: 0;
+
+  a {
+    color: var(--ant-color-text-tertiary);
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+      color: var(--ant-color-primary);
+    }
+  }
+
+  .version {
+    font-family: 'SF Mono', Monaco, monospace;
+  }
+`;
+
 const MainLayout: React.FC = () => {
   const {
     token: { colorBgLayout, borderRadiusLG },
   } = theme.useToken();
+
+  const currentYear = new Date().getFullYear();
 
   return (
     <StyledLayout>
@@ -60,6 +87,10 @@ const MainLayout: React.FC = () => {
             <Outlet />
           </React.Suspense>
         </StyledContent>
+        <StyledFooter>
+          <span>© {currentYear} <a href="https://github.com/rhkdguskim" target="_blank" rel="noopener noreferrer">rhkdguskim</a>. All rights reserved.</span>
+          <span className="version">v{__APP_VERSION__}</span>
+        </StyledFooter>
       </ContentLayout>
     </StyledLayout>
   );

@@ -51,7 +51,9 @@
         "assignmentSettings": "Assignment Settings",
         "assignmentSettingsDesc": "Target assignment configurations",
         "otherSettings": "Other Settings",
-        "otherSettingsDesc": "Miscellaneous configuration keys"
+        "otherSettingsDesc": "Miscellaneous configuration keys",
+        "versionInfo": "Version Info",
+        "versionInfoDesc": "Application version and build information"
     },
     "placeholders": {
         "array": "value1, value2, ..."
@@ -77,7 +79,9 @@
         "actionCleanupEnabled": "Enable automatic action cleanup",
         "actionCleanupExpiry": "Action expiry time for cleanup (ms)",
         "actionCleanupStatus": "Action statuses to clean up",
-        "implicitLock": "Implicitly lock DS on assignment"
+        "implicitLock": "Implicitly lock DS on assignment",
+        "appVersion": "Current application version",
+        "buildTime": "Build timestamp"
     },
     "validation": {
         "invalidTime": "Invalid time format. Use HH:mm:ss",

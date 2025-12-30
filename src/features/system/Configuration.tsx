@@ -601,6 +601,44 @@ const Configuration: React.FC = () => {
             <ConfigGroupsContainer>
                 {allGroups.map((group, index) => renderGroup(group, index))}
                 <ApprovalPolicyCard isEditMode={isEditMode} />
+
+                {/* Version Info Card */}
+                <ConfigGroupCard
+                    $themeKey="other"
+                    $delay={allGroups.length + 1}
+                    title={
+                        <Flex align="center" gap={12}>
+                            <GroupIconBadge $themeKey="other">
+                                <InfoCircleOutlined />
+                            </GroupIconBadge>
+                            <Flex vertical gap={0}>
+                                <span>{t('groups.versionInfo', 'Version Info')}</span>
+                                <Text type="secondary" style={{ fontSize: 11, fontWeight: 400 }}>
+                                    {t('groups.versionInfoDesc', 'Application version and build information')}
+                                </Text>
+                            </Flex>
+                        </Flex>
+                    }
+                >
+                    <ConfigItemRow $delay={0}>
+                        <ConfigItemLabel>
+                            <ConfigKeyText>version</ConfigKeyText>
+                            <ConfigDescText>{t('descriptions.appVersion', 'Current application version')}</ConfigDescText>
+                        </ConfigItemLabel>
+                        <ConfigItemValue>
+                            <ValueDisplay>v{__APP_VERSION__}</ValueDisplay>
+                        </ConfigItemValue>
+                    </ConfigItemRow>
+                    <ConfigItemRow $delay={1}>
+                        <ConfigItemLabel>
+                            <ConfigKeyText>buildTime</ConfigKeyText>
+                            <ConfigDescText>{t('descriptions.buildTime', 'Build timestamp')}</ConfigDescText>
+                        </ConfigItemLabel>
+                        <ConfigItemValue>
+                            <ValueDisplay>{new Date(__BUILD_TIME__).toLocaleString()}</ValueDisplay>
+                        </ConfigItemValue>
+                    </ConfigItemRow>
+                </ConfigGroupCard>
             </ConfigGroupsContainer>
         </ConfigPageContainer>
     );
