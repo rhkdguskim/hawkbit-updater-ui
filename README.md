@@ -1,73 +1,156 @@
-# React + TypeScript + Vite
+# Updater UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> HawkBit Management UI - A modern, operation-friendly web interface for Eclipse hawkBit
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Updater UI** is a specialized Management UI for **Eclipse HawkBit**. It is designed as a headless frontend that interacts directly with the HawkBit Management API (`/rest/v1`) without requiring modifications to the HawkBit server itself.
 
-## React Compiler
+- **Goal**: Provide an operation-friendly, scalable Web UI for managing large-scale IoT targets and software distributions.
+- **Backend**: Standard Eclipse HawkBit Server.
+- **Frontend**: React Single Page Application (SPA).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- 📊 **Dashboard** - Real-time overview of targets, distributions, and rollouts
+- 🎯 **Target Management** - Manage IoT devices with advanced filtering (RSQL/FIQL)
+- 📦 **Distribution Management** - Create and manage distribution sets and software modules
+- 🚀 **Rollout Management** - Deploy software updates with group-based rollout strategies
+- ⚙️ **System Configuration** - Configure tenant settings and policies
+- 🌐 **Internationalization** - Support for English and Korean languages
+- 🌙 **Dark Mode** - Theme support for comfortable viewing
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Core
+- **Framework**: React 19, TypeScript 5, Vite 7
+- **UI Component Library**: Ant Design 6
+- **Styling**: Styled Components (Dynamic theming)
+- **Icons**: React Icons
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### State & Data
+- **Server State**: TanStack Query (React Query) v5
+- **Client State**: Zustand v5
+- **API Client**: Axios with Basic Auth
+- **Code Generation**: Orval (from OpenAPI specs)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Internationalization
+- **Library**: i18next, react-i18next
+- **Languages**: English (en), Korean (ko)
+
+## Quick Start
+
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+- Running HawkBit server instance
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/rhkdguskim/updater-ui.git
+cd updater-ui
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The application will be available at `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Environment Variables
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Create a `.env` file in the project root:
+
+```env
+# API URL (optional, defaults to proxy in development)
+API_URL=
+
+# Application titles
+VITE_APP_TITLE=Updater UI
+VITE_LOGIN_TITLE=Updater UI
 ```
+
+## Development
+
+### Available Scripts
+
+```bash
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Lint code
+npm run lint
+
+# Generate API client from OpenAPI specs
+npm run gen:api
+```
+
+### Project Structure
+
+```
+src/
+├── api/
+│   ├── generated/          # Auto-generated API hooks (Do not edit directly)
+│   └── axios-instance.ts   # Axios setup with Interceptors & Auth
+├── assets/                 # Static assets
+├── components/             # Shared UI components
+├── features/               # Feature-based modules
+│   ├── actions/            # Action History & Details
+│   ├── auth/               # Login & Guard logic
+│   ├── dashboard/          # Main dashboard widgets
+│   ├── distributions/      # Distribution Sets & Software Modules
+│   ├── rollouts/           # Rollout Management
+│   └── targets/            # Target Management
+├── i18n/                   # Translation files (locales)
+├── stores/                 # Global Zustand stores (Auth, Theme, Language)
+├── theme/                  # Theme configuration (AntD Tokens)
+└── utils/                  # Utilities (FIQL builder, Formatters)
+```
+
+### API Generation
+
+This project uses **Orval** to generate API clients from HawkBit OpenAPI specs:
+
+```bash
+npm run gen:api
+```
+
+The generated code is placed in `src/api/generated/`.
+
+## Architecture
+
+### Headless Integration
+The UI is decoupled from the backend, communicating purely via REST APIs.
+
+### Data Querying
+Uses **RSQL/FIQL** standards for advanced filtering of Targets and Distributions.
+
+### Real-time Updates
+Implements **Polling** strategies via React Query since HawkBit lacks WebSocket support for management events.
+
+### Authentication
+- Development uses **Basic Authentication**
+- Token is stored in Zustand store and injected into requests via Axios interceptor
+
+## Documentation
+
+- `docs/TECH.md` - Detailed architectural decisions and implementation plans
+- `docs/api-spec/` - OpenAPI specifications for the backend
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## Related Projects
+
+- [Eclipse HawkBit](https://www.eclipse.org/hawkbit/) - IoT Update Management Server
