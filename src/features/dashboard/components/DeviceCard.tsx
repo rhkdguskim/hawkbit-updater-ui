@@ -191,7 +191,7 @@ const getStatusLabel = (status?: string, t?: TFunction) => {
     if (s === 'in_sync') return t ? t('status.inSync') : 'In Sync';
     if (s === 'pending') return t ? t('status.pending') : 'Pending';
     if (s === 'error') return t ? t('status.error') : 'Error';
-    if (s === 'registered') return t ? t('status.registered') : 'Registered';
+    if (s === 'registered') return t ? t('common:status.registered', 'Registered') : 'Registered';
     return t ? t('status.unknown') : 'Unknown';
 };
 

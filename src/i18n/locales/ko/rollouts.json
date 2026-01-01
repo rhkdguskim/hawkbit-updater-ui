@@ -91,7 +91,13 @@
         "view": "보기",
         "edit": "편집",
         "pause": "일시정지",
-        "resume": "재개"
+        "resume": "재개",
+        "startSuccess": "롤아웃이 시작되었습니다",
+        "startError": "롤아웃 시작에 실패했습니다",
+        "pauseSuccess": "롤아웃이 일시정지되었습니다",
+        "pauseError": "롤아웃 일시정지에 실패했습니다",
+        "resumeSuccess": "롤아웃이 재개되었습니다",
+        "resumeError": "롤아웃 재개에 실패했습니다"
     },
     "detail": {
         "description": "실시간 롤아웃 진행 상황, 배포 그룹 및 제어 작업을 확인합니다.",

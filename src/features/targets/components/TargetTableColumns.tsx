@@ -45,6 +45,8 @@ export const getTargetTableColumns = ({
                 return <Tag icon={<SyncOutlined spin />} color="processing">{t('status.pending')}</Tag>;
             case 'error':
                 return <Tag icon={<CloseCircleOutlined />} color="error">{t('status.error')}</Tag>;
+            case 'registered':
+                return <Tag icon={<ExclamationCircleOutlined />} color="default">{t('status.registered')}</Tag>;
             default:
                 return <Tag icon={<ExclamationCircleOutlined />} color="default">{t('status.unknown')}</Tag>;
         }

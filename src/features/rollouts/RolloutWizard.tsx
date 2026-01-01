@@ -182,7 +182,7 @@ interface RolloutWizardProps {
 }
 
 const ArtifactPreview: React.FC<{ distributionSetId: number }> = ({ distributionSetId }) => {
-    const { t } = useTranslation(['distributions', 'common']);
+    const { t } = useTranslation(['rollouts', 'distributions', 'common']);
     const { data: modulesData, isLoading } = useGetAssignedSoftwareModules(distributionSetId);
 
     if (isLoading) return <Spin size="small" />;
@@ -191,7 +191,7 @@ const ArtifactPreview: React.FC<{ distributionSetId: number }> = ({ distribution
 
     return (
         <div style={{ padding: '8px 24px' }}>
-            <Typography.Title level={5}>{t('wizard.distributionSet.softwareModules')}</Typography.Title>
+            <Typography.Title level={5}>{t('rollouts:wizard.distributionSet.softwareModules')}</Typography.Title>
             <Space direction="vertical" style={{ width: '100%' }}>
                 {modules.map((mod: MgmtSoftwareModule) => (
                     <div key={mod.id}>

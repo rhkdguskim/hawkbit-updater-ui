@@ -168,6 +168,7 @@
         "inSync": "In Sync",
         "pending": "Pending",
         "error": "Error",
+        "registered": "Registered",
         "unknown": "Unknown",
         "online": "Online",
         "offline": "Offline",

@@ -91,7 +91,13 @@
         "view": "View",
         "edit": "Edit",
         "pause": "Pause",
-        "resume": "Resume"
+        "resume": "Resume",
+        "startSuccess": "Rollout started",
+        "startError": "Failed to start rollout",
+        "pauseSuccess": "Rollout paused",
+        "pauseError": "Failed to pause rollout",
+        "resumeSuccess": "Rollout resumed",
+        "resumeError": "Failed to resume rollout"
     },
     "detail": {
         "description": "Real-time rollout progress, deployment groups, and control actions",

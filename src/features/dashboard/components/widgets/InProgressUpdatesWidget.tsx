@@ -24,6 +24,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
 import 'dayjs/locale/en';
+import { getStatusLabel, translateStatusMessage } from '@/utils/statusUtils';
 
 dayjs.extend(relativeTime);
 
@@ -240,7 +241,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                             <Flex vertical gap={4} style={{ width: '100%' }}>
                                 <Flex justify="space-between" align="center">
                                     <Tag color="blue" style={{ fontSize: 11, margin: 0, fontWeight: 600 }}>
-                                        {status.type}
+                                        {getStatusLabel(status.type, t)}
                                     </Tag>
                                     <Text type="secondary" style={{ fontSize: 10 }}>
                                         {status.timestamp || status.reportedAt
@@ -259,13 +260,13 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                                         whiteSpace: 'pre-wrap',
                                         wordBreak: 'break-all'
                                     }}>
-                                        {status.messages.join(', ')}
+                                        {status.messages.map(m => translateStatusMessage(m, t)).join(', ')}
                                     </div>
                                 )}
                             </Flex>
                         </List.Item>
                     )}
-                    locale={{ emptyText: t('common:noHistory', 'No history available') }}
+                    locale={{ emptyText: t('actions:statusHistoryEmpty') }}
                 />
             </div>
         </div>

@@ -164,5 +164,8 @@
         "error": "Error",
         "canceled": "Canceled",
         "unknown": "Unknown"
+    },
+    "history": {
+        "title": "Action History"
     }
 }

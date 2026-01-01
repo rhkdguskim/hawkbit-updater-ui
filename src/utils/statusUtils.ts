@@ -70,6 +70,42 @@ export const getStatusLabel = (
 ): string => {
     if (!status) return t('common:status.unknown');
     const key = status.toLowerCase();
+    // Use common namespace for basic statuses if possible
     return t(`common:status.${key}`);
+};
+
+/**
+ * Translates common backend messages from HawkBit to localized labels.
+ */
+export const translateStatusMessage = (
+    message: string,
+    t: (key: string, options?: any) => string
+): string => {
+    const trimmed = message.trim();
+
+    // Mapping for common messages
+    if (/^Update failed, rollback performed$/i.test(trimmed)) return t('actions:statusMessages.updateFailedRollback');
+    if (/^Starting services$/i.test(trimmed)) return t('actions:statusMessages.startingServices');
+    if (/^Updating binaries$/i.test(trimmed)) return t('actions:statusMessages.updatingBinaries');
+    if (/^Downloading artifacts$/i.test(trimmed)) return t('actions:statusMessages.downloadingArtifacts');
+    if (/^Verifying services stopped$/i.test(trimmed)) return t('actions:statusMessages.verifyingServicesStopped');
+    if (/^Creating backup$/i.test(trimmed)) return t('actions:statusMessages.creatingBackup');
+    if (/^Starting update process$/i.test(trimmed)) return t('actions:statusMessages.startingUpdateProcess');
+
+    // Messages with potential dynamic content
+    if (/^Update Server: Target retrieved update action and should start now the download\.$/i.test(trimmed))
+        return t('actions:statusMessages.targetRetrieved');
+
+    if (trimmed.startsWith('Update Server: Target downloads')) {
+        const pathPart = trimmed.replace('Update Server: Target downloads ', '');
+        return t('actions:statusMessages.targetDownloads', { path: pathPart });
+    }
+
+    if (trimmed.startsWith('Assignment initiated by user')) {
+        const userPart = trimmed.replace('Assignment initiated by user ', '').replace(/'/g, '');
+        return t('actions:statusMessages.assignmentInitiated', { user: userPart });
+    }
+
+    return message;
 };
 

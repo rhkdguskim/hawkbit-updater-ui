@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import type { MgmtActionStatus } from '@/api/generated/model';
+import { getStatusLabel, translateStatusMessage } from '@/utils/statusUtils';
 
 const { Text } = Typography;
 
@@ -99,10 +100,8 @@ interface ActionStatusTimelineProps {
 export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ statuses, emptyText }) => {
     const { t } = useTranslation(['actions', 'common']);
 
-    const getStatusLabel = useCallback((status?: string) => {
-        if (!status) return t('common:status.unknown');
-        const key = status.toLowerCase();
-        return t(`common:status.${key}`, { defaultValue: status.toUpperCase() });
+    const getStatusLabelLocal = useCallback((status?: string) => {
+        return getStatusLabel(status, t);
     }, [t]);
 
     const getStatusTone = (status?: string, code?: number) => {
@@ -132,17 +131,8 @@ export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ stat
         }
     };
 
-    const translateStatusMessage = useCallback((message: string) => {
-        const trimmed = message.trim();
-        // Basic translations for common hawkBit messages
-        if (/^Update failed, rollback performed$/i.test(trimmed)) return t('statusMessages.updateFailedRollback');
-        if (/^Starting services$/i.test(trimmed)) return t('statusMessages.startingServices');
-        if (/^Updating binaries$/i.test(trimmed)) return t('statusMessages.updatingBinaries');
-        if (/^Downloading artifacts$/i.test(trimmed)) return t('statusMessages.downloadingArtifacts');
-        if (/^Verifying services stopped$/i.test(trimmed)) return t('statusMessages.verifyingServicesStopped');
-        if (/^Creating backup$/i.test(trimmed)) return t('statusMessages.creatingBackup');
-        if (/^Starting update process$/i.test(trimmed)) return t('statusMessages.startingUpdateProcess');
-        return message;
+    const translateMessage = useCallback((message: string) => {
+        return translateStatusMessage(message, t);
     }, [t]);
 
     const timelineItems = useMemo(() => {
@@ -164,7 +154,7 @@ export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ stat
                         <StepContent>
                             <StepHeader>
                                 <Space align="center" size="small">
-                                    <StepTitle>{getStatusLabel(status.type)}</StepTitle>
+                                    <StepTitle>{getStatusLabelLocal(status.type)}</StepTitle>
                                     {status.code !== undefined && (
                                         <StatusCodeTag bordered={false}>{t('actions:statusCode', { code: status.code })}</StatusCodeTag>
                                     )}
@@ -180,7 +170,7 @@ export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ stat
                                 <LogContainer>
                                     {status.messages.map((message, index) => (
                                         <LogLine key={`${status.id}-${index}`}>
-                                            {translateStatusMessage(message)}
+                                            {translateMessage(message)}
                                         </LogLine>
                                     ))}
                                 </LogContainer>
