@@ -20,6 +20,7 @@ import { ListCard, IconBadge } from '../DashboardStyles';
 import { useResume, usePause, useStart } from '@/api/generated/rollouts/rollouts';
 import { useQueryClient } from '@tanstack/react-query';
 import type { MgmtRolloutResponseBody } from '@/api/generated/model';
+import { RolloutDrilldown } from './RolloutDrilldown';
 
 const { Text } = Typography;
 
@@ -114,6 +115,7 @@ export const ActiveRolloutsWidget: React.FC<ActiveRolloutsWidgetProps> = ({
         action: 'resume' | 'pause' | 'start' | null;
         rollout: MgmtRolloutResponseBody | null;
     }>({ visible: false, action: null, rollout: null });
+    const [expandedRolloutId, setExpandedRolloutId] = useState<number | null>(null);
 
     // Mutations
     const { mutate: resumeRollout, isPending: isResuming } = useResume({
@@ -375,6 +377,27 @@ export const ActiveRolloutsWidget: React.FC<ActiveRolloutsWidgetProps> = ({
                                                 />
                                             </Tooltip>
                                         </ActionButtons>
+                                        {/* Action Buttons */}
+                                        <ActionButtons>
+                                            {isAdmin && rollout.status === 'paused' && (
+                                                <Button size="small" type="primary" icon={<PlayCircleOutlined />} onClick={(e) => handleAction(e, 'resume', rollout)}>
+                                                    {t('dashboard:activeRollouts.resume')}
+                                                </Button>
+                                            )}
+                                            {isAdmin && rollout.status === 'running' && (
+                                                <Button size="small" danger icon={<PauseCircleOutlined />} onClick={(e) => handleAction(e, 'pause', rollout)}>
+                                                    {t('dashboard:activeRollouts.pause')}
+                                                </Button>
+                                            )}
+                                            {isAdmin && (rollout.status === 'scheduled' || rollout.status === 'ready') && (
+                                                <Button size="small" type="primary" icon={<PlayCircleOutlined />} onClick={(e) => handleAction(e, 'start', rollout)}>
+                                                    {t('dashboard:activeRollouts.start')}
+                                                </Button>
+                                            )}
+                                            <Button size="small" icon={<CaretRightOutlined />} onClick={(e) => { e.stopPropagation(); if (rollout.id) setExpandedRolloutId(rollout.id); }}>
+                                                {t('dashboard:activeRollouts.groups')}
+                                            </Button>
+                                        </ActionButtons>
                                     </ActivityItem>
                                 );
                             }}
@@ -410,6 +433,23 @@ export const ActiveRolloutsWidget: React.FC<ActiveRolloutsWidgetProps> = ({
                     <Text strong>"{confirmModal.rollout?.name}"</Text>
                     <Text>{getConfirmMessage()}</Text>
                 </Flex>
+            </Modal>
+
+            {/* Drilldown Modal */}
+            <Modal
+                open={expandedRolloutId !== null}
+                title={t('dashboard:activeRollouts.details')}
+                onCancel={() => setExpandedRolloutId(null)}
+                footer={null}
+                width={600}
+                styles={{ body: { padding: 0 } }}
+            >
+                {expandedRolloutId && (
+                    <RolloutDrilldown
+                        rolloutId={expandedRolloutId}
+                        isExpanded={expandedRolloutId !== null}
+                    />
+                )}
             </Modal>
         </>
     );

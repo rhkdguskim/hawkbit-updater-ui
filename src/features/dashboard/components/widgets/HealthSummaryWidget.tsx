@@ -155,6 +155,7 @@ interface HealthSummaryWidgetProps {
     pausedRollouts: number;
     errorRollouts: number;
     errorActions1h: number;
+    onAnalysisClick?: () => void;
 }
 
 export const HealthSummaryWidget: React.FC<HealthSummaryWidgetProps> = ({
@@ -164,6 +165,7 @@ export const HealthSummaryWidget: React.FC<HealthSummaryWidgetProps> = ({
     pausedRollouts,
     errorRollouts,
     errorActions1h,
+    onAnalysisClick,
 }) => {
     const { t } = useTranslation(['dashboard', 'common']);
 
@@ -221,7 +223,11 @@ export const HealthSummaryWidget: React.FC<HealthSummaryWidgetProps> = ({
     }
 
     return (
-        <Container $status={healthData.status}>
+        <Container
+            $status={healthData.status}
+            onClick={healthData.status !== 'SAFE' ? onAnalysisClick : undefined}
+            style={{ cursor: healthData.status !== 'SAFE' ? 'pointer' : 'default' }}
+        >
             <Flex justify="space-between" align="center">
                 <StatusBadge $status={healthData.status}>
                     {getStatusIcon(healthData.status)}

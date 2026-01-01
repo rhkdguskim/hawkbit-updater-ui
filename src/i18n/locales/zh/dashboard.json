@@ -194,5 +194,42 @@
         "cancel": "取消",
         "download": "下载",
         "deploy": "部署"
+    },
+    "actionActivity": {
+        "title": "操作活动",
+        "subtitle": "系统负载与瓶颈检测",
+        "waitingActions": "等待中的操作",
+        "waitingActionsTooltip": "当前运行或挂起中的操作数量",
+        "avgCompletionTime": "平均完成时间",
+        "avgCompletionTimeTooltip": "操作完成的平均时间",
+        "threshold": "阈值",
+        "normalRange": "正常范围",
+        "recentlyCompleted": "最近已完成",
+        "actions": "项",
+        "bottleneckDetected": "检测到瓶颈",
+        "bottleneckDesc": "系统负载高于推荐阈值。请考虑暂停新发布或调查运行缓慢的操作。",
+        "status": {
+            "normal": "正常",
+            "warning": "警告",
+            "critical": "严重"
+        }
+    },
+    "actionRequired": {
+        "title": "需要操作",
+        "subtitle": "需要立即处理的项目",
+        "delayedActions": "延迟操作",
+        "pendingApprovals": "待批准",
+        "noItems": "一切正常"
+    },
+    "statusTrend": {
+        "title": "状态趋势 (24h)",
+        "subtitle": "每小时操作状态汇总",
+        "successRate": "成功率",
+        "actionsTotal": "项操作",
+        "success": "成功",
+        "running": "运行中",
+        "error": "错误",
+        "rolloutStart": "发布开始",
+        "rolloutPause": "发布暂停"
     }
 }

@@ -136,6 +136,9 @@ export const useDashboardMetrics = () => {
     const totalActions = recentActions.length;
     const finishedActions = finishedCount;
 
+    const onlineRate = totalDevices > 0 ? Math.round((onlineCount / totalDevices) * 100) : 0;
+    const errorRateAccuracy = finishedCount + errorCount > 0 ? Math.round((errorCount / (finishedCount + errorCount)) * 100) : 0;
+
     const deploymentRate = hasRollouts
         ? Math.round((finishedRolloutTargets / totalRolloutTargets) * 100)
         : totalActions > 0
@@ -342,11 +345,37 @@ export const useDashboardMetrics = () => {
         return time > 0 && dayjs(time).isBefore(now.subtract(10, 'minute'));
     }).length;
 
+    const delayedActions24hCount = actions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        if (!['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(status)) return false;
+        const time = a.lastModifiedAt || a.createdAt || 0;
+        return time > 0 && dayjs(time).isBefore(now.subtract(24, 'hour'));
+    }).length;
+
     const newTargets24hCount = targets.filter(t =>
         t.createdAt && dayjs(t.createdAt).isAfter(last24h)
     ).length;
 
+    const orphanTargetsCount = targets.filter(t => !t._links?.assignedDS).length;
+
+    const criticalOfflineCount = targets.filter(t =>
+        !isTargetOnline(t) &&
+        ['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(t.updateStatus?.toLowerCase() || '')
+    ).length;
+
+    const neverConnectedCount = targets.filter(t =>
+        t.pollStatus?.lastRequestAt === undefined
+    ).length;
+
+    const canceledActions24hCount = actions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        if (!['canceled', 'canceling'].includes(status)) return false;
+        const createdAt = a.createdAt || 0;
+        return createdAt > 0 && dayjs(createdAt).isAfter(last24h);
+    }).length;
+
     const newTargetsTrendData = useMemo(() => {
+        const now = dayjs();
         const bucketCount = 6;
         const bucketHours = 4;
         const buckets = Array.from({ length: bucketCount }).map((_, index) => {
@@ -367,24 +396,21 @@ export const useDashboardMetrics = () => {
                 count
             };
         });
-    }, [now, targets]);
+    }, [targets]);
 
-    const neverConnectedCount = targets.filter(t =>
-        t.pollStatus?.lastRequestAt === undefined
-    ).length;
-
-    const canceledActions24hCount = actions.filter(a => {
-        const status = a.status?.toLowerCase() || '';
-        if (!['canceled', 'canceling'].includes(status)) return false;
-        const createdAt = a.createdAt || 0;
-        return createdAt > 0 && dayjs(createdAt).isAfter(last24h);
-    }).length;
-
-    const errorActions24hCount = actions.filter(a => {
+    const errorActions24hCountArray = actions.filter(a => {
         const status = a.status?.toLowerCase() || '';
         if (!['error', 'warning'].includes(status)) return false;
         const createdAt = a.createdAt || 0;
         return createdAt > 0 && dayjs(createdAt).isAfter(last24h);
+    });
+    const errorActions24hCount = errorActions24hCountArray.length;
+
+    const errorActions1hCount = actions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        if (!['error', 'warning', 'canceled'].includes(status)) return false;
+        const createdAt = a.createdAt || 0;
+        return createdAt > 0 && dayjs(createdAt).isAfter(now.subtract(1, 'hour'));
     }).length;
 
     const targetTypeCoverageData = useMemo(() => {
@@ -467,6 +493,8 @@ export const useDashboardMetrics = () => {
 
         // Deployment Metrics
         deploymentRate,
+        onlineRate,
+        errorRate: errorRateAccuracy,
         deploymentRateLabel,
         velocityData,
         actionTrendData,
@@ -476,10 +504,14 @@ export const useDashboardMetrics = () => {
         pendingApprovalRolloutCount,
         scheduledReadyRolloutCount,
         delayedActionsCount,
+        delayedActions24hCount,
+        orphanTargetsCount,
+        criticalOfflineCount,
         newTargets24hCount,
         neverConnectedCount,
         canceledActions24hCount,
         errorActions24hCount,
+        errorActions1hCount,
         newTargetsTrendData,
         targetTypeCoverageData,
 

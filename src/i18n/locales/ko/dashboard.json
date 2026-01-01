@@ -291,5 +291,76 @@
         "finished": "완료",
         "running": "진행 중",
         "error": "에러"
+    },
+    "drilldown": {
+        "loading": "그룹 로딩 중...",
+        "noGroups": "그룹이 없습니다",
+        "groupLabel": "그룹 {{number}}",
+        "totalTargets": "그룹 내 총 타겟",
+        "errors": "에러 수"
+    },
+    "inProgress": {
+        "title": "진행 중인 업데이트",
+        "delayWarning": "{{count}}개 항목 24시간 이상 지연",
+        "delayed": "{{time}} 지연",
+        "justNow": "방금 전",
+        "rolloutLabel": "롤아웃",
+        "retry": "재시도",
+        "cancel": "취소"
+    },
+    "confirmations": {
+        "start": {
+            "title": "롤아웃 시작",
+            "message": "\"{{name}}\" 롤아웃을 시작하시겠습니까? {{count}}개 타겟에 대한 배포가 시작됩니다."
+        },
+        "pause": {
+            "title": "롤아웃 일시정지",
+            "message": "\"{{name}}\" 롤아웃을 일시정지하시겠습니까? 진행 중인 배포가 중단됩니다."
+        },
+        "resume": {
+            "title": "롤아웃 재개",
+            "message": "\"{{name}}\" 롤아웃을 재개하시겠습니까? 남은 {{count}}개 타겟에 대한 배포가 계속됩니다."
+        },
+        "cancel": {
+            "title": "액션 취소",
+            "message": "이 액션을 취소하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+        }
+    },
+    "actionActivity": {
+        "title": "액션 활동",
+        "subtitle": "시스템 부하 및 병목 현상 감지",
+        "waitingActions": "대기 중인 액션",
+        "waitingActionsTooltip": "현재 실행 또는 대기 중인 액션 수",
+        "avgCompletionTime": "평균 완료 시간",
+        "avgCompletionTimeTooltip": "액션이 완료되는 데 걸리는 평균 시간",
+        "threshold": "임계치",
+        "normalRange": "정상 범위",
+        "recentlyCompleted": "최근 완료됨",
+        "actions": "건",
+        "bottleneckDetected": "병목 현상 감지됨",
+        "bottleneckDesc": "시스템 부하가 권장 임계치보다 높습니다. 새로운 롤아웃을 일시중지하거나 느린 액션을 조사하는 것을 고려하십시오.",
+        "status": {
+            "normal": "정상",
+            "warning": "경고",
+            "critical": "심각"
+        }
+    },
+    "actionRequired": {
+        "title": "조치 필요",
+        "subtitle": "즉각적인 확인이 필요한 항목",
+        "delayedActions": "지연된 액션",
+        "pendingApprovals": "승인 대기 중",
+        "noItems": "모든 항목이 정상입니다"
+    },
+    "statusTrend": {
+        "title": "상태 추이 (24시간)",
+        "subtitle": "시간대별 액션 상태 집계",
+        "successRate": "성공",
+        "actionsTotal": "건",
+        "success": "성공",
+        "running": "진행 중",
+        "error": "에러",
+        "rolloutStart": "롤아웃 시작",
+        "rolloutPause": "롤아웃 일시정지"
     }
 }
