@@ -41,7 +41,15 @@
         "realtimeSample": "Realtime sample ({{count}} devices)",
         "alertBadge": "Alert",
         "requiresAttention": "Requires attention",
-        "allClear": "All clear"
+        "allClear": "All clear",
+        "pendingApprovalRollouts": "Pending approvals",
+        "pausedRollouts": "Paused rollouts",
+        "scheduledReadyRollouts": "Scheduled / Ready",
+        "delayedActions": "Delayed actions",
+        "newTargets24h": "New targets (24h)",
+        "neverConnected": "Never connected",
+        "canceledActions24h": "Canceled actions (24h)",
+        "errorActions24h": "Error actions (24h)"
     },
     "charts": {
         "deviceStatus": "Device Status",
@@ -69,12 +77,28 @@
         "online": "Online",
         "offline": "Offline",
         "connectivityStatus": "Target Connection Status",
+        "totalTargets": "Total {{count}} targets",
         "deploymentRate": "Deployment Rate",
         "deploymentRateDesc": "Target completion rate",
         "targets": "targets",
         "rolloutStatus": "Rollout Status",
         "totalRollouts": "Total {{count}} rollouts",
         "actionStatus": "Action Status (24h)",
+        "actionTrend": "Action Volume Trend",
+        "actionTrendDesc": "Last 24h activity",
+        "actionsLabel": "Actions",
+        "errorRateLabel": "Error rate",
+        "targetTypeCoverage": "Target Type Coverage",
+        "rolloutQueue": "Rollout Queue",
+        "waitingApproval": "Waiting approval",
+        "paused": "Paused",
+        "scheduledReady": "Scheduled/Ready",
+        "delayedActions": "Delayed Actions",
+        "activeActions": "{{count}} active",
+        "delayed": "Delayed",
+        "onTime": "On time",
+        "newTargetsTrend": "New Targets Trend",
+        "last24h": "Last 24h",
         "fragmentation": "Target Update Status",
         "velocity": "Deployment Velocity",
         "velocityDesc": "Action completion rate per minute"
@@ -228,5 +252,115 @@
         "cancel": "Cancel",
         "download": "Download",
         "deploy": "Deploy"
+    },
+    "snapshot": {
+        "title": "System Snapshot",
+        "subtitle": "Key health signals",
+        "onlineRate": "Online rate",
+        "deploymentRate": "Deployment rate",
+        "errorRate": "Action error rate",
+        "pendingActions": "Pending actions",
+        "activeRollouts": "Active rollouts",
+        "attention": "Needs attention",
+        "stable": "Stable"
+    },
+    "health": {
+        "title": "Health Summary",
+        "totalTargets": "Total Targets",
+        "updating": "Updating",
+        "errorRate1h": "Error Rate (1h)",
+        "pausedRollouts": "Paused Rollouts",
+        "infoTooltip": "System health is calculated based on paused rollouts and error rate in the last hour",
+        "pausedRolloutsReason": "{{count}} rollout(s) paused",
+        "errorRolloutsReason": "{{count}} rollout(s) in error state",
+        "highErrorRateReason": "Error rate {{rate}}% exceeds 5% threshold",
+        "moderateErrorRateReason": "Error rate {{rate}}% exceeds 2% threshold"
+    },
+    "activeRollouts": {
+        "resume": "Resume",
+        "pause": "Pause",
+        "start": "Start",
+        "details": "Details",
+        "groups": "Groups",
+        "confirmResume": "Resume Rollout",
+        "confirmResumeMessage": "Are you sure you want to resume \"{{name}}\"? Deployment will continue for {{count}} targets.",
+        "confirmPause": "Pause Rollout",
+        "confirmPauseMessage": "Are you sure you want to pause \"{{name}}\"? Ongoing deployments will be interrupted.",
+        "progress": "Progress",
+        "groupProgress": "Group {{current}}/{{total}}",
+        "finished": "Finished",
+        "running": "Running",
+        "error": "Error"
+    },
+    "drilldown": {
+        "loading": "Loading groups...",
+        "noGroups": "No groups found",
+        "groupLabel": "Group {{number}}",
+        "totalTargets": "Total targets in group",
+        "errors": "Error count"
+    },
+    "inProgress": {
+        "title": "In-Progress Updates",
+        "delayWarning": "{{count}} items delayed over 24h",
+        "delayed": "{{time}} delayed",
+        "justNow": "Just now",
+        "rolloutLabel": "Rollout",
+        "retry": "Retry",
+        "cancel": "Cancel"
+    },
+    "confirmations": {
+        "start": {
+            "title": "Start Rollout",
+            "message": "Are you sure you want to start \"{{name}}\"? Deployment to {{count}} targets will begin."
+        },
+        "pause": {
+            "title": "Pause Rollout",
+            "message": "Are you sure you want to pause \"{{name}}\"? Ongoing deployments will be suspended."
+        },
+        "resume": {
+            "title": "Resume Rollout",
+            "message": "Are you sure you want to resume \"{{name}}\"? Deployment to {{count}} remaining targets will continue."
+        },
+        "cancel": {
+            "title": "Cancel Action",
+            "message": "Are you sure you want to cancel this action? This operation cannot be undone."
+        }
+    },
+    "actionActivity": {
+        "title": "Action Activity",
+        "subtitle": "System load and bottleneck detection",
+        "waitingActions": "Waiting Actions",
+        "waitingActionsTooltip": "Number of actions currently running/pending",
+        "avgCompletionTime": "Avg. Completion Time",
+        "avgCompletionTimeTooltip": "Average time to complete an action",
+        "threshold": "Threshold",
+        "normalRange": "Normal",
+        "recentlyCompleted": "Recently Completed",
+        "actions": "actions",
+        "bottleneckDetected": "Bottleneck Detected",
+        "bottleneckDesc": "System load is higher than recommended thresholds. Consider pausing new rollouts or investigating slow actions.",
+        "status": {
+            "normal": "Normal",
+            "warning": "Warning",
+            "critical": "Critical"
+        }
+    },
+    "actionRequired": {
+        "title": "Action Required",
+        "subtitle": "Items needing immediate attention",
+        "delayedActions": "Delayed Actions",
+        "pendingApprovals": "Pending Approvals",
+        "noItems": "Everything is on track"
+    },
+    "statusTrend": {
+        "title": "Status Trend (24h)",
+        "subtitle": "Hourly action status aggregation",
+        "successRate": "Success",
+        "actionsTotal": "actions",
+        "success": "Success",
+        "running": "Running",
+        "error": "Error",
+        "rolloutStart": "Rollout Start",
+        "rolloutPause": "Rollout Pause"
     }
 }

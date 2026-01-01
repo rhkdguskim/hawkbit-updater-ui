@@ -1,15 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
-import { PageContainer, DashboardScrollContent, IntegratedKPIGrid, IntegratedTopRow, IntegratedChartsGrid, IntegratedBottomRow } from '../DashboardStyles';
+import { PageLayout } from '@/components/patterns';
+import { DashboardScrollContent, IntegratedKPIGrid, IntegratedKPIColumn, IntegratedTopRow, IntegratedChartsGrid, IntegratedBottomRow } from '../DashboardStyles';
 
 const HeaderRow = styled.div`
     flex-shrink: 0;
-    margin-bottom: 8px;
 `;
 
 interface IntegratedDashboardGridProps {
     header: React.ReactNode;
     kpiCards: React.ReactNode;
+    kpiFooter?: React.ReactNode;
     charts: React.ReactNode;
     bottomWidgets: React.ReactNode;
 }
@@ -17,20 +18,24 @@ interface IntegratedDashboardGridProps {
 export const IntegratedDashboardGrid: React.FC<IntegratedDashboardGridProps> = ({
     header,
     kpiCards,
+    kpiFooter,
     charts,
     bottomWidgets,
 }) => {
     return (
-        <PageContainer>
+        <PageLayout fullWidth={true}>
             <HeaderRow>
                 {header}
             </HeaderRow>
             <DashboardScrollContent>
                 {/* Top Row: KPI 2x4 grid + 4 Charts */}
                 <IntegratedTopRow>
-                    <IntegratedKPIGrid>
-                        {kpiCards}
-                    </IntegratedKPIGrid>
+                    <IntegratedKPIColumn>
+                        <IntegratedKPIGrid>
+                            {kpiCards}
+                        </IntegratedKPIGrid>
+                        {kpiFooter}
+                    </IntegratedKPIColumn>
                     <IntegratedChartsGrid>
                         {charts}
                     </IntegratedChartsGrid>
@@ -41,7 +46,7 @@ export const IntegratedDashboardGrid: React.FC<IntegratedDashboardGridProps> = (
                     {bottomWidgets}
                 </IntegratedBottomRow>
             </DashboardScrollContent>
-        </PageContainer>
+        </PageLayout>
     );
 };
 
@@ -75,7 +80,7 @@ export const DashboardGrid: React.FC<DashboardGridProps> = ({
     bottomWidgets,
 }) => {
     return (
-        <PageContainer>
+        <PageLayout fullWidth={true}>
             {header}
             <DashboardScrollContent>
                 <TopRow>
@@ -86,6 +91,6 @@ export const DashboardGrid: React.FC<DashboardGridProps> = ({
                     {bottomWidgets}
                 </BottomRow>
             </DashboardScrollContent>
-        </PageContainer>
+        </PageLayout>
     );
 };

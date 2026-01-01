@@ -5,6 +5,7 @@ import {
     Alert,
     Space,
     Button,
+    Breadcrumb,
     Switch,
     Input,
     InputNumber,
@@ -29,6 +30,7 @@ import {
     CloudDownloadOutlined,
     LinkOutlined,
     SettingOutlined,
+    HomeOutlined,
     EyeOutlined,
     EyeInvisibleOutlined,
 } from '@ant-design/icons';
@@ -38,14 +40,11 @@ import {
 } from '@/api/generated/system-configuration/system-configuration';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
-    ConfigPageContainer,
-    ConfigHeader,
-    HeaderContent,
     GradientTitle,
-    StatusIndicator,
     ConfigGroupsContainer,
     ConfigGroupCard,
     GroupIconBadge,
@@ -63,8 +62,10 @@ import {
     GROUP_THEMES,
 } from './ConfigurationStyles';
 import type { GroupThemeKey } from './ConfigurationStyles';
+import { PageHeader, PageLayout } from '@/components/patterns';
 
 import ApprovalPolicyCard from './components/ApprovalPolicyCard';
+import { StatusIndicator } from './ConfigurationStyles';
 
 const { Text } = Typography;
 
@@ -530,59 +531,71 @@ const Configuration: React.FC = () => {
     };
 
     return (
-        <ConfigPageContainer>
+        <PageLayout>
             {contextHolder}
 
-            <ConfigHeader>
-                <HeaderContent>
-                    <GradientTitle level={3}>
+            <Breadcrumb>
+                <Breadcrumb.Item>
+                    <Link to="/">
+                        <HomeOutlined /> {t('common:nav.home')}
+                    </Link>
+                </Breadcrumb.Item>
+                <Breadcrumb.Item>
+                    <SettingOutlined /> {t('common:nav.system')}
+                </Breadcrumb.Item>
+                <Breadcrumb.Item>{t('pageTitle')}</Breadcrumb.Item>
+            </Breadcrumb>
+
+            <PageHeader
+                title={(
+                    <GradientTitle level={2}>
                         {t('pageTitle')}
                     </GradientTitle>
-                    <Flex align="center" gap={12}>
-                        <Text type="secondary" style={{ fontSize: 13 }}>
-                            {t('subtitle', 'Manage your tenant configuration')}
-                        </Text>
-                        <StatusIndicator $isEdit={isEditMode}>
-                            {isEditMode ? t('editMode') : t('readOnly')}
-                        </StatusIndicator>
-                    </Flex>
-                </HeaderContent>
-                <Space>
-                    {isEditMode ? (
-                        <>
-                            <Button icon={<CloseOutlined />} onClick={handleCancel}>
-                                {t('cancel')}
-                            </Button>
-                            <Button
-                                type="primary"
-                                icon={<SaveOutlined />}
-                                onClick={handleSave}
-                                loading={updateMutation.isPending}
-                                disabled={Object.keys(validationErrors).length > 0}
-                            >
-                                {updateMutation.isPending ? t('saving') : t('save')}
-                            </Button>
-                        </>
-                    ) : (
-                        <>
-                            <Button
-                                icon={<ReloadOutlined />}
-                                onClick={() => refetch()}
-                                loading={isLoading}
-                            >
-                                {t('refresh')}
-                            </Button>
-                            <Button
-                                type="primary"
-                                icon={<EditOutlined />}
-                                onClick={() => setIsEditMode(true)}
-                            >
-                                {t('edit')}
-                            </Button>
-                        </>
-                    )}
-                </Space>
-            </ConfigHeader>
+                )}
+                subtitle={t('subtitle', 'Manage your tenant configuration')}
+                subtitleExtra={(
+                    <StatusIndicator $isEdit={isEditMode}>
+                        {isEditMode ? t('editMode') : t('readOnly')}
+                    </StatusIndicator>
+                )}
+                actions={(
+                    <Space>
+                        {isEditMode ? (
+                            <>
+                                <Button icon={<CloseOutlined />} onClick={handleCancel}>
+                                    {t('cancel')}
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    icon={<SaveOutlined />}
+                                    onClick={handleSave}
+                                    loading={updateMutation.isPending}
+                                    disabled={Object.keys(validationErrors).length > 0}
+                                >
+                                    {updateMutation.isPending ? t('saving') : t('save')}
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button
+                                    icon={<ReloadOutlined />}
+                                    onClick={() => refetch()}
+                                    loading={isLoading}
+                                >
+                                    {t('refresh')}
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    icon={<EditOutlined />}
+                                    onClick={() => setIsEditMode(true)}
+                                >
+                                    {t('edit')}
+                                </Button>
+                            </>
+                        )}
+                    </Space>
+                )}
+            />
 
             <ConfigGroupsContainer>
                 {allGroups.map((group, index) => renderGroup(group, index))}
@@ -626,7 +639,7 @@ const Configuration: React.FC = () => {
                     </ConfigItemRow>
                 </ConfigGroupCard>
             </ConfigGroupsContainer>
-        </ConfigPageContainer>
+        </PageLayout>
     );
 };
 

@@ -301,5 +301,32 @@
                 "title": "受限时间范围"
             }
         }
+    },
+    "actionConfirm": {
+        "start": {
+            "title": "确认启动 Rollout",
+            "message": "确定要启动此 Rollout 吗？",
+            "targetInfo": "将开始向 {{count}} 个目标部署。",
+            "okText": "启动 ▶"
+        },
+        "pause": {
+            "title": "确认暂停 Rollout",
+            "message": "确定要暂停此 Rollout 吗？",
+            "targetInfo": "正在进行的 {{count}} 个目标的部署将被暂停。",
+            "okText": "暂停 ⏸"
+        },
+        "resume": {
+            "title": "确认恢复 Rollout",
+            "message": "确定要恢复此 Rollout 吗？",
+            "targetInfo": "将继续向 {{count}} 个目标部署。",
+            "okText": "恢复 ▶"
+        },
+        "cancel": {
+            "title": "确认取消操作",
+            "message": "确定要取消此操作吗？",
+            "targetInfo": "{{count}} 个目标将受到影响。",
+            "okText": "取消操作",
+            "warning": "此操作无法撤销。"
+        }
     }
 }

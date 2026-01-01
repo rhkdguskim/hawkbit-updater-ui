@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
-import { Typography, Flex, Empty, Skeleton, Timeline, Progress, Tag, Popover } from 'antd';
+import { Typography, Flex, Empty, Skeleton, Progress, Tag, Popover } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -10,8 +10,6 @@ import {
     ThunderboltOutlined,
     CheckCircleOutlined,
     CloseCircleOutlined,
-    DownOutlined,
-    UpOutlined,
 } from '@ant-design/icons';
 import { useGetAction1 } from '@/api/generated/actions/actions';
 import { useGetActionStatusList } from '@/api/generated/targets/targets';
@@ -78,7 +76,7 @@ const ListContainer = styled.div`
     }
 `;
 
-const UpdateRow = styled.div<{ $isCompleting?: boolean; $isExpanded?: boolean }>`
+const UpdateRow = styled.div<{ $isCompleting?: boolean; $isNew?: boolean }>`
     display: flex;
     flex-direction: column;
     padding: 12px 16px;
@@ -89,14 +87,16 @@ const UpdateRow = styled.div<{ $isCompleting?: boolean; $isExpanded?: boolean }>
         ? css`${fadeOutSlide} 0.5s ease-out forwards`
         : css`${fadeInSlide} 0.3s ease-out`};
     cursor: pointer;
-
-    ${props => props.$isExpanded && `
-        background: var(--ant-color-primary-bg, rgba(59, 130, 246, 0.04));
-    `}
+    will-change: transform, opacity;
 
     &:hover {
         background: var(--ant-color-item-hover, rgba(59, 130, 246, 0.03));
     }
+
+    ${props => props.$isNew && css`
+        background: rgba(var(--ant-color-info-rgb), 0.06);
+        box-shadow: inset 0 0 0 1px rgba(var(--ant-color-info-rgb), 0.2);
+    `}
 `;
 
 const MainContent = styled.div`
@@ -143,35 +143,45 @@ const IconBadge = styled.div<{ $status?: string }>`
     `}
 `;
 
-const ExpandButton = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: var(--ant-padding-xxs, 4px) var(--ant-padding-xs, 8px);
-    font-size: var(--ant-font-size-sm);
-    color: var(--ant-color-text-description, #6b7280);
-    cursor: pointer;
-    border-radius: var(--ant-border-radius-sm, 6px);
-    transition: all 0.2s;
-
-    &:hover {
-        background: var(--ant-color-item-hover);
-        color: var(--ant-color-primary);
-    }
-`;
-
-const HistoryPanel = styled.div`
-    margin-top: var(--ant-margin-sm, 12px);
-    padding: var(--ant-padding-sm, 12px);
-    background: var(--ant-color-fill-quaternary, rgba(0, 0, 0, 0.02));
-    border-radius: var(--ant-border-radius, 8px);
-    max-height: 200px;
-    overflow-y: auto;
-`;
-
 const ProgressBar = styled.div`
     margin-top: var(--ant-margin-xs, 8px);
     padding: 0 var(--ant-padding-xxs, 4px);
+`;
+
+const RowContent = styled(Flex)`
+    flex: 1;
+    min-width: 0;
+`;
+
+const RowMeta = styled(Flex)`
+    flex: 1;
+    min-width: 0;
+`;
+
+const TargetName = styled(Text)`
+    && {
+        font-size: var(--ant-font-size);
+    }
+`;
+
+const TimeText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+    }
+`;
+
+const StatusText = styled(Text)`
+    && {
+        font-size: var(--ant-font-size-sm);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 200px;
+    }
+`;
+
+const EmptyState = styled(Flex)`
+    flex: 1;
 `;
 
 const PopoverContainer = styled.div`
@@ -218,55 +228,6 @@ const PopoverMore = styled(Text)`
     }
 `;
 
-const RowContent = styled(Flex)`
-    flex: 1;
-    min-width: 0;
-`;
-
-const RowMeta = styled(Flex)`
-    flex: 1;
-    min-width: 0;
-`;
-
-const TargetName = styled(Text)`
-    && {
-        font-size: var(--ant-font-size);
-    }
-`;
-
-const TimeText = styled(Text)`
-    && {
-        font-size: var(--ant-font-size-sm);
-    }
-`;
-
-const StatusText = styled(Text)`
-    && {
-        font-size: var(--ant-font-size-sm);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 200px;
-    }
-`;
-
-const HistoryTag = styled(Tag)`
-    && {
-        font-size: var(--ant-font-size-sm);
-        margin: 0;
-    }
-`;
-
-const HistoryMessage = styled(Text)`
-    && {
-        font-size: var(--ant-font-size-sm);
-    }
-`;
-
-const EmptyState = styled(Flex)`
-    flex: 1;
-`;
-
 const StatusPopover = styled(Popover)`
     .ant-popover-inner {
         max-width: 350px;
@@ -294,12 +255,12 @@ const ActiveUpdateRowComponent: React.FC<{
     onNavigate?: (actionId: number) => void;
     showHistory?: boolean;
     onComplete?: (actionId: number) => void;
-}> = ({ item, onNavigate, showHistory = true, onComplete }) => {
+    rowRef?: (node: HTMLDivElement | null) => void;
+    isNew?: boolean;
+}> = ({ item, onNavigate, showHistory = true, onComplete, rowRef, isNew }) => {
     const { t } = useTranslation(['dashboard', 'actions', 'common']);
     const navigate = useNavigate();
-    const [isExpanded, setIsExpanded] = useState(false);
     const [isCompleting, setIsCompleting] = useState(false);
-    const [popoverOpen, setPopoverOpen] = useState(false);
     const prevStatusRef = useRef<string | undefined>(item.action.status);
 
     // Real-time action data polling for active actions
@@ -320,20 +281,21 @@ const ActiveUpdateRowComponent: React.FC<{
 
     const displayAction = fetchedAction || item.action;
     const status = displayAction.status?.toLowerCase() || '';
-    const showPopover = ['running', 'pending', 'scheduled', 'retrieving', 'retrieved', 'downloading'].includes(status);
+    const isActiveStatus = ['running', 'pending', 'scheduled', 'retrieving', 'retrieved', 'downloading'].includes(status);
 
     const targetLink = (displayAction._links as Record<string, unknown> | undefined)?.target as { href?: string } | undefined;
     const targetId = item.controllerId || targetLink?.href?.split('/')?.pop();
 
-    // Fetch granular status history on hover
+    // Poll granular status history for active update rows
     const { data: statusData } = useGetActionStatusList(
         targetId || '',
         item.action.id!,
         { limit: 10 },
         {
             query: {
-                enabled: !!targetId && !!item.action.id && popoverOpen && showPopover,
-                staleTime: 5000 // Cache for 5s
+                enabled: !!targetId && !!item.action.id && showHistory && isActiveStatus,
+                staleTime: 0,
+                refetchInterval: 5000
             }
         }
     );
@@ -392,11 +354,6 @@ const ActiveUpdateRowComponent: React.FC<{
         }
     };
 
-    const handleExpandClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setIsExpanded(!isExpanded);
-    };
-
     const getStatusIcon = () => {
         switch (status) {
             case 'finished':
@@ -416,7 +373,6 @@ const ActiveUpdateRowComponent: React.FC<{
     // Calculate progress if available
     const progress = (displayAction as Record<string, unknown>).progress as number | undefined;
 
-    // Popover content for hover - status history only
     const popoverContent = (
         <PopoverContainer>
             <Flex vertical gap={8}>
@@ -474,7 +430,7 @@ const ActiveUpdateRowComponent: React.FC<{
     );
 
     const rowContent = (
-        <UpdateRow $isCompleting={isCompleting} $isExpanded={isExpanded}>
+        <UpdateRow $isCompleting={isCompleting} $isNew={isNew} ref={rowRef}>
             <MainContent onClick={handleClick}>
                 <RowContent align="center" gap={12}>
                     <IconBadge $status={status}>
@@ -499,11 +455,6 @@ const ActiveUpdateRowComponent: React.FC<{
 
                 <Flex align="center" gap={8}>
                     <ActionTimeline action={displayAction} />
-                    {showHistory && messages && messages.length > 1 && (
-                        <ExpandButton onClick={handleExpandClick}>
-                            {isExpanded ? <UpOutlined /> : <DownOutlined />}
-                        </ExpandButton>
-                    )}
                 </Flex>
             </MainContent>
 
@@ -514,41 +465,16 @@ const ActiveUpdateRowComponent: React.FC<{
                 </ProgressBar>
             )}
 
-            {/* Expandable Status History - uses messages from action */}
-            {isExpanded && showHistory && messages && messages.length > 0 && (
-                <HistoryPanel onClick={(e) => e.stopPropagation()}>
-                    <Timeline
-                        items={messages.slice().reverse().slice(0, 10).map((msg: string, idx: number) => ({
-                            color: idx === 0 ? 'blue' : 'gray',
-                            children: (
-                                <Flex vertical gap={2}>
-                                    <Flex align="center" gap={8}>
-                                        <HistoryTag>
-                                            {idx === 0 ? t('common:status.current') : `${t('common:pagination.step')} ${messages.length - idx}`}
-                                        </HistoryTag>
-                                    </Flex>
-                                    <HistoryMessage type="secondary">
-                                        {msg}
-                                    </HistoryMessage>
-                                </Flex>
-                            ),
-                        }))}
-                    />
-                </HistoryPanel>
-            )}
         </UpdateRow>
     );
-
-    // Wrap with Popover for hover effect on active actions
-    if (showPopover) {
+    if (showHistory) {
         return (
             <StatusPopover
                 content={popoverContent}
                 title={null}
-                placement="right" // Changed to right for better visibility usually, or auto
+                placement="right"
                 trigger="hover"
-                mouseEnterDelay={0.2} // Slightly faster to feel responsive
-                onOpenChange={setPopoverOpen}
+                mouseEnterDelay={0.2}
             >
                 {rowContent}
             </StatusPopover>
@@ -568,11 +494,63 @@ export const ActiveUpdatesCard: React.FC<ActiveUpdatesCardProps> = ({
 }) => {
     const { t } = useTranslation(['dashboard', 'common']);
     const [visibleItems, setVisibleItems] = useState<ActiveUpdateItem[]>(items);
+    const [recentlyAddedIds, setRecentlyAddedIds] = useState<Set<number>>(new Set());
+    const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+    const previousPositions = useRef<Map<number, DOMRect>>(new Map());
+    const previousIds = useRef<Set<number>>(new Set());
 
     // Update visible items when props change
     useEffect(() => {
         setVisibleItems(items);
     }, [items]);
+
+    useEffect(() => {
+        const nextIds = new Set(items.map(item => item.action.id!));
+        const newIds = items
+            .map(item => item.action.id!)
+            .filter(id => !previousIds.current.has(id));
+        previousIds.current = nextIds;
+        if (newIds.length === 0) return undefined;
+        setRecentlyAddedIds(prev => {
+            const next = new Set(prev);
+            newIds.forEach(id => next.add(id));
+            return next;
+        });
+        const timer = setTimeout(() => {
+            setRecentlyAddedIds(prev => {
+                const next = new Set(prev);
+                newIds.forEach(id => next.delete(id));
+                return next;
+            });
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, [items]);
+
+    useLayoutEffect(() => {
+        const nextPositions = new Map<number, DOMRect>();
+        visibleItems.forEach(item => {
+            const node = itemRefs.current.get(item.action.id!);
+            if (!node) return;
+            nextPositions.set(item.action.id!, node.getBoundingClientRect());
+        });
+
+        nextPositions.forEach((nextRect, id) => {
+            const prevRect = previousPositions.current.get(id);
+            if (!prevRect) return;
+            const deltaX = prevRect.left - nextRect.left;
+            const deltaY = prevRect.top - nextRect.top;
+            if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) return;
+            const node = itemRefs.current.get(id);
+            if (!node) return;
+            node.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            node.style.transition = 'transform 260ms ease';
+            requestAnimationFrame(() => {
+                node.style.transform = 'translate(0, 0)';
+            });
+        });
+
+        previousPositions.current = nextPositions;
+    }, [visibleItems]);
 
     // Handle item completion (remove from list after animation)
     const handleComplete = useCallback((actionId: number) => {
@@ -614,6 +592,14 @@ export const ActiveUpdatesCard: React.FC<ActiveUpdatesCardProps> = ({
                         onNavigate={onNavigate}
                         showHistory={showHistory}
                         onComplete={handleComplete}
+                        isNew={recentlyAddedIds.has(item.action.id!)}
+                        rowRef={(node) => {
+                            if (node) {
+                                itemRefs.current.set(item.action.id!, node);
+                            } else {
+                                itemRefs.current.delete(item.action.id!);
+                            }
+                        }}
                     />
                 ))}
             </ListContainer>

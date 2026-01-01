@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -11,6 +11,7 @@ import { useGetSoftwareModules } from '@/api/generated/software-modules/software
 import type { MgmtDistributionSet, MgmtSoftwareModule, MgmtRolloutResponseBody, MgmtAction } from '@/api/generated/model';
 
 import { isTargetOnline, isActionErrored } from '@/entities';
+import { COLORS } from '@/components/shared/OverviewStyles';
 
 dayjs.extend(relativeTime);
 
@@ -21,21 +22,37 @@ export const useDashboardMetrics = () => {
     const { data: targetsData, isLoading: targetsLoading, refetch: refetchTargets, dataUpdatedAt } = useGetTargets(
         { limit: 1000 },
         {
-            query: { staleTime: 5000, refetchInterval: 5000 },
+            query: { staleTime: 0, refetchInterval: 3000 },
             request: { skipGlobalError: true }
         }
     );
     const { data: actionsData, isLoading: actionsLoading, refetch: refetchActions } = useGetActions(
         { limit: 100 },
         {
-            query: { staleTime: 5000, refetchInterval: 10000 },
+            query: {
+                staleTime: 0,
+                refetchInterval: (query) => {
+                    const hasActive = query.state.data?.content?.some(a =>
+                        ['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'retrieved'].includes(a.status?.toLowerCase() || '')
+                    );
+                    return hasActive ? 1000 : 10000;
+                }
+            },
             request: { skipGlobalError: true }
         }
     );
     const { data: rolloutsData, isLoading: rolloutsLoading, refetch: refetchRollouts } = useGetRollouts(
         { limit: 100 },
         {
-            query: { staleTime: 5000, refetchInterval: 10000 },
+            query: {
+                staleTime: 0,
+                refetchInterval: (query) => {
+                    const hasActive = query.state.data?.content?.some(r =>
+                        ['running', 'starting', 'creating', 'paused', 'waiting_for_approval', 'scheduled', 'ready'].includes(r.status?.toLowerCase() || '')
+                    );
+                    return hasActive ? 1000 : 10000;
+                }
+            },
             request: { skipGlobalError: true }
         }
     );
@@ -64,6 +81,13 @@ export const useDashboardMetrics = () => {
     const isLoading = targetsLoading || actionsLoading || rolloutsLoading || dsLoading || smLoading;
     const refetch = () => { refetchTargets(); refetchActions(); refetchRollouts(); refetchDS(); refetchSM(); };
     const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';
+
+    // Stable reference for "now" to satisfy React Compiler purity rules
+    const [stableNowMs, setStableNowMs] = useState<number | null>(null);
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setStableNowMs(dataUpdatedAt || Date.now());
+    }, [dataUpdatedAt]);
 
     const targets = useMemo(() => targetsData?.content || [], [targetsData]);
     const totalDevices = targetsData?.total ?? 0;
@@ -113,6 +137,10 @@ export const useDashboardMetrics = () => {
         ['scheduled', 'pending', 'retrieving', 'running', 'waiting_for_confirmation'].includes(a.status?.toLowerCase() || '') &&
         !isActionErrored(a)
     ).length;
+    const activeActionsCount = recentActions.filter(a =>
+        ['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(a.status?.toLowerCase() || '') &&
+        !isActionErrored(a)
+    ).length;
     const finishedCount = recentActions.filter(a => a.status?.toLowerCase() === 'finished' && !isActionErrored(a)).length;
     const errorCount = recentActions.filter(a => isActionErrored(a)).length;
 
@@ -121,25 +149,6 @@ export const useDashboardMetrics = () => {
         ? Math.round((finishedCount / (finishedCount + errorCount)) * 100)
         : null;
 
-    // 5. Deployment Rate
-    const totalRolloutTargets = rollouts.reduce((sum, r) => sum + (r.totalTargets || 0), 0);
-    const finishedRolloutTargets = rollouts.reduce(
-        (sum, r) => sum + (r.totalTargetsPerStatus?.finished || 0), 0
-    );
-
-    const hasRollouts = totalRolloutTargets > 0;
-    const totalActions = recentActions.length;
-    const finishedActions = finishedCount;
-
-    const deploymentRate = hasRollouts
-        ? Math.round((finishedRolloutTargets / totalRolloutTargets) * 100)
-        : totalActions > 0
-            ? Math.round((finishedActions / totalActions) * 100)
-            : null;
-
-    const deploymentRateLabel = hasRollouts
-        ? `${finishedRolloutTargets} / ${totalRolloutTargets} ${t('chart.targets', 'targets')}`
-        : `${finishedActions} / ${totalActions} ${t('chart.actions', 'actions')}`;
 
     // 6. Recent Activity Lists - Show ACTIVE actions with real detailStatus from server
     // Use actual actions data which contains real detailStatus messages from targets
@@ -156,6 +165,10 @@ export const useDashboardMetrics = () => {
             .sort((a, b) => (b.lastModifiedAt || b.createdAt || 0) - (a.lastModifiedAt || a.createdAt || 0))
             .slice(0, 10);
 
+        const DELAY_WARNING_MS = 60 * 60 * 1000; // 1 hour
+        const DELAY_CRITICAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+        const nowMs = stableNowMs || 0;
+
         // Match actions to targets
         return activeActions.map(action => {
             // Extract target ID from action links
@@ -168,25 +181,30 @@ export const useDashboardMetrics = () => {
             // Find matching target
             const matchedTarget = targets.find(t => t.controllerId === targetId);
 
-            // Create target object (use matched or create placeholder)
+            // Create target object
             const target = matchedTarget || {
                 controllerId: targetId || `action-${action.id}`,
                 name: targetId || `Action #${action.id}`,
                 updateStatus: action.status,
             };
 
-            // Use the ACTUAL detailStatus from the action - this contains real messages like
-            // "Disabling service recovery", "Starting update process" (e.g. "업데이트 프로세스 시작"), etc.
+            const startTime = action.createdAt || 0;
+            const elapsed = (startTime > 0 && nowMs > 0) ? nowMs - startTime : 0;
+            let delayLevel: 'normal' | 'warning' | 'critical' = 'normal';
+            if (elapsed >= DELAY_CRITICAL_MS) delayLevel = 'critical';
+            else if (elapsed >= DELAY_WARNING_MS) delayLevel = 'warning';
+
             return {
                 target,
                 action: {
                     ...action,
-                    // Keep the original detailStatus from the server
                     detailStatus: action.detailStatus || action.status || 'Processing',
-                }
+                },
+                delayLevel,
+                delayMs: elapsed,
             };
         });
-    }, [actions, targets]);
+    }, [actions, targets, stableNowMs]);
 
 
     // 7. Recent Devices (Original List for fallback)
@@ -205,6 +223,43 @@ export const useDashboardMetrics = () => {
         error: targets.filter(t => t.updateStatus?.toUpperCase() === 'ERROR').length,
         registered: targets.filter(t => t.updateStatus?.toUpperCase() === 'REGISTERED').length,
     };
+
+    // 5. Deployment Rate & General Progress
+    const ongoingRollouts = rollouts.filter(r =>
+        ['running', 'paused', 'starting'].includes(r.status?.toLowerCase() || '')
+    );
+
+    const totalOngoingTargets = ongoingRollouts.reduce((sum, r) => sum + (r.totalTargets || 0), 0);
+    const totalOngoingFinished = ongoingRollouts.reduce((sum, r) => {
+        const stats = r.totalTargetsPerStatus || {};
+        return sum + (stats.finished || stats.success || stats.SUCCESS || stats.PROCEEDED || 0);
+    }, 0);
+
+    const activeRolloutWeightedProgress = totalOngoingTargets > 0
+        ? (totalOngoingFinished / totalOngoingTargets) * 100
+        : 0;
+
+    const onlineRate = totalDevices > 0 ? Math.round((onlineCount / totalDevices) * 100) : 0;
+    const errorRateAccuracy = finishedCount + errorCount > 0 ? Math.round((errorCount / (finishedCount + errorCount)) * 100) : 0;
+
+    // Use fleet-wide In Sync rate as the primary source of truth for "Deployment Progress"
+    // unless the active rollouts specifically provide higher/more recent progress stats.
+    const inSyncRate = totalDevices > 0 ? Math.round((fragmentationStats.inSync / totalDevices) * 100) : 0;
+
+    const totalActions = recentActions.length;
+    const finishedActions = finishedCount;
+
+    const deploymentRate = ongoingRollouts.length > 0
+        ? Math.round(activeRolloutWeightedProgress)
+        : totalDevices > 0
+            ? inSyncRate
+            : totalActions > 0
+                ? Math.round((finishedActions / totalActions) * 100)
+                : null;
+
+    const deploymentRateLabel = ongoingRollouts.length > 0
+        ? `${totalOngoingFinished} / ${totalOngoingTargets} ${t('chart.targets', 'targets')}`
+        : `${finishedActions} / ${totalActions} ${t('chart.actions', 'actions')}`;
 
     // 9. Distribution Sets Metrics
     const distributionSets = useMemo(() => distributionSetsData?.content || [], [distributionSetsData]);
@@ -287,7 +342,138 @@ export const useDashboardMetrics = () => {
         return { currentVelocity, trend };
     }, [actions]);
 
-    // 13. Error Analysis Calculation
+    // 13. Action Trend (Last 24h, 4h buckets)
+    const actionTrendData = useMemo(() => {
+        const now = dayjs();
+        const bucketCount = 6;
+        const bucketHours = 4;
+        const buckets = Array.from({ length: bucketCount }).map((_, index) => {
+            const end = now.subtract((bucketCount - 1 - index) * bucketHours, 'hour');
+            const start = end.subtract(bucketHours, 'hour');
+            return { start, end, label: end.format('HH:mm') };
+        });
+
+        return buckets.map(bucket => {
+            const inBucket = actions.filter(action => {
+                if (!action.createdAt) return false;
+                const createdAt = dayjs(action.createdAt);
+                return (createdAt.isAfter(bucket.start) || createdAt.isSame(bucket.start)) && createdAt.isBefore(bucket.end);
+            });
+            const total = inBucket.length;
+            const error = inBucket.filter(action => isActionErrored(action)).length;
+            const finished = inBucket.filter(action => action.status?.toLowerCase() === 'finished' && !isActionErrored(action)).length;
+            const errorRate = total > 0 ? Math.round((error / total) * 100) : 0;
+
+            return {
+                time: bucket.label,
+                total,
+                error,
+                finished,
+                errorRate
+            };
+        });
+    }, [actions]);
+
+    // 14. Additional KPI Metrics
+    const now = dayjs();
+    const last24h = now.subtract(24, 'hour');
+
+    const pendingApprovalRolloutCount = rollouts.filter(r =>
+        r.status?.toLowerCase() === 'waiting_for_approval'
+    ).length;
+    const scheduledReadyRolloutCount = rollouts.filter(r =>
+        ['scheduled', 'ready'].includes(r.status?.toLowerCase() || '')
+    ).length;
+
+    const delayedActionsCount = actions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        if (!['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(status)) return false;
+        const time = a.lastModifiedAt || a.createdAt || 0;
+        return time > 0 && dayjs(time).isBefore(now.subtract(10, 'minute'));
+    }).length;
+
+    const delayedActions24hCount = actions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        if (!['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(status)) return false;
+        const time = a.lastModifiedAt || a.createdAt || 0;
+        return time > 0 && dayjs(time).isBefore(now.subtract(24, 'hour'));
+    }).length;
+
+    const newTargets24hCount = targets.filter(t =>
+        t.createdAt && dayjs(t.createdAt).isAfter(last24h)
+    ).length;
+
+    const orphanTargetsCount = targets.filter(t => !t._links?.assignedDS).length;
+
+    const criticalOfflineCount = targets.filter(t =>
+        !isTargetOnline(t) &&
+        ['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(t.updateStatus?.toLowerCase() || '')
+    ).length;
+
+    const neverConnectedCount = targets.filter(t =>
+        t.pollStatus?.lastRequestAt === undefined
+    ).length;
+
+    const canceledActions24hCount = actions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        if (!['canceled', 'canceling'].includes(status)) return false;
+        const createdAt = a.createdAt || 0;
+        return createdAt > 0 && dayjs(createdAt).isAfter(last24h);
+    }).length;
+
+    const newTargetsTrendData = useMemo(() => {
+        const now = dayjs();
+        const bucketCount = 6;
+        const bucketHours = 4;
+        const buckets = Array.from({ length: bucketCount }).map((_, index) => {
+            const end = now.subtract((bucketCount - 1 - index) * bucketHours, 'hour');
+            const start = end.subtract(bucketHours, 'hour');
+            return { start, end, label: end.format('HH:mm') };
+        });
+
+        return buckets.map(bucket => {
+            const count = targets.filter(target => {
+                if (!target.createdAt) return false;
+                const createdAt = dayjs(target.createdAt);
+                return (createdAt.isAfter(bucket.start) || createdAt.isSame(bucket.start)) && createdAt.isBefore(bucket.end);
+            }).length;
+
+            return {
+                time: bucket.label,
+                count
+            };
+        });
+    }, [targets]);
+
+    const errorActions24hCountArray = actions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        if (!['error', 'warning'].includes(status)) return false;
+        const createdAt = a.createdAt || 0;
+        return createdAt > 0 && dayjs(createdAt).isAfter(last24h);
+    });
+    const errorActions24hCount = errorActions24hCountArray.length;
+
+    const errorActions1hCount = actions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        if (!['error', 'warning', 'canceled'].includes(status)) return false;
+        const createdAt = a.createdAt || 0;
+        return createdAt > 0 && dayjs(createdAt).isAfter(now.subtract(1, 'hour'));
+    }).length;
+
+    const targetTypeCoverageData = useMemo(() => {
+        const counts = new Map<string, number>();
+        targets.forEach(target => {
+            const typeName = target.targetTypeName || t('common:status.unknown', 'Unknown');
+            counts.set(typeName, (counts.get(typeName) || 0) + 1);
+        });
+        return Array.from(counts.entries()).map(([name, value]) => ({
+            name,
+            value,
+            color: targetTypeColorMap.get(name) || COLORS.unknown,
+        }));
+    }, [targets, targetTypeColorMap, t]);
+
+    // 15. Error Analysis Calculation
     const errorAnalysis = useMemo(() => {
         const errorActions = actions.filter(a =>
             a.status?.toLowerCase() === 'error' ||
@@ -320,6 +506,7 @@ export const useDashboardMetrics = () => {
         refetch,
         lastUpdated,
         isActivePolling,
+        stableNowMs,
 
         // Data
         targets,
@@ -335,6 +522,7 @@ export const useDashboardMetrics = () => {
         pendingCount,
         finishedCount,
         errorCount,
+        activeActionsCount,
 
         // Rollout Metrics
         activeRolloutCount,
@@ -353,9 +541,27 @@ export const useDashboardMetrics = () => {
 
         // Deployment Metrics
         deploymentRate,
+        onlineRate,
+        errorRate: errorRateAccuracy,
         deploymentRateLabel,
         velocityData,
+        actionTrendData,
         errorAnalysis,
+
+        // Additional KPI Metrics
+        pendingApprovalRolloutCount,
+        scheduledReadyRolloutCount,
+        delayedActionsCount,
+        delayedActions24hCount,
+        orphanTargetsCount,
+        criticalOfflineCount,
+        newTargets24hCount,
+        neverConnectedCount,
+        canceledActions24hCount,
+        errorActions24hCount,
+        errorActions1hCount,
+        newTargetsTrendData,
+        targetTypeCoverageData,
 
         // Fragmentation Metrics
         fragmentationStats,

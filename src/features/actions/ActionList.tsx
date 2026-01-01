@@ -18,7 +18,7 @@ import { useServerTable } from '@/hooks/useServerTable';
 import { StatusTag } from '@/components/common/StatusTag';
 import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction, type FilterValue, type FilterField } from '@/components/patterns';
 import type { ColumnsType } from 'antd/es/table';
-import { appendFilter, buildCondition } from '@/utils/fiql';
+import { buildQueryFromFilterValues } from '@/utils/fiql';
 
 dayjs.extend(relativeTime);
 
@@ -96,24 +96,14 @@ const ActionList: React.FC = () => {
     ], [t]);
 
     // Build RSQL query from filters
-    const buildFinalQuery = useCallback(() => {
-        if (filters.length === 0) return undefined;
+    const buildFinalQuery = useCallback(() => buildQueryFromFilterValues(filters), [filters]);
 
-        const conditions = filters.map(f => {
-            const op = '==';
-            return buildCondition({ field: f.field, operator: op, value: String(f.value) });
-        });
-
-        return conditions.reduce((acc, cond) => appendFilter(acc, cond), '');
-    }, [filters]);
-
-
-
+    const query = buildFinalQuery();
     const { data, isLoading, isFetching, error, refetch } = useGetActions(
         {
             offset,
             limit: pagination.pageSize,
-            q: buildFinalQuery(),
+            q: query || undefined,
         },
         {
             query: {

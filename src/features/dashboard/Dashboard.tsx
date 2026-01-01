@@ -1,26 +1,33 @@
 import React, { useState } from 'react';
-import { IntegratedDashboardGrid } from './components/layouts/DashboardGrid';
+import { useNavigate } from 'react-router-dom';
+import { ThreeLayerDashboardGrid } from './components/layouts/ThreeLayerDashboardGrid';
 import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import { DashboardHeader } from './components/widgets/DashboardHeader';
-import { IntegratedKPICards } from './components/widgets/IntegratedKPICards';
-import { ConnectivityChart } from './components/widgets/ConnectivityChart';
-import { FragmentationChart } from './components/widgets/FragmentationChart';
-import { RolloutStatusChart } from './components/widgets/RolloutStatusChart';
+import { HealthSummaryWidget } from './components/widgets/HealthSummaryWidget';
+import { ActionRequiredWidget } from './components/widgets/ActionRequiredWidget';
 import { ActiveRolloutsWidget } from './components/widgets/ActiveRolloutsWidget';
-import { RecentActivityWidget } from './components/widgets/RecentActivityWidget';
-import { DeploymentVelocityWidget } from './components/widgets/DeploymentVelocityWidget';
+import { InProgressUpdatesWidget } from './components/widgets/InProgressUpdatesWidget';
+import { StatusTrendChartEnhanced } from './components/widgets/StatusTrendChartEnhanced';
+import { ActionActivityWidget } from './components/widgets/ActionActivityWidgetEnhanced';
+import { KPIHealthSummary } from './components/widgets/KPIHealthSummary';
 import { FailureAnalysisModal } from './components/widgets/FailureAnalysisModal';
 
 const Dashboard: React.FC = () => {
     const metrics = useDashboardMetrics();
+    const navigate = useNavigate();
     const [isFailureModalVisible, setIsFailureModalVisible] = useState(false);
 
-    // Calculate in-sync count from fragmentation stats
-    const inSyncCount = metrics.fragmentationStats.inSync;
+    const onActionRequiredClick = (type: 'DELAYED' | 'APPROVAL_PENDING') => {
+        if (type === 'DELAYED') {
+            navigate('/targets');
+        } else if (type === 'APPROVAL_PENDING') {
+            navigate('/rollouts');
+        }
+    };
 
     return (
         <>
-            <IntegratedDashboardGrid
+            <ThreeLayerDashboardGrid
                 header={
                     <DashboardHeader
                         lastUpdated={metrics.lastUpdated}
@@ -29,55 +36,65 @@ const Dashboard: React.FC = () => {
                         onRefresh={metrics.refetch}
                     />
                 }
-                kpiCards={
-                    <IntegratedKPICards
+                // Decision Layer
+                healthSummary={
+                    <HealthSummaryWidget
                         isLoading={metrics.isLoading}
-                        totalDevices={metrics.totalDevices}
-                        onlineCount={metrics.onlineCount}
-                        inSyncCount={inSyncCount}
-                        pendingCount={metrics.pendingCount}
-                        errorCount={metrics.errorCount}
-                        runningRolloutCount={metrics.runningRolloutCount}
-                        successRate={metrics.successRate}
-                        currentVelocity={metrics.velocityData.currentVelocity}
-                        onErrorClick={() => setIsFailureModalVisible(true)}
+                        totalTargets={metrics.totalDevices}
+                        updatingCount={metrics.activeActionsCount}
+                        pausedRollouts={metrics.pausedRolloutCount}
+                        errorRollouts={metrics.errorRolloutCount}
+                        errorActions1h={metrics.errorActions1hCount}
+                        onAnalysisClick={() => setIsFailureModalVisible(true)}
                     />
                 }
-                charts={
-                    <>
-                        <ConnectivityChart
-                            isLoading={metrics.isLoading}
-                            onlineCount={metrics.onlineCount}
-                            offlineCount={metrics.offlineCount}
-                        />
-                        <FragmentationChart
-                            isLoading={metrics.isLoading}
-                            stats={metrics.fragmentationStats}
-                        />
-                        <RolloutStatusChart
-                            isLoading={metrics.isLoading}
-                            activeRolloutCount={metrics.runningRolloutCount}
-                            finishedRolloutCount={metrics.finishedRolloutCount}
-                            errorRolloutCount={metrics.errorRolloutCount}
-                        />
-                        <DeploymentVelocityWidget
-                            isLoading={metrics.isLoading}
-                            data={metrics.velocityData.trend}
-                            currentVelocity={metrics.velocityData.currentVelocity}
-                        />
-                    </>
+                actionRequired={
+                    <ActionRequiredWidget
+                        isLoading={metrics.isLoading}
+                        delayedActionsCount={metrics.delayedActionsCount}
+                        pendingApprovalsCount={metrics.pendingApprovalRolloutCount}
+                        onActionClick={onActionRequiredClick}
+                    />
                 }
-                bottomWidgets={
-                    <>
-                        <ActiveRolloutsWidget
-                            isLoading={metrics.isLoading}
-                            activeRollouts={metrics.activeRollouts}
-                        />
-                        <RecentActivityWidget
-                            isLoading={metrics.isLoading}
-                            data={metrics.recentActivities}
-                        />
-                    </>
+                extraDecision={
+                    <KPIHealthSummary
+                        isLoading={metrics.isLoading}
+                        onlineRate={metrics.onlineRate}
+                        deploymentRate={metrics.deploymentRate}
+                        errorRate={metrics.errorRate}
+                        pendingCount={metrics.pendingCount}
+                        runningRolloutCount={metrics.runningRolloutCount}
+                    />
+                }
+                // Control Layer
+                activeRollouts={
+                    <ActiveRolloutsWidget
+                        isLoading={metrics.isLoading}
+                        activeRollouts={metrics.activeRollouts}
+                        isAdmin={true} // In a real app, this would come from an auth store
+                    />
+                }
+                inProgressUpdates={
+                    <InProgressUpdatesWidget
+                        isLoading={metrics.isLoading}
+                        data={metrics.recentActivities}
+                    />
+                }
+                // Monitoring Layer
+                statusTrend={
+                    <StatusTrendChartEnhanced
+                        isLoading={metrics.isLoading}
+                        actions={metrics.actions}
+                        rollouts={metrics.rollouts}
+                        referenceTimeMs={metrics.stableNowMs}
+                    />
+                }
+                actionActivity={
+                    <ActionActivityWidget
+                        isLoading={metrics.isLoading}
+                        runningActions={metrics.actions.filter(a => ['running', 'pending', 'scheduled'].includes(a.status?.toLowerCase() || ''))}
+                        recentFinishedActions={metrics.actions.filter(a => a.status?.toLowerCase() === 'finished')}
+                    />
                 }
             />
             <FailureAnalysisModal

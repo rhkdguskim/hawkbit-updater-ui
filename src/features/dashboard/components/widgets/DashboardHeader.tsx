@@ -2,23 +2,10 @@ import styled from 'styled-components';
 import { Typography, Button, Flex } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { PageHeader } from '@/components/patterns';
 import { LiveIndicator } from '../DashboardStyles';
 
 const { Title, Text } = Typography;
-
-const HeaderContainer = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 0 8px 0;
-    flex-shrink: 0;
-`;
-
-const ContentWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-`;
 
 const GradientTitle = styled(Title)`
     && {
@@ -52,33 +39,33 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     const { t } = useTranslation(['dashboard', 'common']);
 
     return (
-        <HeaderContainer>
-            <ContentWrapper>
-                <GradientTitle level={3}>
+        <PageHeader
+            title={(
+                <GradientTitle level={2}>
                     {t('title', 'Operations Dashboard')}
                 </GradientTitle>
-                <Flex align="center" gap={12}>
-                    <Text type="secondary" style={{ fontSize: 13 }}>
-                        {t('subtitle', 'Deployment actions and status overview')}
+            )}
+            subtitle={t('subtitle', 'Deployment actions and status overview')}
+            subtitleExtra={(
+                <LiveIndicator $active={isActivePolling} $color="#10b981">
+                    {isActivePolling ? t('common:status.live', 'Live') : t('common:status.idle', 'Idle')}
+                </LiveIndicator>
+            )}
+            actions={(
+                <Flex align="center" gap={8}>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                        {t('updated', 'Updated')}: {lastUpdated}
                     </Text>
-                    <LiveIndicator $active={isActivePolling} $color="#10b981">
-                        {isActivePolling ? t('common:status.live', 'Live') : t('common:status.idle', 'Idle')}
-                    </LiveIndicator>
+                    <Button
+                        icon={<ReloadOutlined />}
+                        onClick={onRefresh}
+                        loading={isLoading}
+                        size="small"
+                    >
+                        {t('refresh', 'Refresh')}
+                    </Button>
                 </Flex>
-            </ContentWrapper>
-            <Flex align="center" gap={8}>
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                    {t('updated', 'Updated')}: {lastUpdated}
-                </Text>
-                <Button
-                    icon={<ReloadOutlined />}
-                    onClick={onRefresh}
-                    loading={isLoading}
-                    size="small"
-                >
-                    {t('refresh', 'Refresh')}
-                </Button>
-            </Flex>
-        </HeaderContainer>
+            )}
+        />
     );
 };
