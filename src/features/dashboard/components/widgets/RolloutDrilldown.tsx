@@ -172,22 +172,30 @@ export const RolloutDrilldown: React.FC<RolloutDrilldownProps> = ({ rolloutId, i
         {
             query: {
                 enabled: isExpanded && !!rolloutId,
-                staleTime: 30000,
+                staleTime: 0,
+                refetchInterval: 2000,
             },
         }
     );
 
     const groups = groupsData?.content || [];
 
+    const getFinishedCount = (group: MgmtRolloutGroupResponseBody) => {
+        const stats = group.totalTargetsPerStatus || {};
+        // Support various key formats from HawkBit and simulator
+        return stats.finished || stats.success || stats.SUCCESS || stats.PROCEEDED || 0;
+    };
+
     const getGroupProgress = (group: MgmtRolloutGroupResponseBody) => {
         const total = group.totalTargets || 0;
-        const finished = group.totalTargetsPerStatus?.finished || 0;
+        const finished = getFinishedCount(group);
         if (!total) return 0;
         return Math.round((finished / total) * 100);
     };
 
     const getErrorCount = (group: MgmtRolloutGroupResponseBody) => {
-        return group.totalTargetsPerStatus?.error || 0;
+        const stats = group.totalTargetsPerStatus || {};
+        return stats.error || stats.failed || stats.ERROR || stats.FAILED || stats.CANCELED || 0;
     };
 
     const handleGroupClick = (group: MgmtRolloutGroupResponseBody) => {
@@ -270,7 +278,7 @@ export const RolloutDrilldown: React.FC<RolloutDrilldownProps> = ({ rolloutId, i
                                     style={{ marginTop: 4 }}
                                     format={() => (
                                         <Text style={{ fontSize: 10 }}>
-                                            {group.totalTargetsPerStatus?.finished || 0}/{group.totalTargets || 0}
+                                            {getFinishedCount(group)}/{group.totalTargets || 0}
                                         </Text>
                                     )}
                                 />

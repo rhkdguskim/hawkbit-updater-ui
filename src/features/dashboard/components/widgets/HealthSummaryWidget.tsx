@@ -7,6 +7,7 @@ import {
     WarningFilled,
     CloseCircleFilled,
     InfoCircleOutlined,
+    ArrowRightOutlined,
 } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -139,12 +140,38 @@ const ReasonsList = styled.div<{ $status: HealthStatus }>`
 const ReasonItem = styled.div<{ $status: HealthStatus }>`
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     color: ${props => statusColors[props.$status].text};
+    font-weight: 500;
+`;
 
-    &::before {
-        content: '⚠️';
-        font-size: 12px;
+const ViewAnalysisButton = styled.div<{ $status: HealthStatus }>`
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    color: ${props => statusColors[props.$status].text};
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.8);
+        transform: translateY(-2px);
+    }
+
+    [data-theme='dark'] &,
+    .dark-mode & {
+        background: rgba(0, 0, 0, 0.2);
+        &:hover {
+            background: rgba(0, 0, 0, 0.4);
+        }
     }
 `;
 
@@ -261,10 +288,21 @@ export const HealthSummaryWidget: React.FC<HealthSummaryWidgetProps> = ({
                 <ReasonsList $status={healthData.status}>
                     {healthData.reasons.map((reason, index) => (
                         <ReasonItem key={index} $status={healthData.status}>
+                            <WarningFilled style={{ fontSize: 14 }} />
                             {reason}
                         </ReasonItem>
                     ))}
                 </ReasonsList>
+            )}
+
+            {healthData.status !== 'SAFE' && (
+                <ViewAnalysisButton $status={healthData.status} onClick={(e) => {
+                    e.stopPropagation();
+                    onAnalysisClick?.();
+                }}>
+                    <span>{t('health.viewAnalysis', 'View Analysis')}</span>
+                    <ArrowRightOutlined />
+                </ViewAnalysisButton>
             )}
         </Container>
     );

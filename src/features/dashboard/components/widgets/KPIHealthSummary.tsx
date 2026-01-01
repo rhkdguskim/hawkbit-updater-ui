@@ -29,7 +29,7 @@ export const KPIHealthSummary: React.FC<KPIHealthSummaryProps> = ({
         <Flex vertical gap={6}>
             <Flex justify="space-between" align="center">
                 <Text type="secondary" style={{ fontSize: 12 }}>{label}</Text>
-                <Text strong style={{ fontSize: 12, color }}>{value !== null ? `${value}%` : '-'}</Text>
+                <Text strong style={{ fontSize: 13, color }}>{value !== null ? `${value.toFixed(1)}%` : '-'}</Text>
             </Flex>
             <ProgressBar $progress={value ?? 0} $color={color} />
         </Flex>

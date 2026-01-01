@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Flex, Typography, Skeleton, Tag, Progress, Alert, Tooltip } from 'antd';
+import { Flex, Typography, Skeleton, Tag, Progress, Tooltip } from 'antd';
 import {
     ThunderboltOutlined,
     ClockCircleOutlined,
@@ -7,7 +7,7 @@ import {
     CheckCircleOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import type { MgmtAction } from '@/api/generated/model';
 
 const { Text, Title } = Typography;
@@ -98,9 +98,38 @@ const ThresholdText = styled(Text)`
     }
 `;
 
-const BottleneckAlert = styled(Alert)`
+const pulse = keyframes`
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+`;
+
+const BottleneckBanner = styled.div<{ $status: 'warning' | 'critical' }>`
+    background: ${({ $status }) => $status === 'critical' ? 'var(--ant-color-error-bg)' : 'var(--ant-color-warning-bg)'};
+    border-radius: var(--ant-border-radius);
+    padding: 12px;
+    border: 1px solid ${({ $status }) => $status === 'critical' ? 'var(--ant-color-error-border)' : 'var(--ant-color-warning-border)'};
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+
+    ${({ $status }) => $status === 'critical' && css`
+        animation: ${pulse} 2s infinite ease-in-out;
+    `}
+`;
+
+const BottleneckHeader = styled(Flex)`
+    font-weight: 600;
+    font-size: 13px;
+    color: ${({ color }) => color || 'inherit'};
+`;
+
+const BottleneckDesc = styled(Text)`
     && {
-        border-radius: var(--ant-border-radius);
+        font-size: 11px;
+        color: var(--ant-color-text-secondary);
+        display: block;
     }
 `;
 
@@ -240,13 +269,15 @@ export const ActionActivityWidget: React.FC<ActionActivityWidgetProps> = ({
             </Flex>
 
             {metrics.isBottleneck && (
-                <BottleneckAlert
-                    type={overallStatus === 'critical' ? 'error' : 'warning'}
-                    icon={<WarningOutlined />}
-                    message={t('actionActivity.bottleneckDetected', 'Bottleneck Detected')}
-                    description={t('actionActivity.bottleneckDesc', 'System load is higher than recommended thresholds. Consider pausing new rollouts or investigating slow actions.')}
-                    showIcon
-                />
+                <BottleneckBanner $status={overallStatus === 'critical' ? 'critical' : 'warning'}>
+                    <BottleneckHeader align="center" gap={8} color={overallStatus === 'critical' ? 'var(--ant-color-error)' : 'var(--ant-color-warning)'}>
+                        <WarningOutlined />
+                        <span>{t('actionActivity.bottleneckDetected', 'Bottleneck Detected')}</span>
+                    </BottleneckHeader>
+                    <BottleneckDesc>
+                        {t('actionActivity.bottleneckDesc', 'System load is higher than recommended thresholds. Consider pausing new rollouts or investigating slow actions.')}
+                    </BottleneckDesc>
+                </BottleneckBanner>
             )}
         </WidgetContainer>
     );

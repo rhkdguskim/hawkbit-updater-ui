@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ThreeLayerDashboardGrid } from './components/layouts/ThreeLayerDashboardGrid';
 import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import { DashboardHeader } from './components/widgets/DashboardHeader';
@@ -13,7 +14,16 @@ import { FailureAnalysisModal } from './components/widgets/FailureAnalysisModal'
 
 const Dashboard: React.FC = () => {
     const metrics = useDashboardMetrics();
+    const navigate = useNavigate();
     const [isFailureModalVisible, setIsFailureModalVisible] = useState(false);
+
+    const onActionRequiredClick = (type: 'DELAYED' | 'APPROVAL_PENDING') => {
+        if (type === 'DELAYED') {
+            navigate('/targets');
+        } else if (type === 'APPROVAL_PENDING') {
+            navigate('/rollouts');
+        }
+    };
 
     return (
         <>
@@ -35,6 +45,7 @@ const Dashboard: React.FC = () => {
                         pausedRollouts={metrics.pausedRolloutCount}
                         errorRollouts={metrics.errorRolloutCount}
                         errorActions1h={metrics.errorActions1hCount}
+                        onAnalysisClick={() => setIsFailureModalVisible(true)}
                     />
                 }
                 actionRequired={
@@ -42,6 +53,7 @@ const Dashboard: React.FC = () => {
                         isLoading={metrics.isLoading}
                         delayedActionsCount={metrics.delayedActionsCount}
                         pendingApprovalsCount={metrics.pendingApprovalRolloutCount}
+                        onActionClick={onActionRequiredClick}
                     />
                 }
                 extraDecision={
@@ -74,6 +86,7 @@ const Dashboard: React.FC = () => {
                         isLoading={metrics.isLoading}
                         actions={metrics.actions}
                         rollouts={metrics.rollouts}
+                        referenceTimeMs={metrics.stableNowMs}
                     />
                 }
                 actionActivity={

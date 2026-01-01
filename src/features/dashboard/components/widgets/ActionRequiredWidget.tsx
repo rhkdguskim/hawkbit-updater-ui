@@ -10,11 +10,11 @@ import {
 
 const { Text, Title } = Typography;
 
-
 interface ActionRequiredWidgetProps {
     isLoading: boolean;
     delayedActionsCount: number;
     pendingApprovalsCount: number;
+    onActionClick?: (type: 'DELAYED' | 'APPROVAL_PENDING') => void;
 }
 
 const Container = styled.div`
@@ -46,13 +46,23 @@ const IconBadge = styled.div<{ $hasItems: boolean }>`
 `;
 
 const ItemRow = styled(List.Item)`
-    padding: 12px 0 !important;
+    padding: 12px 12px !important;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin: 4px 0;
+
+    &:hover {
+        background: var(--ant-color-fill-quaternary);
+        transform: translateX(4px);
+    }
 `;
 
 export const ActionRequiredWidget: React.FC<ActionRequiredWidgetProps> = ({
     isLoading,
     delayedActionsCount,
     pendingApprovalsCount,
+    onActionClick,
 }) => {
     const { t } = useTranslation(['dashboard', 'common']);
     const totalCount = delayedActionsCount + pendingApprovalsCount;
@@ -89,26 +99,37 @@ export const ActionRequiredWidget: React.FC<ActionRequiredWidgetProps> = ({
                     itemLayout="horizontal"
                     dataSource={[
                         ...(delayedActionsCount > 0 ? [{
-                            type: 'DELAYED',
+                            type: 'DELAYED' as const,
                             count: delayedActionsCount,
                             label: t('actionRequired.delayedActions', 'Delayed Actions'),
                             icon: <ClockCircleOutlined style={{ color: 'var(--ant-color-warning)' }} />
                         }] : []),
                         ...(pendingApprovalsCount > 0 ? [{
-                            type: 'APPROVAL_PENDING',
+                            type: 'APPROVAL_PENDING' as const,
                             count: pendingApprovalsCount,
                             label: t('actionRequired.pendingApprovals', 'Pending Approvals'),
                             icon: <LockOutlined style={{ color: 'var(--ant-color-info)' }} />
                         }] : [])
                     ]}
                     renderItem={item => (
-                        <ItemRow>
+                        <ItemRow onClick={() => onActionClick?.(item.type)}>
                             <List.Item.Meta
-                                avatar={item.icon}
-                                title={item.label}
+                                avatar={
+                                    <div style={{
+                                        padding: '8px',
+                                        background: item.type === 'DELAYED' ? 'var(--ant-color-warning-bg)' : 'var(--ant-color-info-bg)',
+                                        borderRadius: '8px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        {item.icon}
+                                    </div>
+                                }
+                                title={<Text strong>{item.label}</Text>}
                                 description={`${item.count} ${t('common:items', 'items')}`}
                             />
-                            <Tag color={item.type === 'DELAYED' ? 'warning' : 'processing'}>
+                            <Tag color={item.type === 'DELAYED' ? 'warning' : 'processing'} style={{ borderRadius: '6px' }}>
                                 {t('common:actions.view', 'View')}
                             </Tag>
                         </ItemRow>

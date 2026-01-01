@@ -17,7 +17,7 @@ import {
 } from '@ant-design/icons';
 import { AirportSlideList } from '@/components/common';
 import { ListCard, IconBadge } from '../DashboardStyles';
-import { useResume, usePause, useStart } from '@/api/generated/rollouts/rollouts';
+import { useResume, usePause, useStart, useGetRollout } from '@/api/generated/rollouts/rollouts';
 import { useQueryClient } from '@tanstack/react-query';
 import type { MgmtRolloutResponseBody } from '@/api/generated/model';
 import { RolloutDrilldown } from './RolloutDrilldown';
@@ -101,6 +101,217 @@ interface ActiveRolloutsWidgetProps {
     onCreateClick?: () => void;
 }
 
+const getFinishedCount = (rollout: MgmtRolloutResponseBody) => {
+    const stats = rollout.totalTargetsPerStatus || {};
+    return stats.finished || stats.success || stats.SUCCESS || stats.PROCEEDED || 0;
+};
+
+const getRunningCount = (rollout: MgmtRolloutResponseBody) => {
+    const stats = rollout.totalTargetsPerStatus || {};
+    return stats.running || stats.started || stats.STARTED || stats.PROCEEDING || stats.IN_PROGRESS || 0;
+};
+
+const getErrorCount = (rollout: MgmtRolloutResponseBody) => {
+    const stats = rollout.totalTargetsPerStatus || {};
+    return stats.error || stats.failed || stats.ERROR || stats.FAILED || stats.CANCELED || 0;
+};
+
+const getRolloutProgress = (rollout: MgmtRolloutResponseBody) => {
+    if (rollout.status === 'finished') return 100;
+    const total = rollout.totalTargets || 0;
+    const finished = getFinishedCount(rollout);
+    if (!total) return 0;
+    return Math.round((finished / total) * 100);
+};
+
+interface ActiveRolloutItemProps {
+    rollout: MgmtRolloutResponseBody;
+    isAdmin: boolean;
+    onAction: (e: React.MouseEvent, action: 'resume' | 'pause' | 'start', rollout: MgmtRolloutResponseBody) => void;
+    onShowGroups: (id: number) => void;
+    confirmModalRolloutId?: number;
+    actionsPending: {
+        isResuming: boolean;
+        isPausing: boolean;
+        isStarting: boolean;
+    };
+}
+
+const ActiveRolloutItem: React.FC<ActiveRolloutItemProps> = ({
+    rollout: initialRollout,
+    isAdmin,
+    onAction,
+    onShowGroups,
+    confirmModalRolloutId,
+    actionsPending,
+}) => {
+    const { t } = useTranslation(['dashboard', 'rollouts', 'common']);
+    const navigate = useNavigate();
+
+    // Aggressive individual polling for real-time progress updates (500ms)
+    const activeStatuses = ['running', 'starting', 'creating', 'paused', 'waiting_for_approval', 'scheduled', 'ready'];
+    const isActive = activeStatuses.includes(initialRollout.status?.toLowerCase() || '');
+    const { data: polledRollout } = useGetRollout(initialRollout.id, {
+        query: {
+            enabled: !!initialRollout.id && isActive,
+            refetchInterval: 1000,
+            staleTime: 0,
+            gcTime: 0,
+        }
+    });
+
+    const rollout = polledRollout || initialRollout;
+    const progress = getRolloutProgress(rollout);
+    const finished = getFinishedCount(rollout);
+    const running = getRunningCount(rollout);
+    const error = getErrorCount(rollout);
+    const total = rollout.totalTargets || 0;
+
+    const getStatusLabel = (status?: string) => {
+        if (!status) return 'Unknown';
+        return t(`common:status.${status.toLowerCase()}`, { defaultValue: status.toUpperCase() });
+    };
+
+    return (
+        <ActivityItem onClick={() => navigate(`/rollouts/${rollout.id}`)}>
+            {/* Header Row */}
+            <Flex justify="space-between" align="center">
+                <Flex align="center" gap={8} style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                        width: 28, height: 28, borderRadius: 6,
+                        background: rollout.status === 'running'
+                            ? 'rgba(var(--ant-color-primary-rgb), 0.15)'
+                            : rollout.status === 'paused'
+                                ? 'rgba(var(--ant-color-warning-rgb), 0.15)'
+                                : 'rgba(var(--ant-color-info-rgb), 0.15)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0
+                    }}>
+                        {rollout.status === 'running' ? (
+                            <SyncOutlined spin style={{ fontSize: 12, color: ROLLOUT_COLORS.running }} />
+                        ) : rollout.status === 'paused' ? (
+                            <PauseCircleOutlined style={{ fontSize: 12, color: ROLLOUT_COLORS.paused }} />
+                        ) : (
+                            <ClockCircleOutlined style={{ fontSize: 12, color: ROLLOUT_COLORS.scheduled }} />
+                        )}
+                    </div>
+                    <Tooltip title={rollout.name}>
+                        <Text strong style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {rollout.name}
+                        </Text>
+                    </Tooltip>
+                </Flex>
+                <Tag color={statusColorMap[rollout.status || ''] || 'default'} style={{ margin: 0, fontSize: 9, borderRadius: 999, padding: '0 6px' }}>
+                    {getStatusLabel(rollout.status)}
+                </Tag>
+            </Flex>
+
+            {/* Progress Section */}
+            <ProgressSection>
+                <Flex justify="space-between" align="center">
+                    <Text type="secondary" style={{ fontSize: 10 }}>
+                        {t('dashboard:activeRollouts.progress')}: {progress}% ({finished}/{total})
+                    </Text>
+                    {rollout.totalGroups && (
+                        <Text type="secondary" style={{ fontSize: 10 }}>
+                            {t('dashboard:activeRollouts.groupProgress', {
+                                current: Math.min(rollout.totalGroups, Math.ceil((finished / total) * rollout.totalGroups) || 1),
+                                total: rollout.totalGroups
+                            })}
+                        </Text>
+                    )}
+                </Flex>
+                <Progress
+                    percent={progress}
+                    showInfo={false}
+                    size="small"
+                    strokeColor={
+                        rollout.status === 'running' ? ROLLOUT_COLORS.running :
+                            rollout.status === 'paused' ? ROLLOUT_COLORS.paused :
+                                'var(--ant-color-text-quaternary)'
+                    }
+                />
+                <StatusCounts>
+                    <StatusCount $color="#10b981">
+                        <CheckCircleFilled /> {finished}
+                    </StatusCount>
+                    <StatusCount $color="var(--ant-color-primary)">
+                        <SyncOutlined /> {running}
+                    </StatusCount>
+                    <StatusCount $color="#ef4444">
+                        <CloseCircleFilled /> {error}
+                    </StatusCount>
+                </StatusCounts>
+            </ProgressSection>
+
+            {/* Action Buttons */}
+            <ActionButtons justify="flex-end">
+                {isAdmin && rollout.status === 'paused' && (
+                    <Tooltip title={t('dashboard:activeRollouts.resume')}>
+                        <Button
+                            type="primary"
+                            size="small"
+                            icon={<CaretRightOutlined />}
+                            loading={actionsPending.isResuming && confirmModalRolloutId === rollout.id}
+                            onClick={(e) => onAction(e, 'resume', rollout)}
+                        >
+                            {t('dashboard:activeRollouts.resume')}
+                        </Button>
+                    </Tooltip>
+                )}
+                {isAdmin && rollout.status === 'running' && (
+                    <Tooltip title={t('dashboard:activeRollouts.pause')}>
+                        <Button
+                            size="small"
+                            icon={<PauseCircleOutlined />}
+                            loading={actionsPending.isPausing && confirmModalRolloutId === rollout.id}
+                            onClick={(e) => onAction(e, 'pause', rollout)}
+                        >
+                            {t('dashboard:activeRollouts.pause')}
+                        </Button>
+                    </Tooltip>
+                )}
+                {isAdmin && (rollout.status === 'ready' || rollout.status === 'scheduled') && (
+                    <Tooltip title={t('dashboard:activeRollouts.start')}>
+                        <Button
+                            type="primary"
+                            size="small"
+                            icon={<PlayCircleOutlined />}
+                            loading={actionsPending.isStarting && confirmModalRolloutId === rollout.id}
+                            onClick={(e) => onAction(e, 'start', rollout)}
+                        >
+                            {t('dashboard:activeRollouts.start')}
+                        </Button>
+                    </Tooltip>
+                )}
+                <Tooltip title={t('dashboard:activeRollouts.groups')}>
+                    <Button
+                        size="small"
+                        icon={<CaretRightOutlined />}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (rollout.id) onShowGroups(rollout.id);
+                        }}
+                    >
+                        {t('dashboard:activeRollouts.groups')}
+                    </Button>
+                </Tooltip>
+                <Tooltip title={t('dashboard:activeRollouts.details')}>
+                    <Button
+                        type="text"
+                        size="small"
+                        icon={<FileTextOutlined />}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/rollouts/${rollout.id}`);
+                        }}
+                    />
+                </Tooltip>
+            </ActionButtons>
+        </ActivityItem>
+    );
+};
+
 export const ActiveRolloutsWidget: React.FC<ActiveRolloutsWidgetProps> = ({
     isLoading,
     activeRollouts,
@@ -156,24 +367,6 @@ export const ActiveRolloutsWidget: React.FC<ActiveRolloutsWidgetProps> = ({
             },
         },
     });
-
-    const getStatusLabel = (status?: string) => {
-        if (!status) return 'Unknown';
-        return t(`common:status.${status.toLowerCase()}`, { defaultValue: status.toUpperCase() });
-    };
-
-    const getRolloutProgress = (rollout: MgmtRolloutResponseBody) => {
-        if (rollout.status === 'finished') return 100;
-        const total = rollout.totalTargets || 0;
-        const finished = rollout.totalTargetsPerStatus?.finished || 0;
-        if (!total) return 0;
-        return Math.round((finished / total) * 100);
-    };
-
-    const handleAction = (e: React.MouseEvent, action: 'resume' | 'pause' | 'start', rollout: MgmtRolloutResponseBody) => {
-        e.stopPropagation();
-        setConfirmModal({ visible: true, action, rollout });
-    };
 
     const executeAction = () => {
         if (!confirmModal.rollout?.id || !confirmModal.action) return;
@@ -242,165 +435,28 @@ export const ActiveRolloutsWidget: React.FC<ActiveRolloutsWidgetProps> = ({
                     <ListBody>
                         <AirportSlideList
                             items={activeRollouts}
-                            itemHeight={120}
+                            itemHeight={150}
                             visibleCount={3}
                             scrollSpeed={30}
                             fullHeight={true}
-                            renderItem={(rollout: MgmtRolloutResponseBody) => {
-                                const progress = getRolloutProgress(rollout);
-                                const finished = rollout.totalTargetsPerStatus?.finished || 0;
-                                const running = rollout.totalTargetsPerStatus?.running || 0;
-                                const error = rollout.totalTargetsPerStatus?.error || 0;
-                                const total = rollout.totalTargets || 0;
-
-                                return (
-                                    <ActivityItem key={rollout.id} onClick={() => navigate(`/rollouts/${rollout.id}`)}>
-                                        {/* Header Row */}
-                                        <Flex justify="space-between" align="center">
-                                            <Flex align="center" gap={8} style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{
-                                                    width: 28, height: 28, borderRadius: 6,
-                                                    background: rollout.status === 'running'
-                                                        ? 'rgba(var(--ant-color-primary-rgb), 0.15)'
-                                                        : rollout.status === 'paused'
-                                                            ? 'rgba(var(--ant-color-warning-rgb), 0.15)'
-                                                            : 'rgba(var(--ant-color-info-rgb), 0.15)',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    flexShrink: 0
-                                                }}>
-                                                    {rollout.status === 'running' ? (
-                                                        <SyncOutlined spin style={{ fontSize: 12, color: ROLLOUT_COLORS.running }} />
-                                                    ) : rollout.status === 'paused' ? (
-                                                        <PauseCircleOutlined style={{ fontSize: 12, color: ROLLOUT_COLORS.paused }} />
-                                                    ) : (
-                                                        <ClockCircleOutlined style={{ fontSize: 12, color: ROLLOUT_COLORS.scheduled }} />
-                                                    )}
-                                                </div>
-                                                <Tooltip title={rollout.name}>
-                                                    <Text strong style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                        {rollout.name}
-                                                    </Text>
-                                                </Tooltip>
-                                            </Flex>
-                                            <Tag color={statusColorMap[rollout.status || ''] || 'default'} style={{ margin: 0, fontSize: 9, borderRadius: 999, padding: '0 6px' }}>
-                                                {getStatusLabel(rollout.status)}
-                                            </Tag>
-                                        </Flex>
-
-                                        {/* Progress Section */}
-                                        <ProgressSection>
-                                            <Flex justify="space-between" align="center">
-                                                <Text type="secondary" style={{ fontSize: 10 }}>
-                                                    {t('dashboard:activeRollouts.progress')}: {progress}% ({finished}/{total})
-                                                </Text>
-                                                {rollout.totalGroups && (
-                                                    <Text type="secondary" style={{ fontSize: 10 }}>
-                                                        {t('dashboard:activeRollouts.groupProgress', {
-                                                            current: Math.min(rollout.totalGroups, Math.ceil((finished / total) * rollout.totalGroups) || 1),
-                                                            total: rollout.totalGroups
-                                                        })}
-                                                    </Text>
-                                                )}
-                                            </Flex>
-                                            <Progress
-                                                percent={progress}
-                                                showInfo={false}
-                                                size="small"
-                                                strokeColor={
-                                                    rollout.status === 'running' ? ROLLOUT_COLORS.running :
-                                                        rollout.status === 'paused' ? ROLLOUT_COLORS.paused :
-                                                            'var(--ant-color-text-quaternary)'
-                                                }
-                                            />
-                                            <StatusCounts>
-                                                <StatusCount $color="#10b981">
-                                                    <CheckCircleFilled /> {finished}
-                                                </StatusCount>
-                                                <StatusCount $color="var(--ant-color-primary)">
-                                                    <SyncOutlined /> {running}
-                                                </StatusCount>
-                                                <StatusCount $color="#ef4444">
-                                                    <CloseCircleFilled /> {error}
-                                                </StatusCount>
-                                            </StatusCounts>
-                                        </ProgressSection>
-
-                                        {/* Action Buttons */}
-                                        <ActionButtons justify="flex-end">
-                                            {rollout.status === 'paused' && (
-                                                <Tooltip title={t('dashboard:activeRollouts.resume')}>
-                                                    <Button
-                                                        type="primary"
-                                                        size="small"
-                                                        icon={<CaretRightOutlined />}
-                                                        loading={isResuming && confirmModal.rollout?.id === rollout.id}
-                                                        onClick={(e) => handleAction(e, 'resume', rollout)}
-                                                    >
-                                                        {t('dashboard:activeRollouts.resume')}
-                                                    </Button>
-                                                </Tooltip>
-                                            )}
-                                            {rollout.status === 'running' && (
-                                                <Tooltip title={t('dashboard:activeRollouts.pause')}>
-                                                    <Button
-                                                        size="small"
-                                                        icon={<PauseCircleOutlined />}
-                                                        loading={isPausing && confirmModal.rollout?.id === rollout.id}
-                                                        onClick={(e) => handleAction(e, 'pause', rollout)}
-                                                    >
-                                                        {t('dashboard:activeRollouts.pause')}
-                                                    </Button>
-                                                </Tooltip>
-                                            )}
-                                            {(rollout.status === 'ready' || rollout.status === 'scheduled') && (
-                                                <Tooltip title={t('dashboard:activeRollouts.start')}>
-                                                    <Button
-                                                        type="primary"
-                                                        size="small"
-                                                        icon={<PlayCircleOutlined />}
-                                                        loading={isStarting && confirmModal.rollout?.id === rollout.id}
-                                                        onClick={(e) => handleAction(e, 'start', rollout)}
-                                                    >
-                                                        {t('dashboard:activeRollouts.start')}
-                                                    </Button>
-                                                </Tooltip>
-                                            )}
-                                            <Tooltip title={t('dashboard:activeRollouts.details')}>
-                                                <Button
-                                                    type="text"
-                                                    size="small"
-                                                    icon={<FileTextOutlined />}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        navigate(`/rollouts/${rollout.id}`);
-                                                    }}
-                                                />
-                                            </Tooltip>
-                                        </ActionButtons>
-                                        {/* Action Buttons */}
-                                        <ActionButtons>
-                                            {isAdmin && rollout.status === 'paused' && (
-                                                <Button size="small" type="primary" icon={<PlayCircleOutlined />} onClick={(e) => handleAction(e, 'resume', rollout)}>
-                                                    {t('dashboard:activeRollouts.resume')}
-                                                </Button>
-                                            )}
-                                            {isAdmin && rollout.status === 'running' && (
-                                                <Button size="small" danger icon={<PauseCircleOutlined />} onClick={(e) => handleAction(e, 'pause', rollout)}>
-                                                    {t('dashboard:activeRollouts.pause')}
-                                                </Button>
-                                            )}
-                                            {isAdmin && (rollout.status === 'scheduled' || rollout.status === 'ready') && (
-                                                <Button size="small" type="primary" icon={<PlayCircleOutlined />} onClick={(e) => handleAction(e, 'start', rollout)}>
-                                                    {t('dashboard:activeRollouts.start')}
-                                                </Button>
-                                            )}
-                                            <Button size="small" icon={<CaretRightOutlined />} onClick={(e) => { e.stopPropagation(); if (rollout.id) setExpandedRolloutId(rollout.id); }}>
-                                                {t('dashboard:activeRollouts.groups')}
-                                            </Button>
-                                        </ActionButtons>
-                                    </ActivityItem>
-                                );
-                            }}
+                            renderItem={(rollout: MgmtRolloutResponseBody) => (
+                                <ActiveRolloutItem
+                                    key={rollout.id}
+                                    rollout={rollout}
+                                    isAdmin={isAdmin}
+                                    onAction={(e, action, r) => {
+                                        e.stopPropagation();
+                                        setConfirmModal({ visible: true, action, rollout: r });
+                                    }}
+                                    onShowGroups={(id) => setExpandedRolloutId(id)}
+                                    confirmModalRolloutId={confirmModal.rollout?.id}
+                                    actionsPending={{
+                                        isResuming,
+                                        isPausing,
+                                        isStarting
+                                    }}
+                                />
+                            )}
                         />
                     </ListBody>
                 ) : (

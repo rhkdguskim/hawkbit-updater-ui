@@ -142,7 +142,7 @@ const RolloutActionConfirmModal: React.FC<RolloutActionConfirmModalProps> = ({
             onOk={onConfirm}
             onCancel={onCancel}
             okText={getOkText()}
-            cancelText={t('common:buttons.cancel')}
+            cancelText={t('common:actions.cancel')}
             okButtonProps={{
                 loading,
                 danger: actionType === 'cancel',

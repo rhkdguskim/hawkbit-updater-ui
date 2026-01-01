@@ -653,7 +653,7 @@ const RolloutsOverview: React.FC = () => {
                                         icon={<PlusOutlined />}
                                         onClick={() => setIsCreateModalOpen(true)}
                                     >
-                                        {t('overview.createFirst', 'Create First Rollout')}
+                                        {t('overview.createRollout', 'Create Rollout')}
                                     </Button>
                                 )}
                             </EmptyState>

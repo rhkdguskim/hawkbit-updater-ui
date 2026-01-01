@@ -42,6 +42,7 @@ interface StatusTrendChartProps {
     actions: MgmtAction[];
     rollouts?: MgmtRolloutResponseBody[];
     hours?: number;
+    referenceTimeMs?: number | null;
 }
 
 const ChartContainer = styled.div`
@@ -122,11 +123,12 @@ export const StatusTrendChartEnhanced: React.FC<StatusTrendChartProps> = ({
     actions,
     rollouts = [],
     hours = 24,
+    referenceTimeMs,
 }) => {
     const { t } = useTranslation(['dashboard', 'common']);
 
     const chartData = useMemo<HourlyData[]>(() => {
-        const now = dayjs();
+        const now = referenceTimeMs ? dayjs(referenceTimeMs) : dayjs();
         const hoursArray: HourlyData[] = [];
 
         // Initialize hourly buckets
@@ -172,7 +174,8 @@ export const StatusTrendChartEnhanced: React.FC<StatusTrendChartProps> = ({
 
     const rolloutEvents = useMemo<RolloutEvent[]>(() => {
         const events: RolloutEvent[] = [];
-        const twentyFourHoursAgo = dayjs().subtract(24, 'hour').valueOf();
+        const now = referenceTimeMs ? dayjs(referenceTimeMs) : dayjs();
+        const twentyFourHoursAgo = now.subtract(24, 'hour').valueOf();
 
         rollouts.forEach(rollout => {
             // Check for start events

@@ -44,7 +44,6 @@ import { useTranslation } from 'react-i18next';
 import { PageLayout } from '@/components/patterns';
 import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader, StatusTag } from '@/components/common';
-import { getStatusLabel } from '@/utils/statusUtils';
 import RolloutActionConfirmModal, { type RolloutActionType } from './components/RolloutActionConfirmModal';
 
 const { Text } = Typography;
@@ -87,7 +86,9 @@ const RolloutDetail: React.FC = () => {
         {
             query: {
                 enabled: !!rolloutIdNum,
-                refetchInterval: rolloutData?.status === 'running' ? 2000 : 10000,
+                refetchInterval: rolloutData?.status && ['creating', 'starting', 'running', 'paused', 'waiting_for_approval'].includes(rolloutData.status.toLowerCase())
+                    ? 2000
+                    : 10000,
                 staleTime: 0,
             }
         }
@@ -418,7 +419,7 @@ const RolloutDetail: React.FC = () => {
             <DetailPageHeader
                 title={rolloutData?.name || rolloutId}
                 description={t('detail.description')}
-                status={rolloutData?.status ? getStatusLabel(rolloutData.status, t) : undefined}
+                status={rolloutData?.status}
                 backLabel={t('detail.back')}
                 onBack={() => navigate('/rollouts')}
                 actions={headerActions}
