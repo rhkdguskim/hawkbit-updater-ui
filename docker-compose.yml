@@ -53,7 +53,8 @@ services:
       - HAWKBIT_DMF_RABBITMQ_ENABLED=false
 
       # Artifact storage - persist to mounted volume
-      - HAWKBIT_ARTIFACT_REPOSITORY_FILE_FILEPATH=/opt/hawkbit/data/artifacts
+      - HAWKBIT_ARTIFACT_REPOSITORY_LOCAL_FILESYSTEM_PATH=/opt/hawkbit/data/artifacts
+      - HAWKBIT_ARTIFACT_URL_PROTOCOLS_DOWNLOAD_PROTOCOL_DOWNLOAD_PREFIX=/download
     volumes:
       - hawkbit-data:/opt/hawkbit/data
     depends_on:

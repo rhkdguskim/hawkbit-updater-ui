@@ -19,10 +19,13 @@ import { useGetAction1 } from '@/api/generated/actions/actions';
 import { useQueryClient } from '@tanstack/react-query';
 import type { MgmtTarget, MgmtAction, MgmtActionStatus } from '@/api/generated/model';
 import { Popover, List } from 'antd';
-import { formatDistance } from 'date-fns';
-import { enUS, ko } from 'date-fns/locale';
 import { useLanguageStore } from '@/stores/useLanguageStore';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/en';
+
+dayjs.extend(relativeTime);
 
 const { Text } = Typography;
 
@@ -158,7 +161,6 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
     const { t } = useTranslation(['dashboard', 'common', 'actions']);
     const { language } = useLanguageStore();
     const queryClient = useQueryClient();
-    const dateLocale = language === 'ko' ? ko : enUS;
 
     // Polling for THE action to get latest detail status
     const { data: actionData } = useGetAction1(item.action.id!, {
@@ -189,7 +191,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
 
     const getDelayText = (startTime?: number): string => {
         if (!startTime || !currentTime) return t('inProgress.justNow');
-        return formatDistance(new Date(startTime), new Date(currentTime), { addSuffix: false, locale: dateLocale });
+        return dayjs(startTime).locale(language).from(dayjs(currentTime), true);
     };
 
     const handleRetry = async (e: React.MouseEvent) => {
