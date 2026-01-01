@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
     Descriptions,
@@ -45,6 +45,7 @@ import { PageLayout } from '@/components/patterns';
 import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader, StatusTag } from '@/components/common';
 import { getStatusLabel } from '@/utils/statusUtils';
+import RolloutActionConfirmModal, { type RolloutActionType } from './components/RolloutActionConfirmModal';
 
 const { Text } = Typography;
 
@@ -55,6 +56,10 @@ const RolloutDetail: React.FC = () => {
     const queryClient = useQueryClient();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
+
+    // Modal state for action confirmation
+    const [actionModalOpen, setActionModalOpen] = useState(false);
+    const [currentAction, setCurrentAction] = useState<RolloutActionType | null>(null);
 
     const rolloutIdNum = parseInt(rolloutId || '0', 10);
 
@@ -149,24 +154,40 @@ const RolloutDetail: React.FC = () => {
         },
     });
 
+    // Modal handlers
+    const openActionModal = (action: RolloutActionType) => {
+        setCurrentAction(action);
+        setActionModalOpen(true);
+    };
+
+    const closeActionModal = () => {
+        setActionModalOpen(false);
+        setCurrentAction(null);
+    };
+
+    const handleActionConfirm = () => {
+        if (!rolloutIdNum || !currentAction) return;
+
+        switch (currentAction) {
+            case 'start':
+                startMutation.mutate({ rolloutId: rolloutIdNum });
+                break;
+            case 'pause':
+                pauseMutation.mutate({ rolloutId: rolloutIdNum });
+                break;
+            case 'resume':
+                resumeMutation.mutate({ rolloutId: rolloutIdNum });
+                break;
+            default:
+                break;
+        }
+        closeActionModal();
+    };
+
     // Handlers
-    const handleStart = () => {
-        if (rolloutIdNum) {
-            startMutation.mutate({ rolloutId: rolloutIdNum });
-        }
-    };
-
-    const handlePause = () => {
-        if (rolloutIdNum) {
-            pauseMutation.mutate({ rolloutId: rolloutIdNum });
-        }
-    };
-
-    const handleResume = () => {
-        if (rolloutIdNum) {
-            resumeMutation.mutate({ rolloutId: rolloutIdNum });
-        }
-    };
+    const handleStart = () => openActionModal('start');
+    const handlePause = () => openActionModal('pause');
+    const handleResume = () => openActionModal('resume');
 
     const handleApprove = () => {
         if (rolloutIdNum) {
@@ -304,31 +325,23 @@ const RolloutDetail: React.FC = () => {
     const headerActions = (
         <Space wrap>
             {canStart && (
-                <Popconfirm
-                    title={t('detail.controls.startConfirm')}
-                    onConfirm={handleStart}
+                <Button
+                    type="primary"
+                    icon={<PlayCircleOutlined />}
+                    onClick={handleStart}
+                    loading={startMutation.isPending}
                 >
-                    <Button
-                        type="primary"
-                        icon={<PlayCircleOutlined />}
-                        loading={startMutation.isPending}
-                    >
-                        {t('detail.controls.start')}
-                    </Button>
-                </Popconfirm>
+                    {t('detail.controls.start')}
+                </Button>
             )}
             {canPause && (
-                <Popconfirm
-                    title={t('detail.controls.pauseConfirm')}
-                    onConfirm={handlePause}
+                <Button
+                    icon={<PauseCircleOutlined />}
+                    onClick={handlePause}
+                    loading={pauseMutation.isPending}
                 >
-                    <Button
-                        icon={<PauseCircleOutlined />}
-                        loading={pauseMutation.isPending}
-                    >
-                        {t('detail.controls.pause')}
-                    </Button>
-                </Popconfirm>
+                    {t('detail.controls.pause')}
+                </Button>
             )}
             {canResume && (
                 <Button
@@ -469,6 +482,23 @@ const RolloutDetail: React.FC = () => {
                     locale={{ emptyText: t('detail.emptyGroups') }}
                 />
             </SectionCard>
+
+            {/* Action Confirmation Modal */}
+            {currentAction && (
+                <RolloutActionConfirmModal
+                    open={actionModalOpen}
+                    actionType={currentAction}
+                    rolloutName={rolloutData?.name || ''}
+                    targetCount={totalTargets}
+                    loading={
+                        currentAction === 'start' ? startMutation.isPending :
+                            currentAction === 'pause' ? pauseMutation.isPending :
+                                currentAction === 'resume' ? resumeMutation.isPending : false
+                    }
+                    onConfirm={handleActionConfirm}
+                    onCancel={closeActionModal}
+                />
+            )}
         </PageLayout>
     );
 };

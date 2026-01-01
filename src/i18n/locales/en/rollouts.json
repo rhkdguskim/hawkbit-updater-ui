@@ -301,5 +301,32 @@
                 "title": "Restricted time range"
             }
         }
+    },
+    "actionConfirm": {
+        "start": {
+            "title": "Confirm Start Rollout",
+            "message": "Do you want to start this rollout?",
+            "targetInfo": "Deployment will begin for {{count}} target(s).",
+            "okText": "Start ▶"
+        },
+        "pause": {
+            "title": "Confirm Pause Rollout",
+            "message": "Do you want to pause this rollout?",
+            "targetInfo": "Ongoing deployment for {{count}} target(s) will be suspended.",
+            "okText": "Pause ⏸"
+        },
+        "resume": {
+            "title": "Confirm Resume Rollout",
+            "message": "Do you want to resume this rollout?",
+            "targetInfo": "Deployment will continue for {{count}} target(s).",
+            "okText": "Resume ▶"
+        },
+        "cancel": {
+            "title": "Confirm Cancel Action",
+            "message": "Do you want to cancel this action?",
+            "targetInfo": "{{count}} target(s) will be affected.",
+            "okText": "Cancel Action",
+            "warning": "This action cannot be undone."
+        }
     }
 }
