@@ -301,5 +301,32 @@
                 "title": "제한된 시간대"
             }
         }
+    },
+    "actionConfirm": {
+        "start": {
+            "title": "롤아웃 시작 확인",
+            "message": "이 롤아웃을 시작하시겠습니까?",
+            "targetInfo": "{{count}}개 타겟에 대한 배포가 시작됩니다.",
+            "okText": "시작 ▶"
+        },
+        "pause": {
+            "title": "롤아웃 일시정지 확인",
+            "message": "이 롤아웃을 일시정지하시겠습니까?",
+            "targetInfo": "진행 중인 {{count}}개 타겟에 대한 배포가 중단됩니다.",
+            "okText": "일시정지 ⏸"
+        },
+        "resume": {
+            "title": "롤아웃 재개 확인",
+            "message": "이 롤아웃을 재개하시겠습니까?",
+            "targetInfo": "{{count}}개 타겟에 대한 배포가 계속됩니다.",
+            "okText": "재개 ▶"
+        },
+        "cancel": {
+            "title": "액션 취소 확인",
+            "message": "이 액션을 취소하시겠습니까?",
+            "targetInfo": "{{count}}개 타겟이 영향을 받습니다.",
+            "okText": "액션 취소",
+            "warning": "이 작업은 되돌릴 수 없습니다."
+        }
     }
 }
