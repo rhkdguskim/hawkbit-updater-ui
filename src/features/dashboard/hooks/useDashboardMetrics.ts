@@ -11,6 +11,7 @@ import { useGetSoftwareModules } from '@/api/generated/software-modules/software
 import type { MgmtDistributionSet, MgmtSoftwareModule, MgmtRolloutResponseBody, MgmtAction } from '@/api/generated/model';
 
 import { isTargetOnline, isActionErrored } from '@/entities';
+import { COLORS } from '@/components/shared/OverviewStyles';
 
 dayjs.extend(relativeTime);
 
