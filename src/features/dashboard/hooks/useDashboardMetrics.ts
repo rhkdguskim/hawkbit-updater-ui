@@ -229,27 +229,28 @@ export const useDashboardMetrics = () => {
         ['running', 'paused', 'starting'].includes(r.status?.toLowerCase() || '')
     );
 
-    const averageActiveProgress = ongoingRollouts.length > 0
-        ? ongoingRollouts.reduce((sum, r) => {
-            const total = r.totalTargets || 0;
-            if (total === 0) return sum;
-            const stats = r.totalTargetsPerStatus || {};
-            const finished = stats.finished || stats.success || stats.SUCCESS || stats.PROCEEDED || 0;
-            return sum + (finished / total) * 100;
-        }, 0) / ongoingRollouts.length
+    const totalOngoingTargets = ongoingRollouts.reduce((sum, r) => sum + (r.totalTargets || 0), 0);
+    const totalOngoingFinished = ongoingRollouts.reduce((sum, r) => {
+        const stats = r.totalTargetsPerStatus || {};
+        return sum + (stats.finished || stats.success || stats.SUCCESS || stats.PROCEEDED || 0);
+    }, 0);
+
+    const activeRolloutWeightedProgress = totalOngoingTargets > 0
+        ? (totalOngoingFinished / totalOngoingTargets) * 100
         : 0;
 
     const onlineRate = totalDevices > 0 ? Math.round((onlineCount / totalDevices) * 100) : 0;
     const errorRateAccuracy = finishedCount + errorCount > 0 ? Math.round((errorCount / (finishedCount + errorCount)) * 100) : 0;
 
-    // Use Average Active Progress if rollouts are running, otherwise fall back to fleet-wide In Sync rate
+    // Use fleet-wide In Sync rate as the primary source of truth for "Deployment Progress"
+    // unless the active rollouts specifically provide higher/more recent progress stats.
     const inSyncRate = totalDevices > 0 ? Math.round((fragmentationStats.inSync / totalDevices) * 100) : 0;
 
     const totalActions = recentActions.length;
     const finishedActions = finishedCount;
 
     const deploymentRate = ongoingRollouts.length > 0
-        ? Math.round(averageActiveProgress)
+        ? Math.round(activeRolloutWeightedProgress)
         : totalDevices > 0
             ? inSyncRate
             : totalActions > 0
@@ -257,7 +258,7 @@ export const useDashboardMetrics = () => {
                 : null;
 
     const deploymentRateLabel = ongoingRollouts.length > 0
-        ? `${ongoingRollouts.length} ${t('chart.rollouts', 'rollouts')} ${t('chart.active', 'active')}`
+        ? `${totalOngoingFinished} / ${totalOngoingTargets} ${t('chart.targets', 'targets')}`
         : `${finishedActions} / ${totalActions} ${t('chart.actions', 'actions')}`;
 
     // 9. Distribution Sets Metrics

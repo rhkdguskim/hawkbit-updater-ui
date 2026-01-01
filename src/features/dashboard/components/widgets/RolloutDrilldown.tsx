@@ -264,9 +264,9 @@ export const RolloutDrilldown: React.FC<RolloutDrilldownProps> = ({ rolloutId, i
                                     {t(`common:status.${group.status?.toLowerCase() || 'unknown'}`)}
                                 </Tag>
                             </Flex>
-                            {group.status !== 'scheduled' && group.status !== 'ready' && (
+                            {(group.status === 'running' || group.status === 'finished' || group.status === 'error') && (
                                 <Progress
-                                    percent={progress}
+                                    percent={group.status === 'finished' ? 100 : progress}
                                     size="small"
                                     strokeColor={
                                         group.status === 'error'
