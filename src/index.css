@@ -93,6 +93,9 @@
     --space-8: 32px;
     --space-10: 40px;
     --space-12: 48px;
+
+    /* Layout */
+    --page-max-width: 1440px;
 }
 
 /* Dark mode variables override */
@@ -210,7 +213,7 @@ pre,
 
 /* Focus Styles */
 *:focus-visible {
-    outline: 2px solid rgba(99, 102, 241, 0.5);
+    outline: 2px solid var(--ant-color-primary);
     outline-offset: 2px;
 }
 
@@ -555,6 +558,20 @@ textarea {
 /* Smooth page content */
 .ant-layout-content {
     animation: fadeIn 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .ant-layout-content,
+    .page-transition {
+        animation: none !important;
+    }
 }
 
 /* Logo styling in sidebar */

@@ -56,6 +56,14 @@ const ActivityItem = styled.div`
     }
 `;
 
+const ListBody = styled.div`
+    flex: 1;
+    max-height: 360px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+`;
+
 interface ActiveRolloutsWidgetProps {
     isLoading: boolean;
     activeRollouts: MgmtRolloutResponseBody[];
@@ -109,7 +117,7 @@ export const ActiveRolloutsWidget: React.FC<ActiveRolloutsWidgetProps> = ({
             {isLoading ? (
                 <Skeleton active paragraph={{ rows: 4 }} />
             ) : activeRollouts.length > 0 ? (
-                <div style={{ flex: 1, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <ListBody>
                     <AirportSlideList
                         items={activeRollouts}
                         itemHeight={56}
@@ -165,7 +173,7 @@ export const ActiveRolloutsWidget: React.FC<ActiveRolloutsWidgetProps> = ({
                             </ActivityItem>
                         )}
                     />
-                </div>
+                </ListBody>
             ) : (
                 <Flex vertical justify="center" align="center" gap={12} style={{ flex: 1 }}>
                     <RocketOutlined style={{ fontSize: 32, color: 'var(--ant-color-text-quaternary)' }} />

@@ -422,7 +422,7 @@ const RolloutsOverview: React.FC = () => {
                         >
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="var(--gradient-info)">
+                                    <IconBadge $color="linear-gradient(135deg, #38bdf8 0%, #2563eb 100%)">
                                         <RocketOutlined />
                                     </IconBadge>
                                     <BigNumber $color={ROLLOUT_COLORS.running}>{runningRollouts}</BigNumber>
@@ -441,7 +441,7 @@ const RolloutsOverview: React.FC = () => {
                         >
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="var(--gradient-primary)">
+                                    <IconBadge $color="linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)">
                                         <ThunderboltOutlined />
                                     </IconBadge>
                                     <BigNumber $color="var(--ant-color-primary)">{totalActions}</BigNumber>
@@ -460,7 +460,7 @@ const RolloutsOverview: React.FC = () => {
                         >
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="var(--gradient-success)">
+                                    <IconBadge $color="linear-gradient(135deg, #10b981 0%, #059669 100%)">
                                         <CheckCircleOutlined />
                                     </IconBadge>
                                     <BigNumber $color={ACTION_COLORS.finished}>

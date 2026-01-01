@@ -16,7 +16,7 @@ import { useGetTargetTags } from '@/api/generated/target-tags/target-tags';
 import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useServerTable } from '@/hooks/useServerTable';
-import { appendFilter, buildCondition } from '@/utils/fiql';
+import { buildQueryFromFilterValues } from '@/utils/fiql';
 import type { MgmtTarget, MgmtTag, MgmtTargetType, MgmtDistributionSetAssignment, MgmtDistributionSetAssignments, MgmtDistributionSetAssignmentType } from '@/api/generated/model';
 import type { FilterValue, FilterField } from '@/components/patterns';
 import type { AssignPayload } from '../components';
@@ -100,20 +100,13 @@ export const useTargetListModel = () => {
     ], [t, availableTypes, availableTags]);
 
     const buildFinalQuery = useCallback((targetFilters: FilterValue[] = filters): string => {
-        if (targetFilters.length === 0) return '';
-        const conditions = targetFilters.map(f => {
-            let field = f.field;
-            if (f.field === 'targetType') field = 'targetTypeName';
-            if (f.field === 'tag') field = 'tag';
-            if (f.field === 'query') return f.value as string;
-            let val = String(f.value);
-            if (f.operator === 'contains') val = `*${val}*`;
-            else if (f.operator === 'startsWith') val = `${val}*`;
-            else if (f.operator === 'endsWith') val = `*${val}`;
-            const op: '==' | '!=' = f.operator === 'notEquals' ? '!=' : '==';
-            return buildCondition({ field, operator: op, value: val });
+        return buildQueryFromFilterValues(targetFilters, {
+            fieldMap: {
+                targetType: 'targetTypeName',
+                tag: 'tag',
+            },
+            rawFields: ['query'],
         });
-        return conditions.reduce((acc, cond) => appendFilter(acc, cond), '');
     }, [filters]);
 
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {

@@ -41,6 +41,7 @@ const HeaderLeft = styled.div`
     align-items: center;
     gap: 32px;
     flex: 1;
+    min-width: 0;
 `;
 
 const HeaderRight = styled.div`
@@ -138,17 +139,27 @@ const UserInfo = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    max-width: 160px;
+    min-width: 0;
 `;
 
 const UserName = styled(Text)`
     font-weight: 600;
     font-size: 13px;
     line-height: 1.2;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 `;
 
 const UserRole = styled(Text)`
     font-size: 11px;
     opacity: 0.7;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 `;
 
 const StyledAvatar = styled(Avatar)`

@@ -13,6 +13,18 @@ export interface FiqlCondition {
     value: string | number | boolean | (string | number)[];
 }
 
+export interface FiqlFilterValue {
+    field: string;
+    operator: string;
+    value: string | number | boolean;
+}
+
+export interface BuildFiqlOptions {
+    fieldMap?: Record<string, string>;
+    rawFields?: string[];
+    customCondition?: (filter: FiqlFilterValue) => string | undefined;
+}
+
 /**
  * Escapes special characters in FIQL values.
  * RSQL reserves: " ' ( ) ; , < > = ! ~ space
@@ -136,4 +148,66 @@ export const buildQueryFromFilters = (
     });
 
     return combineWithAnd(conditions);
+};
+
+const mapFilterOperator = (operator: string): FiqlOperator => {
+    switch (operator) {
+        case 'notEquals':
+            return '!=';
+        case 'gt':
+        case 'greaterThan':
+            return '=gt=';
+        case 'gte':
+        case 'greaterThanOrEquals':
+            return '=ge=';
+        case 'lt':
+        case 'lessThan':
+        case 'before':
+            return '=lt=';
+        case 'lte':
+        case 'lessThanOrEquals':
+            return '=le=';
+        case 'after':
+            return '=gt=';
+        default:
+            return '==';
+    }
+};
+
+const normalizeFilterValue = (operator: string, value: FiqlFilterValue['value']): FiqlFilterValue['value'] => {
+    if (operator === 'contains') return `*${String(value)}*`;
+    if (operator === 'startsWith') return `${String(value)}*`;
+    if (operator === 'endsWith') return `*${String(value)}`;
+    return value;
+};
+
+export const buildQueryFromFilterValues = (
+    filters: FiqlFilterValue[],
+    options: BuildFiqlOptions = {}
+): string => {
+    if (!filters || filters.length === 0) return '';
+
+    const { fieldMap, rawFields, customCondition } = options;
+    const rawFieldSet = rawFields ? new Set(rawFields) : null;
+
+    const conditions = filters
+        .map((filter) => {
+            if (customCondition) {
+                const custom = customCondition(filter);
+                if (custom !== undefined) return custom;
+            }
+
+            if (rawFieldSet?.has(filter.field)) {
+                return String(filter.value);
+            }
+
+            const field = fieldMap?.[filter.field] ?? filter.field;
+            const operator = mapFilterOperator(filter.operator);
+            const value = normalizeFilterValue(filter.operator, filter.value);
+
+            return buildCondition({ field, operator, value });
+        })
+        .filter((condition): condition is string => Boolean(condition && condition.trim()));
+
+    return conditions.reduce((acc, condition) => appendFilter(acc, condition), '');
 };

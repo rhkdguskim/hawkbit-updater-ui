@@ -41,7 +41,15 @@
         "realtimeSample": "실시간 샘플 ({{count}}대)",
         "alertBadge": "경고",
         "requiresAttention": "확인 필요",
-        "allClear": "정상"
+        "allClear": "정상",
+        "pendingApprovalRollouts": "승인 대기 롤아웃",
+        "pausedRollouts": "일시중지 롤아웃",
+        "scheduledReadyRollouts": "예약 / 준비됨",
+        "delayedActions": "지연 액션",
+        "newTargets24h": "신규 타겟 (24h)",
+        "neverConnected": "미접속 타겟",
+        "canceledActions24h": "취소된 액션 (24h)",
+        "errorActions24h": "오류 액션 (24h)"
     },
     "charts": {
         "deviceStatus": "장치 상태",
@@ -69,12 +77,28 @@
         "online": "온라인",
         "offline": "오프라인",
         "connectivityStatus": "타겟 연결 상태",
+        "totalTargets": "총 {{count}}대 타겟",
         "deploymentRate": "배포 진행률",
         "deploymentRateDesc": "대상 완료 비율",
         "targets": "대상",
         "rolloutStatus": "롤아웃 상태",
         "totalRollouts": "총 {{count}}개 롤아웃",
         "actionStatus": "액션 상태 (24시간)",
+        "actionTrend": "액션 처리량 추이",
+        "actionTrendDesc": "최근 24시간 활동",
+        "actionsLabel": "액션",
+        "errorRateLabel": "오류율",
+        "targetTypeCoverage": "타겟 유형 분포",
+        "rolloutQueue": "롤아웃 대기열",
+        "waitingApproval": "승인 대기",
+        "paused": "일시중지",
+        "scheduledReady": "예약/준비",
+        "delayedActions": "지연 액션",
+        "activeActions": "진행 중 {{count}}건",
+        "delayed": "지연됨",
+        "onTime": "정상",
+        "newTargetsTrend": "신규 타겟 추이",
+        "last24h": "최근 24시간",
         "fragmentation": "타겟 업데이트 상태",
         "velocity": "배포 속도 (분/완료)",
         "velocityDesc": "분당 액션 완료 속도"
@@ -228,5 +252,16 @@
         "cancel": "취소",
         "download": "다운로드",
         "deploy": "배포"
+    },
+    "snapshot": {
+        "title": "시스템 요약",
+        "subtitle": "핵심 상태 신호",
+        "onlineRate": "온라인 비율",
+        "deploymentRate": "배포 진행률",
+        "errorRate": "액션 오류율",
+        "pendingActions": "대기 중 액션",
+        "activeRollouts": "진행 중 롤아웃",
+        "attention": "확인 필요",
+        "stable": "안정"
     }
 }

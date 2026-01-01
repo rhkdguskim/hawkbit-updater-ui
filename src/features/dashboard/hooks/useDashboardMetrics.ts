@@ -113,6 +113,10 @@ export const useDashboardMetrics = () => {
         ['scheduled', 'pending', 'retrieving', 'running', 'waiting_for_confirmation'].includes(a.status?.toLowerCase() || '') &&
         !isActionErrored(a)
     ).length;
+    const activeActionsCount = recentActions.filter(a =>
+        ['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(a.status?.toLowerCase() || '') &&
+        !isActionErrored(a)
+    ).length;
     const finishedCount = recentActions.filter(a => a.status?.toLowerCase() === 'finished' && !isActionErrored(a)).length;
     const errorCount = recentActions.filter(a => isActionErrored(a)).length;
 
@@ -287,7 +291,115 @@ export const useDashboardMetrics = () => {
         return { currentVelocity, trend };
     }, [actions]);
 
-    // 13. Error Analysis Calculation
+    // 13. Action Trend (Last 24h, 4h buckets)
+    const actionTrendData = useMemo(() => {
+        const now = dayjs();
+        const bucketCount = 6;
+        const bucketHours = 4;
+        const buckets = Array.from({ length: bucketCount }).map((_, index) => {
+            const end = now.subtract((bucketCount - 1 - index) * bucketHours, 'hour');
+            const start = end.subtract(bucketHours, 'hour');
+            return { start, end, label: end.format('HH:mm') };
+        });
+
+        return buckets.map(bucket => {
+            const inBucket = actions.filter(action => {
+                if (!action.createdAt) return false;
+                const createdAt = dayjs(action.createdAt);
+                return (createdAt.isAfter(bucket.start) || createdAt.isSame(bucket.start)) && createdAt.isBefore(bucket.end);
+            });
+            const total = inBucket.length;
+            const error = inBucket.filter(action => isActionErrored(action)).length;
+            const finished = inBucket.filter(action => action.status?.toLowerCase() === 'finished' && !isActionErrored(action)).length;
+            const errorRate = total > 0 ? Math.round((error / total) * 100) : 0;
+
+            return {
+                time: bucket.label,
+                total,
+                error,
+                finished,
+                errorRate
+            };
+        });
+    }, [actions]);
+
+    // 14. Additional KPI Metrics
+    const now = dayjs();
+    const last24h = now.subtract(24, 'hour');
+
+    const pendingApprovalRolloutCount = rollouts.filter(r =>
+        r.status?.toLowerCase() === 'waiting_for_approval'
+    ).length;
+    const scheduledReadyRolloutCount = rollouts.filter(r =>
+        ['scheduled', 'ready'].includes(r.status?.toLowerCase() || '')
+    ).length;
+
+    const delayedActionsCount = actions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        if (!['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(status)) return false;
+        const time = a.lastModifiedAt || a.createdAt || 0;
+        return time > 0 && dayjs(time).isBefore(now.subtract(10, 'minute'));
+    }).length;
+
+    const newTargets24hCount = targets.filter(t =>
+        t.createdAt && dayjs(t.createdAt).isAfter(last24h)
+    ).length;
+
+    const newTargetsTrendData = useMemo(() => {
+        const bucketCount = 6;
+        const bucketHours = 4;
+        const buckets = Array.from({ length: bucketCount }).map((_, index) => {
+            const end = now.subtract((bucketCount - 1 - index) * bucketHours, 'hour');
+            const start = end.subtract(bucketHours, 'hour');
+            return { start, end, label: end.format('HH:mm') };
+        });
+
+        return buckets.map(bucket => {
+            const count = targets.filter(target => {
+                if (!target.createdAt) return false;
+                const createdAt = dayjs(target.createdAt);
+                return (createdAt.isAfter(bucket.start) || createdAt.isSame(bucket.start)) && createdAt.isBefore(bucket.end);
+            }).length;
+
+            return {
+                time: bucket.label,
+                count
+            };
+        });
+    }, [now, targets]);
+
+    const neverConnectedCount = targets.filter(t =>
+        t.pollStatus?.lastRequestAt === undefined
+    ).length;
+
+    const canceledActions24hCount = actions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        if (!['canceled', 'canceling'].includes(status)) return false;
+        const createdAt = a.createdAt || 0;
+        return createdAt > 0 && dayjs(createdAt).isAfter(last24h);
+    }).length;
+
+    const errorActions24hCount = actions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        if (!['error', 'warning'].includes(status)) return false;
+        const createdAt = a.createdAt || 0;
+        return createdAt > 0 && dayjs(createdAt).isAfter(last24h);
+    }).length;
+
+    const targetTypeCoverageData = useMemo(() => {
+        const counts = new Map<string, number>();
+        targets.forEach(target => {
+            const typeName = target.targetTypeName || t('common:status.unknown', 'Unknown');
+            counts.set(typeName, (counts.get(typeName) || 0) + 1);
+        });
+        return Array.from(counts.entries()).map(([name, value]) => ({
+            name,
+            value,
+            color: targetTypeColorMap.get(name) || COLORS.unknown,
+        }));
+    }, [targets, targetTypeColorMap, t]);
+
+    // 15. Error Analysis Calculation
     const errorAnalysis = useMemo(() => {
         const errorActions = actions.filter(a =>
             a.status?.toLowerCase() === 'error' ||
@@ -335,6 +447,7 @@ export const useDashboardMetrics = () => {
         pendingCount,
         finishedCount,
         errorCount,
+        activeActionsCount,
 
         // Rollout Metrics
         activeRolloutCount,
@@ -355,7 +468,19 @@ export const useDashboardMetrics = () => {
         deploymentRate,
         deploymentRateLabel,
         velocityData,
+        actionTrendData,
         errorAnalysis,
+
+        // Additional KPI Metrics
+        pendingApprovalRolloutCount,
+        scheduledReadyRolloutCount,
+        delayedActionsCount,
+        newTargets24hCount,
+        neverConnectedCount,
+        canceledActions24hCount,
+        errorActions24hCount,
+        newTargetsTrendData,
+        targetTypeCoverageData,
 
         // Fragmentation Metrics
         fragmentationStats,
