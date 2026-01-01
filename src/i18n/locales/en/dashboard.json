@@ -33,7 +33,15 @@
         "realtimeSample": "Realtime sample ({{count}} devices)",
         "alertBadge": "Alert",
         "requiresAttention": "Requires attention",
-        "allClear": "All clear"
+        "allClear": "All clear",
+        "pendingApprovalRollouts": "Pending approvals",
+        "pausedRollouts": "Paused rollouts",
+        "scheduledReadyRollouts": "Scheduled / Ready",
+        "delayedActions": "Delayed actions",
+        "newTargets24h": "New targets (24h)",
+        "neverConnected": "Never connected",
+        "canceledActions24h": "Canceled actions (24h)",
+        "errorActions24h": "Error actions (24h)"
     },
     "charts": {
         "deviceStatus": "Device Status",
@@ -61,12 +69,28 @@
         "online": "Online",
         "offline": "Offline",
         "connectivityStatus": "Target Connection Status",
+        "totalTargets": "Total {{count}} targets",
         "deploymentRate": "Deployment Rate",
         "deploymentRateDesc": "Target completion rate",
         "targets": "targets",
         "rolloutStatus": "Rollout Status",
         "totalRollouts": "Total {{count}} rollouts",
         "actionStatus": "Action Status (24h)",
+        "actionTrend": "Action Volume Trend",
+        "actionTrendDesc": "Last 24h activity",
+        "actionsLabel": "Actions",
+        "errorRateLabel": "Error rate",
+        "targetTypeCoverage": "Target Type Coverage",
+        "rolloutQueue": "Rollout Queue",
+        "waitingApproval": "Waiting approval",
+        "paused": "Paused",
+        "scheduledReady": "Scheduled/Ready",
+        "delayedActions": "Delayed Actions",
+        "activeActions": "{{count}} active",
+        "delayed": "Delayed",
+        "onTime": "On time",
+        "newTargetsTrend": "New Targets Trend",
+        "last24h": "Last 24h",
         "fragmentation": "Target Update Status",
         "velocity": "Deployment Velocity",
         "velocityDesc": "Action completion rate per minute"
@@ -220,5 +244,16 @@
         "cancel": "Cancel",
         "download": "Download",
         "deploy": "Deploy"
+    },
+    "snapshot": {
+        "title": "System Snapshot",
+        "subtitle": "Key health signals",
+        "onlineRate": "Online rate",
+        "deploymentRate": "Deployment rate",
+        "errorRate": "Action error rate",
+        "pendingActions": "Pending actions",
+        "activeRollouts": "Active rollouts",
+        "attention": "Needs attention",
+        "stable": "Stable"
     }
 }

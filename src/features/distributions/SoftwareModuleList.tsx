@@ -19,7 +19,7 @@ import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import { useServerTable } from '@/hooks/useServerTable';
 import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction, type FilterValue, type FilterField } from '@/components/patterns';
 import type { ColumnsType } from 'antd/es/table';
-import { appendFilter, buildCondition } from '@/utils/fiql';
+import { buildQueryFromFilterValues } from '@/utils/fiql';
 
 const { Text } = Typography;
 
@@ -51,25 +51,9 @@ const SoftwareModuleList: React.FC = () => {
     ], [t]);
 
     // Build RSQL query from filters
-    const buildFinalQuery = useCallback(() => {
-        if (filters.length === 0) return undefined;
+    const buildFinalQuery = useCallback(() => buildQueryFromFilterValues(filters), [filters]);
 
-        const conditions = filters.map(f => {
-            let val = String(f.value);
-
-            // For contains, use wildcards with == operator
-            if (f.operator === 'contains') val = `*${val}*`;
-
-            // HawkBit uses == for all comparisons including wildcards
-            const op = '==' as const;
-
-            return buildCondition({ field: f.field, operator: op, value: val });
-        });
-
-        return conditions.reduce((acc, cond) => appendFilter(acc, cond), '');
-    }, [filters]);
-
-
+    const query = buildFinalQuery();
     const {
         data,
         isLoading,
@@ -81,7 +65,7 @@ const SoftwareModuleList: React.FC = () => {
             offset,
             limit: pagination.pageSize,
             sort: sort || undefined,
-            q: buildFinalQuery(),
+            q: query || undefined,
         },
         {
             query: {

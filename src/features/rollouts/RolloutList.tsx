@@ -11,7 +11,7 @@ import { DataView, EnhancedTable, FilterBuilder, type FilterValue, type FilterFi
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import { useServerTable } from '@/hooks/useServerTable';
 import dayjs from 'dayjs';
-import { appendFilter, buildCondition } from '@/utils/fiql';
+import { buildQueryFromFilterValues } from '@/utils/fiql';
 import RolloutCreateModal from './RolloutCreateModal';
 import { StatusTag } from '@/components/common/StatusTag';
 import type { ColumnsType } from 'antd/es/table';
@@ -89,30 +89,14 @@ const RolloutList: React.FC = () => {
     ], [t]);
 
     // Build RSQL query from filters
-    const buildFinalQuery = useCallback(() => {
-        if (filters.length === 0) return undefined;
+    const buildFinalQuery = useCallback(() => buildQueryFromFilterValues(filters), [filters]);
 
-        const conditions = filters.map(f => {
-            let val = String(f.value);
-
-            // For contains, use wildcards with == operator
-            if (f.operator === 'contains') val = `*${val}*`;
-
-            // HawkBit uses == for all comparisons including wildcards
-            const op = '==' as const;
-
-            return buildCondition({ field: f.field, operator: op, value: val });
-        });
-
-        return conditions.reduce((acc, cond) => appendFilter(acc, cond), '');
-    }, [filters]);
-
-
+    const query = buildFinalQuery();
     const { data, isLoading, isFetching, error, refetch } = useGetRollouts(
         {
             offset,
             limit: pagination.pageSize,
-            q: buildFinalQuery(),
+            q: query || undefined,
         },
         {
             query: {

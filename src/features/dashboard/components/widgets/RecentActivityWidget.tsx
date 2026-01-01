@@ -2,11 +2,20 @@ import React, { useMemo } from 'react';
 import { Skeleton, Flex, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { SyncOutlined } from '@ant-design/icons';
+import styled from 'styled-components';
 import { ActiveUpdatesCard } from '@/components/common';
 import { ListCard, IconBadge } from '../DashboardStyles';
 import type { MgmtTarget, MgmtAction } from '@/api/generated/model';
 
 const { Text } = Typography;
+
+const ListBody = styled.div`
+    flex: 1;
+    max-height: 360px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+`;
 
 interface RecentActivityItem {
     target: MgmtTarget;
@@ -49,14 +58,14 @@ export const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({ isLo
             {isLoading ? (
                 <Skeleton active paragraph={{ rows: 4 }} />
             ) : (
-                <div style={{ flex: 1, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <ListBody>
                     <ActiveUpdatesCard
                         items={activeUpdateItems}
                         isLoading={false}
                         showHistory={true}
                         emptyText={t('activeUpdates.empty')}
                     />
-                </div>
+                </ListBody>
             )}
         </ListCard>
     );
