@@ -23,7 +23,7 @@ describe('Target Entity', () => {
             const validTarget = {
                 controllerId: 'device-001',
                 name: 'Test Device',
-                updateStatus: 'IN_SYNC',
+                updateStatus: 'in_sync',
             };
 
             const result = TargetSchema.safeParse(validTarget);
@@ -87,14 +87,14 @@ describe('Target Entity', () => {
         const onlineTarget: Target = {
             controllerId: 'online-device',
             name: 'Online Device',
-            updateStatus: 'IN_SYNC',
+            updateStatus: 'in_sync',
             pollStatus: { overdue: false },
         };
 
         const offlineTarget: Target = {
             controllerId: 'offline-device',
             name: 'Offline Device',
-            updateStatus: 'PENDING',
+            updateStatus: 'pending',
             pollStatus: { overdue: true },
         };
 
@@ -148,7 +148,7 @@ describe('Target Entity', () => {
                 const errorTarget: Target = {
                     controllerId: 'error-device',
                     name: 'Error Device',
-                    updateStatus: 'ERROR',
+                    updateStatus: 'error',
                 };
                 expect(hasError(errorTarget)).toBe(true);
             });
@@ -156,12 +156,12 @@ describe('Target Entity', () => {
 
         describe('getNormalizedUpdateStatus', () => {
             it('should return the status as-is for valid statuses', () => {
-                expect(getNormalizedUpdateStatus(onlineTarget)).toBe('IN_SYNC');
-                expect(getNormalizedUpdateStatus(offlineTarget)).toBe('PENDING');
+                expect(getNormalizedUpdateStatus(onlineTarget)).toBe('in_sync');
+                expect(getNormalizedUpdateStatus(offlineTarget)).toBe('pending');
             });
 
             it('should return UNKNOWN for undefined status', () => {
-                expect(getNormalizedUpdateStatus(noPollTarget)).toBe('UNKNOWN');
+                expect(getNormalizedUpdateStatus(noPollTarget)).toBe('unknown');
             });
         });
 
@@ -196,9 +196,9 @@ describe('Target Entity', () => {
                 const targets = [onlineTarget, offlineTarget, noPollTarget];
                 const groups = groupByUpdateStatus(targets);
 
-                expect(groups.IN_SYNC.length).toBe(1);
-                expect(groups.PENDING.length).toBe(1);
-                expect(groups.UNKNOWN.length).toBe(1);
+                expect(groups.in_sync.length).toBe(1);
+                expect(groups.pending.length).toBe(1);
+                expect(groups.unknown.length).toBe(1);
             });
         });
 
