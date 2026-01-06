@@ -17,16 +17,11 @@ import type { UpdateStatus } from '../shared';
  */
 export const isTargetOnline = (target: { pollStatus?: { overdue?: boolean; nextExpectedRequestAt?: number } }): boolean => {
     if (!target.pollStatus) return false;
-    return target.pollStatus.overdue === false && !isOverdueByExpectedTime(target.pollStatus);
+    // Trust the server's overdue status.
+    return target.pollStatus.overdue === false;
 };
 
-/**
- * Checks if target is overdue based on nextExpectedRequestAt.
- */
-export const isOverdueByExpectedTime = (pollStatus?: { nextExpectedRequestAt?: number }): boolean => {
-    if (!pollStatus?.nextExpectedRequestAt) return false;
-    return Date.now() > pollStatus.nextExpectedRequestAt;
-};
+
 
 /**
  * Gets the connectivity status label for display.
@@ -45,21 +40,21 @@ export const getConnectivityStatus = (target: Target): 'online' | 'offline' | 'u
  */
 export const needsUpdate = (target: Target): boolean => {
     const status = target.updateStatus as UpdateStatus | undefined;
-    return status === 'PENDING' || status === 'ERROR';
+    return status === 'pending' || status === 'error';
 };
 
 /**
  * Checks if target is in sync (up to date).
  */
 export const isInSync = (target: Target): boolean => {
-    return target.updateStatus === 'IN_SYNC';
+    return target.updateStatus === 'in_sync';
 };
 
 /**
  * Checks if target has an error status.
  */
 export const hasError = (target: Target): boolean => {
-    return target.updateStatus === 'ERROR';
+    return target.updateStatus === 'error';
 };
 
 /**
@@ -67,12 +62,12 @@ export const hasError = (target: Target): boolean => {
  */
 export const getNormalizedUpdateStatus = (target: Target): UpdateStatus => {
     const status = target.updateStatus;
-    if (!status) return 'UNKNOWN';
+    if (!status) return 'unknown';
 
-    const validStatuses: UpdateStatus[] = ['ERROR', 'IN_SYNC', 'PENDING', 'REGISTERED', 'UNKNOWN'];
+    const validStatuses: UpdateStatus[] = ['error', 'in_sync', 'pending', 'registered', 'unknown'];
     return validStatuses.includes(status as UpdateStatus)
         ? (status as UpdateStatus)
-        : 'UNKNOWN';
+        : 'unknown';
 };
 
 // ============================================================================
@@ -125,11 +120,11 @@ export const getTimeSinceLastRequest = (target: Target): string | null => {
  */
 export const groupByUpdateStatus = (targets: Target[]): Record<UpdateStatus, Target[]> => {
     const groups: Record<UpdateStatus, Target[]> = {
-        ERROR: [],
-        IN_SYNC: [],
-        PENDING: [],
-        REGISTERED: [],
-        UNKNOWN: [],
+        error: [],
+        in_sync: [],
+        pending: [],
+        registered: [],
+        unknown: [],
     };
 
     for (const target of targets) {

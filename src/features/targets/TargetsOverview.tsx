@@ -15,6 +15,7 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { isTargetOnline } from '@/entities';
 
 import { useGetTargets } from '@/api/generated/targets/targets';
 import { useGetActions } from '@/api/generated/actions/actions';
@@ -175,11 +176,8 @@ const TargetsOverview: React.FC = () => {
     const refetch = () => { refetchTargets(); refetchActions(); };
 
     // Offline check
-    const now = dataUpdatedAt || 0;
-    const isOverdueByExpectedTime = (pollStatus?: { nextExpectedRequestAt?: number }) => {
-        if (!pollStatus?.nextExpectedRequestAt) return false;
-        return now > pollStatus.nextExpectedRequestAt;
-    };
+    // Removed client-side overdue check to trust server status
+    // const now = dataUpdatedAt || 0;
 
     // --- Update Status ---
     const inSyncCount = targets.filter(t => t.updateStatus === 'in_sync').length;
@@ -188,14 +186,10 @@ const TargetsOverview: React.FC = () => {
     const unknownCount = targets.filter(t => !t.updateStatus || t.updateStatus === 'unknown' || t.updateStatus === 'registered').length;
 
     // --- Connectivity Status ---
-    const onlineCount = targets.filter(t =>
-        t.pollStatus?.lastRequestAt !== undefined &&
-        !t.pollStatus?.overdue &&
-        !isOverdueByExpectedTime(t.pollStatus)
-    ).length;
+    const onlineCount = targets.filter(t => isTargetOnline(t)).length;
     const offlineCount = targets.filter(t =>
         t.pollStatus?.lastRequestAt !== undefined &&
-        (t.pollStatus?.overdue || isOverdueByExpectedTime(t.pollStatus))
+        !isTargetOnline(t)
     ).length;
     const neverConnectedCount = targets.filter(t =>
         !t.pollStatus || t.pollStatus.lastRequestAt === undefined

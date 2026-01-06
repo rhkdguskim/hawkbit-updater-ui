@@ -45,7 +45,10 @@ export const LinkSchema = z.object({
     href: z.string().url().optional(),
 }).passthrough();
 
-export const LinksSchema = z.record(z.string(), LinkSchema).optional();
+export const LinksSchema = z.record(
+    z.string(),
+    z.union([LinkSchema, z.array(LinkSchema)])
+).optional();
 
 export type Links = z.infer<typeof LinksSchema>;
 
@@ -54,11 +57,11 @@ export type Links = z.infer<typeof LinksSchema>;
 // ============================================================================
 
 export const UpdateStatusSchema = z.enum([
-    'ERROR',
-    'IN_SYNC',
-    'PENDING',
-    'REGISTERED',
-    'UNKNOWN',
+    'error',
+    'in_sync',
+    'pending',
+    'registered',
+    'unknown',
 ]);
 
 export type UpdateStatus = z.infer<typeof UpdateStatusSchema>;
