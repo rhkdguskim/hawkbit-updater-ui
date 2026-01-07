@@ -27,6 +27,7 @@ services:
 
   # hawkBit Update Server
   hawkbit:
+    platform: linux/amd64
     image: hawkbit/hawkbit-update-server:latest
     container_name: hawkbit-server
     environment:
