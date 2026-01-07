@@ -67,6 +67,14 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
         {
             query: {
                 enabled: modalOpen && !!selectedAction?.id && !!targetId,
+                refetchInterval: (query) => {
+                    const status = query.state.data?.content?.[0]?.type;
+                    if (status !== 'finished' && status !== 'error' && status !== 'canceled') {
+                        return 3000;
+                    }
+                    return 15000;
+                },
+                staleTime: 0,
             },
         }
     );

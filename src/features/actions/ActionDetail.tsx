@@ -65,6 +65,16 @@ const ActionDetail: React.FC = () => {
     const { data: actionData, isLoading, error } = useGetAction1(actionIdNum, {
         query: {
             enabled: !!actionIdNum,
+            refetchInterval: (query) => {
+                const status = query.state.data?.status?.toLowerCase();
+                // Poll every 3 seconds when status is dynamic (running, pending, canceling)
+                if (['running', 'pending', 'canceling', 'wait_for_confirmation'].includes(status || '')) {
+                    return 3000;
+                }
+                // Poll less frequently for stable states
+                return 15000;
+            },
+            staleTime: 0,
         },
     });
 
@@ -82,6 +92,14 @@ const ActionDetail: React.FC = () => {
         {
             query: {
                 enabled: !!targetId && !!actionIdNum,
+                refetchInterval: (query) => {
+                    const latestType = query.state.data?.content?.[0]?.type;
+                    if (latestType !== 'finished' && latestType !== 'error' && latestType !== 'canceled') {
+                        return 3000;
+                    }
+                    return 15000;
+                },
+                staleTime: 0,
             },
         }
     );

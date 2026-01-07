@@ -110,6 +110,13 @@ const ActionList: React.FC = () => {
                 placeholderData: keepPreviousData,
                 refetchOnWindowFocus: true,
                 staleTime: 5000,
+                refetchInterval: (query) => {
+                    // Poll faster if there are active actions in the current view
+                    const hasActive = query.state.data?.content?.some(action =>
+                        isCancelableStatus(action.status)
+                    );
+                    return hasActive ? 5000 : 20000;
+                }
             },
         }
     );

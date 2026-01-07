@@ -85,7 +85,12 @@ const TargetDetail: React.FC = () => {
         data: targetData,
         isLoading: targetLoading,
         error: targetError,
-    } = useGetTarget(targetId!, { query: { enabled: !!targetId } });
+    } = useGetTarget(targetId!, {
+        query: {
+            enabled: !!targetId,
+            refetchInterval: 10000, // 10s polling for general target info
+        }
+    });
 
     const { data: attributesData, isLoading: attributesLoading } = useGetAttributes(targetId!, {
         query: { enabled: !!targetId && activeTab === 'attributes' },
@@ -94,7 +99,12 @@ const TargetDetail: React.FC = () => {
     const { data: actionsData, isLoading: actionsLoading } = useGetActionHistory(
         targetId!,
         { limit: 50 },
-        { query: { enabled: !!targetId && activeTab === 'actions' } }
+        {
+            query: {
+                enabled: !!targetId && activeTab === 'actions',
+                refetchInterval: 3000, // 3s polling for actions history
+            }
+        }
     );
 
     const { data: metadataData, isLoading: metadataLoading } = useGetMetadata(
@@ -109,12 +119,22 @@ const TargetDetail: React.FC = () => {
 
     const { data: installedDSData, isLoading: installedDSLoading } = useGetInstalledDistributionSet(
         targetId!,
-        { query: { enabled: !!targetId && activeTab === 'distribution' } }
+        {
+            query: {
+                enabled: !!targetId && activeTab === 'distribution',
+                refetchInterval: 5000,
+            }
+        }
     );
 
     const { data: assignedDSData, isLoading: assignedDSLoading } = useGetAssignedDistributionSet(
         targetId!,
-        { query: { enabled: !!targetId && activeTab === 'distribution' } }
+        {
+            query: {
+                enabled: !!targetId && activeTab === 'distribution',
+                refetchInterval: 5000,
+            }
+        }
     );
 
     const { data: autoConfirmData, isLoading: autoConfirmLoading } = useGetAutoConfirmStatus(
@@ -485,7 +505,7 @@ const TargetDetail: React.FC = () => {
                     activeKey={activeTab}
                     onChange={setActiveTab}
                     items={tabItems}
-                    
+
                 />
             </SectionCard>
 

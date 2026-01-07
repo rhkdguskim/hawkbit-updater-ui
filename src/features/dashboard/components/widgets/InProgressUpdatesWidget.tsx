@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Flex, Typography, Skeleton, Tag, Button, Tooltip, Badge, Empty, message } from 'antd';
+import { Flex, Typography, Skeleton, Tag, Button, Tooltip, Badge, Empty, message, Space } from 'antd';
 import {
     SyncOutlined,
     ClockCircleOutlined,
@@ -317,21 +317,35 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                             )}
                         </div>
                         <Flex vertical gap={0}>
-                            <Text strong style={{ fontSize: 12 }}>
-                                {item.target.name || item.target.controllerId}
-                            </Text>
-                            <Tag
-                                color="blue"
-                                style={{
-                                    margin: 0,
-                                    fontSize: 10,
-                                    borderRadius: 4,
-                                    padding: '0 4px',
-                                    marginTop: 2,
-                                }}
-                            >
-                                {t(`common:status.${currentAction.status?.toLowerCase() || 'running'}`)} ({currentAction.type?.toLowerCase()})
-                            </Tag>
+                            <Flex align="center" gap={4}>
+                                <Text strong style={{ fontSize: 12 }}>
+                                    {item.target.name || item.target.controllerId}
+                                </Text>
+                                {item.target.ipAddress && (
+                                    <Text type="secondary" style={{ fontSize: 10 }}>
+                                        ({item.target.ipAddress})
+                                    </Text>
+                                )}
+                            </Flex>
+                            <Space size={4} wrap>
+                                <Tag
+                                    color="blue"
+                                    style={{
+                                        margin: 0,
+                                        fontSize: 10,
+                                        borderRadius: 4,
+                                        padding: '0 4px',
+                                        marginTop: 2,
+                                    }}
+                                >
+                                    {t(`common:status.${currentAction.status?.toLowerCase() || 'running'}`)}
+                                </Tag>
+                                {statusHistory[0] && (
+                                    <Text type="secondary" style={{ fontSize: 10, marginTop: 2 }} ellipsis={{ tooltip: true }}>
+                                        {statusHistory[0].messages?.[0] ? translateStatusMessage(statusHistory[0].messages[0], t) : getStatusLabel(statusHistory[0].type, t)}
+                                    </Text>
+                                )}
+                            </Space>
                         </Flex>
                     </Flex>
                     <DelayIndicator $level={delayLevel}>
