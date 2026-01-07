@@ -91,7 +91,13 @@
         "view": "查看",
         "edit": "编辑",
         "pause": "暂停",
-        "resume": "恢复"
+        "resume": "恢复",
+        "startSuccess": "Rollout 已开始",
+        "startError": "开始 Rollout 失败",
+        "pauseSuccess": "Rollout 已暂停",
+        "pauseError": "暂停 Rollout 失败",
+        "resumeSuccess": "Rollout 已恢复",
+        "resumeError": "恢复 Rollout 失败"
     },
     "detail": {
         "description": "实时 Rollout 进度、部署分组和控制操作",

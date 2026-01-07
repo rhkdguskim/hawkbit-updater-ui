@@ -31,31 +31,6 @@
         "typesAndTags": "Types & Tags",
         "overview": "Overview"
     },
-    "actions": {
-        "save": "Save",
-        "cancel": "Cancel",
-        "delete": "Delete",
-        "edit": "Edit",
-        "create": "Create",
-        "update": "Update",
-        "no": "No",
-        "dsSearch": "DS Search",
-        "groupDistributionPreview": "Group Distribution Preview",
-        "add": "Add",
-        "refresh": "Refresh",
-        "search": "Search",
-        "confirm": "Confirm",
-        "back": "Back",
-        "close": "Close",
-        "submit": "Submit",
-        "reset": "Reset",
-        "apply": "Apply",
-        "view": "View",
-        "assign": "Assign",
-        "select": "Select",
-        "import": "Import",
-        "export": "Export"
-    },
     "status": {
         "online": "Online",
         "offline": "Offline",
@@ -98,6 +73,43 @@
         "idle": "Idle",
         "active": "Active"
     },
+    "actions": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "update": "Update",
+        "no": "No",
+        "dsSearch": "DS Search",
+        "groupDistributionPreview": "Group Distribution Preview",
+        "add": "Add",
+        "refresh": "Refresh",
+        "search": "Search",
+        "confirm": "Confirm",
+        "back": "Back",
+        "close": "Close",
+        "submit": "Submit",
+        "reset": "Reset",
+        "apply": "Apply",
+        "view": "View",
+        "assign": "Assign",
+        "select": "Select",
+        "import": "Import",
+        "export": "Export",
+        "copy": "Copy",
+        "download": "Download",
+        "upload": "Upload",
+        "next": "Next",
+        "finish": "Finish",
+        "details": "Details",
+        "logs": "Logs",
+        "history": "History",
+        "settings": "Settings",
+        "more": "More",
+        "filter": "Filter",
+        "clear": "Clear"
+    },
     "messages": {
         "success": "Operation completed successfully.",
         "error": "An error occurred.",
@@ -108,7 +120,13 @@
         "unauthorized": "Authentication required.",
         "forbidden": "Access denied.",
         "conflict": "Conflict occurred. Please refresh and try again.",
-        "warning": "Warning"
+        "warning": "Warning",
+        "saved": "Saved",
+        "deleted": "Deleted",
+        "created": "Created",
+        "updated": "Updated",
+        "networkError": "Network error, please try again later",
+        "sessionExpired": "Session expired, please login again"
     },
     "apiErrors": {
         "ENTITY_NOT_FOUND": "The requested item was not found.",
@@ -141,42 +159,6 @@
             "unknown": "An unknown error occurred."
         }
     },
-    "settings": {
-        "language": "Language",
-        "theme": "Theme",
-        "lightMode": "Light Mode",
-        "darkMode": "Dark Mode",
-        "systemMode": "System",
-        "account": "Account",
-        "logout": "Logout"
-    },
-    "languages": {
-        "ko": "🇰🇷 한국어",
-        "en": "🇺🇸 English",
-        "zh": "🇨🇳 Chinese"
-    },
-    "pagination": {
-        "total": "{{from}}-{{to}} of {{total}}",
-        "itemsPerPage": "Items per page"
-    },
-    "units": {
-        "kb": "KB",
-        "mb": "MB",
-        "gb": "GB"
-    },
-    "table": {
-        "id": "ID",
-        "actions": "Actions",
-        "noResults": "No results found."
-    },
-    "form": {
-        "required": "This field is required.",
-        "invalidFormat": "Invalid format.",
-        "maxLength": "Maximum {{max}} characters allowed."
-    },
-    "validation": {
-        "required": "This field is required."
-    },
     "filter": {
         "addFilter": "Add Filter",
         "clear": "Clear",
@@ -198,7 +180,84 @@
             "gte": "≥",
             "lt": "<",
             "lte": "≤"
+        },
+        "title": "Filter",
+        "placeholder": "Enter search term...",
+        "apply": "Apply Filter",
+        "reset": "Reset Filter",
+        "add": "Add Filter",
+        "field": "Field",
+        "operator": "Operator",
+        "value": "Value",
+        "builder": {
+            "title": "Advanced Filter Builder",
+            "and": "AND",
+            "or": "OR",
+            "addGroup": "Add Group",
+            "addRule": "Add Rule"
         }
+    },
+    "table": {
+        "id": "ID",
+        "actions": "Actions",
+        "noResults": "No results found.",
+        "rowsPerPage": "Rows per page",
+        "total": "Total",
+        "of": "of",
+        "selected": "{{count}} selected"
+    },
+    "pagination": {
+        "total": "{{from}}-{{to}} of {{total}}",
+        "itemsPerPage": "Items per page"
+    },
+    "units": {
+        "kb": "KB",
+        "mb": "MB",
+        "gb": "GB"
+    },
+    "time": {
+        "now": "now",
+        "seconds": "{{count}}s ago",
+        "minutes": "{{count}}m ago",
+        "hours": "{{count}}h ago",
+        "days": "{{count}}d ago",
+        "weeks": "{{count}}w ago",
+        "months": "{{count}}mo ago",
+        "years": "{{count}}y ago"
+    },
+    "theme": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System",
+        "theme": "Theme",
+        "lightMode": "Light Mode",
+        "darkMode": "Dark Mode",
+        "systemMode": "System Mode"
+    },
+    "settings": {
+        "language": "Language",
+        "theme": "Theme",
+        "lightMode": "Light Mode",
+        "darkMode": "Dark Mode",
+        "systemMode": "System Mode",
+        "account": "Account",
+        "logout": "Logout"
+    },
+    "languages": {
+        "en": "🇺🇸 English",
+        "ko": "🇰🇷 한국어",
+        "zh": "🇨🇳 Chinese"
+    },
+    "form": {
+        "required": "This field is required.",
+        "invalidFormat": "Invalid format.",
+        "maxLength": "Maximum {{max}} characters allowed."
+    },
+    "validation": {
+        "required": "This field is required.",
+        "email": "Please enter a valid email address",
+        "url": "Please enter a valid URL",
+        "number": "Please enter a valid number"
     },
     "yes": "Yes",
     "no": "No",

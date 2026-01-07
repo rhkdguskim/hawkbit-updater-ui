@@ -164,5 +164,8 @@
         "error": "错误",
         "canceled": "已取消",
         "unknown": "未知"
+    },
+    "history": {
+        "title": "操作历史"
     }
 }

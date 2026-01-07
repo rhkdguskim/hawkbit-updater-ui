@@ -1,119 +1,177 @@
 {
     "title": "仪表板",
-    "subtitle": "系统概览与指标",
+    "subtitle": "实时系统监控",
+    "refresh": "刷新",
+    "pageTitle": "仪表板概览",
+    "lastUpdated": "更新时间",
+    "updated": "已更新",
+    "polling": {
+        "live": "实时",
+        "idle": "待机"
+    },
     "overview": {
         "title": "概览",
-        "totalTargets": "总目标数",
-        "onlineTargets": "在线目标",
+        "totalTargets": "总设备数",
+        "onlineTargets": "在线设备",
         "activeRollouts": "活动发布",
         "pendingActions": "挂起操作",
         "percentOnline": "{{percent}}% 在线"
     },
     "kpi": {
+        "totalTargets": "总目标数",
+        "totalDevices": "总设备数",
+        "onlineTargets": "在线目标",
+        "online": "在线",
+        "offlineTargets": "离线目标",
+        "successRate": "成功率",
+        "availability": "可用性",
         "connectivity": "连接性",
         "onlineDevices": "在线设备",
-        "successRate": "成功率",
         "pendingActions": "挂起操作",
-        "last24h": "过去 24 小时",
+        "pending": "挂起",
+        "inSync": "已同步",
         "errors": "错误",
+        "distributions": "分发集",
+        "activeRollouts": "运行中",
+        "last24h": "过去 24 小时",
+        "devices": "设备",
+        "notAvailable": "N/A",
+        "criticalErrors": "严重错误",
+        "window24h": "过去 24 小时窗口",
+        "realtimeSample": "实时采样 ({{count}} 台设备)",
+        "alertBadge": "告警",
         "requiresAttention": "需要注意",
         "allClear": "一切正常",
-        "totalDevices": "设备总数",
-        "online": "在线",
-        "inSync": "已同步",
-        "pending": "挂起",
-        "activeRollouts": "活动发布"
+        "pendingApprovalRollouts": "待批准发布",
+        "pausedRollouts": "已暂停发布",
+        "scheduledReadyRollouts": "已调度 / 就绪",
+        "delayedActions": "延迟操作",
+        "newTargets24h": "新增目标 (24h)",
+        "neverConnected": "从未连接",
+        "canceledActions24h": "已取消操作 (24h)",
+        "errorActions24h": "错误操作 (24h)"
     },
     "charts": {
-        "rollouts": "发布状态",
-        "actions": "操作状态",
-        "targets": "目标状态",
-        "distribution": "分发概览"
+        "deviceStatus": "设备状态",
+        "actionStatus": "操作状态分布",
+        "failureAnalysis": "失败分析 (24h)",
+        "versionMap": "固件版本分布",
+        "availability": "可用性",
+        "successRate": "成功率 (24h)",
+        "pendingActions": "挂起操作",
+        "totalTargets": "总目标数",
+        "online": "在线",
+        "offline": "离线",
+        "finished": "已完成",
+        "error": "错误",
+        "running": "运行中",
+        "pending": "挂起",
+        "count": "数量",
+        "timeout": "超时",
+        "installError": "安装错误",
+        "networkError": "网络错误"
     },
     "chart": {
         "deviceStatus": "设备状态",
         "total": "总计",
         "online": "在线",
         "offline": "离线",
-        "connectivityStatus": "连接状态",
+        "connectivityStatus": "目标连接状态",
+        "totalTargets": "共 {{count}} 个目标",
         "deploymentRate": "部署率",
         "deploymentRateDesc": "目标完成率",
         "targets": "目标",
         "rolloutStatus": "发布状态",
         "totalRollouts": "共 {{count}} 个发布",
-        "actionStatus": "操作状态 (24小时)",
+        "actionStatus": "操作状态 (24h)",
+        "actionTrend": "操作量趋势",
+        "actionTrendDesc": "过去 24 小时活动",
+        "actionsLabel": "操作",
+        "errorRateLabel": "错误率",
+        "targetTypeCoverage": "目标类型覆盖",
+        "rolloutQueue": "发布队列",
+        "waitingApproval": "等待批准",
+        "paused": "已暂停",
+        "scheduledReady": "已调度/就绪",
+        "delayedActions": "延迟操作",
+        "activeActions": "{{count}} 项活动",
+        "delayed": "已延迟",
+        "onTime": "准时",
+        "newTargetsTrend": "新增目标趋势",
+        "last24h": "过去 24h",
         "fragmentation": "目标更新状态",
         "velocity": "部署速度",
         "velocityDesc": "每分钟操作完成率"
     },
-    "recentActivity": {
-        "title": "最近活动",
-        "viewAll": "查看全部",
-        "noActivity": "近期无活动"
-    },
-    "quickActions": {
-        "title": "快速操作",
-        "createRollout": "创建发布",
-        "registerTarget": "注册目标",
-        "uploadArtifact": "上传构建产物"
-    },
-    "systemStatus": {
-        "title": "系统状态",
-        "healthy": "健康",
-        "issues": "存在问题",
-        "maintenance": "维护中"
-    },
-    "deployment": {
-        "title": "部署概览",
-        "stats": {
-            "total": "总计",
-            "success": "成功",
-            "fail": "失败",
-            "inProgress": "进行中"
+    "velocity": {
+        "title": "部署速度监控",
+        "current": "当前速度",
+        "trend": "过去 1h 趋势",
+        "unit": "次/分",
+        "status": {
+            "slow": "较慢",
+            "normal": "正常",
+            "fast": "较快"
         }
     },
-    "updateActivity": {
-        "title": "更新活动",
-        "updates": "更新",
-        "errors": "错误"
+    "recentActions": {
+        "title": "最近操作 (24h)",
+        "target": "目标",
+        "distribution": "分发集",
+        "status": "状态",
+        "time": "时间",
+        "empty": "近期无操作"
     },
-    "connectivity": {
-        "title": "连接性趋势",
-        "online": "在线",
-        "total": "总计"
+    "recentActivities": {
+        "title": "活动更新",
+        "inProgress": "{{count}} 项进行中",
+        "empty": "当前无活动更新"
     },
-    "distributionCompleteness": {
-        "title": "分发完成度",
-        "installed": "已安装",
-        "assigned": "已分配"
+    "timeline": {
+        "queued": "已排队",
+        "processing": "处理中",
+        "completed": "已完成",
+        "failed": "已失败"
     },
-    "velocity": {
-        "title": "部署速度",
-        "current": "当前速度",
-        "actionsPerDay": "操作/天",
-        "trend": "趋势"
+    "recentDevices": {
+        "title": "最近设备活动"
     },
-    "fragmentation": {
-        "title": "软件碎片化",
-        "distribution": "版本分布"
+    "deviceGrid": {
+        "title": "设备状态"
     },
-    "actionStatus": {
-        "title": "操作状态分布",
-        "ready": "准备就绪",
-        "scheduled": "已调度",
-        "finished": "已完成",
-        "error": "错误"
+    "activeUpdates": {
+        "title": "活动更新",
+        "empty": "无活动更新",
+        "noHistory": "无状态历史",
+        "expandHistory": "查看历史",
+        "statusHistory": "状态历史"
     },
-    "progressLabel": "完成度",
-    "timelineLabel": "阶段时间轴",
-    "successCount": "成功",
-    "runningCount": "运行中",
-    "errorCount": "错误",
-    "stages": {
-        "scheduled": "已调度",
-        "waiting_for_approval": "等待批准",
-        "running": "运行中",
-        "finished": "已完成"
+    "rollout": {
+        "activeMonitor": "活动发布监控",
+        "noActiveRollout": "当前无活动发布",
+        "currentRollout": "当前发布",
+        "targetsLabel": "{{count}} 个目标",
+        "updatedAt": "更新于 {{value}}",
+        "updatedAtUnknown": "最近已更新",
+        "statusLabel": {
+            "running": "运行中",
+            "waiting_for_approval": "等待批准",
+            "ready": "就绪",
+            "scheduled": "已调度",
+            "finished": "已完成",
+            "error": "错误"
+        },
+        "progressLabel": "完成度",
+        "timelineLabel": "阶段时间轴",
+        "successCount": "成功",
+        "runningCount": "运行中",
+        "errorCount": "错误",
+        "stages": {
+            "scheduled": "已调度",
+            "waiting_for_approval": "批准",
+            "running": "运行",
+            "finished": "完成"
+        }
     },
     "status": {
         "in_sync": "已同步",
@@ -131,7 +189,7 @@
     },
     "rolloutStatus": {
         "title": "发布状态",
-        "ready": "准备就绪",
+        "ready": "就绪",
         "running": "运行中",
         "waitingApproval": "等待批准",
         "error": "错误",
@@ -143,7 +201,7 @@
         "offline": "离线"
     },
     "actionFunnel": {
-        "title": "操作漏斗",
+        "title": "操作流水线",
         "pending": "挂起",
         "running": "运行中",
         "finished": "已完成"
@@ -151,7 +209,7 @@
     "delayedActions": {
         "title": "延迟操作 (>10m/30m)",
         "target": "目标",
-        "distribution": "分发",
+        "distribution": "分发集",
         "forceType": "强制类型",
         "elapsed": "耗时",
         "noDelayed": "未监控到延迟操作"
@@ -181,7 +239,7 @@
             "action": "操作",
             "rollout": "发布",
             "system": "系统",
-            "alert": "警报",
+            "alert": "告警",
             "info": "信息"
         }
     },
@@ -195,6 +253,79 @@
         "download": "下载",
         "deploy": "部署"
     },
+    "snapshot": {
+        "title": "系统快照",
+        "subtitle": "核心运行信号",
+        "onlineRate": "在线率",
+        "deploymentRate": "部署率",
+        "errorRate": "操作错误率",
+        "pendingActions": "挂起操作",
+        "activeRollouts": "活动发布",
+        "attention": "需要注意",
+        "stable": "稳定"
+    },
+    "health": {
+        "title": "系统健康概览",
+        "totalTargets": "总目标数",
+        "updating": "更新中",
+        "errorRate1h": "错误率 (1h)",
+        "pausedRollouts": "已暂停发布",
+        "infoTooltip": "系统健康度根据过去一小时内的已暂停发布和错误率计算得出",
+        "pausedRolloutsReason": "{{count}} 个发布已暂停",
+        "errorRolloutsReason": "{{count}} 个发布处于错误状态",
+        "highErrorRateReason": "错误率 {{rate}}% 超过 5% 阈值",
+        "moderateErrorRateReason": "错误率 {{rate}}% 超过 2% 阈值"
+    },
+    "activeRollouts": {
+        "resume": "开始",
+        "pause": "暂停",
+        "start": "开始",
+        "details": "详情",
+        "groups": "组",
+        "confirmResume": "继续发布",
+        "confirmResumeMessage": "您确定要继续 \"{{name}}\" 吗？部署将继续在 {{count}} 个目标上进行。",
+        "confirmPause": "暂停发布",
+        "confirmPauseMessage": "您确定要暂停 \"{{name}}\" 吗？正在进行的部署将被中断。",
+        "progress": "进度",
+        "groupProgress": "第 {{current}}/{{total}} 组",
+        "finished": "已完成",
+        "running": "运行中",
+        "error": "错误"
+    },
+    "drilldown": {
+        "loading": "正在加载组...",
+        "noGroups": "未找到组",
+        "groupLabel": "第 {{number}} 组",
+        "totalTargets": "组内总目标数",
+        "errors": "错误数"
+    },
+    "inProgress": {
+        "title": "进行中的更新",
+        "delayWarning": "{{count}} 个项目延迟超过 24h",
+        "delayed": "延迟 {{time}}",
+        "justNow": "刚刚",
+        "rolloutLabel": "发布",
+        "retry": "重试",
+        "cancel": "取消"
+    },
+    "confirmations": {
+        "start": {
+            "title": "开始发布",
+            "message": "您确定要开始 \"{{name}}\" 吗？将开始向 {{count}} 个目标进行部署。"
+        },
+        "pause": {
+            "title": "暂停发布",
+            "message": "您确定要暂停 \"{{name}}\" 吗？正在进行的部署将被挂起。"
+        },
+        "resume": {
+            "title": "继续发布",
+            "message": "您确定要继续 \"{{name}}\" 吗？将继续向剩余的 {{count}} 个目标进行部署。"
+        },
+        "cancel": {
+            "title": "取消操作",
+            "message": "您确定要取消此操作吗？此操作无法撤销。"
+        }
+    },
     "actionActivity": {
         "title": "操作活动",
         "subtitle": "系统负载与瓶颈检测",
@@ -203,11 +334,11 @@
         "avgCompletionTime": "平均完成时间",
         "avgCompletionTimeTooltip": "操作完成的平均时间",
         "threshold": "阈值",
-        "normalRange": "正常范围",
+        "normalRange": "正常",
         "recentlyCompleted": "最近已完成",
         "actions": "项",
         "bottleneckDetected": "检测到瓶颈",
-        "bottleneckDesc": "系统负载高于推荐阈值。请考虑暂停新发布或调查运行缓慢的操作。",
+        "bottleneckDesc": "系统负载高于推荐阈值。建议考虑暂停新发布或调查运行缓慢的操作。",
         "status": {
             "normal": "正常",
             "warning": "警告",
@@ -216,18 +347,18 @@
     },
     "actionRequired": {
         "title": "需要操作",
-        "subtitle": "需要立即处理的项目",
+        "subtitle": "需要立即关注的项目",
         "delayedActions": "延迟操作",
-        "pendingApprovals": "待批准",
+        "pendingApprovals": "待批准项目",
         "noItems": "一切正常"
     },
     "statusTrend": {
         "title": "状态趋势 (24h)",
         "subtitle": "每小时操作状态汇总",
-        "successRate": "成功率",
-        "actionsTotal": "项操作",
+        "successRate": "成功",
+        "actionsTotal": "项",
         "success": "成功",
-        "running": "运行中",
+        "running": "进行中",
         "error": "错误",
         "rolloutStart": "发布开始",
         "rolloutPause": "发布暂停"

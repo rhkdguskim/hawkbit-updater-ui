@@ -168,6 +168,7 @@
         "inSync": "已同步",
         "pending": "挂起",
         "error": "错误",
+        "registered": "已注册",
         "unknown": "未知",
         "online": "在线",
         "offline": "离线",
