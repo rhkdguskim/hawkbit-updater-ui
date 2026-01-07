@@ -166,6 +166,7 @@
         "finished": "Finished",
         "error": "Error",
         "canceled": "Canceled",
+        "canceling": "Canceling",
         "unknown": "Unknown"
     },
     "history": {

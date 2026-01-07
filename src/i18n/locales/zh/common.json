@@ -261,5 +261,11 @@
     },
     "yes": "是",
     "no": "否",
-    "notSelected": "未选择"
+    "notSelected": "未选择",
+    "labels": {
+        "ofTotal": "总错误中",
+        "targets": "个目标",
+        "andMoreCount": "以及另外 {{count}} 个",
+        "viewAll": "查看全部"
+    }
 }

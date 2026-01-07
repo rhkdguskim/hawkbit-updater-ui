@@ -135,10 +135,10 @@
             "deny": "거부"
         },
         "messages": {
-            "cancelSuccess": "액션이 취소되었습니다",
+            "cancelSuccess": "액션이 성공적으로 취소되었습니다",
             "cancelError": "액션 취소에 실패했습니다",
             "cancelFailed": "액션 취소에 실패했습니다",
-            "retrySuccess": "액션 재시도에 성공했습니다",
+            "retrySuccess": "액션이 성공적으로 재시도되었습니다",
             "retryError": "액션 재시도에 실패했습니다",
             "forceSuccess": "액션이 강제로 업데이트되었습니다",
             "forceError": "액션 업데이트에 실패했습니다",

@@ -274,7 +274,8 @@
         "pausedRolloutsReason": "{{count}} 个发布已暂停",
         "errorRolloutsReason": "{{count}} 个发布处于错误状态",
         "highErrorRateReason": "错误率 {{rate}}% 超过 5% 阈值",
-        "moderateErrorRateReason": "错误率 {{rate}}% 超过 2% 阈值"
+        "moderateErrorRateReason": "错误率 {{rate}}% 超过 2% 阈值",
+        "viewAnalysis": "查看分析"
     },
     "activeRollouts": {
         "resume": "开始",

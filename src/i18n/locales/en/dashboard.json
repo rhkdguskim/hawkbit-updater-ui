@@ -274,7 +274,8 @@
         "pausedRolloutsReason": "{{count}} rollout(s) paused",
         "errorRolloutsReason": "{{count}} rollout(s) in error state",
         "highErrorRateReason": "Error rate {{rate}}% exceeds 5% threshold",
-        "moderateErrorRateReason": "Error rate {{rate}}% exceeds 2% threshold"
+        "moderateErrorRateReason": "Error rate {{rate}}% exceeds 2% threshold",
+        "viewAnalysis": "View Analysis"
     },
     "activeRollouts": {
         "resume": "Resume",

@@ -159,7 +159,8 @@
             "ready": "준비됨",
             "scheduled": "예약됨",
             "finished": "완료됨",
-            "error": "오류"
+            "error": "오류",
+            "canceling": "취소 중"
         },
         "progressLabel": "진행률",
         "timelineLabel": "단계 타임라인",
@@ -274,7 +275,8 @@
         "pausedRolloutsReason": "{{count}}개 롤아웃 일시정지됨",
         "errorRolloutsReason": "{{count}}개 롤아웃 에러 상태",
         "highErrorRateReason": "에러율 {{rate}}%가 5% 임계치 초과",
-        "moderateErrorRateReason": "에러율 {{rate}}%가 2% 임계치 초과"
+        "moderateErrorRateReason": "에러율 {{rate}}%가 2% 임계치 초과",
+        "viewAnalysis": "분석 보기"
     },
     "activeRollouts": {
         "resume": "재개",

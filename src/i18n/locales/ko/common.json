@@ -263,7 +263,7 @@
     "no": "아니오",
     "notSelected": "선택되지 않음",
     "labels": {
-        "ofTotal": "전체 중",
+        "ofTotal": "전체 에러 중",
         "targets": "개 타겟",
         "andMoreCount": "외 {{count}}개 더 있음",
         "viewAll": "전체 보기"
