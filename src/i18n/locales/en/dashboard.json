@@ -120,7 +120,8 @@
         "distribution": "Distribution",
         "status": "Status",
         "time": "Time",
-        "empty": "No recent actions"
+        "empty": "No recent actions",
+        "subtitle": "{{count}} completed"
     },
     "recentActivities": {
         "title": "Active Updates",

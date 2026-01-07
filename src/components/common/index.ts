@@ -12,3 +12,5 @@ export { EditableCell } from './EditableCell';
 export type { EditableCellProps } from './EditableCell';
 export { DetailPageHeader } from './DetailPageHeader';
 export type { DetailPageHeaderProps } from './DetailPageHeader';
+export { ActionCell } from './ActionCell';
+export type { ActionCellProps, ActionButton } from './ActionCell';

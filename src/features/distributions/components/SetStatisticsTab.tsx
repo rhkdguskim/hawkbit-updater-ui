@@ -90,16 +90,23 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
 
     const actions = data.actions || {};
     const totalRollouts = Object.values(data.rollouts || {}).reduce((a, b) => a + b, 0);
-    const totalActions = Object.values(actions).reduce((a, b) => a + (b as number), 0);
-    const successActions = (actions as Record<string, number>)['finished'] || 0;
+
+    // Normalize actions keys to lowercase for easier lookup
+    const normalizedActions: Record<string, number> = {};
+    Object.entries(actions).forEach(([key, value]) => {
+        normalizedActions[key.toLowerCase()] = value as number;
+    });
+
+    const totalActions = Object.values(normalizedActions).reduce((a, b) => a + b, 0);
+    const successActions = normalizedActions['finished'] || normalizedActions['completed'] || 0;
     const successRate = totalActions > 0 ? Math.round((successActions / totalActions) * 100) : 0;
 
-    const chartData = Object.entries(actions)
-        .filter(([, value]) => (value as number) > 0)
+    const chartData = Object.entries(normalizedActions)
+        .filter(([, value]) => value > 0)
         .map(([key, value]) => ({
-            name: t(`common:status.${key.toLowerCase()}`, key),
-            value: value as number,
-            key: key.toLowerCase()
+            name: t(`common:status.${key}`, key),
+            value: value,
+            key: key
         }));
 
     return (

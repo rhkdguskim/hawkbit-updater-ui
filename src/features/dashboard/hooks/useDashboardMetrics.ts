@@ -138,7 +138,7 @@ export const useDashboardMetrics = () => {
         !isActionErrored(a)
     ).length;
     const activeActionsCount = recentActions.filter(a =>
-        ['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'canceling'].includes(a.status?.toLowerCase() || '') &&
+        ['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'canceling', 'retrieved'].includes(a.status?.toLowerCase() || '') &&
         !isActionErrored(a)
     ).length;
     const finishedCount = recentActions.filter(a => a.status?.toLowerCase() === 'finished' && !isActionErrored(a)).length;
@@ -153,9 +153,9 @@ export const useDashboardMetrics = () => {
     // 6. Recent Activity Lists - Show ACTIVE actions with real detailStatus from server
     // Use actual actions data which contains real detailStatus messages from targets
     const recentActivities = useMemo(() => {
-        // Filter for actions that are currently active (not finished/canceled)
-        // Ensure 'retrieved' is included so actions in this state show up and don't fall back to synthetic target data
-        const activeStatuses = ['running', 'pending', 'scheduled', 'retrieving', 'retrieved', 'downloading', 'canceling'];
+        // Filter for actions that are currently active (not finished/canceled/canceling)
+        // Include wait_for_confirmation states for actions awaiting user approval
+        const activeStatuses = ['running', 'pending', 'scheduled', 'retrieving', 'retrieved', 'downloading', 'wait_for_confirmation', 'waiting_for_confirmation'];
 
         const activeActions = [...actions]
             .filter(a => {
@@ -228,7 +228,7 @@ export const useDashboardMetrics = () => {
 
     // 5. Deployment Rate & General Progress
     const ongoingRollouts = rollouts.filter(r =>
-        ['running', 'paused', 'starting'].includes(r.status?.toLowerCase() || '')
+        ['running', 'paused', 'starting', 'waiting_for_approval'].includes(r.status?.toLowerCase() || '')
     );
 
     const totalOngoingTargets = ongoingRollouts.reduce((sum, r) => sum + (r.totalTargets || 0), 0);
@@ -294,6 +294,36 @@ export const useDashboardMetrics = () => {
             .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
             .slice(0, 10);
     }, [rollouts]);
+
+    // 10.5. Recently Finished Actions (includes finished, canceled, error) for the widget
+    const recentlyFinishedItems = useMemo(() => {
+        const finishedStatuses = ['finished', 'canceled', 'error'];
+
+        const finishedActions = [...actions]
+            .filter(a => {
+                const status = a.status?.toLowerCase() || '';
+                return finishedStatuses.includes(status) || isActionErrored(a);
+            })
+            .sort((a, b) => (b.lastModifiedAt || 0) - (a.lastModifiedAt || 0))
+            .slice(0, 5);
+
+        return finishedActions.map(action => {
+            let targetId = action._links?.target?.href?.split('/').pop();
+            if (!targetId && action._links?.self?.href) {
+                const match = action._links.self.href.match(/targets\/([^/]+)\/actions/);
+                if (match) targetId = match[1];
+            }
+
+            const matchedTarget = targets.find(t => t.controllerId === targetId);
+            const target = matchedTarget || {
+                controllerId: targetId || `action-${action.id}`,
+                name: targetId || `Action #${action.id}`,
+                updateStatus: action.status,
+            };
+
+            return { target, action };
+        });
+    }, [actions, targets]);
 
     // 11. Rollout running count for KPI
     const runningRolloutCount = rollouts.filter(r => r.status === 'running').length;
@@ -380,19 +410,17 @@ export const useDashboardMetrics = () => {
     const now = dayjs();
     const last24h = now.subtract(24, 'hour');
 
-    const pendingApprovalRolloutCount = rollouts.filter(r =>
-        r.status?.toLowerCase() === 'waiting_for_approval'
-    ).length;
     const scheduledReadyRolloutCount = rollouts.filter(r =>
         ['scheduled', 'ready'].includes(r.status?.toLowerCase() || '')
     ).length;
 
-    const delayedActionsCount = actions.filter(a => {
+    const delayedActions = actions.filter(a => {
         const status = a.status?.toLowerCase() || '';
         if (!['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'canceling'].includes(status)) return false;
         const time = a.lastModifiedAt || a.createdAt || 0;
         return time > 0 && dayjs(time).isBefore(now.subtract(10, 'minute'));
-    }).length;
+    });
+    const delayedActionsCount = delayedActions.length;
 
     const delayedActions24hCount = actions.filter(a => {
         const status = a.status?.toLowerCase() || '';
@@ -400,6 +428,11 @@ export const useDashboardMetrics = () => {
         const time = a.lastModifiedAt || a.createdAt || 0;
         return time > 0 && dayjs(time).isBefore(now.subtract(24, 'hour'));
     }).length;
+
+    const pendingApprovalRollouts = rollouts.filter(r =>
+        r.status?.toLowerCase() === 'waiting_for_approval'
+    );
+    const pendingApprovalRolloutCount = pendingApprovalRollouts.length;
 
     const newTargets24hCount = targets.filter(t =>
         t.createdAt && dayjs(t.createdAt).isAfter(last24h)
@@ -574,6 +607,9 @@ export const useDashboardMetrics = () => {
         recentDistributionSets,
         recentSoftwareModules,
         activeRollouts,
+        delayedActions,
+        pendingApprovalRollouts,
+        recentlyFinishedItems,
 
         // Target Type Colors
         targetTypeColorMap,

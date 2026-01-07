@@ -137,11 +137,11 @@ const ReasonsList = styled.div<{ $status: HealthStatus }>`
     font-size: 12px;
 `;
 
-const ReasonItem = styled.div<{ $status: HealthStatus }>`
+const ReasonItem = styled.div<{ $status: HealthStatus; $type?: 'error' | 'warning' | 'info' }>`
     display: flex;
     align-items: center;
     gap: 8px;
-    color: ${props => statusColors[props.$status].text};
+    color: ${props => props.$type === 'error' ? 'var(--ant-color-error)' : props.$type === 'warning' ? 'var(--ant-color-warning)' : statusColors[props.$status].text};
     font-weight: 500;
 `;
 
@@ -258,7 +258,7 @@ export const HealthSummaryWidget: React.FC<HealthSummaryWidgetProps> = ({
             <Flex justify="space-between" align="center">
                 <StatusBadge $status={healthData.status}>
                     {getStatusIcon(healthData.status)}
-                    {healthData.status}
+                    {t(`actionActivity.status.${healthData.status.toLowerCase()}`, healthData.status)}
                 </StatusBadge>
                 <Tooltip title={t('health.infoTooltip')}>
                     <InfoCircleOutlined style={{ color: 'var(--ant-color-text-tertiary)', cursor: 'help' }} />

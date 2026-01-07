@@ -44,12 +44,16 @@ const ControlLayer = styled.section`
 // ===== Monitoring Layer (BOTTOM - 30%) =====
 const MonitoringLayer = styled.section`
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.5fr 1fr 1fr;
     gap: var(--ant-margin, 16px);
     min-height: 280px;
     flex-shrink: 0;
     padding-top: var(--ant-margin, 16px);
     border-top: 1px solid var(--ant-color-border-secondary, rgba(0, 0, 0, 0.06));
+
+    @media (max-width: 1400px) {
+        grid-template-columns: 1fr 1fr;
+    }
 
     @media (max-width: 992px) {
         grid-template-columns: 1fr;
@@ -93,6 +97,7 @@ export interface ThreeLayerDashboardGridProps {
     // Monitoring Layer
     statusTrend: React.ReactNode;
     actionActivity: React.ReactNode;
+    recentlyFinishedActions?: React.ReactNode;
     // Labels
     showLayerLabels?: boolean;
 }
@@ -106,6 +111,7 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
     inProgressUpdates,
     statusTrend,
     actionActivity,
+    recentlyFinishedActions,
     showLayerLabels = false,
 }) => {
     return (
@@ -139,6 +145,7 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
                     <MonitoringLayer>
                         {statusTrend}
                         {actionActivity}
+                        {recentlyFinishedActions}
                     </MonitoringLayer>
                 </SectionWrapper>
             </DashboardScrollContent>

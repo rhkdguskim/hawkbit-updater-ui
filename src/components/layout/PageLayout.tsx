@@ -23,15 +23,13 @@ export const HeaderRow = styled.div`
 `;
 
 export const SectionCard = styled(Card)`
-    border-radius: var(--ant-border-radius-lg, 20px);
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
+    border-radius: var(--ant-border-radius-lg, 12px);
+    width: 100%;
     
     .ant-card-head {
         padding: var(--ant-padding, 16px) var(--ant-padding-lg, 24px);
         min-height: auto;
+        border-bottom: 1px solid var(--ant-color-split);
     }
     
     .ant-card-head-title {
@@ -40,9 +38,6 @@ export const SectionCard = styled(Card)`
     }
     
     .ant-card-body {
-        flex: 1;
-        min-height: 0;
-        overflow-y: auto;
         padding: var(--ant-padding-lg, 24px);
     }
 `;

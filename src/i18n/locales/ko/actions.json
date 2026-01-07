@@ -66,7 +66,10 @@
         "startingUpdateProcess": "업데이트 프로세스 시작",
         "targetRetrieved": "업데이트 서버: 대상이 업데이트 액션을 수신했으며 다운로드를 시작합니다.",
         "targetDownloads": "업데이트 서버: 대상이 다운로드 중 {{path}}",
-        "assignmentInitiated": "사용자 '{{user}}'가 할당을 시작했습니다"
+        "assignmentInitiated": "사용자 '{{user}}'가 할당을 시작했습니다",
+        "installationComplete": "설치 완료",
+        "updateInstalledSuccessfully": "업데이트가 성공적으로 설치되었습니다",
+        "updateSuccessful": "업데이트 성공"
     },
     "statusHistoryFilter": "필터",
     "statusFilters": {

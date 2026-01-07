@@ -257,7 +257,7 @@ const DistributionSetDetail: React.FC = () => {
                 backLabel={t('sets.title')}
                 title={setData?.name || id}
                 description={t('detail.description')}
-                status={setData?.complete ? t('status.complete') : t('status.incomplete')}
+                status={setData?.complete ? 'complete' : 'incomplete'}
                 loading={isSetLoading}
                 extra={titleExtra}
                 actions={headerActions}

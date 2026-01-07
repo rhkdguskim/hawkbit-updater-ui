@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Tag, Tooltip, Space, Button, message, Modal, Typography } from 'antd';
+import React, { useState, useMemo, useCallback } from 'react';
+import { Tag, message, Modal } from 'antd';
 import type { TableProps } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import {
     useGetTypes,
@@ -9,43 +8,12 @@ import {
 } from '@/api/generated/software-module-types/software-module-types';
 import type { MgmtSoftwareModuleType } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { EnhancedTable } from '@/components/patterns';
+import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterValue } from '@/components/patterns';
+import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import SoftwareModuleTypeDialog from './SoftwareModuleTypeDialog';
-import { ColorSwatch } from '@/components/common';
-import styled from 'styled-components';
-
-const { Text } = Typography;
-
-const ListStack = styled(Space)`
-    width: 100%;
-`;
-
-const ActionRow = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-`;
-
-const SmallText = styled(Text)`
-    && {
-        font-size: var(--ant-font-size-sm);
-    }
-`;
-
-const SmallSecondaryText = styled(Text)`
-    && {
-        font-size: var(--ant-font-size-sm);
-    }
-`;
-
-const KeyTag = styled(Tag)`
-    && {
-        font-size: var(--ant-font-size-sm);
-        margin: 0;
-    }
-`;
+import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createDateColumn } from '@/utils/columnFactory';
+import { StrongSmallText, SmallText } from '@/components/shared/Typography';
 
 const SoftwareModuleTypeList: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
@@ -55,13 +23,26 @@ const SoftwareModuleTypeList: React.FC = () => {
     const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingType, setEditingType] = useState<MgmtSoftwareModuleType | null>(null);
+    const [filters, setFilters] = useState<FilterValue[]>([]);
 
     const offset = (pagination.current - 1) * pagination.pageSize;
 
-    const { data, isLoading, refetch } = useGetTypes({
+    const { data, isLoading, isFetching, refetch } = useGetTypes({
         offset,
         limit: pagination.pageSize,
     });
+
+    // Filter fields
+    const filterFields: FilterField[] = useMemo(() => [
+        { key: 'name', label: t('common:table.name'), type: 'text' },
+        { key: 'key', label: t('typeManagement.columns.key'), type: 'text' },
+        { key: 'description', label: t('common:table.description'), type: 'text' },
+    ], [t]);
+
+    const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
+        setFilters(newFilters);
+        setPagination(prev => ({ ...prev, current: 1 }));
+    }, []);
 
     const deleteMutation = useDeleteSoftwareModuleType({
         mutation: {
@@ -75,24 +56,19 @@ const SoftwareModuleTypeList: React.FC = () => {
         },
     });
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (record: MgmtSoftwareModuleType) => {
         Modal.confirm({
             title: t('typeManagement.deleteConfirmTitle'),
             content: t('typeManagement.deleteConfirmDesc'),
             okText: t('common:actions.delete'),
             okType: 'danger',
             cancelText: t('common:actions.cancel'),
-            onOk: () => deleteMutation.mutate({ softwareModuleTypeId: id }),
+            onOk: () => deleteMutation.mutate({ softwareModuleTypeId: record.id }),
         });
     };
 
     const handleEdit = (record: MgmtSoftwareModuleType) => {
         setEditingType(record);
-        setDialogOpen(true);
-    };
-
-    const handleCreate = () => {
-        setEditingType(null);
         setDialogOpen(true);
     };
 
@@ -114,129 +90,92 @@ const SoftwareModuleTypeList: React.FC = () => {
         }));
     };
 
-    const columns: ColumnsType<MgmtSoftwareModuleType> = [
+    const columns: ColumnsType<MgmtSoftwareModuleType> = useMemo(() => [
+        createIdColumn<MgmtSoftwareModuleType>(t),
         {
-            title: t('common:id', { defaultValue: 'ID' }),
-            dataIndex: 'id',
-            key: 'id',
-            width: 60,
-            sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
-            render: (id) => <SmallText>{id}</SmallText>,
-        },
-        {
-            title: t('typeManagement.columns.name'),
+            title: t('common:table.name'),
             dataIndex: 'name',
             key: 'name',
             width: 180,
-            render: (text) => <SmallText strong>{text}</SmallText>,
+            sorter: true,
+            render: (text: string) => <StrongSmallText>{text}</StrongSmallText>,
         },
         {
             title: t('typeManagement.columns.key'),
             dataIndex: 'key',
             key: 'key',
             width: 150,
-            render: (text) => <KeyTag>{text}</KeyTag>,
+            render: (text: string) => <Tag style={{ fontSize: 'var(--ant-font-size-sm)', margin: 0 }}>{text}</Tag>,
         },
-        {
-            title: t('typeManagement.columns.description'),
-            dataIndex: 'description',
-            key: 'description',
-            ellipsis: true,
-            render: (text) => <SmallSecondaryText type="secondary">{text || '-'}</SmallSecondaryText>,
-        },
+        createDescriptionColumn<MgmtSoftwareModuleType>({ t }),
         {
             title: t('typeManagement.columns.maxAssignments'),
             dataIndex: 'maxAssignments',
             key: 'maxAssignments',
             width: 100,
-            render: (val) => <SmallText>{val ?? 1}</SmallText>,
+            render: (val: number) => <SmallText>{val ?? 1}</SmallText>,
         },
-        {
-            title: t('typeManagement.columns.colour'),
-            dataIndex: 'colour',
-            key: 'colour',
-            width: 120,
-            render: (colour) => <ColorSwatch color={colour} size="small" />,
-        },
-        {
-            title: t('typeManagement.columns.lastModified'),
-            dataIndex: 'lastModifiedAt',
-            key: 'lastModifiedAt',
-            width: 150,
-            render: (val: number) => (
-                <SmallText>
-                    {val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}
-                </SmallText>
-            ),
-        },
-        {
-            title: t('common:table.actions'),
-            key: 'actions',
-            width: 100,
-            fixed: 'right',
-            render: (_, record) => (
-                <Space size={0} className="action-cell">
-                    {isAdmin && (
-                        <>
-                            <Tooltip title={t('common:actions.edit')}>
-                                <Button
-                                    type="text"
-                                    size="small"
-                                    icon={<EditOutlined />}
-                                    onClick={() => handleEdit(record)}
-                                />
-                            </Tooltip>
-                            <Tooltip title={t('common:actions.delete')}>
-                                <Button
-                                    type="text"
-                                    size="small"
-                                    danger
-                                    icon={<DeleteOutlined />}
-                                    onClick={() => handleDelete(record.id)}
-                                />
-                            </Tooltip>
-                        </>
-                    )}
-                </Space>
-            ),
-        },
-    ];
+        createColorColumn<MgmtSoftwareModuleType>({ t }),
+        createDateColumn<MgmtSoftwareModuleType>({ t, dataIndex: 'lastModifiedAt' }),
+        createActionsColumn<MgmtSoftwareModuleType>({
+            t,
+            onEdit: handleEdit,
+            onDelete: handleDelete,
+            canEdit: isAdmin,
+            canDelete: isAdmin,
+        }),
+    ], [t, isAdmin]);
 
     return (
-        <ListStack direction="vertical" size="middle">
-            <ActionRow>
-                <Space>
-                    <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>
-                        {t('common:actions.refresh')}
-                    </Button>
-                    {isAdmin && (
-                        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-                            {t('typeManagement.addType')}
-                        </Button>
-                    )}
-                </Space>
-            </ActionRow>
-            <EnhancedTable<MgmtSoftwareModuleType>
-                columns={columns}
-                dataSource={data?.content || []}
-                rowKey="id"
-                pagination={{
-                    ...pagination,
-                    total: data?.total || 0,
-                    showSizeChanger: true,
-                    pageSizeOptions: ['10', '20', '50'],
-                }}
+        <StandardListLayout
+            title={t('typeManagement.smTypeTitle')}
+            description={t('typeManagement.smTypeDescription', { defaultValue: 'Manage software module types' })}
+            searchBar={
+                <FilterBuilder
+                    fields={filterFields}
+                    filters={filters}
+                    onFiltersChange={handleFiltersChange}
+                    onRefresh={() => refetch()}
+                    onAdd={isAdmin ? () => {
+                        setEditingType(null);
+                        setDialogOpen(true);
+                    } : undefined}
+                    canAdd={isAdmin}
+                    addLabel={t('typeManagement.addType')}
+                    loading={isLoading || isFetching}
+                />
+            }
+        >
+            <DataView
                 loading={isLoading}
-                onChange={handleTableChange}
-                scroll={{ x: 900 }}
-            />
+                error={null}
+                isEmpty={data?.content?.length === 0}
+                emptyText={t('common:messages.noData')}
+            >
+                <EnhancedTable<MgmtSoftwareModuleType>
+                    columns={columns}
+                    dataSource={data?.content || []}
+                    rowKey="id"
+                    pagination={{
+                        ...pagination,
+                        total: data?.total || 0,
+                        showSizeChanger: true,
+                        pageSizeOptions: ['10', '20', '50'],
+                        position: ['topRight'],
+                    }}
+                    loading={isLoading}
+                    onChange={handleTableChange}
+                    scroll={{ x: 900 }}
+                />
+            </DataView>
+
             <SoftwareModuleTypeDialog
                 open={dialogOpen}
                 editingType={editingType}
                 onClose={handleDialogClose}
                 onSuccess={handleDialogSuccess}
             />
-        </ListStack>
+        </StandardListLayout>
     );
 };
 

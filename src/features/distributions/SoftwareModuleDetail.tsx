@@ -21,6 +21,8 @@ import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader } from '@/components/common';
 import styled from 'styled-components';
 
+import { formatBytes } from '@/utils/formatUtils';
+
 const FullWidthSpace = styled(Space)`
     width: 100%;
 `;
@@ -268,7 +270,7 @@ const SoftwareModuleDetail: React.FC = () => {
                         title: t('detail.artifactsColumns.size'),
                         dataIndex: 'size',
                         key: 'size',
-                        render: (size) => size ? `${(size / 1024).toFixed(2)} ${t('common:units.kb')}` : '-',
+                        render: (size) => size ? formatBytes(size) : '-',
                     },
                     {
                         title: t('detail.artifactsColumns.hashes'),

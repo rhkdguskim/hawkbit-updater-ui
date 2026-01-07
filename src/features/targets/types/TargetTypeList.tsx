@@ -1,16 +1,7 @@
-import React, { useState } from 'react';
-import {
-    Button,
-    Space,
-    message,
-    Modal,
-    Tag,
-    Typography,
-    Tooltip,
-} from 'antd';
+import React, { useState, useMemo, useCallback } from 'react';
+import { message, Modal, Tag, Space } from 'antd';
 import type { TableProps } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -26,41 +17,11 @@ import {
 } from '@/api/generated/target-types/target-types';
 import type { MgmtTargetType, MgmtTargetTypeRequestBodyPost, MgmtTargetTypeRequestBodyPut } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { ColorSwatch } from '@/components/common';
-import { EnhancedTable } from '@/components/patterns';
+import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterValue } from '@/components/patterns';
+import { StandardListLayout } from '@/components/layout/StandardListLayout';
+import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn } from '@/utils/columnFactory';
+import { SmallText, StrongSmallText } from '@/components/shared/Typography';
 import TargetTypeDialog from './TargetTypeDialog';
-import styled from 'styled-components';
-
-const { Text } = Typography;
-
-const ListStack = styled(Space)`
-    width: 100%;
-`;
-
-const ActionRow = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-`;
-
-const SmallText = styled(Text)`
-    && {
-        font-size: var(--ant-font-size-sm);
-    }
-`;
-
-const SmallSecondaryText = styled(Text)`
-    && {
-        font-size: var(--ant-font-size-sm);
-    }
-`;
-
-const NameTag = styled(Tag)`
-    && {
-        margin: 0;
-        font-size: var(--ant-font-size-sm);
-    }
-`;
 
 const TargetTypeList: React.FC = () => {
     const queryClient = useQueryClient();
@@ -71,13 +32,26 @@ const TargetTypeList: React.FC = () => {
     const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingType, setEditingType] = useState<MgmtTargetType | null>(null);
+    const [filters, setFilters] = useState<FilterValue[]>([]);
 
     const offset = (pagination.current - 1) * pagination.pageSize;
 
-    const { data, isLoading, refetch } = useGetTargetTypes({
+    const { data, isLoading, isFetching, refetch } = useGetTargetTypes({
         offset,
         limit: pagination.pageSize,
     });
+
+    // Filter fields
+    const filterFields: FilterField[] = useMemo(() => [
+        { key: 'name', label: t('common:table.name'), type: 'text' },
+        { key: 'key', label: t('typeManagement.key'), type: 'text' },
+        { key: 'description', label: t('common:table.description'), type: 'text' },
+    ], [t]);
+
+    const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
+        setFilters(newFilters);
+        setPagination(prev => ({ ...prev, current: 1 }));
+    }, []);
 
     const deleteMutation = useDeleteTargetType({
         mutation: {
@@ -125,7 +99,6 @@ const TargetTypeList: React.FC = () => {
 
     const handleCreate = async (values: MgmtTargetTypeRequestBodyPost, compatibleDsTypeIds?: number[]) => {
         try {
-            // Create the target type with compatible DS types
             const createData: MgmtTargetTypeRequestBodyPost = {
                 ...values,
                 compatibledistributionsettypes: compatibleDsTypeIds?.map(id => ({ id })),
@@ -145,11 +118,8 @@ const TargetTypeList: React.FC = () => {
         if (!editingType?.id) return;
 
         try {
-            // First update the target type basic info
             await updateMutation.mutateAsync({ targetTypeId: editingType.id, data: values });
 
-            // Then handle compatible DS types
-            // Get current compatible DS types
             const currentCompatible = await queryClient.fetchQuery({
                 queryKey: getGetCompatibleDistributionSetsQueryKey(editingType.id),
                 queryFn: () => getCompatibleDistributionSets(editingType.id),
@@ -159,11 +129,9 @@ const TargetTypeList: React.FC = () => {
             const currentIds = currentCompatible?.map(dt => dt.id) || [];
             const newIds = compatibleDsTypeIds || [];
 
-            // Find IDs to add and remove
             const toAdd = newIds.filter(id => !currentIds.includes(id));
             const toRemove = currentIds.filter(id => !newIds.includes(id));
 
-            // Add new compatible DS types
             if (toAdd.length > 0) {
                 await addCompatibleMutation.mutateAsync({
                     targetTypeId: editingType.id,
@@ -171,7 +139,6 @@ const TargetTypeList: React.FC = () => {
                 });
             }
 
-            // Remove old compatible DS types
             for (const dsTypeId of toRemove) {
                 await removeCompatibleMutation.mutateAsync({
                     targetTypeId: editingType.id,
@@ -189,15 +156,20 @@ const TargetTypeList: React.FC = () => {
         }
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (record: MgmtTargetType) => {
         Modal.confirm({
             title: t('typeManagement.deleteConfirmTitle'),
             content: t('typeManagement.deleteConfirmDesc'),
             okText: t('common:actions.delete'),
             okType: 'danger',
             cancelText: t('common:actions.cancel'),
-            onOk: () => deleteMutation.mutate({ targetTypeId: id }),
+            onOk: () => deleteMutation.mutate({ targetTypeId: record.id }),
         });
+    };
+
+    const handleEdit = (record: MgmtTargetType) => {
+        setEditingType(record);
+        setDialogOpen(true);
     };
 
     const handleTableChange: TableProps<MgmtTargetType>['onChange'] = (newPagination) => {
@@ -207,29 +179,23 @@ const TargetTypeList: React.FC = () => {
         });
     };
 
-    const columns: ColumnsType<MgmtTargetType> = [
+    const columns: ColumnsType<MgmtTargetType> = useMemo(() => [
+        createIdColumn<MgmtTargetType>(t),
         {
-            title: t('common:id', { defaultValue: 'ID' }),
-            dataIndex: 'id',
-            key: 'id',
-            width: 60,
-            sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
-            render: (id) => <SmallText>{id}</SmallText>,
-        },
-        {
-            title: t('table.name'),
+            title: t('common:table.name'),
             dataIndex: 'name',
             key: 'name',
             width: 180,
-            sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
-            render: (name: string, record) => (
+            sorter: true,
+            render: (name: string, record: MgmtTargetType) => (
                 <Space size={4}>
-                    {record.colour && (
-                        <NameTag color={record.colour}>
+                    {record.colour ? (
+                        <Tag color={record.colour} style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)' }}>
                             {name}
-                        </NameTag>
+                        </Tag>
+                    ) : (
+                        <StrongSmallText>{name}</StrongSmallText>
                     )}
-                    {!record.colour && <SmallText strong>{name}</SmallText>}
                 </Space>
             ),
         },
@@ -238,99 +204,65 @@ const TargetTypeList: React.FC = () => {
             dataIndex: 'key',
             key: 'key',
             width: 150,
-            sorter: (a, b) => (a.key ?? '').localeCompare(b.key ?? ''),
-            render: (key) => <SmallText>{key}</SmallText>,
+            sorter: true,
+            render: (key: string) => <SmallText>{key}</SmallText>,
         },
-        {
-            title: t('form.description'),
-            dataIndex: 'description',
-            key: 'description',
-            ellipsis: true,
-            sorter: (a, b) => (a.description ?? '').localeCompare(b.description ?? ''),
-            render: (desc) => <SmallSecondaryText type="secondary">{desc || '-'}</SmallSecondaryText>,
-        },
-        {
-            title: t('tagManagement.colour'),
-            dataIndex: 'colour',
-            key: 'colour',
-            width: 100,
-            render: (colour: string) => <ColorSwatch color={colour} />,
-        },
-        {
-            title: t('table.actions'),
-            key: 'actions',
-            width: 100,
-            fixed: 'right',
-            render: (_, record) => (
-                <Space size={0} className="action-cell">
-                    {isAdmin && (
-                        <>
-                            <Tooltip title={t('common:actions.edit')}>
-                                <Button
-                                    type="text"
-                                    size="small"
-                                    icon={<EditOutlined />}
-                                    onClick={() => {
-                                        setEditingType(record);
-                                        setDialogOpen(true);
-                                    }}
-                                />
-                            </Tooltip>
-                            <Tooltip title={t('common:actions.delete')}>
-                                <Button
-                                    type="text"
-                                    size="small"
-                                    danger
-                                    icon={<DeleteOutlined />}
-                                    onClick={() => handleDelete(record.id)}
-                                />
-                            </Tooltip>
-                        </>
-                    )}
-                </Space>
-            ),
-        },
-    ];
+        createDescriptionColumn<MgmtTargetType>({ t }),
+        createColorColumn<MgmtTargetType>({ t }),
+        createActionsColumn<MgmtTargetType>({
+            t,
+            onEdit: handleEdit,
+            onDelete: handleDelete,
+            canEdit: isAdmin,
+            canDelete: isAdmin,
+        }),
+    ], [t, isAdmin]);
 
     const isSubmitting = createMutation.isPending || updateMutation.isPending ||
         addCompatibleMutation.isPending || removeCompatibleMutation.isPending;
 
     return (
-        <ListStack direction="vertical" size="middle">
-            <ActionRow>
-                <Space>
-                    <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>
-                        {t('common:actions.refresh')}
-                    </Button>
-                    {isAdmin && (
-                        <Button
-                            type="primary"
-                            icon={<PlusOutlined />}
-                            onClick={() => {
-                                setEditingType(null);
-                                setDialogOpen(true);
-                            }}
-                        >
-                            {t('typeManagement.add')}
-                        </Button>
-                    )}
-                </Space>
-            </ActionRow>
-
-            <EnhancedTable<MgmtTargetType>
-                columns={columns}
-                dataSource={data?.content || []}
-                rowKey="id"
+        <StandardListLayout
+            title={t('typeManagement.title')}
+            description={t('typeManagement.description', { defaultValue: 'Manage target types for device categorization' })}
+            searchBar={
+                <FilterBuilder
+                    fields={filterFields}
+                    filters={filters}
+                    onFiltersChange={handleFiltersChange}
+                    onRefresh={() => refetch()}
+                    onAdd={isAdmin ? () => {
+                        setEditingType(null);
+                        setDialogOpen(true);
+                    } : undefined}
+                    canAdd={isAdmin}
+                    addLabel={t('typeManagement.add')}
+                    loading={isLoading || isFetching}
+                />
+            }
+        >
+            <DataView
                 loading={isLoading}
-                pagination={{
-                    ...pagination,
-                    total: data?.total || 0,
-                    showSizeChanger: true,
-                    pageSizeOptions: ['10', '20', '50'],
-                }}
-                onChange={handleTableChange}
-                scroll={{ x: 800 }}
-            />
+                error={null}
+                isEmpty={data?.content?.length === 0}
+                emptyText={t('common:messages.noData')}
+            >
+                <EnhancedTable<MgmtTargetType>
+                    columns={columns}
+                    dataSource={data?.content || []}
+                    rowKey="id"
+                    loading={isLoading}
+                    pagination={{
+                        ...pagination,
+                        total: data?.total || 0,
+                        showSizeChanger: true,
+                        pageSizeOptions: ['10', '20', '50'],
+                        position: ['topRight'],
+                    }}
+                    onChange={handleTableChange}
+                    scroll={{ x: 800 }}
+                />
+            </DataView>
 
             <TargetTypeDialog
                 open={dialogOpen}
@@ -343,7 +275,7 @@ const TargetTypeList: React.FC = () => {
                     setEditingType(null);
                 }}
             />
-        </ListStack>
+        </StandardListLayout>
     );
 };
 

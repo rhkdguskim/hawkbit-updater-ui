@@ -8,9 +8,11 @@ import {
     MdRocketLaunch,
     MdPlayArrow,
     MdAssignment,
-    MdList,
-    MdExtension,
     MdOutlineDashboard,
+    MdLayers,
+    MdWidgets,
+    MdDns,
+    MdExtension,
 } from 'react-icons/md';
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -218,7 +220,7 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
                 },
                 {
                     key: '/targets/list',
-                    icon: <MdList />,
+                    icon: <MdDns />,
                     label: t('nav.list'),
                     onClick: () => navigate('/targets/list'),
                 },
@@ -238,13 +240,13 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
                 },
                 {
                     key: '/distributions/sets',
-                    icon: <MdList />,
+                    icon: <MdLayers />,
                     label: t('nav.distributionSets'),
                     onClick: () => navigate('/distributions/sets'),
                 },
                 {
                     key: '/distributions/modules',
-                    icon: <MdExtension />,
+                    icon: <MdWidgets />,
                     label: t('nav.softwareModules'),
                     onClick: () => navigate('/distributions/modules'),
                 },

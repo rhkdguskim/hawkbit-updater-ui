@@ -343,7 +343,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                             </Flex>
                             <Space size={4} wrap>
                                 <Tag
-                                    color={['error', 'failed'].includes(currentAction.status?.toLowerCase() || '') ? 'red' : 'blue'}
+                                    color={['error', 'failed', 'canceled'].includes(currentAction.status?.toLowerCase() || '') ? 'red' : currentAction.status?.toLowerCase() === 'canceling' ? 'orange' : 'blue'}
                                     style={{
                                         margin: 0,
                                         fontSize: 10,
@@ -393,7 +393,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                             danger
                             icon={<CloseOutlined />}
                             loading={cancelActionMutation.isPending}
-                            disabled={!['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'wait_for_confirmation', 'waiting_for_confirmation'].includes(currentAction.status?.toLowerCase() || '')}
+                            disabled={!['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'wait_for_confirmation', 'waiting_for_confirmation', 'retrieved'].includes(currentAction.status?.toLowerCase() || '') || ['canceled', 'canceling'].includes(currentAction.status?.toLowerCase() || '')}
                             onClick={handleCancel}
                         >
                             {t('inProgress.cancel')}
@@ -432,7 +432,13 @@ export const InProgressUpdatesWidget: React.FC<InProgressUpdatesWidgetProps> = (
     }, []);
 
     const sortedData = useMemo(() => {
-        return [...data].sort((a, b) => {
+        // Filter out canceling/canceled actions - these should not appear in "in progress"
+        const filteredData = data.filter((item) => {
+            const status = item.action.status?.toLowerCase() || '';
+            return !['canceled', 'canceling'].includes(status);
+        });
+
+        return [...filteredData].sort((a, b) => {
             const aStart = a.action.createdAt || 0;
             const bStart = b.action.createdAt || 0;
             // Sort by delay (oldest first)

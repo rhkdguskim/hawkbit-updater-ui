@@ -120,7 +120,8 @@
         "distribution": "分发集",
         "status": "状态",
         "time": "时间",
-        "empty": "近期无操作"
+        "empty": "近期无操作",
+        "subtitle": "{{count}} 项完成"
     },
     "recentActivities": {
         "title": "活动更新",

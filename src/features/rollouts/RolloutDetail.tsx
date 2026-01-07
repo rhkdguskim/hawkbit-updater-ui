@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
     Descriptions,
     Button,
@@ -13,7 +13,6 @@ import {
     Row,
     Col,
     Statistic,
-    Breadcrumb,
 } from 'antd';
 import {
     PlayCircleOutlined,
@@ -41,9 +40,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { PageLayout } from '@/components/patterns';
+import { StandardDetailLayout } from '@/components/layout';
 import { SectionCard } from '@/components/layout/PageLayout';
-import { DetailPageHeader, StatusTag } from '@/components/common';
+import { StatusTag } from '@/components/common';
+import { PageLayout } from '@/components/patterns';
 import RolloutActionConfirmModal, { type RolloutActionType } from './components/RolloutActionConfirmModal';
 
 const { Text } = Typography;
@@ -404,35 +404,44 @@ const RolloutDetail: React.FC = () => {
         </Space>
     );
 
+    if (error) {
+        return (
+            <PageLayout>
+                <Alert
+                    type="error"
+                    message={t('detail.notFound')}
+                    description={t('detail.notFoundDesc')}
+                    action={
+                        <Button onClick={() => navigate('/rollouts')}>
+                            {t('detail.backToRollouts')}
+                        </Button>
+                    }
+                />
+            </PageLayout>
+        );
+    }
+
     return (
-        <PageLayout>
-            {/* Breadcrumb */}
-            <Breadcrumb
-                items={[
-                    { title: <Link to="/rollouts">{t('list.title')}</Link> },
-                    { title: rolloutData?.name || rolloutId },
-                ]}
-                style={{ marginBottom: 0 }}
-            />
-
-            {/* Header */}
-            <DetailPageHeader
-                title={rolloutData?.name || rolloutId}
-                description={t('detail.description')}
-                status={rolloutData?.status}
-                backLabel={t('detail.back')}
-                onBack={() => navigate('/rollouts')}
-                actions={headerActions}
-                loading={isLoading}
-            />
-
+        <StandardDetailLayout
+            breadcrumbs={[
+                { label: t('list.title'), path: '/rollouts' },
+                { label: rolloutData?.name || rolloutId || '' },
+            ]}
+            title={rolloutData?.name || rolloutId}
+            description={t('detail.description')}
+            status={rolloutData?.status}
+            backLabel={t('detail.back')}
+            onBack={() => navigate('/rollouts')}
+            actions={headerActions}
+            loading={isLoading}
+        >
             {isAdmin && !canStart && !canPause && !canResume && !canApprove && !canRetry && !canDelete && (
-                <SectionCard>
+                <SectionCard style={{ marginBottom: 16 }}>
                     <Text type="secondary">{t('detail.noActions')}</Text>
                 </SectionCard>
             )}
 
-            <SectionCard title={t('detail.overviewTitle')} loading={isLoading}>
+            <SectionCard title={t('detail.overviewTitle')} loading={isLoading} style={{ marginBottom: 16 }}>
                 <Row gutter={[16, 16]}>
                     <Col xs={24} md={8}>
                         <Statistic title={t('detail.labels.totalTargets')} value={totalTargets} />
@@ -481,6 +490,7 @@ const RolloutDetail: React.FC = () => {
                     rowKey="id"
                     pagination={false}
                     locale={{ emptyText: t('detail.emptyGroups') }}
+                    scroll={{ x: true }}
                 />
             </SectionCard>
 
@@ -500,7 +510,7 @@ const RolloutDetail: React.FC = () => {
                     onCancel={closeActionModal}
                 />
             )}
-        </PageLayout>
+        </StandardDetailLayout>
     );
 };
 

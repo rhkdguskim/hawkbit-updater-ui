@@ -9,7 +9,6 @@ import {
     Alert,
     Popconfirm,
     message,
-    Breadcrumb,
 } from 'antd';
 import {
     StopOutlined,
@@ -29,10 +28,11 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { PageLayout } from '@/components/patterns';
+import { StandardDetailLayout } from '@/components/layout';
 import { SectionCard } from '@/components/layout/PageLayout';
 import { ActionStatusTimeline } from '@/components/common/ActionStatusTimeline';
-import { DetailPageHeader, StatusTag } from '@/components/common';
+import { StatusTag } from '@/components/common';
+import { PageLayout } from '@/components/patterns';
 
 const { Text } = Typography;
 
@@ -258,28 +258,20 @@ const ActionDetail: React.FC = () => {
     ) : undefined;
 
     return (
-        <PageLayout>
-            {/* Breadcrumb */}
-            <Breadcrumb
-                items={[
-                    { title: <Link to="/actions">{t('list.title')}</Link> },
-                    { title: actionData ? `#${actionData.id}` : `#${actionId}` },
-                ]}
-                style={{ marginBottom: 0 }}
-            />
-
-            {/* Header */}
-            <DetailPageHeader
-                title={actionData ? `${t('detail.pageTitle')} #${actionData.id}` : `#${actionId}`}
-                description={t('detail.description')}
-                status={actionData?.status}
-                backLabel={t('detail.back')}
-                onBack={() => navigate('/actions')}
-                extra={liveTag}
-                actions={headerActions}
-                loading={isLoading}
-            />
-
+        <StandardDetailLayout
+            breadcrumbs={[
+                { label: t('list.title'), path: '/actions' },
+                { label: actionData ? `#${actionData.id}` : `#${actionId}` },
+            ]}
+            title={actionData ? `${t('detail.pageTitle')} #${actionData.id}` : `#${actionId}`}
+            description={t('detail.description')}
+            status={actionData?.status}
+            backLabel={t('detail.back')}
+            onBack={() => navigate('/actions')}
+            loading={isLoading}
+            actions={headerActions}
+            headerExtra={liveTag}
+        >
             {/* Error Banner */}
             {actionData?.status === 'error' && errorMessages.length > 0 && (
                 <Alert
@@ -293,6 +285,7 @@ const ActionDetail: React.FC = () => {
                         </ul>
                     }
                     showIcon
+                    style={{ marginBottom: 16 }}
                 />
             )}
 
@@ -335,13 +328,13 @@ const ActionDetail: React.FC = () => {
             </SectionCard>
 
             {/* Status History Timeline */}
-            <SectionCard title={t('detail.statusHistoryTitle')} loading={statusLoading}>
+            <SectionCard title={t('detail.statusHistoryTitle')} loading={statusLoading} style={{ marginTop: 16 }}>
                 <ActionStatusTimeline
                     statuses={statusData?.content}
                     emptyText={t('detail.noStatusHistory')}
                 />
             </SectionCard>
-        </PageLayout>
+        </StandardDetailLayout>
     );
 };
 

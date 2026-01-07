@@ -92,6 +92,13 @@ export const translateStatusMessage = (
     if (/^Creating backup$/i.test(trimmed)) return t('actions:statusMessages.creatingBackup');
     if (/^Starting update process$/i.test(trimmed)) return t('actions:statusMessages.startingUpdateProcess');
 
+    // Installation complete variants
+    if (/^Installation complete$/i.test(trimmed)) return t('actions:statusMessages.installationComplete');
+    if (/^Installation completed$/i.test(trimmed)) return t('actions:statusMessages.installationComplete');
+    if (/^Update installed successfully$/i.test(trimmed)) return t('actions:statusMessages.updateInstalledSuccessfully');
+    if (/^Update successful$/i.test(trimmed)) return t('actions:statusMessages.updateSuccessful');
+    if (/^Finished$/i.test(trimmed)) return t('common:status.finished');
+
     // Messages with potential dynamic content
     if (/^Update Server: Target retrieved update action and should start now the download\.$/i.test(trimmed))
         return t('actions:statusMessages.targetRetrieved');

@@ -66,7 +66,10 @@
         "startingUpdateProcess": "正在启动更新进程",
         "targetRetrieved": "更新服务器：目标已检索更新操作，现在应开始下载。",
         "targetDownloads": "更新服务器：目标正在下载 {{path}}",
-        "assignmentInitiated": "由用户 '{{user}}' 发起的分配"
+        "assignmentInitiated": "由用户 '{{user}}' 发起的分配",
+        "installationComplete": "安装完成",
+        "updateInstalledSuccessfully": "更新安装成功",
+        "updateSuccessful": "更新成功"
     },
     "statusHistoryFilter": "筛选",
     "statusFilters": {

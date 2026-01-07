@@ -120,7 +120,8 @@
         "distribution": "배포 세트",
         "status": "상태",
         "time": "시간",
-        "empty": "최근 액션이 없습니다"
+        "empty": "최근 액션이 없습니다",
+        "subtitle": "{{count}}건 완료"
     },
     "recentActivities": {
         "title": "진행 중인 업데이트",

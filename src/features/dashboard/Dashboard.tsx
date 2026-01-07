@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ThreeLayerDashboardGrid } from './components/layouts/ThreeLayerDashboardGrid';
 import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import { DashboardHeader } from './components/widgets/DashboardHeader';
@@ -10,19 +9,17 @@ import { InProgressUpdatesWidget } from './components/widgets/InProgressUpdatesW
 import { StatusTrendChartEnhanced } from './components/widgets/StatusTrendChartEnhanced';
 import { ActionActivityWidget } from './components/widgets/ActionActivityWidgetEnhanced';
 import { KPIHealthSummary } from './components/widgets/KPIHealthSummary';
+import { ActionRequiredDetailsModal } from './components/widgets/ActionRequiredDetailsModal';
 import { FailureAnalysisModal } from './components/widgets/FailureAnalysisModal';
+import { RecentlyFinishedActionsWidget } from './components/widgets/RecentlyFinishedActionsWidget';
 
 const Dashboard: React.FC = () => {
     const metrics = useDashboardMetrics();
-    const navigate = useNavigate();
     const [isFailureModalVisible, setIsFailureModalVisible] = useState(false);
+    const [actionRequiredType, setActionRequiredType] = useState<'DELAYED' | 'APPROVAL_PENDING' | null>(null);
 
     const onActionRequiredClick = (type: 'DELAYED' | 'APPROVAL_PENDING') => {
-        if (type === 'DELAYED') {
-            navigate('/targets');
-        } else if (type === 'APPROVAL_PENDING') {
-            navigate('/rollouts');
-        }
+        setActionRequiredType(type);
     };
 
     return (
@@ -96,11 +93,24 @@ const Dashboard: React.FC = () => {
                         recentFinishedActions={metrics.actions.filter(a => a.status?.toLowerCase() === 'finished')}
                     />
                 }
+                recentlyFinishedActions={
+                    <RecentlyFinishedActionsWidget
+                        isLoading={metrics.isLoading}
+                        recentlyFinishedItems={metrics.recentlyFinishedItems}
+                    />
+                }
             />
             <FailureAnalysisModal
                 visible={isFailureModalVisible}
                 onClose={() => setIsFailureModalVisible(false)}
                 errorAnalysis={metrics.errorAnalysis}
+            />
+            <ActionRequiredDetailsModal
+                visible={!!actionRequiredType}
+                onClose={() => setActionRequiredType(null)}
+                type={actionRequiredType}
+                delayedActions={metrics.delayedActions}
+                pendingApprovals={metrics.pendingApprovalRollouts}
             />
         </>
     );

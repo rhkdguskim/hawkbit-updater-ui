@@ -1,18 +1,8 @@
-import React, { useState } from 'react';
-import {
-    Button,
-    Space,
-    message,
-    Modal,
-    Tag,
-    Tooltip,
-    Typography,
-} from 'antd';
+import React, { useState, useMemo, useCallback } from 'react';
+import { message, Modal } from 'antd';
 import type { TableProps } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import type { ColumnsType } from 'antd/es/table';
 import {
     useGetTargetTags,
     useDeleteTargetTag,
@@ -22,11 +12,12 @@ import {
 } from '@/api/generated/target-tags/target-tags';
 import type { MgmtTag } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { ColorSwatch, TagFormModal } from '@/components/common';
+import { TagFormModal } from '@/components/common';
 import type { TagFormValues } from '@/components/common';
-import { EnhancedTable } from '@/components/patterns';
-
-const { Text } = Typography;
+import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterValue } from '@/components/patterns';
+import { StandardListLayout } from '@/components/layout/StandardListLayout';
+import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createTagNameColumn } from '@/utils/columnFactory';
+import type { ColumnsType } from 'antd/es/table';
 
 interface MgmtTagRequestBodyPost {
     name: string;
@@ -43,13 +34,25 @@ const TargetTagList: React.FC = () => {
     const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingTag, setEditingTag] = useState<MgmtTag | null>(null);
+    const [filters, setFilters] = useState<FilterValue[]>([]);
 
     const offset = (pagination.current - 1) * pagination.pageSize;
 
-    const { data, isLoading, refetch } = useGetTargetTags({
+    const { data, isLoading, isFetching, refetch } = useGetTargetTags({
         offset,
         limit: pagination.pageSize,
     });
+
+    // Filter fields
+    const filterFields: FilterField[] = useMemo(() => [
+        { key: 'name', label: t('common:table.name'), type: 'text' },
+        { key: 'description', label: t('common:table.description'), type: 'text' },
+    ], [t]);
+
+    const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
+        setFilters(newFilters);
+        setPagination(prev => ({ ...prev, current: 1 }));
+    }, []);
 
     const deleteMutation = useDeleteTargetTag({
         mutation: {
@@ -100,15 +103,20 @@ const TargetTagList: React.FC = () => {
         }
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (record: MgmtTag) => {
         Modal.confirm({
             title: t('tagManagement.deleteConfirmTitle'),
             content: t('tagManagement.deleteConfirmDesc'),
             okText: t('common:actions.delete'),
             okType: 'danger',
             cancelText: t('common:actions.cancel'),
-            onOk: () => deleteMutation.mutate({ targetTagId: id }),
+            onOk: () => deleteMutation.mutate({ targetTagId: record.id }),
         });
+    };
+
+    const handleEdit = (record: MgmtTag) => {
+        setEditingTag(record);
+        setDialogOpen(true);
     };
 
     const handleTableChange: TableProps<MgmtTag>['onChange'] = (newPagination) => {
@@ -118,108 +126,62 @@ const TargetTagList: React.FC = () => {
         });
     };
 
-    const columns: ColumnsType<MgmtTag> = [
-        {
-            title: t('common:id', { defaultValue: 'ID' }),
-            dataIndex: 'id',
-            key: 'id',
-            width: 60,
-            sorter: (a, b) => (a.id ?? 0) - (b.id ?? 0),
-            render: (id) => <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{id}</Text>,
-        },
-        {
-            title: t('table.name'),
-            dataIndex: 'name',
-            key: 'name',
-            width: 180,
-            sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
-            render: (name: string, record) => (
-                <Tag color={record.colour || 'default'}>{name}</Tag>
-            ),
-        },
-        {
-            title: t('form.description'),
-            dataIndex: 'description',
-            key: 'description',
-            ellipsis: true,
-            sorter: (a, b) => (a.description ?? '').localeCompare(b.description ?? ''),
-            render: (text) => <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{text || '-'}</Text>,
-        },
-        {
-            title: t('tagManagement.colour'),
-            dataIndex: 'colour',
-            key: 'colour',
-            width: 120,
-            render: (colour: string) => <ColorSwatch color={colour} />,
-        },
-        {
-            title: t('table.actions'),
-            key: 'actions',
-            width: 100,
-            fixed: 'right',
-            render: (_, record) => (
-                <Space size={0} className="action-cell">
-                    <Tooltip title={t('common:actions.edit')}>
-                        <Button
-                            type="text"
-                            size="small"
-                            icon={<EditOutlined />}
-                            onClick={() => {
-                                setEditingTag(record);
-                                setDialogOpen(true);
-                            }}
-                        />
-                    </Tooltip>
-                    {isAdmin && (
-                        <Tooltip title={t('common:actions.delete')}>
-                            <Button
-                                type="text"
-                                size="small"
-                                danger
-                                icon={<DeleteOutlined />}
-                                onClick={() => handleDelete(record.id)}
-                            />
-                        </Tooltip>
-                    )}
-                </Space>
-            ),
-        },
-    ];
+    const columns: ColumnsType<MgmtTag> = useMemo(() => [
+        createIdColumn<MgmtTag>(t),
+        createTagNameColumn<MgmtTag>({ t }),
+        createDescriptionColumn<MgmtTag>({ t }),
+        createColorColumn<MgmtTag>({ t }),
+        createActionsColumn<MgmtTag>({
+            t,
+            onEdit: handleEdit,
+            onDelete: handleDelete,
+            canEdit: true,
+            canDelete: isAdmin,
+        }),
+    ], [t, isAdmin]);
 
     return (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Space>
-                    <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>
-                        {t('common:actions.refresh')}
-                    </Button>
-                    <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={() => {
-                            setEditingTag(null);
-                            setDialogOpen(true);
-                        }}
-                    >
-                        {t('tagManagement.add')}
-                    </Button>
-                </Space>
-            </div>
-
-            <EnhancedTable<MgmtTag>
-                columns={columns}
-                dataSource={data?.content || []}
-                rowKey="id"
+        <StandardListLayout
+            title={t('tagManagement.title')}
+            description={t('tagManagement.description', { defaultValue: 'Manage target tags for categorization' })}
+            searchBar={
+                <FilterBuilder
+                    fields={filterFields}
+                    filters={filters}
+                    onFiltersChange={handleFiltersChange}
+                    onRefresh={() => refetch()}
+                    onAdd={() => {
+                        setEditingTag(null);
+                        setDialogOpen(true);
+                    }}
+                    canAdd={isAdmin}
+                    addLabel={t('tagManagement.add')}
+                    loading={isLoading || isFetching}
+                />
+            }
+        >
+            <DataView
                 loading={isLoading}
-                pagination={{
-                    ...pagination,
-                    total: data?.total || 0,
-                    showSizeChanger: true,
-                    pageSizeOptions: ['10', '20', '50'],
-                }}
-                onChange={handleTableChange}
-                scroll={{ x: 700 }}
-            />
+                error={null}
+                isEmpty={data?.content?.length === 0}
+                emptyText={t('common:messages.noData')}
+            >
+                <EnhancedTable<MgmtTag>
+                    columns={columns}
+                    dataSource={data?.content || []}
+                    rowKey="id"
+                    loading={isLoading}
+                    pagination={{
+                        ...pagination,
+                        total: data?.total || 0,
+                        showSizeChanger: true,
+                        pageSizeOptions: ['10', '20', '50'],
+                        position: ['topRight'],
+                    }}
+                    onChange={handleTableChange}
+                    scroll={{ x: 700 }}
+                />
+            </DataView>
 
             <TagFormModal
                 open={dialogOpen}
@@ -234,16 +196,16 @@ const TargetTagList: React.FC = () => {
                 translations={{
                     createTitle: t('tagManagement.createTitle'),
                     editTitle: t('tagManagement.editTitle'),
-                    nameLabel: t('table.name'),
+                    nameLabel: t('common:table.name'),
                     namePlaceholder: t('form.namePlaceholder'),
                     nameRequired: t('common:validation.required'),
-                    descriptionLabel: t('form.description'),
+                    descriptionLabel: t('common:table.description'),
                     descriptionPlaceholder: t('form.descriptionPlaceholder'),
-                    colourLabel: t('tagManagement.colour'),
+                    colourLabel: t('common:table.color'),
                     cancelText: t('common:actions.cancel'),
                 }}
             />
-        </Space>
+        </StandardListLayout>
     );
 };
 
