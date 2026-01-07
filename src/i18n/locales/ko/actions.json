@@ -137,6 +137,9 @@
         "messages": {
             "cancelSuccess": "액션이 취소되었습니다",
             "cancelError": "액션 취소에 실패했습니다",
+            "cancelFailed": "액션 취소에 실패했습니다",
+            "retrySuccess": "액션 재시도에 성공했습니다",
+            "retryError": "액션 재시도에 실패했습니다",
             "forceSuccess": "액션이 강제로 업데이트되었습니다",
             "forceError": "액션 업데이트에 실패했습니다",
             "confirmSuccess": "액션이 확인되었습니다",
@@ -163,6 +166,7 @@
         "finished": "완료됨",
         "error": "오류",
         "canceled": "취소됨",
+        "canceling": "취소 중",
         "unknown": "알 수 없음"
     },
     "history": {

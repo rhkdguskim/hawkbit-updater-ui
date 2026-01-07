@@ -137,6 +137,9 @@
         "messages": {
             "cancelSuccess": "Action canceled successfully",
             "cancelError": "Failed to cancel action",
+            "cancelFailed": "Failed to cancel action",
+            "retrySuccess": "Action retry successful",
+            "retryError": "Failed to retry action",
             "forceSuccess": "Action updated to forced",
             "forceError": "Failed to update action",
             "confirmSuccess": "Action confirmed",

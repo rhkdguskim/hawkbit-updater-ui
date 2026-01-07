@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ExclamationCircleOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import dayjs from 'dayjs';
 import { StandardModal } from '@/components/patterns';
 
 const { Text } = Typography;
@@ -75,26 +76,62 @@ export const FailureAnalysisModal: React.FC<FailureAnalysisModalProps> = ({
                 itemLayout="horizontal"
                 dataSource={errorAnalysis}
                 renderItem={(item) => (
-                    <List.Item
-                        actions={[
-                            <Text key="count" strong>{item.count}</Text>
-                        ]}
-                    >
+                    <List.Item>
                         <List.Item.Meta
                             title={<Text strong>{item.cause}</Text>}
                             description={
-                                <Flex vertical gap={4}>
-                                    <Progress
-                                        percent={item.percentage}
-                                        size="small"
-                                        status="exception"
-                                        showInfo={false}
-                                    />
-                                    <Flex justify="space-between">
-                                        <MetaText type="secondary">
-                                            {item.percentage}% {t('common:labels.ofTotal', 'of total errors')}
-                                        </MetaText>
+                                <Flex vertical gap={8}>
+                                    <Flex vertical gap={4}>
+                                        <Progress
+                                            percent={item.percentage}
+                                            size="small"
+                                            status="exception"
+                                            showInfo={false}
+                                        />
+                                        <Flex justify="space-between">
+                                            <MetaText type="secondary">
+                                                {item.percentage}% {t('common:labels.ofTotal', 'of total errors')}
+                                            </MetaText>
+                                            <Text key="count" strong>{item.count} {t('common:labels.targets', 'targets')}</Text>
+                                        </Flex>
                                     </Flex>
+
+                                    <div style={{
+                                        padding: '8px 12px',
+                                        background: 'var(--ant-color-fill-quaternary)',
+                                        borderRadius: 8,
+                                        maxHeight: 120,
+                                        overflowY: 'auto'
+                                    }}>
+                                        <Flex vertical gap={4}>
+                                            {item.actions.slice(0, 5).map((action) => {
+                                                const targetId = action._links?.target?.href?.split('/').pop() || action.id;
+                                                return (
+                                                    <Flex key={action.id} justify="space-between" align="center">
+                                                        <Button
+                                                            type="link"
+                                                            size="small"
+                                                            style={{ padding: 0, height: 'auto', fontSize: 12 }}
+                                                            onClick={() => {
+                                                                onClose();
+                                                                navigate(`/targets/${targetId}/actions`);
+                                                            }}
+                                                        >
+                                                            {targetId}
+                                                        </Button>
+                                                        <Text type="secondary" style={{ fontSize: 11 }}>
+                                                            {action.lastModifiedAt ? dayjs(action.lastModifiedAt).fromNow() : '-'}
+                                                        </Text>
+                                                    </Flex>
+                                                );
+                                            })}
+                                            {item.actions.length > 5 && (
+                                                <Text type="secondary" style={{ fontSize: 11, textAlign: 'center', marginTop: 4 }}>
+                                                    {t('common:labels.andMoreCount', { count: item.actions.length - 5 })}
+                                                </Text>
+                                            )}
+                                        </Flex>
+                                    </div>
                                 </Flex>
                             }
                         />

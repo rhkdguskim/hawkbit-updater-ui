@@ -200,9 +200,10 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
         if (onRetry && item.target.controllerId && item.action.id) {
             try {
                 await onRetry(item.target.controllerId, item.action.id);
-                message.success(t('actions:messages.retrySuccess'));
-            } catch {
-                message.error(t('actions:messages.retryFailed'));
+                message.success(t('actions:detail.messages.retrySuccess'));
+            } catch (error) {
+                // Global interceptor handles the error message, avoid double alert
+                console.error('Retry action failed:', error);
             }
         }
     };
@@ -216,10 +217,11 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                     actionId: item.action.id,
                     params: { force: false },
                 });
-                message.success(t('actions:messages.cancelSuccess'));
+                message.success(t('actions:detail.messages.cancelSuccess'));
                 queryClient.invalidateQueries({ queryKey: ['/rest/v1/actions'] });
-            } catch {
-                message.error(t('actions:messages.cancelFailed'));
+            } catch (error) {
+                // Global interceptor handles the error message, avoid double alert
+                console.error('Cancel action failed:', error);
             }
         }
     };
@@ -299,7 +301,19 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                                 justifyContent: 'center',
                             }}
                         >
-                            {delayLevel !== 'normal' ? (
+                            {['error', 'failed'].includes(currentAction.status?.toLowerCase() || '') ? (
+                                <CloseOutlined
+                                    style={{
+                                        fontSize: 14,
+                                        color: 'var(--ant-color-error)',
+                                    }}
+                                />
+                            ) : ['canceling'].includes(currentAction.status?.toLowerCase() || '') ? (
+                                <SyncOutlined
+                                    spin
+                                    style={{ fontSize: 14, color: 'var(--ant-color-warning)' }}
+                                />
+                            ) : delayLevel !== 'normal' ? (
                                 <ExclamationCircleFilled
                                     style={{
                                         fontSize: 14,
@@ -329,7 +343,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                             </Flex>
                             <Space size={4} wrap>
                                 <Tag
-                                    color="blue"
+                                    color={['error', 'failed'].includes(currentAction.status?.toLowerCase() || '') ? 'red' : 'blue'}
                                     style={{
                                         margin: 0,
                                         fontSize: 10,
@@ -379,6 +393,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                             danger
                             icon={<CloseOutlined />}
                             loading={cancelActionMutation.isPending}
+                            disabled={!['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'wait_for_confirmation', 'waiting_for_confirmation'].includes(currentAction.status?.toLowerCase() || '')}
                             onClick={handleCancel}
                         >
                             {t('inProgress.cancel')}

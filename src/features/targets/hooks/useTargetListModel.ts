@@ -139,7 +139,14 @@ export const useTargetListModel = () => {
             limit: pagination.pageSize,
             q: buildFinalQuery() || undefined,
         },
-        { query: { placeholderData: keepPreviousData, refetchOnWindowFocus: false, refetchOnReconnect: false } }
+        {
+            query: {
+                placeholderData: keepPreviousData,
+                refetchOnWindowFocus: true,
+                staleTime: 5000,
+                refetchInterval: 20000, // Background poll every 20s
+            }
+        }
     );
 
     const { data: dsData, isLoading: dsLoading } = useGetDistributionSets(

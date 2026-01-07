@@ -33,7 +33,7 @@ export const useDashboardMetrics = () => {
                 staleTime: 0,
                 refetchInterval: (query) => {
                     const hasActive = query.state.data?.content?.some(a =>
-                        ['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'retrieved'].includes(a.status?.toLowerCase() || '')
+                        ['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'retrieved', 'canceling'].includes(a.status?.toLowerCase() || '')
                     );
                     return hasActive ? 1000 : 10000;
                 }
@@ -138,7 +138,7 @@ export const useDashboardMetrics = () => {
         !isActionErrored(a)
     ).length;
     const activeActionsCount = recentActions.filter(a =>
-        ['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(a.status?.toLowerCase() || '') &&
+        ['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'canceling'].includes(a.status?.toLowerCase() || '') &&
         !isActionErrored(a)
     ).length;
     const finishedCount = recentActions.filter(a => a.status?.toLowerCase() === 'finished' && !isActionErrored(a)).length;
@@ -155,12 +155,14 @@ export const useDashboardMetrics = () => {
     const recentActivities = useMemo(() => {
         // Filter for actions that are currently active (not finished/canceled)
         // Ensure 'retrieved' is included so actions in this state show up and don't fall back to synthetic target data
-        const activeStatuses = ['running', 'pending', 'scheduled', 'retrieving', 'retrieved', 'downloading'];
+        const activeStatuses = ['running', 'pending', 'scheduled', 'retrieving', 'retrieved', 'downloading', 'canceling'];
 
         const activeActions = [...actions]
             .filter(a => {
                 const status = a.status?.toLowerCase() || '';
-                return activeStatuses.includes(status) && !isActionErrored(a);
+                const isActiveStatus = activeStatuses.includes(status);
+                const isRecentlyErrored = isActionErrored(a) && (a.lastModifiedAt || a.createdAt || 0) > now.subtract(10, 'minute').valueOf();
+                return isActiveStatus || isRecentlyErrored;
             })
             .sort((a, b) => (b.lastModifiedAt || b.createdAt || 0) - (a.lastModifiedAt || a.createdAt || 0))
             .slice(0, 10);
@@ -387,14 +389,14 @@ export const useDashboardMetrics = () => {
 
     const delayedActionsCount = actions.filter(a => {
         const status = a.status?.toLowerCase() || '';
-        if (!['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(status)) return false;
+        if (!['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'canceling'].includes(status)) return false;
         const time = a.lastModifiedAt || a.createdAt || 0;
         return time > 0 && dayjs(time).isBefore(now.subtract(10, 'minute'));
     }).length;
 
     const delayedActions24hCount = actions.filter(a => {
         const status = a.status?.toLowerCase() || '';
-        if (!['running', 'pending', 'scheduled', 'retrieving', 'downloading'].includes(status)) return false;
+        if (!['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'canceling'].includes(status)) return false;
         const time = a.lastModifiedAt || a.createdAt || 0;
         return time > 0 && dayjs(time).isBefore(now.subtract(24, 'hour'));
     }).length;
@@ -446,16 +448,14 @@ export const useDashboardMetrics = () => {
     }, [targets]);
 
     const errorActions24hCountArray = actions.filter(a => {
-        const status = a.status?.toLowerCase() || '';
-        if (!['error', 'warning'].includes(status)) return false;
+        if (!isActionErrored(a)) return false;
         const createdAt = a.createdAt || 0;
         return createdAt > 0 && dayjs(createdAt).isAfter(last24h);
     });
     const errorActions24hCount = errorActions24hCountArray.length;
 
     const errorActions1hCount = actions.filter(a => {
-        const status = a.status?.toLowerCase() || '';
-        if (!['error', 'warning', 'canceled'].includes(status)) return false;
+        if (!isActionErrored(a) && a.status?.toLowerCase() !== 'canceled') return false;
         const createdAt = a.createdAt || 0;
         return createdAt > 0 && dayjs(createdAt).isAfter(now.subtract(1, 'hour'));
     }).length;
@@ -475,16 +475,18 @@ export const useDashboardMetrics = () => {
 
     // 15. Error Analysis Calculation
     const errorAnalysis = useMemo(() => {
-        const errorActions = actions.filter(a =>
-            a.status?.toLowerCase() === 'error' ||
-            a.status?.toLowerCase() === 'canceled' ||
-            a.status?.toLowerCase() === 'warning'
-        );
+        const errorActions = actions.filter(a => isActionErrored(a) || a.status?.toLowerCase() === 'canceled');
 
         const groups: Record<string, { count: number; actions: MgmtAction[] }> = {};
 
         errorActions.forEach(a => {
-            const cause = a.detailStatus || 'Unknown Error';
+            let cause = a.detailStatus;
+            if (!cause || cause.toLowerCase() === 'error') {
+                if (a.status?.toLowerCase() === 'canceled') cause = t('common:status.canceled');
+                else if (a.lastStatusCode) cause = `${t('common:status.error')} (Code: ${a.lastStatusCode})`;
+                else cause = t('common:status.error');
+            }
+
             if (!groups[cause]) {
                 groups[cause] = { count: 0, actions: [] };
             }
@@ -498,7 +500,7 @@ export const useDashboardMetrics = () => {
             percentage: errorActions.length > 0 ? Math.round((data.count / errorActions.length) * 100) : 0,
             actions: data.actions
         })).sort((a, b) => b.count - a.count);
-    }, [actions]);
+    }, [actions, t]);
 
     return {
         // State

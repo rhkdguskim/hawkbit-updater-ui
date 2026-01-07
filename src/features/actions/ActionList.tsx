@@ -318,12 +318,10 @@ const ActionList: React.FC = () => {
                                         { targetId, actionId: record.id },
                                         {
                                             onSuccess: () => {
-                                                message.success(t('detail.messages.cancelSuccess'));
+                                                message.success(t('actions:detail.messages.cancelSuccess'));
                                                 refetch();
                                             },
-                                            onError: () => {
-                                                message.error(t('detail.messages.cancelError'));
-                                            },
+                                            // onError intentionally omitted to avoid double alert (handled by global interceptor)
                                         }
                                     );
                                 }
@@ -361,7 +359,7 @@ const ActionList: React.FC = () => {
             }
         >
             <DataView
-                loading={isLoading || isFetching}
+                loading={isLoading}
                 error={error as Error}
                 isEmpty={data?.content?.length === 0}
                 emptyText={t('common:messages.noData')}
@@ -370,7 +368,7 @@ const ActionList: React.FC = () => {
                     dataSource={data?.content || []}
                     columns={columns}
                     rowKey="id"
-                    loading={isLoading || isFetching}
+                    loading={isLoading}
                     selectedRowKeys={selectedActionIds}
                     onSelectionChange={handleSelectionChange}
                     selectionActions={selectionActions}

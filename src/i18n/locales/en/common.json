@@ -261,5 +261,11 @@
     },
     "yes": "Yes",
     "no": "No",
-    "notSelected": "Not selected"
+    "notSelected": "Not selected",
+    "labels": {
+        "ofTotal": "of total errors",
+        "targets": "targets",
+        "andMoreCount": "and {{count}} more",
+        "viewAll": "View All"
+    }
 }

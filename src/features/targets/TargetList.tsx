@@ -99,7 +99,7 @@ const TargetList: React.FC = () => {
             }
         >
             <DataView
-                loading={model.targetsLoading || model.targetsFetching}
+                loading={model.targetsLoading}
                 error={model.targetsError as Error}
                 isEmpty={model.targetsData?.content?.length === 0}
                 emptyText={t('noTargets')}
@@ -108,7 +108,7 @@ const TargetList: React.FC = () => {
                     columns={columns}
                     dataSource={model.targetsData?.content || []}
                     rowKey="controllerId"
-                    loading={model.targetsLoading || model.targetsFetching}
+                    loading={model.targetsLoading}
                     selectedRowKeys={model.selectedTargetIds}
                     onSelectionChange={(keys) => model.setSelectedTargetIds(keys)}
                     selectionActions={selectionActions}

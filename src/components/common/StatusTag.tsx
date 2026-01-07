@@ -27,6 +27,7 @@ const getStatusIcon = (status?: string) => {
         case 'starting':
         case 'retrieving':
         case 'downloading':
+        case 'canceling':
             return <SyncOutlined spin />;
         case 'finished':
         case 'completed':

@@ -108,36 +108,30 @@ const ActionDetail: React.FC = () => {
     const cancelMutation = useCancelAction({
         mutation: {
             onSuccess: () => {
-                message.success(t('detail.messages.cancelSuccess'));
+                message.success(t('actions:detail.messages.cancelSuccess'));
                 queryClient.invalidateQueries();
             },
-            onError: (err) => {
-                message.error((err as Error).message || t('detail.messages.cancelError'));
-            },
+            // onError handled by global interceptor
         },
     });
 
     const updateMutation = useUpdateAction({
         mutation: {
             onSuccess: () => {
-                message.success(t('detail.messages.forceSuccess'));
+                message.success(t('actions:detail.messages.forceSuccess'));
                 queryClient.invalidateQueries();
             },
-            onError: (err) => {
-                message.error((err as Error).message || t('detail.messages.forceError'));
-            },
+            // onError handled by global interceptor
         },
     });
 
     const confirmMutation = useUpdateActionConfirmation({
         mutation: {
             onSuccess: () => {
-                message.success(t('detail.messages.confirmSuccess'));
+                message.success(t('actions:detail.messages.confirmSuccess'));
                 queryClient.invalidateQueries();
             },
-            onError: (err) => {
-                message.error((err as Error).message || t('detail.messages.confirmError'));
-            },
+            // onError handled by global interceptor
         },
     });
 

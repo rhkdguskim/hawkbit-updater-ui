@@ -39,6 +39,6 @@ export const isTerminalState = (action: ActionLike): boolean => {
  */
 export const isActive = (action: ActionLike): boolean => {
     const status = (action.status as string)?.toLowerCase() || '';
-    const activeStatuses = ['scheduled', 'pending', 'retrieving', 'running', 'waiting_for_confirmation', 'downloading'];
+    const activeStatuses = ['scheduled', 'pending', 'retrieving', 'running', 'waiting_for_confirmation', 'downloading', 'canceling'];
     return activeStatuses.includes(status) && !isActionErrored(action);
 };

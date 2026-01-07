@@ -137,6 +137,9 @@
         "messages": {
             "cancelSuccess": "操作取消成功",
             "cancelError": "取消操作失败",
+            "cancelFailed": "取消操作失败",
+            "retrySuccess": "操作重试成功",
+            "retryError": "操作重试失败",
             "forceSuccess": "操作已更新为强制",
             "forceError": "更新操作失败",
             "confirmSuccess": "操作已确认",
