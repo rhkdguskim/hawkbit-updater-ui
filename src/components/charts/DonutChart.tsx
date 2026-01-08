@@ -25,10 +25,12 @@ export const DonutChart: React.FC<DonutChartProps> = ({
         return `${entry.name || tooltipTitle}: ${percent.toFixed(1)}%`;
     };
 
-    const tooltipFormatter = (value: number | string, name: string) => {
-        const numericValue = Number(value);
-        const percent = formatPercent(numericValue);
-        return [`${numericValue} (${percent.toFixed(1)}%)`, name || tooltipTitle];
+    const tooltipFormatter = (value: number | string | undefined, name?: string) => {
+        const numericValue = Number(value ?? 0);
+        const safeValue = Number.isFinite(numericValue) ? numericValue : 0;
+        const percent = formatPercent(safeValue);
+        const label = name || tooltipTitle;
+        return [`${safeValue} (${percent.toFixed(1)}%)`, label];
     };
 
     return (

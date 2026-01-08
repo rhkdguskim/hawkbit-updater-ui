@@ -111,13 +111,15 @@ export const DistributionSummaryWidget: React.FC<DistributionSummaryWidgetProps>
 
     return (
         <OverviewCard
-            isLoading={isLoading}
-            title={t('dashboard:kpi.distributions')}
-            titleSuffix={
-                <Popover content={helpContent} placement="bottom">
-                    <QuestionCircleOutlined style={{ color: 'var(--ant-color-text-tertiary)' }} />
-                </Popover>
-            }
+            loading={isLoading}
+            title={(
+                <Flex align="center" gap={8}>
+                    <span>{t('dashboard:kpi.distributions')}</span>
+                    <Popover content={helpContent} placement="bottom">
+                        <QuestionCircleOutlined style={{ color: 'var(--ant-color-text-tertiary)' }} />
+                    </Popover>
+                </Flex>
+            )}
         >
             <SummaryLayout>
                 <MetricStack>

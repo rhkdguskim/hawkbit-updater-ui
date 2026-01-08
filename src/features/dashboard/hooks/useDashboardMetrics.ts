@@ -15,6 +15,13 @@ import { COLORS } from '@/components/shared/OverviewStyles';
 
 dayjs.extend(relativeTime);
 
+type CompletenessDatum = {
+    statusKey: 'complete' | 'incomplete';
+    name: string;
+    value: number;
+    color: string;
+};
+
 export const useDashboardMetrics = () => {
     const { t } = useTranslation(['dashboard', 'common', 'distributions']);
     const now = dayjs();
@@ -272,20 +279,23 @@ export const useDashboardMetrics = () => {
     const completeSetsCount = useMemo(() => distributionSets.filter(ds => ds.complete).length, [distributionSets]);
     const incompleteSetsCount = useMemo(() => distributionSets.length - completeSetsCount, [distributionSets, completeSetsCount]);
 
-    const completenessData = useMemo(() => [
-        {
-            statusKey: 'complete',
-            name: t('distributions:status.complete', 'Complete'),
-            value: completeSetsCount,
-            color: '#10b981',
-        },
-        {
-            statusKey: 'incomplete',
-            name: t('distributions:status.incomplete', 'Incomplete'),
-            value: incompleteSetsCount,
-            color: '#f59e0b',
-        },
-    ].filter(d => d.value > 0), [completeSetsCount, incompleteSetsCount, t]);
+    const completenessData = useMemo<CompletenessDatum[]>(() => {
+        const entries: CompletenessDatum[] = [
+            {
+                statusKey: 'complete',
+                name: t('distributions:status.complete', 'Complete'),
+                value: completeSetsCount,
+                color: '#10b981',
+            },
+            {
+                statusKey: 'incomplete',
+                name: t('distributions:status.incomplete', 'Incomplete'),
+                value: incompleteSetsCount,
+                color: '#f59e0b',
+            },
+        ];
+        return entries.filter(item => item.value > 0);
+    }, [completeSetsCount, incompleteSetsCount, t]);
 
     const recentDistributionSets: MgmtDistributionSet[] = useMemo(() => {
         return [...distributionSets]
