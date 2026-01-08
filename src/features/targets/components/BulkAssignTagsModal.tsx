@@ -4,7 +4,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAssignTarget, useGetTargetTags, getGetTargetTagsQueryKey, useCreateTargetTags } from '@/api/generated/target-tags/target-tags';
-import { getGetTargetsQueryKey } from '@/api/generated/targets/targets';
+import { getGetTargetsQueryKey, getGetTagsQueryKey } from '@/api/generated/targets/targets';
 import type { MgmtTag } from '@/api/generated/model';
 import { TagFormModal, type TagFormValues } from '@/components/common';
 
@@ -67,6 +67,9 @@ const BulkAssignTagsModal: React.FC<BulkAssignTagsModalProps> = ({
             message.success(t('bulkAssign.tagAssignSuccess', { count: targetIds.length }));
             setSelectedTagIds([]);
             queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
+            targetIds.forEach((controllerId) => {
+                queryClient.invalidateQueries({ queryKey: getGetTagsQueryKey(controllerId) });
+            });
             onSuccess();
         } catch (error) {
             message.error((error as Error).message || t('common:messages.error'));

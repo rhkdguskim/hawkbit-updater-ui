@@ -33,6 +33,7 @@ import { useApprovalPolicyStore } from '@/stores/useApprovalPolicyStore';
 dayjs.extend(isBetween);
 import { useCreate, useStart, getRollouts } from '@/api/generated/rollouts/rollouts';
 import { useGetDistributionSets, useGetAssignedSoftwareModules } from '@/api/generated/distribution-sets/distribution-sets';
+import { useGetDistributionSetTypes } from '@/api/generated/distribution-set-types/distribution-set-types';
 import { useGetArtifacts } from '@/api/generated/software-modules/software-modules';
 import { useGetTargets } from '@/api/generated/targets/targets';
 import { useGetTargetTags } from '@/api/generated/target-tags/target-tags';
@@ -47,6 +48,31 @@ import type { MgmtSoftwareModule, MgmtArtifact, MgmtRolloutRestRequestBodyPost }
 
 const { Text } = Typography;
 const { TextArea } = Input;
+
+const ReleaseNotesArea = styled(TextArea)`
+    && {
+        min-height: 220px;
+        padding: 12px;
+        border-radius: var(--ant-border-radius-lg, 12px);
+        background: var(--ant-color-fill-alter);
+        line-height: 1.5;
+        font-family: 'IBM Plex Mono', 'SF Mono', Menlo, Monaco, monospace;
+    }
+`;
+
+const ReleaseNotesHint = styled(Text)`
+    display: block;
+    font-size: var(--ant-font-size-sm);
+`;
+
+const ReleaseNotesPreview = styled.div`
+    white-space: pre-wrap;
+    background: var(--ant-color-fill-alter);
+    border: 1px solid var(--ant-color-border-secondary, rgba(5, 5, 5, 0.06));
+    border-radius: var(--ant-border-radius-lg, 12px);
+    padding: 12px;
+    min-height: 80px;
+`;
 
 const WizardLayout = styled(Flex)`
     flex: 1;
@@ -115,17 +141,14 @@ interface WizardFormData {
     amountGroups: number;
     successThreshold: number;
     errorThreshold: number;
-    startImmediately: boolean;
 }
 
 interface TargetFilterBuilderState {
     allTargets: boolean;
-    tags: string[];
-    tagMode: 'any' | 'all';
     targetTypes: string[];
     targetTypeMode: 'any' | 'all';
-    updateStatuses: string[];
-    searchKeyword: string;
+    tags: string[];
+    tagMode: 'any' | 'all';
 }
 
 const buildFiqlFromBuilder = (state: TargetFilterBuilderState) => {
@@ -136,17 +159,7 @@ const buildFiqlFromBuilder = (state: TargetFilterBuilderState) => {
 
     const clauses: string[] = [];
 
-    // Tags: tag=="name"
-    if (state.tags.length > 0) {
-        const tagConditions = state.tags.map(t => buildCondition({ field: 'tag.name', operator: '==', value: t }));
-        if (state.tagMode === 'any') {
-            clauses.push(`(${combineWithOr(tagConditions)})`);
-        } else {
-            clauses.push(combineWithAnd(tagConditions));
-        }
-    }
-
-    // Target Types: targettype.name=="name"
+    // Target Types: targettype.name=="name" (우선순위 1순위)
     if (state.targetTypes.length > 0) {
         const typeConditions = state.targetTypes.map(t => buildCondition({ field: 'targettype.name', operator: '==', value: t }));
         if (state.targetTypeMode === 'any') {
@@ -156,20 +169,14 @@ const buildFiqlFromBuilder = (state: TargetFilterBuilderState) => {
         }
     }
 
-    // Update Status: updateStatus=="in_sync"
-    if (state.updateStatuses.length > 0) {
-        const statusConditions = state.updateStatuses.map(s => buildCondition({ field: 'updateStatus', operator: '==', value: s }));
-        if (statusConditions.length === 1) {
-            clauses.push(statusConditions[0]);
+    // Tags: tag=="name" (우선순위 2순위)
+    if (state.tags.length > 0) {
+        const tagConditions = state.tags.map(t => buildCondition({ field: 'tag.name', operator: '==', value: t }));
+        if (state.tagMode === 'any') {
+            clauses.push(`(${combineWithOr(tagConditions)})`);
         } else {
-            clauses.push(`(${combineWithOr(statusConditions)})`);
+            clauses.push(combineWithAnd(tagConditions));
         }
-    }
-
-    // Polling Status is removed per user request
-
-    if (state.searchKeyword.trim()) {
-        clauses.push(`name==*${state.searchKeyword.trim()}*`);
     }
 
     return combineWithAnd(clauses);
@@ -233,7 +240,6 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
         amountGroups: 1,
         successThreshold: 80,
         errorThreshold: 20,
-        startImmediately: false,
     });
 
     const [isCheckingName, setIsCheckingName] = useState(false);
@@ -241,15 +247,14 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
 
     const [dsSearchValue, setDsSearchValue] = useState('');
     const [dsSearchField, setDsSearchField] = useState('name');
+    const [dsTypeFilter, setDsTypeFilter] = useState<string | undefined>(undefined);
     const [filterMode] = useState<'builder'>('builder');
     const [builderState, setBuilderState] = useState<TargetFilterBuilderState>({
         allTargets: false,
-        tags: [],
-        tagMode: 'any',
         targetTypes: [],
         targetTypeMode: 'any',
-        updateStatuses: [],
-        searchKeyword: '',
+        tags: [],
+        tagMode: 'any',
     });
 
     useEffect(() => {
@@ -278,16 +283,21 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
     const [groupSettingsForm] = Form.useForm();
 
     const amountGroupsValue = Form.useWatch('amountGroups', groupSettingsForm);
+
+    // Fetch distribution set types for filtering
+    const { data: dsTypesData, isLoading: dsTypesLoading } = useGetDistributionSetTypes({ limit: 100 });
+
     // Fetch distribution sets
     const dsQuery = useMemo(() => {
         const clauses: string[] = [];
         if (dsSearchValue) {
             clauses.push(`${dsSearchField}==*${dsSearchValue}*`);
         }
-        // Hawkbit doesn't easily support multi-tag filtering in a single GET /distributionsets query
-        // typically you query by tag. We'll simplify for now to name/version/type.
+        if (dsTypeFilter) {
+            clauses.push(`type==${dsTypeFilter}`);
+        }
         return clauses.join(';');
-    }, [dsSearchValue, dsSearchField]);
+    }, [dsSearchValue, dsSearchField, dsTypeFilter]);
 
     const { data: dsData, isLoading: dsLoading } = useGetDistributionSets({
         limit: 50,
@@ -298,11 +308,11 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
     const { data: targetTagsData, isLoading: targetTagsLoading } = useGetTargetTags({ limit: 200 });
     const { data: targetTypesData, isLoading: targetTypesLoading } = useGetTargetTypes({ limit: 200 });
 
-    // Fetch targets for preview
+    // Fetch targets for preview - 전체 목록을 볼 수 있도록 limit 증가
     const { data: targetsData, isLoading: isLoadingTargets, refetch: refetchTargets } = useGetTargets(
         {
             q: formData.targetFilterQuery === 'controllerId==*' ? undefined : formData.targetFilterQuery,
-            limit: 5, // Limit for preview table
+            limit: 100, // 전체 미리보기를 위해 limit 증가
         },
         {
             query: {
@@ -321,17 +331,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                 if (data.id) {
                     const rolloutId = data.id;
 
-                    if (formData.startImmediately) {
-                        // Trigger start attempt in background, but don't block navigation
-                        const tryStart = async () => {
-                            try {
-                                startMutation.mutate({ rolloutId });
-                            } catch (e) {
-                                console.error('Auto-start polling failed', e);
-                            }
-                        };
-                        tryStart();
-                    }
+
 
                     // Navigate immediately regardless of startImmediately
                     if (isModal && onSuccess) {
@@ -539,8 +539,15 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                         onChange={() => setNameError(null)}
                     />
                 </Form.Item>
-                <Form.Item name="description" label={t('wizard.basicInfo.description')}>
-                    <TextArea rows={4} placeholder={t('wizard.basicInfo.descriptionPlaceholder')} />
+                <Form.Item
+                    name="description"
+                    label={t('wizard.basicInfo.description')}
+                    extra={<ReleaseNotesHint type="secondary">{t('wizard.basicInfo.releaseNotesHint')}</ReleaseNotesHint>}
+                >
+                    <ReleaseNotesArea
+                        placeholder={t('wizard.basicInfo.descriptionPlaceholder')}
+                        autoSize={{ minRows: 10, maxRows: 20 }}
+                    />
                 </Form.Item>
             </Form>
             {isCheckingName && <Spin size="small" tip={t('wizard.basicInfo.checkingName')} />}
@@ -551,25 +558,43 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
     const renderDistributionSetStep = () => (
         <WizardCard title={t('wizard.distributionSet.title')} $isModal={isModal}>
             <div style={{ marginBottom: 16 }}>
-                <Space.Compact style={{ width: '100%' }}>
-                    <Select
-                        value={dsSearchField}
-                        onChange={setDsSearchField}
-                        options={[
-                            { label: t('wizard.distributionSet.searchName'), value: 'name' },
-                            { label: t('wizard.distributionSet.searchVersion'), value: 'version' },
-                            { label: t('wizard.distributionSet.searchDescription'), value: 'description' },
-                        ]}
-                        style={{ width: 120 }}
-                    />
-                    <Input.Search
-                        placeholder={t('wizard.distributionSet.searchPlaceholder')}
-                        allowClear
-                        onSearch={(val) => setDsSearchValue(val)}
-                        style={{ width: '100%' }}
-                        enterButton
-                    />
-                </Space.Compact>
+                <Row gutter={16}>
+                    <Col flex="auto">
+                        <Space.Compact style={{ width: '100%' }}>
+                            <Select
+                                value={dsSearchField}
+                                onChange={setDsSearchField}
+                                options={[
+                                    { label: t('wizard.distributionSet.searchName'), value: 'name' },
+                                    { label: t('wizard.distributionSet.searchVersion'), value: 'version' },
+                                    { label: t('wizard.distributionSet.searchDescription'), value: 'description' },
+                                ]}
+                                style={{ width: 120 }}
+                            />
+                            <Input.Search
+                                placeholder={t('wizard.distributionSet.searchPlaceholder')}
+                                allowClear
+                                onSearch={(val) => setDsSearchValue(val)}
+                                style={{ width: '100%' }}
+                                enterButton
+                            />
+                        </Space.Compact>
+                    </Col>
+                    <Col>
+                        <Select
+                            placeholder={t('wizard.distributionSet.filterByType')}
+                            value={dsTypeFilter}
+                            onChange={setDsTypeFilter}
+                            allowClear
+                            loading={dsTypesLoading}
+                            style={{ minWidth: 150 }}
+                            options={(dsTypesData?.content || []).map(type => ({
+                                label: type.name,
+                                value: type.name
+                            }))}
+                        />
+                    </Col>
+                </Row>
             </div>
             <Table
                 loading={dsLoading}
@@ -610,9 +635,9 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
     const renderTargetFilterStep = () => {
 
         const previewColumns = [
-            { title: t('wizard.targetFilter.previewColumns.controllerId'), dataIndex: 'controllerId' },
             { title: t('wizard.targetFilter.previewColumns.name'), dataIndex: 'name' },
-            { title: t('wizard.targetFilter.previewColumns.type'), dataIndex: 'targetTypeName' },
+            { title: t('wizard.targetFilter.previewColumns.ipAddress'), dataIndex: 'ipAddress', render: (ip: string) => ip || '-' },
+            { title: t('wizard.targetFilter.previewColumns.type'), dataIndex: 'targetTypeName', render: (type: string) => type || '-' },
         ];
 
         return (
@@ -636,37 +661,6 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
 
                         {!builderState.allTargets && (
                             <Row gutter={[16, 16]}>
-                                <Col span={12}>
-                                    <Form.Item label={t('wizard.targetFilter.tags')}>
-                                        <Select
-                                            mode="multiple"
-                                            placeholder={t('wizard.targetFilter.selectTags')}
-                                            value={builderState.tags}
-                                            loading={targetTagsLoading}
-                                            onChange={(val) => setBuilderState(prev => ({ ...prev, tags: val }))}
-                                            options={(targetTagsData?.content || []).map(tag => ({
-                                                label: (
-                                                    <Space>
-                                                        {tag.colour && <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', backgroundColor: tag.colour }} />}
-                                                        {tag.name}
-                                                    </Space>
-                                                ),
-                                                value: tag.name
-                                            }))}
-                                        />
-                                        {builderState.tags.length > 1 && (
-                                            <Radio.Group
-                                                value={builderState.tagMode}
-                                                onChange={(e) => setBuilderState(prev => ({ ...prev, tagMode: e.target.value }))}
-                                                size="small"
-                                                style={{ marginTop: 8 }}
-                                            >
-                                                <Radio value="any">{t('wizard.targetFilter.anyTag')}</Radio>
-                                                <Radio value="all">{t('wizard.targetFilter.allTag')}</Radio>
-                                            </Radio.Group>
-                                        )}
-                                    </Form.Item>
-                                </Col>
                                 <Col span={12}>
                                     <Form.Item label={t('wizard.targetFilter.targetTypes')}>
                                         <Select
@@ -699,27 +693,34 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                                     </Form.Item>
                                 </Col>
                                 <Col span={12}>
-                                    <Form.Item label={t('wizard.targetFilter.updateStatus')}>
+                                    <Form.Item label={t('wizard.targetFilter.tags')}>
                                         <Select
                                             mode="multiple"
-                                            placeholder={t('wizard.targetFilter.updateStatusPlaceholder')}
-                                            value={builderState.updateStatuses}
-                                            onChange={(val) => setBuilderState(prev => ({ ...prev, updateStatuses: val }))}
-                                            options={[
-                                                { label: t('wizard.targetFilter.updateStatusInSync'), value: 'in_sync' },
-                                                { label: t('wizard.targetFilter.updateStatusPending'), value: 'pending' },
-                                                { label: t('wizard.targetFilter.updateStatusError'), value: 'error' },
-                                            ]}
+                                            placeholder={t('wizard.targetFilter.selectTags')}
+                                            value={builderState.tags}
+                                            loading={targetTagsLoading}
+                                            onChange={(val) => setBuilderState(prev => ({ ...prev, tags: val }))}
+                                            options={(targetTagsData?.content || []).map(tag => ({
+                                                label: (
+                                                    <Space>
+                                                        {tag.colour && <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', backgroundColor: tag.colour }} />}
+                                                        {tag.name}
+                                                    </Space>
+                                                ),
+                                                value: tag.name
+                                            }))}
                                         />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item label={t('wizard.targetFilter.nameKeyword')}>
-                                        <Input
-                                            placeholder={t('wizard.targetFilter.namePlaceholder')}
-                                            value={builderState.searchKeyword}
-                                            onChange={(e) => setBuilderState(prev => ({ ...prev, searchKeyword: e.target.value }))}
-                                        />
+                                        {builderState.tags.length > 1 && (
+                                            <Radio.Group
+                                                value={builderState.tagMode}
+                                                onChange={(e) => setBuilderState(prev => ({ ...prev, tagMode: e.target.value }))}
+                                                size="small"
+                                                style={{ marginTop: 8 }}
+                                            >
+                                                <Radio value="any">{t('wizard.targetFilter.anyTag')}</Radio>
+                                                <Radio value="all">{t('wizard.targetFilter.allTag')}</Radio>
+                                            </Radio.Group>
+                                        )}
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -741,7 +742,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                             size="small"
                             pagination={false}
                             loading={isLoadingTargets}
-                            scroll={{ y: 200 }}
+                            scroll={{ y: 300 }}
                             style={{ marginTop: 8 }}
                             footer={() => (
                                 <div style={{ textAlign: 'right', fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>
@@ -774,7 +775,6 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                         amountGroups: formData.amountGroups,
                         successThreshold: formData.successThreshold,
                         errorThreshold: formData.errorThreshold,
-                        startImmediately: formData.startImmediately,
                     }}
                 >
                     <Row gutter={24}>
@@ -814,9 +814,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                     <Form.Item name="errorThreshold" label={t('wizard.groupSettings.errorThreshold')} rules={[{ required: true }]}>
                         <InputNumber<number> min={0} max={100} formatter={value => `${value}%`} parser={value => value?.replace('%', '') as unknown as number} style={{ width: '100%' }} />
                     </Form.Item>
-                    <Form.Item name="startImmediately" valuePropName="checked">
-                        <Checkbox>{t('wizard.groupSettings.startImmediately')}</Checkbox>
-                    </Form.Item>
+
                 </Form>
             </WizardCard>
         );
@@ -826,7 +824,9 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
         <WizardCard title={t('wizard.review.title')} $isModal={isModal}>
             <Descriptions bordered column={1} size="small">
                 <Descriptions.Item label={t('wizard.review.name')}>{formData.name}</Descriptions.Item>
-                <Descriptions.Item label={t('wizard.review.description')}>{formData.description || '-'}</Descriptions.Item>
+                <Descriptions.Item label={t('wizard.review.description')}>
+                    <ReleaseNotesPreview>{formData.description || '-'}</ReleaseNotesPreview>
+                </Descriptions.Item>
                 <Descriptions.Item label={t('wizard.review.distributionSet')}>{formData.distributionSetName}</Descriptions.Item>
                 <Descriptions.Item label={t('wizard.review.targetFilter')}>
                     {formData.targetFilterQuery ? (
@@ -840,13 +840,6 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                 <Descriptions.Item label={t('wizard.review.groups')}>{formData.amountGroups}</Descriptions.Item>
                 <Descriptions.Item label={t('wizard.review.successThreshold')}>{formData.successThreshold}%</Descriptions.Item>
                 <Descriptions.Item label={t('wizard.review.errorThreshold')}>{formData.errorThreshold}%</Descriptions.Item>
-                <Descriptions.Item label={t('wizard.groupSettings.startImmediately')}>
-                    {formData.startImmediately ? (
-                        <Tag color="blue">{t('common:yes')}</Tag>
-                    ) : (
-                        <Tag>{t('common:no')}</Tag>
-                    )}
-                </Descriptions.Item>
             </Descriptions>
 
             {/* Target Preview List */}
@@ -857,14 +850,14 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
                 <Table
                     dataSource={targetsData?.content || []}
                     columns={[
-                        { title: t('wizard.targetFilter.previewColumns.controllerId'), dataIndex: 'controllerId', key: 'controllerId' },
                         { title: t('wizard.targetFilter.previewColumns.name'), dataIndex: 'name', key: 'name' },
-                        { title: t('wizard.targetFilter.previewColumns.type'), dataIndex: 'targetTypeName', key: 'type' },
+                        { title: t('wizard.targetFilter.previewColumns.ipAddress'), dataIndex: 'ipAddress', key: 'ipAddress', render: (ip: string) => ip || '-' },
+                        { title: t('wizard.targetFilter.previewColumns.type'), dataIndex: 'targetTypeName', key: 'type', render: (type: string) => type || '-' },
                     ]}
                     rowKey="id"
                     size="small"
                     pagination={false}
-                    scroll={{ y: 150 }}
+                    scroll={{ y: 300 }}
                     loading={isLoadingTargets}
                 />
             </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Table, message } from 'antd';
 import type { TableProps } from 'antd';
 import { useGetSoftwareModules } from '@/api/generated/software-modules/software-modules';
@@ -29,11 +29,32 @@ const AssignModuleModal: React.FC<AssignModuleModalProps> = ({
 
     const offset = (pagination.current - 1) * pagination.pageSize;
 
-    const { data: modulesData, isLoading } = useGetSoftwareModules({
-        offset,
-        limit: pagination.pageSize,
-        q: searchQuery || undefined,
-    });
+    const {
+        data: modulesData,
+        isLoading,
+        refetch,
+    } = useGetSoftwareModules(
+        {
+            offset,
+            limit: pagination.pageSize,
+            q: searchQuery || undefined,
+        },
+        {
+            query: {
+                enabled: visible,
+                staleTime: 0,
+                refetchOnMount: 'always',
+            },
+        }
+    );
+
+    useEffect(() => {
+        if (!visible) return;
+        setSelectedRowKeys([]);
+        setSearchQuery('');
+        setPagination({ current: 1, pageSize: 10 });
+        refetch();
+    }, [visible, refetch]);
 
     const handleSearch = (query: string) => {
         setSearchQuery(query);
@@ -102,7 +123,10 @@ const AssignModuleModal: React.FC<AssignModuleModalProps> = ({
             <DistributionSearchBar
                 type="module"
                 onSearch={handleSearch}
-                onRefresh={() => { }}
+                onRefresh={() => {
+                    setPagination(prev => ({ ...prev, current: 1 }));
+                    refetch();
+                }}
                 canAdd={false}
             />
             <Table

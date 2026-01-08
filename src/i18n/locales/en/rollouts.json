@@ -170,7 +170,8 @@
             "nameRequired": "Please enter a rollout name",
             "nameDuplicate": "Rollout name already exists",
             "description": "Description",
-            "descriptionPlaceholder": "Enter description (optional)",
+            "descriptionPlaceholder": "## Release Notes\n- Added:\n- Changed:\n- Fixed:\n- Known issues:\n- Rollback:",
+            "releaseNotesHint": "Use headings and bullets. Line breaks will be preserved.",
             "checkingName": "Checking name..."
         },
         "distributionSet": {
@@ -180,6 +181,7 @@
             "searchName": "Name",
             "searchVersion": "Version",
             "searchDescription": "Description",
+            "filterByType": "Filter by Type",
             "selectionRequired": "Please select a distribution set",
             "selected": "Selected",
             "noSelection": "No distribution set selected",
@@ -232,7 +234,9 @@
             "previewColumns": {
                 "controllerId": "Controller ID",
                 "name": "Name",
-                "type": "Type"
+                "ipAddress": "IP Address",
+                "type": "Type",
+                "tags": "Tags"
             }
         },
         "groupSettings": {
@@ -241,8 +245,7 @@
             "preview": "Group Distribution Preview: {{count}} groups, approx. {{size}} targets/group",
             "distributionHint": "Targets will be divided into {{count}} groups. {{exact}} groups of {{size}}, and {{extraCount}} groups of {{extraSize}}.",
             "successThreshold": "Success Threshold (%)",
-            "errorThreshold": "Error Threshold (%)",
-            "startImmediately": "Start immediately after creation"
+            "errorThreshold": "Error Threshold (%)"
         },
         "review": {
             "title": "Review & Create",

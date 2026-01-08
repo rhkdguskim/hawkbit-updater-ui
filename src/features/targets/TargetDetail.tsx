@@ -55,6 +55,41 @@ import { useTranslation } from 'react-i18next';
 import { PageLayout } from '@/components/patterns';
 import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader } from '@/components/common';
+import styled from 'styled-components';
+
+const FullHeightPageLayout = styled(PageLayout)`
+    height: 100%;
+    min-height: 0;
+    flex: 1;
+`;
+
+const FullHeightSectionCard = styled(SectionCard)`
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+`;
+
+const FullHeightTabs = styled(Tabs)`
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+
+    .ant-tabs-content-holder {
+        flex: 1;
+        min-height: 0;
+    }
+
+    .ant-tabs-content,
+    .ant-tabs-tabpane {
+        height: 100%;
+    }
+
+    .ant-tabs-tabpane {
+        overflow: hidden;
+    }
+`;
 
 const TargetDetail: React.FC = () => {
     const { id: targetId, tab: tabParam } = useParams<{ id: string; tab?: string }>();
@@ -369,13 +404,13 @@ const TargetDetail: React.FC = () => {
     // Error State
     if (targetError) {
         return (
-            <PageLayout>
+            <FullHeightPageLayout>
                 <DetailPageHeader
                     title={t('detail.notFoundTitle')}
                     backLabel={t('detail.backToTargets')}
                     onBack={() => navigate('/targets/list')}
                 />
-            </PageLayout>
+            </FullHeightPageLayout>
         );
     }
 
@@ -480,7 +515,7 @@ const TargetDetail: React.FC = () => {
     );
 
     return (
-        <PageLayout>
+        <FullHeightPageLayout>
             {/* Breadcrumb */}
             <Breadcrumb
                 items={[
@@ -501,14 +536,14 @@ const TargetDetail: React.FC = () => {
             />
 
             {/* Tabs */}
-            <SectionCard>
-                <Tabs
+            <FullHeightSectionCard>
+                <FullHeightTabs
                     activeKey={activeTab}
                     onChange={handleTabChange}
                     items={tabItems}
 
                 />
-            </SectionCard>
+            </FullHeightSectionCard>
 
             {/* Modals */}
             <DeleteTargetModal
@@ -562,7 +597,7 @@ const TargetDetail: React.FC = () => {
                     setMetadataToDelete(null);
                 }}
             />
-        </PageLayout>
+        </FullHeightPageLayout>
     );
 };
 

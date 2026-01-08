@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tag, Space, Spin, Typography, Popover, Select, Button, message, Divider } from 'antd';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { useGetTags } from '@/api/generated/targets/targets';
+import { useGetTags, getGetTagsQueryKey } from '@/api/generated/targets/targets';
 import { useGetTargetTags, useAssignTarget, useUnassignTarget, useCreateTargetTags, getGetTargetTagsQueryKey } from '@/api/generated/target-tags/target-tags';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +26,12 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
     const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
     const [createModalOpen, setCreateModalOpen] = useState(false);
 
-    const { data: currentTags, isLoading } = useGetTags(controllerId);
+    const { data: currentTags, isLoading } = useGetTags(controllerId, {
+        query: {
+            staleTime: 0,
+            refetchOnMount: 'always',
+        },
+    });
     const { data: allTagsData, isLoading: allTagsLoading, refetch: refetchAllTags } = useGetTargetTags({ limit: 100 });
 
     const assignTagMutation = useAssignTarget();
@@ -71,6 +76,7 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
             }
             message.success(t('messages.tagsUpdated'));
             queryClient.invalidateQueries({ queryKey: getGetTargetTagsQueryKey() });
+            queryClient.invalidateQueries({ queryKey: getGetTagsQueryKey(controllerId) });
             setPopoverOpen(false);
         } catch (error) {
             message.error((error as Error).message || t('common:messages.error'));

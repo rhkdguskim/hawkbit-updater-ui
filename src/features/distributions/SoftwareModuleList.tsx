@@ -144,6 +144,7 @@ const SoftwareModuleList: React.FC = () => {
             onSuccess: () => {
                 message.success(t('messages.updateSuccess'));
                 queryClient.invalidateQueries({ queryKey: getGetSoftwareModulesQueryKey() });
+                refetch();
             },
             onError: (error) => {
                 message.error((error as Error).message || t('common:messages.error'));

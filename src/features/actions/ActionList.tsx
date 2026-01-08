@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useGetActions } from '@/api/generated/actions/actions';
-import { useCancelAction } from '@/api/generated/targets/targets';
+import { useCancelAction, useGetTargets } from '@/api/generated/targets/targets';
 import type { MgmtAction } from '@/api/generated/model';
 import { useTranslation } from 'react-i18next';
 import { keepPreviousData } from '@tanstack/react-query';
@@ -139,6 +139,38 @@ const ActionList: React.FC = () => {
         return targetId;
     }, []);
 
+    const targetIds = useMemo(() => {
+        const ids = new Set<string>();
+        data?.content?.forEach(action => {
+            const targetId = getTargetId(action);
+            if (targetId) ids.add(targetId);
+        });
+        return Array.from(ids);
+    }, [data?.content, getTargetId]);
+
+    const targetQuery = useMemo(() => {
+        if (targetIds.length === 0) return undefined;
+        const encoded = targetIds.map(id => `"${id.replace(/"/g, '\\"')}"`);
+        return encoded.map(id => `controllerId==${id}`).join(',');
+    }, [targetIds]);
+
+    const { data: targetsData } = useGetTargets(
+        {
+            offset: 0,
+            limit: targetIds.length || 1,
+            q: targetQuery,
+        },
+        {
+            query: {
+                enabled: !!targetQuery,
+            },
+        }
+    );
+
+    const targetMap = useMemo(() => {
+        return new Map((targetsData?.content || []).map(target => [target.controllerId, target]));
+    }, [targetsData]);
+
     // Extract distribution set info
     const getDistributionInfo = useCallback((action: MgmtAction) => {
         const dsLink = action._links?.distributionset || action._links?.distributionSet;
@@ -230,12 +262,24 @@ const ActionList: React.FC = () => {
             render: (_, record) => {
                 const targetId = getTargetId(record);
                 if (!targetId) return <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>-</Text>;
+                const target = targetMap.get(targetId);
+                const targetName = target?.name || record._links?.target?.name || targetId;
+                const targetIp = target?.ipAddress;
                 return (
                     <a
                         onClick={(e) => { e.stopPropagation(); navigate(`/targets/${targetId}`); }}
                         style={{ cursor: 'pointer' }}
                     >
-                        <Text strong ellipsis style={{ maxWidth: 140, fontSize: 'var(--ant-font-size-sm)' }}>{targetId}</Text>
+                        <Space direction="vertical" size={2}>
+                            <Text strong ellipsis style={{ maxWidth: 140, fontSize: 'var(--ant-font-size-sm)' }}>
+                                {targetName}
+                            </Text>
+                            {targetIp ? (
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-xs)' }}>
+                                    ({targetIp})
+                                </Text>
+                            ) : null}
+                        </Space>
                     </a>
                 );
             },

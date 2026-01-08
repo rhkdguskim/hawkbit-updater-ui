@@ -162,6 +162,7 @@ export const useTargetListModel = () => {
                 setDeleteModalOpen(false);
                 setTargetToDelete(null);
                 queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
+                refetchTargets();
             },
             onError: (error: Error) => {
                 const errMsg = error.message || t('messages.deleteFailed');
@@ -178,6 +179,7 @@ export const useTargetListModel = () => {
                 setFormModalOpen(false);
                 setEditingTarget(null);
                 queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
+                refetchTargets();
             },
             onError: (error: Error) => {
                 const errMsg = error.message || t('messages.createFailed');
@@ -192,6 +194,7 @@ export const useTargetListModel = () => {
             onSuccess: () => {
                 message.success(t('messages.updateSuccess', { defaultValue: 'Target updated' }));
                 queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
+                refetchTargets();
             },
             onError: (error: Error) => {
                 message.error(error.message || t('messages.updateFailed', { defaultValue: 'Failed to update target' }));
@@ -206,6 +209,7 @@ export const useTargetListModel = () => {
                 setAssignModalOpen(false);
                 setTargetToAssign(null);
                 queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
+                refetchTargets();
             },
             onError: (error: Error) => {
                 message.error(error.message || t('messages.error', { ns: 'common' }));

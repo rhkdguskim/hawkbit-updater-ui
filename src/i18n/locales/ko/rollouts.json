@@ -170,7 +170,8 @@
             "nameRequired": "롤아웃 이름을 입력해주세요",
             "nameDuplicate": "중복된 롤아웃 이름이 존재합니다",
             "description": "설명",
-            "descriptionPlaceholder": "설명을 입력하세요 (선택사항)",
+            "descriptionPlaceholder": "## 릴리즈 노트\n- 추가:\n- 변경:\n- 수정:\n- 알려진 이슈:\n- 롤백:",
+            "releaseNotesHint": "제목과 불릿을 사용해 작성하세요. 줄바꿈이 그대로 표시됩니다.",
             "checkingName": "이름 확인 중..."
         },
         "distributionSet": {
@@ -180,6 +181,7 @@
             "searchName": "이름",
             "searchVersion": "버전",
             "searchDescription": "설명",
+            "filterByType": "타입 필터",
             "selectionRequired": "배포 세트를 선택해주세요.",
             "selected": "선택됨",
             "noSelection": "배포 세트가 선택되지 않았습니다.",
@@ -232,7 +234,9 @@
             "previewColumns": {
                 "controllerId": "컨트롤러 ID",
                 "name": "이름",
-                "type": "타입"
+                "ipAddress": "IP 주소",
+                "type": "타입",
+                "tags": "태그"
             }
         },
         "groupSettings": {
@@ -241,8 +245,7 @@
             "preview": "그룹 배포 미리보기: {{count}}개 그룹, 그룹당 약 {{size}}개 대상",
             "distributionHint": "대상이 {{count}}개 그룹으로 나뉩니다. {{size}}개 대상씩 {{exact}}개 그룹, 그리고 {{extraSize}}개 대상씩 {{extraCount}}개 그룹으로 구성됩니다.",
             "successThreshold": "성공 임계값 (%)",
-            "errorThreshold": "오류 임계값 (%)",
-            "startImmediately": "생성 후 즉시 시작"
+            "errorThreshold": "오류 임계값 (%)"
         },
         "review": {
             "title": "검토 및 생성",

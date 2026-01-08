@@ -3,6 +3,10 @@ import { Card, theme } from 'antd';
 import { PageLayout, PageHeader } from '@/components/patterns';
 import styled from 'styled-components';
 
+const FullHeightLayout = styled(PageLayout)`
+    min-height: 100vh;
+`;
+
 const ContentCard = styled(Card)<{ $bodyPadding: string }>`
     display: flex;
     flex-direction: column;
@@ -75,7 +79,7 @@ export const StandardListLayout: React.FC<StandardListLayoutProps> = ({
     const bodyPadding = noCardPadding ? '0' : `${token.paddingLG}px`;
 
     return (
-        <PageLayout>
+        <FullHeightLayout>
             <PageHeader
                 title={title}
                 subtitle={subtitle}
@@ -93,7 +97,7 @@ export const StandardListLayout: React.FC<StandardListLayoutProps> = ({
                     {children}
                 </TableWrapper>
             </ContentCard>
-        </PageLayout>
+        </FullHeightLayout>
     );
 };
 

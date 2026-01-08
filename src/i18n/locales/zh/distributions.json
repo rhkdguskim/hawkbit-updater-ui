@@ -270,7 +270,9 @@
     },
     "typeManagement": {
         "dsTypeTitle": "分发集类型",
+        "dsTypeDescription": "管理分发集类型。",
         "smTypeTitle": "软件模块类型",
+        "smTypeDescription": "管理软件模块类型。",
         "addType": "添加类型",
         "editType": "编辑类型",
         "columns": {

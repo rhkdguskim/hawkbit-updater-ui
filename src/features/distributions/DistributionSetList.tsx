@@ -146,6 +146,7 @@ const DistributionSetList: React.FC = () => {
             onSuccess: () => {
                 message.success(t('messages.updateSuccess'));
                 queryClient.invalidateQueries({ queryKey: getGetDistributionSetsQueryKey() });
+                refetch();
             },
             onError: (error) => {
                 message.error((error as Error).message || t('common:messages.error'));

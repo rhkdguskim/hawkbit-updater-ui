@@ -270,7 +270,9 @@
     },
     "typeManagement": {
         "dsTypeTitle": "Distribution Set Types",
+        "dsTypeDescription": "Manage distribution set types.",
         "smTypeTitle": "Software Module Types",
+        "smTypeDescription": "Manage software module types.",
         "addType": "Add Type",
         "editType": "Edit Type",
         "columns": {

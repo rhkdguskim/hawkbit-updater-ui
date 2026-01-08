@@ -270,7 +270,9 @@
     },
     "typeManagement": {
         "dsTypeTitle": "배포 세트 유형",
+        "dsTypeDescription": "배포 세트 유형을 관리합니다.",
         "smTypeTitle": "소프트웨어 모듈 유형",
+        "smTypeDescription": "소프트웨어 모듈 유형을 관리합니다.",
         "addType": "유형 추가",
         "editType": "유형 수정",
         "columns": {

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Descriptions, Typography, Skeleton, Empty, Tag, Card, List, Button, Space } from 'antd';
+import { Descriptions, Typography, Skeleton, Empty, Tag, Card, List, Button } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
-import type { MgmtDistributionSet } from '@/api/generated/model';
+import type { MgmtDistributionSet, MgmtSoftwareModule } from '@/api/generated/model';
 import dayjs from 'dayjs';
+import styled from 'styled-components';
 
 const { Text, Title } = Typography;
 
@@ -17,6 +18,50 @@ interface DistributionSetTabProps {
 import { useTranslation } from 'react-i18next';
 // ...
 
+const TabLayout = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    gap: 16px;
+    overflow: hidden;
+`;
+
+const AssignRow = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+`;
+
+const CardsStack = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding-right: 4px;
+`;
+
+const StyledCard = styled(Card)`
+    flex-shrink: 0;
+
+    .ant-card-body {
+        display: flex;
+        flex-direction: column;
+    }
+`;
+
+const ModulesSection = styled.div`
+    margin-top: 16px;
+    max-height: 180px;
+    overflow: auto;
+    border: 1px solid var(--ant-color-border-secondary);
+    border-radius: 4px;
+    padding: 8px;
+`;
+
+
 const DSCard: React.FC<{ ds: MgmtDistributionSet | null | undefined; title: string; type: 'installed' | 'assigned' }> = ({
     ds,
     title,
@@ -25,14 +70,14 @@ const DSCard: React.FC<{ ds: MgmtDistributionSet | null | undefined; title: stri
     const { t } = useTranslation('targets');
     if (!ds) {
         return (
-            <Card title={title} style={{ marginBottom: 16 }}>
+            <StyledCard title={title}>
                 <Empty description={type === 'installed' ? t('ds.noInstalled') : t('ds.noAssigned')} />
-            </Card>
+            </StyledCard>
         );
     }
 
     return (
-        <Card
+        <StyledCard
             title={
                 <>
                     {title}
@@ -40,7 +85,6 @@ const DSCard: React.FC<{ ds: MgmtDistributionSet | null | undefined; title: stri
                     {type === 'assigned' && <Tag color="blue" style={{ marginLeft: 8 }}>{t('ds.pending')}</Tag>}
                 </>
             }
-            style={{ marginBottom: 16 }}
         >
             <Descriptions column={2} size="small">
                 <Descriptions.Item label={t('table.name')}>
@@ -69,11 +113,11 @@ const DSCard: React.FC<{ ds: MgmtDistributionSet | null | undefined; title: stri
             </Descriptions>
 
             {ds.modules && ds.modules.length > 0 && (
-                <>
-                    <Title level={5} style={{ marginTop: 16, marginBottom: 8 }}>
+                <ModulesSection>
+                    <Title level={5} style={{ marginBottom: 8 }}>
                         {t('ds.softwareModules')}
                     </Title>
-                    <List
+                    <List<MgmtSoftwareModule>
                         size="small"
                         dataSource={ds.modules}
                         renderItem={(module) => (
@@ -84,9 +128,9 @@ const DSCard: React.FC<{ ds: MgmtDistributionSet | null | undefined; title: stri
                             </List.Item>
                         )}
                     />
-                </>
+                </ModulesSection>
             )}
-        </Card>
+        </StyledCard>
     );
 };
 
@@ -105,9 +149,9 @@ const DistributionSetTab: React.FC<DistributionSetTabProps> = ({
     const hasAnyDS = installedDS || assignedDS;
 
     return (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <TabLayout>
             {canAssign && (
-                <div style={{ textAlign: 'right' }}>
+                <AssignRow>
                     <Button
                         type="primary"
                         icon={<SyncOutlined />}
@@ -115,18 +159,18 @@ const DistributionSetTab: React.FC<DistributionSetTabProps> = ({
                     >
                         {t('assign.title')}
                     </Button>
-                </div>
+                </AssignRow>
             )}
 
             {!hasAnyDS && !canAssign ? (
                 <Empty description={t('ds.noConfigured')} />
             ) : (
-                <>
+                <CardsStack>
                     <DSCard ds={installedDS} title={t('ds.installed')} type="installed" />
                     <DSCard ds={assignedDS} title={t('ds.assigned')} type="assigned" />
-                </>
+                </CardsStack>
             )}
-        </Space>
+        </TabLayout>
     );
 };
 
