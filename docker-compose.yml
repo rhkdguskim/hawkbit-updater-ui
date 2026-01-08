@@ -1,5 +1,4 @@
 services:
-  # Nginx Gateway (Port 9100)
   nginx:
     image: nginx:alpine
     container_name: updater-gateway
@@ -14,7 +13,6 @@ services:
     networks:
       - updater-network
 
-  # Updater UI (React App)
   updater-ui:
     build:
       context: .
@@ -25,18 +23,21 @@ services:
     networks:
       - updater-network
 
-  # hawkBit Update Server
   hawkbit:
     platform: linux/amd64
-    image: hawkbit/hawkbit-update-server:latest
+    image: hawkbit/hawkbit-update-server:latest-mysql
     container_name: hawkbit-server
     environment:
-      # PostgreSQL Database Configuration
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/hawkbit
+      # MySQL Database Configuration
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://mysql:3306/hawkbit
       - SPRING_DATASOURCE_USERNAME=hawkbit
       - SPRING_DATASOURCE_PASSWORD=hawkbit
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
-      - SPRING_JPA_DATABASE=POSTGRESQL
+
+      # RabbitMQ Configuration
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
 
       # Security - DDI Authentication
       - HAWKBIT_SERVER_DDI_SECURITY_AUTHENTICATION_ANONYMOUS_ENABLED=false
@@ -48,47 +49,64 @@ services:
 
       # Demo mode
       - HAWKBIT_SERVER_DEMO_DATA_ENABLED=true
+      - ORG_ECLIPSE_HAWKBIT_REPOSITORY_FILE_PATH=/var/lib/hawkbit/artifactrepo
 
-      # Disable RabbitMQ (Not present in compose)
-      - SPRING_RABBITMQ_ENABLED=false
-      - HAWKBIT_DMF_RABBITMQ_ENABLED=false
-
-      # Artifact storage - persist to mounted volume
-      - HAWKBIT_SERVER_ARTIFACT_REPOSITORY_JCR_ENABLED=false
-      - HAWKBIT_SERVER_ARTIFACT_REPOSITORY_FILESYSTEM_ENABLED=true
-      - HAWKBIT_SERVER_ARTIFACT_REPOSITORY_FILESYSTEM_ROOTPATH=/opt/hawkbit/data/artifacts
-      - HAWKBIT_ARTIFACT_URL_PROTOCOLS_DOWNLOAD_HTTP_PATH_PREFIX=/download
     volumes:
-      - hawkbit-data:/opt/hawkbit/data
+      - hawkbit-artifacts:/var/lib/hawkbit/artifactrepo
     depends_on:
-      postgres:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
       start_period: 120s
     restart: unless-stopped
     networks:
       - updater-network
 
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
-    container_name: hawkbit-postgres
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: hawkbit-mysql
     environment:
-      - POSTGRES_DB=hawkbit
-      - POSTGRES_USER=hawkbit
-      - POSTGRES_PASSWORD=hawkbit
+      - MYSQL_DATABASE=hawkbit
+      - MYSQL_USER=hawkbit
+      - MYSQL_PASSWORD=hawkbit
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_ALLOW_EMPTY_PASSWORD=false
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - mysql-data:/var/lib/mysql
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U hawkbit" ]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uhawkbit", "-phawkbit" ]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - updater-network
+
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: hawkbit-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "15672:15672"  # Management UI (optional, for debugging)
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
     networks:
       - updater-network
@@ -98,5 +116,9 @@ networks:
     driver: bridge
 
 volumes:
-  hawkbit-data:
-  postgres-data:
+  hawkbit-artifacts:
+    name: hawkbit-artifacts
+  mysql-data:
+    name: hawkbit-mysql-data
+  rabbitmq-data:
+    name: hawkbit-rabbitmq-data

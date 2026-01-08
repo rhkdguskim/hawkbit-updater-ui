@@ -13,11 +13,12 @@ echo "=== Exporting Docker Images for Offline Deployment ==="
 echo "Building updater-ui image..."
 docker compose build updater-ui
 
-# List of images to export
+# List of images to export (matching docker-compose.yml)
 IMAGES=(
     "updater-ui:latest"
-    "hawkbit/hawkbit-update-server:latest"
-    "postgres:15-alpine"
+    "hawkbit/hawkbit-update-server:latest-mysql"
+    "mysql:8.0"
+    "rabbitmq:3-management"
     "nginx:alpine"
 )
 

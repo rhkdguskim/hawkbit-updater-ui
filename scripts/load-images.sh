@@ -14,6 +14,15 @@ if [ ! -d "$IMPORT_DIR" ]; then
     exit 1
 fi
 
+echo ""
+echo "Expected images (from docker-compose.yml):"
+echo "  - updater-ui:latest"
+echo "  - hawkbit/hawkbit-update-server:latest-mysql"
+echo "  - mysql:8.0"
+echo "  - rabbitmq:3-management"
+echo "  - nginx:alpine"
+echo ""
+
 # Load all tar files
 for TAR_FILE in "$IMPORT_DIR"/*.tar; do
     if [ -f "$TAR_FILE" ]; then

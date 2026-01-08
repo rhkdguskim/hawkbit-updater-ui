@@ -10,6 +10,15 @@ if not exist "docker-images" (
     exit /b 1
 )
 
+echo.
+echo Expected images (from docker-compose.yml):
+echo   - updater-ui:latest
+echo   - hawkbit/hawkbit-update-server:latest-mysql
+echo   - mysql:8.0
+echo   - rabbitmq:3-management
+echo   - nginx:alpine
+echo.
+
 for %%f in (docker-images\*.tar) do (
     echo Loading %%f...
     docker load -i "%%f"
