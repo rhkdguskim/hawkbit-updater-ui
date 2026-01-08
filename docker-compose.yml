@@ -49,7 +49,13 @@ services:
 
       # Demo mode
       - HAWKBIT_SERVER_DEMO_DATA_ENABLED=true
-      - ORG_ECLIPSE_HAWKBIT_REPOSITORY_FILE_PATH=/var/lib/hawkbit/artifactrepo
+
+      # Artifact Repository Configuration (Filesystem)
+      # Disable MongoDB/JCR and enable Filesystem repository
+      - HAWKBIT_ARTIFACT_REPOSITORY_MONGO_ENABLED=false
+      - ORG_ECLIPSE_HAWKBIT_REPOSITORY_MONGO_ENABLED=false
+      - ORG_ECLIPSE_HAWKBIT_ARTIFACT_REPOSITORY_FILESYSTEM_ENABLED=true
+      - ORG_ECLIPSE_HAWKBIT_ARTIFACT_REPOSITORY_FILESYSTEM_ROOTPATH=/var/lib/hawkbit/artifactrepo
 
     volumes:
       - hawkbit-artifacts:/var/lib/hawkbit/artifactrepo
