@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Descriptions, Tag, Typography, Skeleton, Empty, Card, Row, Col, Statistic, Select, Space, message } from 'antd';
+import { Descriptions, Tag, Typography, Skeleton, Empty, Card, Row, Col, Statistic, Select, Space, message, Button } from 'antd';
 import {
     CheckCircleOutlined,
     CloseCircleOutlined,
     DesktopOutlined,
     ClockCircleOutlined,
+    ThunderboltOutlined,
 } from '@ant-design/icons';
-import type { MgmtTarget } from '@/api/generated/model';
+import type { MgmtTarget, MgmtTargetAutoConfirm } from '@/api/generated/model';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import styled from 'styled-components';
@@ -33,12 +34,27 @@ const StyledCard = styled(Card)`
 interface OverviewTabProps {
     target: MgmtTarget | null | undefined;
     loading: boolean;
+    autoConfirmData?: MgmtTargetAutoConfirm | null;
+    autoConfirmLoading?: boolean;
+    canEditAutoConfirm?: boolean;
+    onActivateAutoConfirm?: () => void;
+    onDeactivateAutoConfirm?: () => void;
+    autoConfirmActionLoading?: boolean;
 }
 
 import { useTranslation } from 'react-i18next';
 // ...
 
-const OverviewTab: React.FC<OverviewTabProps> = ({ target, loading }) => {
+const OverviewTab: React.FC<OverviewTabProps> = ({
+    target,
+    loading,
+    autoConfirmData,
+    autoConfirmLoading = false,
+    canEditAutoConfirm = false,
+    onActivateAutoConfirm,
+    onDeactivateAutoConfirm,
+    autoConfirmActionLoading = false,
+}) => {
     const { t } = useTranslation('targets');
     const queryClient = useQueryClient();
     const { role } = useAuthStore();
@@ -186,6 +202,50 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ target, loading }) => {
                     <Tag color={target.requestAttributes ? 'blue' : 'default'}>
                         {target.requestAttributes ? t('overview.requested') : t('overview.notRequested')}
                     </Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label={t('autoConfirm.title', 'AutoConfirm')}>
+                    {autoConfirmLoading ? (
+                        <Skeleton.Input active size="small" />
+                    ) : autoConfirmData ? (
+                        <Space direction="vertical" size={8}>
+                            <Space>
+                                <Tag
+                                    icon={autoConfirmData.active ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+                                    color={autoConfirmData.active ? 'success' : 'default'}
+                                >
+                                    {autoConfirmData.active ? t('autoConfirm.enabled') : t('autoConfirm.disabled')}
+                                </Tag>
+                                {canEditAutoConfirm && (
+                                    autoConfirmData.active ? (
+                                        <Button
+                                            danger
+                                            size="small"
+                                            icon={<CloseCircleOutlined />}
+                                            onClick={onDeactivateAutoConfirm}
+                                            loading={autoConfirmActionLoading}
+                                        >
+                                            {t('autoConfirm.deactivate')}
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            type="primary"
+                                            size="small"
+                                            icon={<ThunderboltOutlined />}
+                                            onClick={onActivateAutoConfirm}
+                                            loading={autoConfirmActionLoading}
+                                        >
+                                            {t('autoConfirm.activate')}
+                                        </Button>
+                                    )
+                                )}
+                            </Space>
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                                {autoConfirmData.active ? t('autoConfirm.enabledDesc') : t('autoConfirm.disabledDesc')}
+                            </Text>
+                        </Space>
+                    ) : (
+                        <Text type="secondary">-</Text>
+                    )}
                 </Descriptions.Item>
                 <Descriptions.Item label={t('overview.targetType')}>
                     {isAdmin ? (

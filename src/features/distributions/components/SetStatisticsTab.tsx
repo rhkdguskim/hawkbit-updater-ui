@@ -97,11 +97,37 @@ const SetStatisticsTab: React.FC<SetStatisticsTabProps> = ({ distributionSetId }
         normalizedActions[key.toLowerCase()] = value as number;
     });
 
-    const totalActions = Object.values(normalizedActions).reduce((a, b) => a + b, 0);
-    const successActions = normalizedActions['finished'] || normalizedActions['completed'] || 0;
-    const successRate = totalActions > 0 ? Math.round((successActions / totalActions) * 100) : 0;
+    const aggregateKeys = new Set([
+        'total',
+        'sum',
+        'all',
+        'count',
+        'totalactions',
+        'totalaction',
+        'totalcount',
+        'totalactionscount',
+    ]);
+    const normalizeKey = (key: string) => key.toLowerCase().replace(/[^a-z]/g, '');
+    const actionEntries = Object.entries(normalizedActions);
+    const statusEntries = actionEntries.filter(([key]) => !aggregateKeys.has(normalizeKey(key)));
+    const aggregateEntry = actionEntries.find(([key]) => aggregateKeys.has(normalizeKey(key)));
 
-    const chartData = Object.entries(normalizedActions)
+    const totalActions = aggregateEntry
+        ? aggregateEntry[1]
+        : statusEntries.reduce((sum, [, value]) => sum + value, 0);
+    const successActions = normalizedActions['finished']
+        || normalizedActions['completed']
+        || normalizedActions['success']
+        || normalizedActions['successful']
+        || 0;
+    const errorActions = (normalizedActions['error'] || 0)
+        + (normalizedActions['failed'] || 0)
+        + (normalizedActions['canceled'] || 0)
+        + (normalizedActions['cancelled'] || 0);
+    const completedActions = successActions + errorActions;
+    const successRate = completedActions > 0 ? Math.round((successActions / completedActions) * 100) : 0;
+
+    const chartData = statusEntries
         .filter(([, value]) => value > 0)
         .map(([key, value]) => ({
             name: t(`common:status.${key}`, key),

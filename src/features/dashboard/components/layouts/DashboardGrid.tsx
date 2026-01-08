@@ -1,7 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 import { PageLayout } from '@/components/patterns';
-import { DashboardScrollContent, IntegratedKPIGrid, IntegratedKPIColumn, IntegratedTopRow, IntegratedChartsGrid, IntegratedBottomRow } from '../DashboardStyles';
+import {
+    DashboardScrollContent,
+    DashboardSurface,
+    IntegratedKPIGrid,
+    IntegratedKPIColumn,
+    IntegratedTopRow,
+    IntegratedChartsGrid,
+    IntegratedBottomRow
+} from '../DashboardStyles';
 
 const HeaderRow = styled.div`
     flex-shrink: 0;
@@ -24,28 +32,30 @@ export const IntegratedDashboardGrid: React.FC<IntegratedDashboardGridProps> = (
 }) => {
     return (
         <PageLayout fullWidth={true}>
-            <HeaderRow>
-                {header}
-            </HeaderRow>
-            <DashboardScrollContent>
-                {/* Top Row: KPI 2x4 grid + 4 Charts */}
-                <IntegratedTopRow>
-                    <IntegratedKPIColumn>
-                        <IntegratedKPIGrid>
-                            {kpiCards}
-                        </IntegratedKPIGrid>
-                        {kpiFooter}
-                    </IntegratedKPIColumn>
-                    <IntegratedChartsGrid>
-                        {charts}
-                    </IntegratedChartsGrid>
-                </IntegratedTopRow>
+            <DashboardSurface>
+                <HeaderRow>
+                    {header}
+                </HeaderRow>
+                <DashboardScrollContent>
+                    {/* Top Row: KPI 2x4 grid + 4 Charts */}
+                    <IntegratedTopRow>
+                        <IntegratedKPIColumn>
+                            <IntegratedKPIGrid>
+                                {kpiCards}
+                            </IntegratedKPIGrid>
+                            {kpiFooter}
+                        </IntegratedKPIColumn>
+                        <IntegratedChartsGrid>
+                            {charts}
+                        </IntegratedChartsGrid>
+                    </IntegratedTopRow>
 
-                {/* Bottom Row: 3 widgets with 1:1:2 ratio */}
-                <IntegratedBottomRow>
-                    {bottomWidgets}
-                </IntegratedBottomRow>
-            </DashboardScrollContent>
+                    {/* Bottom Row: 3 widgets with 1:1:2 ratio */}
+                    <IntegratedBottomRow>
+                        {bottomWidgets}
+                    </IntegratedBottomRow>
+                </DashboardScrollContent>
+            </DashboardSurface>
         </PageLayout>
     );
 };
@@ -81,16 +91,18 @@ export const DashboardGrid: React.FC<DashboardGridProps> = ({
 }) => {
     return (
         <PageLayout fullWidth={true}>
-            {header}
-            <DashboardScrollContent>
-                <TopRow>
-                    {kpiCards}
-                    {charts}
-                </TopRow>
-                <BottomRow>
-                    {bottomWidgets}
-                </BottomRow>
-            </DashboardScrollContent>
+            <DashboardSurface>
+                {header}
+                <DashboardScrollContent>
+                    <TopRow>
+                        {kpiCards}
+                        {charts}
+                    </TopRow>
+                    <BottomRow>
+                        {bottomWidgets}
+                    </BottomRow>
+                </DashboardScrollContent>
+            </DashboardSurface>
         </PageLayout>
     );
 };

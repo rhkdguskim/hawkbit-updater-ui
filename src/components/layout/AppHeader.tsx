@@ -8,10 +8,8 @@ import {
     MdRocketLaunch,
     MdPlayArrow,
     MdAssignment,
-    MdOutlineDashboard,
     MdLayers,
     MdWidgets,
-    MdDns,
     MdExtension,
 } from 'react-icons/md';
 import styled from 'styled-components';
@@ -210,34 +208,14 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
             key: 'targets-menu',
             label: t('nav.targets'),
             icon: <MdDevices />,
-            onTitleClick: () => navigate('/targets'),
-            children: [
-                {
-                    key: '/targets/overview',
-                    icon: <MdOutlineDashboard />,
-                    label: t('nav.overview'),
-                    onClick: () => navigate('/targets'),
-                },
-                {
-                    key: '/targets/list',
-                    icon: <MdDns />,
-                    label: t('nav.list'),
-                    onClick: () => navigate('/targets/list'),
-                },
-            ],
+            onClick: () => navigate('/targets/list'),
         },
         {
             key: 'distributions-menu',
             label: t('nav.distributions'),
             icon: <MdInventory />,
-            onTitleClick: () => navigate('/distributions'),
+            onTitleClick: () => navigate('/distributions/sets'),
             children: [
-                {
-                    key: '/distributions/overview',
-                    icon: <MdOutlineDashboard />,
-                    label: t('nav.overview'),
-                    onClick: () => navigate('/distributions'),
-                },
                 {
                     key: '/distributions/sets',
                     icon: <MdLayers />,
@@ -253,17 +231,11 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
             ],
         },
         {
-            key: '/rollouts-menu',
+            key: 'rollouts-menu',
             icon: <MdAssignment />,
             label: t('nav.rolloutManagement'),
-            onTitleClick: () => navigate('/rollouts'),
+            onTitleClick: () => navigate('/rollouts/list'),
             children: [
-                {
-                    key: '/rollouts/overview',
-                    icon: <MdOutlineDashboard />,
-                    label: t('nav.rolloutOverview'),
-                    onClick: () => navigate('/rollouts'),
-                },
                 {
                     key: '/rollouts/list',
                     icon: <MdRocketLaunch />,

@@ -1,3 +1,5 @@
+export { OverviewCard } from './OverviewCard';
+
 // Shared Typography components
 export {
     SmallText,

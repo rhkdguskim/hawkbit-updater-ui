@@ -33,8 +33,15 @@ import { SectionCard } from '@/components/layout/PageLayout';
 import { ActionStatusTimeline } from '@/components/common/ActionStatusTimeline';
 import { StatusTag } from '@/components/common';
 import { PageLayout } from '@/components/patterns';
+import styled from 'styled-components';
 
 const { Text } = Typography;
+
+const StatusHistoryScroll = styled.div`
+    max-height: clamp(240px, 45vh, 520px);
+    overflow-y: auto;
+    padding-right: 4px;
+`;
 
 const ActionDetail: React.FC = () => {
     const { t } = useTranslation(['actions', 'common']);
@@ -329,10 +336,12 @@ const ActionDetail: React.FC = () => {
 
             {/* Status History Timeline */}
             <SectionCard title={t('detail.statusHistoryTitle')} loading={statusLoading} style={{ marginTop: 16 }}>
-                <ActionStatusTimeline
-                    statuses={statusData?.content}
-                    emptyText={t('detail.noStatusHistory')}
-                />
+                <StatusHistoryScroll>
+                    <ActionStatusTimeline
+                        statuses={statusData?.content}
+                        emptyText={t('detail.noStatusHistory')}
+                    />
+                </StatusHistoryScroll>
             </SectionCard>
         </StandardDetailLayout>
     );

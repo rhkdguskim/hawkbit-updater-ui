@@ -9,7 +9,7 @@ const { Text } = Typography;
 
 interface DistributionCompletenessChartProps {
     isLoading: boolean;
-    completenessData: { name: string; value: number; color: string }[];
+    completenessData: { name: string; value: number; color: string; statusKey?: 'complete' | 'incomplete' }[];
     totalCount: number;
 }
 
@@ -52,11 +52,11 @@ export const DistributionCompletenessChart: React.FC<DistributionCompletenessCha
                     </ResponsiveContainer>
                     <Flex vertical gap={4} style={{ flex: 1, minWidth: 0 }}>
                         {completenessData.map(entry => (
-                            <ChartLegendItem key={entry.name} style={{ padding: '6px 10px' }}>
+                            <ChartLegendItem key={entry.statusKey ?? entry.name} style={{ padding: '6px 10px' }}>
                                 <Flex align="center" gap={6}>
                                     <div style={{ width: 10, height: 10, borderRadius: 3, background: entry.color, flexShrink: 0 }} />
                                     <Text style={{ fontSize: 11, whiteSpace: 'nowrap' }}>
-                                        {entry.name === 'Complete' ? t('status.complete', 'Complete') : t('status.incomplete', 'Incomplete')}
+                                        {entry.name}
                                     </Text>
                                 </Flex>
                                 <Text strong style={{ fontSize: 12, color: entry.color }}>{entry.value}</Text>

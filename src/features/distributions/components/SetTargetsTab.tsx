@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useGetAssignedTargets1, useGetInstalledTargets } from '@/api/generated/distribution-sets/distribution-sets';
-import { Table, Typography, Segmented, Space } from 'antd';
+import { Table, Typography, Segmented, Space, Empty } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+import type { ColumnsType } from 'antd/es/table';
+import type { MgmtTarget } from '@/api/generated/model';
 
 const { Text } = Typography;
 
@@ -31,32 +33,50 @@ const SetTargetsTab: React.FC<SetTargetsTabProps> = ({ distributionSetId }) => {
 
     const data = view === 'assigned' ? assignedQuery.data : installedQuery.data;
     const isLoading = view === 'assigned' ? assignedQuery.isLoading : installedQuery.isLoading;
+    const isError = view === 'assigned' ? assignedQuery.isError : installedQuery.isError;
 
-    const columns = [
+    const getTargetId = (target: MgmtTarget) => {
+        if (target.controllerId) return target.controllerId;
+        const link = target._links?.self?.href;
+        return link ? link.split('/').pop() || '' : '';
+    };
+
+    const columns: ColumnsType<MgmtTarget> = [
         {
             title: t('targets:table.controllerId'),
             dataIndex: 'controllerId',
             key: 'controllerId',
-            render: (text: string) => (
-                <a onClick={() => navigate(`/targets/${text}`)}>{text}</a>
-            )
+            render: (_text: string, record: MgmtTarget) => {
+                const targetId = getTargetId(record);
+                return targetId ? (
+                    <a onClick={() => navigate(`/targets/${targetId}`)}>{targetId}</a>
+                ) : (
+                    <Text type="secondary">-</Text>
+                );
+            }
         },
         {
             title: t('targets:table.name'),
             dataIndex: 'name',
             key: 'name',
+            render: (text: string, record: MgmtTarget) => text || record.controllerId || <Text type="secondary">-</Text>,
         },
         {
             title: t('targets:form.description'),
             dataIndex: 'description',
             key: 'description',
             ellipsis: true,
+            render: (text: string | undefined) => text || <Text type="secondary">-</Text>,
         },
         {
             title: t('targets:table.lastControllerRequest'),
-            dataIndex: 'lastContact',
             key: 'lastContact',
-            render: (val: number) => val ? dayjs(val).format('YYYY-MM-DD HH:mm:ss') : '-'
+            render: (_value: unknown, record: MgmtTarget) => {
+                const timestamp = view === 'installed'
+                    ? record.installedAt
+                    : record.lastControllerRequestAt || record.pollStatus?.lastRequestAt;
+                return timestamp ? dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss') : '-';
+            }
         }
     ];
 
@@ -79,19 +99,23 @@ const SetTargetsTab: React.FC<SetTargetsTabProps> = ({ distributionSetId }) => {
                 </Text>
             </div>
 
-            <Table
-                dataSource={data?.content || []}
-                rowKey="id"
-                loading={isLoading}
-                columns={columns}
-                pagination={{
-                    ...pagination,
-                    total: data?.total || 0,
-                    showSizeChanger: true,
-                }}
-                onChange={(p) => setPagination({ current: p.current || 1, pageSize: p.pageSize || 10 })}
-                size="small"
-            />
+            {isError ? (
+                <Empty description={t('common:messages.error')} />
+            ) : (
+                <Table
+                    dataSource={data?.content || []}
+                    rowKey={(record, index) => getTargetId(record) || record.name || `row-${index}`}
+                    loading={isLoading}
+                    columns={columns}
+                    pagination={{
+                        ...pagination,
+                        total: data?.total || 0,
+                        showSizeChanger: true,
+                    }}
+                    onChange={(p) => setPagination({ current: p.current || 1, pageSize: p.pageSize || 10 })}
+                    size="small"
+                />
+            )}
         </Space>
     );
 };

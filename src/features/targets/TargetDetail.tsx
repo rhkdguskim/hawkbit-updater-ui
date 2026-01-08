@@ -18,7 +18,6 @@ import {
     MetadataTab,
     DistributionSetTab,
     TagsTab,
-    AutoConfirmTab,
 } from './tabs';
 import {
     DeleteTargetModal,
@@ -58,15 +57,24 @@ import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader } from '@/components/common';
 
 const TargetDetail: React.FC = () => {
-    const { id: targetId } = useParams<{ id: string }>();
+    const { id: targetId, tab: tabParam } = useParams<{ id: string; tab?: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
     const { t } = useTranslation(['targets', 'common']);
 
-    // Active Tab State
-    const [activeTab, setActiveTab] = useState('overview');
+    const baseTabs = ['overview', 'actions', 'attributes', 'distribution', 'metadata', 'tags'];
+    const availableTabs = baseTabs;
+    const activeTab = availableTabs.includes(tabParam || '') ? (tabParam as string) : 'overview';
+
+    const handleTabChange = useCallback((nextTab: string) => {
+        if (!targetId) return;
+        const nextPath = nextTab === 'overview'
+            ? `/targets/${targetId}`
+            : `/targets/${targetId}/${nextTab}`;
+        navigate(nextPath);
+    }, [navigate, targetId]);
 
     // Modal States
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -139,7 +147,7 @@ const TargetDetail: React.FC = () => {
 
     const { data: autoConfirmData, isLoading: autoConfirmLoading } = useGetAutoConfirmStatus(
         targetId!,
-        { query: { enabled: !!targetId && activeTab === 'autoconfirm' } }
+        { query: { enabled: !!targetId } }
     );
 
     const { data: dsListData, isLoading: dsListLoading } = useGetDistributionSets(
@@ -375,7 +383,21 @@ const TargetDetail: React.FC = () => {
         {
             key: 'overview',
             label: t('detail.tabs.overview'),
-            children: <OverviewTab target={targetData} loading={targetLoading} />,
+            children: (
+                <OverviewTab
+                    target={targetData}
+                    loading={targetLoading}
+                    autoConfirmData={autoConfirmData}
+                    autoConfirmLoading={autoConfirmLoading}
+                    canEditAutoConfirm={isAdmin}
+                    onActivateAutoConfirm={handleActivateAutoConfirm}
+                    onDeactivateAutoConfirm={handleDeactivateAutoConfirm}
+                    autoConfirmActionLoading={
+                        activateAutoConfirmMutation.isPending ||
+                        deactivateAutoConfirmMutation.isPending
+                    }
+                />
+            ),
         },
         {
             key: 'actions',
@@ -427,27 +449,6 @@ const TargetDetail: React.FC = () => {
             label: t('detail.tabs.tags'),
             children: <TagsTab data={tagsData} loading={tagsLoading} />,
         },
-        ...(isAdmin
-            ? [
-                {
-                    key: 'autoconfirm',
-                    label: t('detail.tabs.autoConfirm'),
-                    children: (
-                        <AutoConfirmTab
-                            data={autoConfirmData}
-                            loading={autoConfirmLoading}
-                            canEdit={isAdmin}
-                            onActivate={handleActivateAutoConfirm}
-                            onDeactivate={handleDeactivateAutoConfirm}
-                            actionLoading={
-                                activateAutoConfirmMutation.isPending ||
-                                deactivateAutoConfirmMutation.isPending
-                            }
-                        />
-                    ),
-                },
-            ]
-            : []),
     ];
 
     const headerActions = (
@@ -503,7 +504,7 @@ const TargetDetail: React.FC = () => {
             <SectionCard>
                 <Tabs
                     activeKey={activeTab}
-                    onChange={setActiveTab}
+                    onChange={handleTabChange}
                     items={tabItems}
 
                 />

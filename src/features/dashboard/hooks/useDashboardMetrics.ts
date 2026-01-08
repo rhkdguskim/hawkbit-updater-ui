@@ -16,7 +16,9 @@ import { COLORS } from '@/components/shared/OverviewStyles';
 dayjs.extend(relativeTime);
 
 export const useDashboardMetrics = () => {
-    const { t } = useTranslation(['dashboard', 'common']);
+    const { t } = useTranslation(['dashboard', 'common', 'distributions']);
+    const now = dayjs();
+    const last24h = now.subtract(24, 'hour');
 
     // Queries with differentiated polling intervals
     const { data: targetsData, isLoading: targetsLoading, refetch: refetchTargets, dataUpdatedAt } = useGetTargets(
@@ -271,9 +273,19 @@ export const useDashboardMetrics = () => {
     const incompleteSetsCount = useMemo(() => distributionSets.length - completeSetsCount, [distributionSets, completeSetsCount]);
 
     const completenessData = useMemo(() => [
-        { name: 'Complete', value: completeSetsCount, color: '#10b981' },
-        { name: 'Incomplete', value: incompleteSetsCount, color: '#f59e0b' },
-    ].filter(d => d.value > 0), [completeSetsCount, incompleteSetsCount]);
+        {
+            statusKey: 'complete',
+            name: t('distributions:status.complete', 'Complete'),
+            value: completeSetsCount,
+            color: '#10b981',
+        },
+        {
+            statusKey: 'incomplete',
+            name: t('distributions:status.incomplete', 'Incomplete'),
+            value: incompleteSetsCount,
+            color: '#f59e0b',
+        },
+    ].filter(d => d.value > 0), [completeSetsCount, incompleteSetsCount, t]);
 
     const recentDistributionSets: MgmtDistributionSet[] = useMemo(() => {
         return [...distributionSets]
@@ -407,8 +419,6 @@ export const useDashboardMetrics = () => {
     }, [actions]);
 
     // 14. Additional KPI Metrics
-    const now = dayjs();
-    const last24h = now.subtract(24, 'hour');
 
     const scheduledReadyRolloutCount = rollouts.filter(r =>
         ['scheduled', 'ready'].includes(r.status?.toLowerCase() || '')
