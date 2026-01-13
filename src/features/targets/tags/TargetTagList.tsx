@@ -134,7 +134,20 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
         createIdColumn<MgmtTag>(t),
         createTagNameColumn<MgmtTag>({ t }),
         createDescriptionColumn<MgmtTag>({ t }),
-        createColorColumn<MgmtTag>({ t }),
+        createColorColumn<MgmtTag>({
+            t,
+            editable: isAdmin,
+            onUpdate: async (record, newColor) => {
+                await updateMutation.mutateAsync({
+                    targetTagId: record.id,
+                    data: {
+                        name: record.name,
+                        description: record.description,
+                        colour: newColor,
+                    },
+                });
+            }
+        }),
         createActionsColumn<MgmtTag>({
             t,
             onEdit: handleEdit,

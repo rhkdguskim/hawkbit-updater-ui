@@ -140,7 +140,20 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
         createIdColumn<MgmtTag>(t),
         createTagNameColumn<MgmtTag>({ t }),
         createDescriptionColumn<MgmtTag>({ t }),
-        createColorColumn<MgmtTag>({ t }),
+        createColorColumn<MgmtTag>({
+            t,
+            editable: isAdmin,
+            onUpdate: async (record, newColor) => {
+                await updateMutation.mutateAsync({
+                    distributionsetTagId: record.id,
+                    data: {
+                        name: record.name,
+                        description: record.description,
+                        colour: newColor,
+                    },
+                });
+            }
+        }),
         createDateColumn<MgmtTag>({ t, dataIndex: 'lastModifiedAt' }),
         createActionsColumn<MgmtTag>({
             t,

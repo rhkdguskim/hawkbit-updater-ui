@@ -5,6 +5,7 @@ import type { ColumnsType } from 'antd/es/table';
 import {
     useGetTypes,
     useDeleteSoftwareModuleType,
+    useUpdateSoftwareModuleType,
 } from '@/api/generated/software-module-types/software-module-types';
 import type { MgmtSoftwareModuleType } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -56,6 +57,18 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
             },
             onError: (error) => {
                 message.error((error as Error).message || t('typeManagement.deleteError'));
+            },
+        },
+    });
+
+    const updateMutation = useUpdateSoftwareModuleType({
+        mutation: {
+            onSuccess: () => {
+                message.success(t('typeManagement.updateSuccess'));
+                refetch();
+            },
+            onError: (error) => {
+                message.error((error as Error).message || t('typeManagement.updateError'));
             },
         },
     });
@@ -112,7 +125,19 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
             width: 100,
             render: (val: number) => <SmallText>{val ?? 1}</SmallText>,
         },
-        createColorColumn<MgmtSoftwareModuleType>({ t }),
+        createColorColumn<MgmtSoftwareModuleType>({
+            t,
+            editable: isAdmin,
+            onUpdate: async (record, newColor) => {
+                await updateMutation.mutateAsync({
+                    softwareModuleTypeId: record.id,
+                    data: {
+                        description: record.description,
+                        colour: newColor,
+                    },
+                });
+            }
+        }),
         createDateColumn<MgmtSoftwareModuleType>({ t, dataIndex: 'lastModifiedAt' }),
         createActionsColumn<MgmtSoftwareModuleType>({
             t,

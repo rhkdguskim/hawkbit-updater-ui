@@ -195,7 +195,21 @@ const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) =>
             render: (key: string) => <SmallText>{key}</SmallText>,
         },
         createDescriptionColumn<MgmtTargetType>({ t }),
-        createColorColumn<MgmtTargetType>({ t }),
+        createColorColumn<MgmtTargetType>({
+            t,
+            editable: isAdmin,
+            onUpdate: async (record, newColor) => {
+                await updateMutation.mutateAsync({
+                    targetTypeId: record.id,
+                    data: {
+                        name: record.name,
+                        description: record.description,
+                        colour: newColor,
+                    },
+                });
+                queryClient.invalidateQueries({ queryKey: getGetTargetTypesQueryKey() });
+            }
+        }),
         createActionsColumn<MgmtTargetType>({
             t,
             onEdit: handleEdit,

@@ -7,7 +7,7 @@ import { SmallText, SecondarySmallText, IdText, StrongSmallText } from '@/compon
 import { ActionCell, type ActionCellProps } from '@/components/common/ActionCell';
 import { StatusTag } from '@/components/common/StatusTag';
 import { EditableCell } from '@/components/common/EditableCell';
-import { ColorSwatch } from '@/components/common/ColorSwatch';
+import { EditableColorCell } from '@/components/common/EditableColorCell';
 
 /**
  * Creates a standard ID column
@@ -254,18 +254,26 @@ export function createTypeColumn<T>(options: {
 /**
  * Creates a standard color swatch column
  */
-export function createColorColumn<T>(options: {
+export function createColorColumn<T extends { id?: number | string; colour?: string }>(options: {
     t: TFunction;
     width?: number;
+    editable?: boolean;
+    onUpdate?: (record: T, color: string) => Promise<void>;
 }): ColumnType<T> {
-    const { t, width = 100 } = options;
+    const { t, width = 100, editable = false, onUpdate } = options;
 
     return {
         title: t('common:table.color', { defaultValue: 'Color' }),
         dataIndex: 'colour',
         key: 'colour',
         width,
-        render: (colour: string) => <ColorSwatch color={colour} />,
+        render: (colour: string, record: T) => (
+            <EditableColorCell
+                value={colour}
+                editable={editable}
+                onSave={onUpdate ? (newColor) => onUpdate(record, newColor) : undefined}
+            />
+        ),
     };
 }
 

@@ -19,6 +19,15 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import type { MgmtAction, MgmtRolloutResponseBody } from '@/api/generated/model';
+import {
+    WidgetContainer,
+    HeaderRow,
+    IconBadge,
+    ChartWrapper,
+    LegendContainer,
+    LegendItem,
+    LegendDot
+} from './WidgetStyles';
 
 const { Text, Title } = Typography;
 
@@ -45,57 +54,6 @@ interface StatusTrendChartProps {
     referenceTimeMs?: number | null;
 }
 
-const ChartContainer = styled.div`
-    background: var(--ant-color-bg-container);
-    border-radius: var(--ant-border-radius-lg);
-    padding: 10px 16px;
-    border: 1px solid var(--ant-color-border-secondary);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    height: 100%;
-    min-height: 180px;
-`;
-
-const HeaderRow = styled(Flex)`
-    border-bottom: 1px solid var(--ant-color-border-secondary);
-    padding-bottom: 4px;
-`;
-
-const IconBadge = styled.div`
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    background: var(--ant-color-info-bg);
-    color: var(--ant-color-info);
-`;
-
-const ChartWrapper = styled.div`
-    flex: 1;
-    min-height: 0;
-`;
-
-const LegendContainer = styled(Flex)`
-    padding-top: 4px;
-    border-top: 1px solid var(--ant-color-border-secondary);
-`;
-
-const LegendItem = styled(Flex)`
-    font-size: 12px;
-    gap: 6px;
-`;
-
-const LegendDot = styled.div<{ $color: string }>`
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
-    background: ${props => props.$color};
-`;
-
 const EventMarker = styled.div<{ $type: 'start' | 'pause' | 'resume' }>`
     display: inline-flex;
     align-items: center;
@@ -118,7 +76,7 @@ const COLORS = {
     error: 'var(--ant-color-error)',
 };
 
-export const StatusTrendChartEnhanced: React.FC<StatusTrendChartProps> = ({
+export const StatusTrendChart: React.FC<StatusTrendChartProps> = ({
     isLoading,
     actions,
     rollouts = [],
@@ -204,14 +162,14 @@ export const StatusTrendChartEnhanced: React.FC<StatusTrendChartProps> = ({
 
     if (isLoading) {
         return (
-            <ChartContainer>
+            <WidgetContainer>
                 <Skeleton active paragraph={{ rows: 6 }} />
-            </ChartContainer>
+            </WidgetContainer>
         );
     }
 
     return (
-        <ChartContainer>
+        <WidgetContainer>
             <HeaderRow align="center" justify="space-between">
                 <Flex align="center" gap={12}>
                     <IconBadge>
@@ -356,8 +314,8 @@ export const StatusTrendChartEnhanced: React.FC<StatusTrendChartProps> = ({
                     <Text type="secondary">{t('statusTrend.rolloutPause', 'Rollout Pause')}</Text>
                 </LegendItem>
             </LegendContainer>
-        </ChartContainer>
+        </WidgetContainer>
     );
 };
 
-export default StatusTrendChartEnhanced;
+export default StatusTrendChart;

@@ -8,8 +8,8 @@ import { HealthSummaryWidget } from './components/widgets/HealthSummaryWidget';
 import { ActionRequiredWidget } from './components/widgets/ActionRequiredWidget';
 import { ActiveRolloutsWidget } from './components/widgets/ActiveRolloutsWidget';
 import { InProgressUpdatesWidget } from './components/widgets/InProgressUpdatesWidget';
-import { StatusTrendChartEnhanced } from './components/widgets/StatusTrendChartEnhanced';
-import { ActionActivityWidget } from './components/widgets/ActionActivityWidgetEnhanced';
+import { ActionActivityWidget } from './components/widgets/ActionActivityWidget';
+import { StatusTrendChart } from './components/widgets/StatusTrendChart';
 import { KPIHealthSummary } from './components/widgets/KPIHealthSummary';
 import { ActionRequiredDetailsModal } from './components/widgets/ActionRequiredDetailsModal';
 import { FailureAnalysisModal } from './components/widgets/FailureAnalysisModal';
@@ -111,7 +111,7 @@ const Dashboard: React.FC = () => {
                 }
                 // Monitoring Layer (Bottom)
                 statusTrend={
-                    <StatusTrendChartEnhanced
+                    <StatusTrendChart
                         isLoading={metrics.isLoading}
                         actions={metrics.actions}
                         rollouts={metrics.rollouts}

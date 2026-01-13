@@ -20,6 +20,7 @@ import { useGetAction1 } from '@/api/generated/actions/actions';
 import { useGetActionStatusList } from '@/api/generated/targets/targets';
 import { getStatusLabel, translateStatusMessage } from '@/utils/statusUtils';
 import { isActionErrored } from '@/entities';
+import { WidgetContainer, HeaderRow } from './WidgetStyles';
 
 dayjs.extend(relativeTime);
 
@@ -33,24 +34,6 @@ interface RecentlyFinishedActionsWidgetProps {
     }[];
     maxItems?: number;
 }
-
-const WidgetContainer = styled.div`
-    background: var(--ant-color-bg-container);
-    border-radius: var(--ant-border-radius-lg);
-    padding: 12px 16px;
-    border: 1px solid var(--ant-color-border-secondary);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    height: 100%;
-    overflow: hidden;
-`;
-
-const HeaderRow = styled(Flex)`
-    border-bottom: 1px solid var(--ant-color-border-secondary);
-    padding-bottom: 8px;
-    flex-shrink: 0;
-`;
 
 const ScrollableContent = styled.div`
     flex: 1;

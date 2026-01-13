@@ -5,6 +5,7 @@ import type { ColumnsType } from 'antd/es/table';
 import {
     useGetDistributionSetTypes,
     useDeleteDistributionSetType,
+    useUpdateDistributionSetType,
 } from '@/api/generated/distribution-set-types/distribution-set-types';
 import type { MgmtDistributionSetType } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -13,7 +14,6 @@ import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterVa
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import DistributionSetTypeDialog from './DistributionSetTypeDialog';
 import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createDateColumn, createColoredNameColumn } from '@/utils/columnFactory';
-import { StrongSmallText } from '@/components/shared/Typography';
 
 interface DistributionSetTypeListProps {
     standalone?: boolean;
@@ -56,6 +56,18 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
             },
             onError: (error) => {
                 message.error((error as Error).message || t('typeManagement.deleteError'));
+            },
+        },
+    });
+
+    const updateMutation = useUpdateDistributionSetType({
+        mutation: {
+            onSuccess: () => {
+                message.success(t('typeManagement.updateSuccess'));
+                refetch();
+            },
+            onError: (error) => {
+                message.error((error as Error).message || t('typeManagement.updateError'));
             },
         },
     });
@@ -105,7 +117,19 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
             render: (text: string) => <Tag style={{ fontSize: 'var(--ant-font-size-sm)', margin: 0 }}>{text}</Tag>,
         },
         createDescriptionColumn<MgmtDistributionSetType>({ t }),
-        createColorColumn<MgmtDistributionSetType>({ t }),
+        createColorColumn<MgmtDistributionSetType>({
+            t,
+            editable: isAdmin,
+            onUpdate: async (record, newColor) => {
+                await updateMutation.mutateAsync({
+                    distributionSetTypeId: record.id,
+                    data: {
+                        description: record.description,
+                        colour: newColor,
+                    },
+                });
+            }
+        }),
         createDateColumn<MgmtDistributionSetType>({ t, dataIndex: 'lastModifiedAt' }),
         createActionsColumn<MgmtDistributionSetType>({
             t,

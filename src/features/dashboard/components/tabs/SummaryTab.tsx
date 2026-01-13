@@ -5,8 +5,8 @@ import { HealthSummaryWidget } from '../widgets/HealthSummaryWidget';
 import { ActionRequiredWidget } from '../widgets/ActionRequiredWidget';
 import { ActiveRolloutsWidget } from '../widgets/ActiveRolloutsWidget';
 import { InProgressUpdatesWidget } from '../widgets/InProgressUpdatesWidget';
-import { StatusTrendChartEnhanced } from '../widgets/StatusTrendChartEnhanced';
-import { ActionActivityWidget } from '../widgets/ActionActivityWidgetEnhanced';
+import { StatusTrendChart } from '../widgets/StatusTrendChart';
+import { ActionActivityWidget } from '../widgets/ActionActivityWidget';
 import { KPIHealthSummary } from '../widgets/KPIHealthSummary';
 import { ActionRequiredDetailsModal } from '../widgets/ActionRequiredDetailsModal';
 import { FailureAnalysisModal } from '../widgets/FailureAnalysisModal';
@@ -68,7 +68,7 @@ export const SummaryTab: React.FC = () => {
                     />
                 }
                 statusTrend={
-                    <StatusTrendChartEnhanced
+                    <StatusTrendChart
                         isLoading={metrics.isLoading}
                         actions={metrics.actions}
                         rollouts={metrics.rollouts}
