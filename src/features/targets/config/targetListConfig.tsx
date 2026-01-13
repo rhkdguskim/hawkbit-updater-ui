@@ -2,7 +2,7 @@
  * Unified Target List Configuration
  * Single source of truth for columns, filters, and sorting
  */
-import React from 'react';
+
 import { Tag, Space, Tooltip, Button, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import {

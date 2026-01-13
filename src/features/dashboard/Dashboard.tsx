@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Flex } from 'antd';
+import { isActive } from '@/entities';
 
 import { ThreeLayerDashboardGrid } from './components/layouts/ThreeLayerDashboardGrid';
-import { DashboardHeader } from './components/widgets/DashboardHeader';
 import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import { HealthSummaryWidget } from './components/widgets/HealthSummaryWidget';
 import { ActionRequiredWidget } from './components/widgets/ActionRequiredWidget';
@@ -15,7 +15,7 @@ import { ActionRequiredDetailsModal } from './components/widgets/ActionRequiredD
 import { FailureAnalysisModal } from './components/widgets/FailureAnalysisModal';
 import { RecentlyFinishedActionsWidget } from './components/widgets/RecentlyFinishedActionsWidget';
 import { ConnectivityChart } from './components/widgets/ConnectivityChart';
-import { DistributionCompletenessChart } from './components/widgets/DistributionCompletenessChart';
+import { TargetRequestDelayWidget } from './components/widgets/TargetRequestDelayWidget';
 import { FragmentationChart } from './components/widgets/FragmentationChart';
 import { TargetTypeCoverageChart } from './components/widgets/TargetTypeCoverageChart';
 import { DeploymentVelocityWidget } from './components/widgets/DeploymentVelocityWidget';
@@ -33,19 +33,10 @@ const Dashboard: React.FC = () => {
         setActionRequiredType(type);
     };
 
-    const completenessData = metrics.completenessData;
-
     return (
         <>
             <ThreeLayerDashboardGrid
-                header={
-                    <DashboardHeader
-                        lastUpdated={metrics.lastUpdated}
-                        isActivePolling={metrics.isActivePolling}
-                        isLoading={metrics.isLoading}
-                        onRefresh={metrics.refetch}
-                    />
-                }
+                header={null}
                 // Decision Layer (Top)
                 healthSummary={
                     <HealthSummaryWidget
@@ -56,6 +47,13 @@ const Dashboard: React.FC = () => {
                         errorRollouts={metrics.errorRolloutCount}
                         errorActions1h={metrics.errorActions1hCount}
                         onAnalysisClick={() => setIsFailureModalVisible(true)}
+                    />
+                }
+                activeRollouts={
+                    <ActiveRolloutsWidget
+                        isLoading={metrics.isLoading}
+                        activeRollouts={metrics.activeRollouts}
+                        isAdmin={true}
                     />
                 }
                 actionRequired={
@@ -81,7 +79,7 @@ const Dashboard: React.FC = () => {
                         isLoading={metrics.isLoading}
                         distributionSetsCount={metrics.distributionSetsCount}
                         softwareModulesCount={metrics.softwareModulesCount}
-                        completenessData={metrics.completenessData}
+                        recentSets={metrics.recentDistributionSets}
                     />
                 }
                 // Stats Layer (New)
@@ -96,10 +94,10 @@ const Dashboard: React.FC = () => {
                             isLoading={metrics.isLoading}
                             stats={metrics.fragmentationStats}
                         />
-                        <DistributionCompletenessChart
+                        <TargetRequestDelayWidget
                             isLoading={metrics.isLoading}
-                            completenessData={completenessData}
-                            totalCount={metrics.distributionSetsCount}
+                            averageDelay={metrics.averageDelay}
+                            topDelayedTargets={metrics.topDelayedTargets}
                         />
                         <TargetTypeCoverageChart
                             isLoading={metrics.isLoading}
@@ -108,13 +106,6 @@ const Dashboard: React.FC = () => {
                     </>
                 }
                 // Control Layer (Middle)
-                activeRollouts={
-                    <ActiveRolloutsWidget
-                        isLoading={metrics.isLoading}
-                        activeRollouts={metrics.activeRollouts}
-                        isAdmin={true}
-                    />
-                }
                 inProgressUpdates={
                     <InProgressUpdatesWidget
                         isLoading={metrics.isLoading}
@@ -152,8 +143,8 @@ const Dashboard: React.FC = () => {
                         <div style={{ height: 'auto' }}>
                             <ActionActivityWidget
                                 isLoading={metrics.isLoading}
-                                runningActions={metrics.actions.filter(a => ['running', 'pending', 'scheduled'].includes(a.status?.toLowerCase() || ''))}
-                                recentFinishedActions={metrics.actions.filter(a => a.status?.toLowerCase() === 'finished')}
+                                runningActions={metrics.actions.filter(a => isActive(a))}
+                                recentFinishedActions={metrics.actions.filter(a => ['finished', 'canceled', 'error'].includes(a.status?.toLowerCase() || ''))}
                             />
                         </div>
                         <div style={{ flex: 1, minHeight: 0 }}>

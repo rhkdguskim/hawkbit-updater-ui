@@ -12,7 +12,7 @@ const HeaderRow = styled.div`
 // ===== Decision Layer (TOP) =====
 const DecisionLayer = styled.section`
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: clamp(10px, 1.2vw, 16px);
     min-height: 160px;
     flex-shrink: 0;
@@ -20,7 +20,7 @@ const DecisionLayer = styled.section`
     border-bottom: 1px solid var(--ant-color-border-secondary, rgba(0, 0, 0, 0.06));
 
     @media (max-width: 1600px) {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
 
     @media (max-width: 768px) {
@@ -48,17 +48,12 @@ const StatsLayer = styled.section`
 
 // ===== Control Layer (MIDDLE) =====
 const ControlLayer = styled.section`
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: clamp(10px, 1.2vw, 16px);
     min-height: 380px;
     flex: 1;
     padding-bottom: var(--ant-margin, 16px);
-
-    @media (max-width: 992px) {
-        grid-template-columns: 1fr;
-        min-height: auto;
-    }
 `;
 
 // ===== Monitoring Layer (BOTTOM) =====
@@ -169,6 +164,7 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
                         {showLayerLabels && <SectionLabel>Overview</SectionLabel>}
                         <DecisionLayer>
                             {healthSummary}
+                            {activeRollouts}
                             {actionRequired}
                             {extraDecision}
                             {overviewItem4}
@@ -188,7 +184,6 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
                     <SectionWrapper>
                         {showLayerLabels && <SectionLabel>Operations</SectionLabel>}
                         <ControlLayer>
-                            {activeRollouts}
                             {inProgressUpdates}
                         </ControlLayer>
                     </SectionWrapper>

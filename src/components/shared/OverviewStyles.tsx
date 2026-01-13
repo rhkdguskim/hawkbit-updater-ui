@@ -86,7 +86,7 @@ export const OverviewPageContainer = styled.div`
     min-height: 0;
     height: 100%;
     overflow: hidden;
-    padding: var(--ant-margin-lg, 24px);
+    padding: var(--ant-margin-xs, 8px);
     animation: ${fadeInUp} 0.5s ease-out;
 `;
 
@@ -96,7 +96,7 @@ export const OverviewScrollContent = styled.div`
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    gap: var(--ant-margin, 16px);
+    gap: var(--ant-margin-xs, 8px);
     min-height: 0;
     
     /* Custom scrollbar for premium feel */
@@ -141,14 +141,14 @@ export const GradientTitle = styled(Typography.Title) <{ $theme?: keyof typeof O
 
 export const TopRow = styled.div`
     display: flex;
-    gap: var(--ant-margin, 16px);
+    gap: var(--ant-margin-xs, 8px);
     min-height: 240px;
     flex-shrink: 0;
 `;
 
 export const BottomRow = styled.div`
     display: flex;
-    gap: var(--ant-margin, 16px);
+    gap: var(--ant-margin-xs, 8px);
     min-height: 300px;
     flex: 1;
 `;
@@ -163,7 +163,7 @@ export const KPIGridContainer = styled.div`
 
 export const ChartsContainer = styled.div`
     display: flex;
-    gap: var(--ant-margin, 16px);
+    gap: var(--ant-margin-xs, 8px);
     flex: 1;
     min-width: 0;
 `;

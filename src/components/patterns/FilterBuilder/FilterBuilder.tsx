@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { FilterChip } from './FilterChip';
 import { FilterCondition, type FilterField, type FilterConditionValue } from './FilterCondition';
 import { SavedFilterDropdown } from './SavedFilterDropdown';
-import { FilterPreview } from './FilterPreview';
 
 const Container = styled.div`
     display: flex;
@@ -89,8 +88,6 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
 }) => {
     const { t } = useTranslation('common');
     const [conditionOpen, setConditionOpen] = useState(false);
-    const [previewOpen, setPreviewOpen] = useState(false);
-    const [pendingFilters, setPendingFilters] = useState<FilterValue[] | null>(null);
 
     const operatorLabels: Record<string, string> = React.useMemo(() => ({
         'equals': t('filter.operators.equals', { defaultValue: '=' }),
@@ -131,8 +128,8 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
         const nextFilters = [...filters, newFilter];
 
         if (buildQuery) {
-            setPendingFilters(nextFilters);
-            setPreviewOpen(true);
+            // Skip confirmation and apply immediately
+            onFiltersChange(nextFilters);
         } else {
             onFiltersChange(nextFilters);
         }
@@ -141,30 +138,13 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
 
     const handleRemoveFilter = useCallback((id: string) => {
         const nextFilters = filters.filter(f => f.id !== id);
-        if (buildQuery && nextFilters.length < filters.length) {
-            setPendingFilters(nextFilters);
-            setPreviewOpen(true);
-        } else {
-            onFiltersChange(nextFilters);
-        }
-    }, [filters, onFiltersChange, buildQuery]);
+        onFiltersChange(nextFilters);
+    }, [filters, onFiltersChange]);
 
     const handleClearAll = useCallback(() => {
-        if (buildQuery && filters.length > 0) {
-            setPendingFilters([]);
-            setPreviewOpen(true);
-        } else {
-            onFiltersChange([]);
-        }
-    }, [onFiltersChange, buildQuery, filters.length]);
+        onFiltersChange([]);
+    }, [onFiltersChange]);
 
-    const handleConfirmPreview = () => {
-        if (pendingFilters !== null) {
-            onFiltersChange(pendingFilters);
-            setPendingFilters(null);
-        }
-        setPreviewOpen(false);
-    };
 
     return (
         <Container>
@@ -253,19 +233,6 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                 </ActionsSection>
             </HeaderRow>
 
-            {buildQuery && pendingFilters !== null && (
-                <FilterPreview
-                    open={previewOpen}
-                    query={buildQuery(pendingFilters)}
-                    onConfirm={handleConfirmPreview}
-                    onCancel={() => {
-                        setPreviewOpen(false);
-                        setPendingFilters(null);
-                    }}
-                >
-                    <div style={{ position: 'absolute', visibility: 'hidden', height: 0, width: 0 }} />
-                </FilterPreview>
-            )}
         </Container>
     );
 };

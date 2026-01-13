@@ -207,6 +207,12 @@
         "running": "运行中",
         "finished": "已完成"
     },
+    "delayWidget": {
+        "title": "目标请求延迟",
+        "subtitle": "自上次轮询以来的时间",
+        "average": "平均延迟",
+        "longestDelays": "最长延迟"
+    },
     "delayedActions": {
         "title": "延迟操作 (>10m/30m)",
         "target": "目标",
@@ -364,5 +370,14 @@
         "error": "错误",
         "rolloutStart": "发布开始",
         "rolloutPause": "发布暂停"
+    },
+    "hygiene": {
+        "title": "设备卫健度",
+        "subtitle": "目标分发健康状况",
+        "orphan": "未分配目标",
+        "orphanTip": "未分配给任何分发集的目标",
+        "neverConnected": "从未连接",
+        "criticalOffline": "更新期间离线",
+        "fleetCoverage": "设备覆盖率: {{percentage}}%"
     }
 }

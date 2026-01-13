@@ -90,7 +90,8 @@
         "deleteSelected": "Delete Selected",
         "createSet": "Create Distribution Set",
         "createModule": "Create Software Module",
-        "edit": "Edit"
+        "edit": "Edit",
+        "upload": "Upload"
     },
     "messages": {
         "deleteSetSuccess": "Distribution Set deleted successfully",
@@ -379,6 +380,8 @@
         "step3Title": "Artifacts",
         "step4Title": "Review",
         "dsStep2Title": "Assign Modules",
+        "dsStep3Title": "Metadata",
+        "dsMetadataReviewTitle": "Metadata",
         "optionalStep": "(Optional)",
         "next": "Next",
         "prev": "Previous",
@@ -398,6 +401,7 @@
         "createModuleHint": "You can create new modules below to assign to this distribution set.",
         "selectExistingModules": "Select Existing Modules",
         "newModulesToCreate": "New Modules to Create",
+        "selectModules": "Select Software Modules",
         "addNewModule": "Create New Module",
         "noNewModules": "No new modules to create",
         "noModulesSelected": "No modules assigned",

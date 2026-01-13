@@ -1,111 +1,87 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Flex, Popover, Typography } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Flex, Popover, Typography, Tag } from 'antd';
+import { QuestionCircleOutlined, AppstoreOutlined, BuildOutlined, HistoryOutlined } from '@ant-design/icons';
 import { OverviewCard } from '@/components/shared';
-import { DonutChart } from '@/components/charts';
 import styled from 'styled-components';
+import type { MgmtDistributionSet } from '@/api/generated/model';
+import { useNavigate } from 'react-router-dom';
 
 interface DistributionSummaryWidgetProps {
     isLoading: boolean;
     distributionSetsCount: number;
     softwareModulesCount: number;
-    completenessData: { name: string; value: number; color: string; statusKey?: 'complete' | 'incomplete' }[];
+    recentSets: MgmtDistributionSet[];
 }
 
 const { Text } = Typography;
 
 const SummaryLayout = styled.div`
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    gap: 14px;
-    align-items: center;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    height: 100%;
 
-    @media (max-width: 900px) {
+    @media (max-width: 1024px) {
         grid-template-columns: 1fr;
     }
 `;
 
-const MetricStack = styled.div`
-    display: grid;
-    gap: 10px;
-`;
-
-const MetricRow = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
+const MetricCard = styled.div`
+    background: var(--ant-color-fill-quaternary);
+    padding: 16px;
     border-radius: 12px;
-    background: rgba(15, 23, 42, 0.04);
-    border: 1px solid rgba(148, 163, 184, 0.25);
-
-    [data-theme='dark'] &,
-    .dark-mode & {
-        background: rgba(148, 163, 184, 0.12);
-        border-color: rgba(148, 163, 184, 0.2);
-    }
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid var(--ant-color-border-secondary);
 `;
 
-const MetricLabel = styled(Text)`
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-`;
-
-const MetricValue = styled.span`
-    font-size: 20px;
+const MetricValue = styled.div<{ $color: string }>`
+    font-size: 28px;
     font-weight: 700;
-    color: var(--ant-color-text);
+    color: ${props => props.$color};
+    line-height: 1.2;
 `;
 
-const LegendList = styled.div`
-    display: grid;
+const RecentListContainer = styled.div`
+    background: var(--ant-color-bg-container);
+    border: 1px solid var(--ant-color-border-secondary);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
     gap: 8px;
 `;
 
-const LegendItem = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px;
-    border-radius: 10px;
-    background: rgba(15, 23, 42, 0.04);
-    border: 1px solid rgba(148, 163, 184, 0.18);
+const ListItem = styled.div`
+    padding: 8px;
+    border-radius: 8px;
+    border-bottom: 1px solid var(--ant-color-border-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
 
-    [data-theme='dark'] &,
-    .dark-mode & {
-        background: rgba(148, 163, 184, 0.12);
-        border-color: rgba(148, 163, 184, 0.2);
+    &:last-child {
+        border-bottom: none;
     }
-`;
 
-const LegendDot = styled.span<{ $color: string }>`
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 999px;
-    background: ${props => props.$color};
-    box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.04);
+    &:hover {
+        background: var(--ant-color-fill-quaternary);
+    }
 `;
 
 export const DistributionSummaryWidget: React.FC<DistributionSummaryWidgetProps> = ({
     isLoading,
     distributionSetsCount,
     softwareModulesCount,
-    completenessData,
+    recentSets,
 }) => {
     const { t } = useTranslation(['dashboard', 'distributions', 'common']);
-    const totalCount = completenessData.reduce((acc, cur) => acc + cur.value, 0);
-    const completeCount = completenessData.find(item => item.statusKey === 'complete')?.value
-        ?? completenessData.find(item => item.name === t('distributions:status.complete', 'Complete'))?.value
-        ?? completenessData.find(item => item.name === 'Complete')?.value
-        ?? 0;
-    const completionRate = totalCount > 0 ? Math.round((completeCount / totalCount) * 100) : 0;
+    const navigate = useNavigate();
 
     const helpContent = (
-        <div>
-            <p>{t('distributions:overview.subtitle')}</p>
+        <div style={{ maxWidth: 250 }}>
+            <Text>{t('distributions:overview.subtitle')}</Text>
         </div>
     );
 
@@ -122,48 +98,73 @@ export const DistributionSummaryWidget: React.FC<DistributionSummaryWidgetProps>
             )}
         >
             <SummaryLayout>
-                <MetricStack>
-                    <MetricRow>
-                        <MetricLabel type="secondary">{t('distributions:overview.distributionSets')}</MetricLabel>
-                        <MetricValue>{distributionSetsCount.toLocaleString()}</MetricValue>
-                    </MetricRow>
-                    <MetricRow>
-                        <MetricLabel type="secondary">{t('distributions:overview.softwareModules')}</MetricLabel>
-                        <MetricValue>{softwareModulesCount.toLocaleString()}</MetricValue>
-                    </MetricRow>
-                    <LegendList>
-                        {completenessData.length > 0 ? (
-                            completenessData.map(item => (
-                                <LegendItem key={item.statusKey ?? item.name}>
-                                    <Flex align="center" gap={8}>
-                                        <LegendDot $color={item.color} />
-                                        <Text>{item.name}</Text>
+                <Flex vertical gap={12}>
+                    <MetricCard>
+                        <Flex align="center" gap={12}>
+                            <div style={{
+                                width: 40, height: 40, borderRadius: 10,
+                                background: 'rgba(59, 130, 246, 0.1)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                <AppstoreOutlined style={{ fontSize: 20, color: '#3b82f6' }} />
+                            </div>
+                            <Flex vertical>
+                                <MetricValue $color="var(--ant-color-text)">{distributionSetsCount.toLocaleString()}</MetricValue>
+                                <Text type="secondary" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                    {t('distributions:overview.distributionSets')}
+                                </Text>
+                            </Flex>
+                        </Flex>
+                    </MetricCard>
+
+                    <MetricCard>
+                        <Flex align="center" gap={12}>
+                            <div style={{
+                                width: 40, height: 40, borderRadius: 10,
+                                background: 'rgba(16, 185, 129, 0.1)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                <BuildOutlined style={{ fontSize: 20, color: '#10b981' }} />
+                            </div>
+                            <Flex vertical>
+                                <MetricValue $color="var(--ant-color-text)">{softwareModulesCount.toLocaleString()}</MetricValue>
+                                <Text type="secondary" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                    {t('distributions:overview.softwareModules')}
+                                </Text>
+                            </Flex>
+                        </Flex>
+                    </MetricCard>
+                </Flex>
+
+                <RecentListContainer>
+                    <Flex align="center" gap={6} style={{ marginBottom: 4 }}>
+                        <HistoryOutlined style={{ color: 'var(--ant-color-text-tertiary)' }} />
+                        <Text strong style={{ fontSize: 12 }}>{t('distributions:overview.recentSets')}</Text>
+                    </Flex>
+                    <div style={{ flex: 1, overflowY: 'auto', maxHeight: 150 }}>
+                        {recentSets.length > 0 ? (
+                            recentSets.map(set => (
+                                <ListItem key={set.id} onClick={() => navigate(`/distributions/${set.id}`)}>
+                                    <Flex vertical gap={2}>
+                                        <Text strong style={{ fontSize: 12 }} ellipsis>{set.name}</Text>
+                                        <Flex justify="space-between" align="center">
+                                            <Text type="secondary" style={{ fontSize: 10 }}>v{set.version}</Text>
+                                            <Tag color={set.complete ? 'success' : 'warning'} style={{ fontSize: 9, margin: 0, height: 16, lineHeight: '14px' }}>
+                                                {set.complete ? t('distributions:status.complete') : t('distributions:status.incomplete')}
+                                            </Tag>
+                                        </Flex>
                                     </Flex>
-                                    <Text strong>{item.value.toLocaleString()}</Text>
-                                </LegendItem>
+                                </ListItem>
                             ))
                         ) : (
-                            <LegendItem>
-                                <Text type="secondary">{t('common:messages.noData')}</Text>
-                            </LegendItem>
+                            <Flex justify="center" align="center" style={{ height: 100 }}>
+                                <Text type="secondary" style={{ fontSize: 11 }}>{t('common:messages.noData')}</Text>
+                            </Flex>
                         )}
-                    </LegendList>
-                </MetricStack>
-                <Flex vertical align="center" justify="center" gap={8} style={{ minHeight: 140 }}>
-                    <div style={{ height: 120, width: 120, position: 'relative' }}>
-                        <DonutChart
-                            data={completenessData}
-                            height={120}
-                            showLegend={false}
-                            tooltipTitle={t('distributions:overview.completeness')}
-                            centerLabel={`${completionRate}%`}
-                        />
                     </div>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                        {t('distributions:overview.completeness')}
-                    </Text>
-                </Flex>
+                </RecentListContainer>
             </SummaryLayout>
         </OverviewCard>
     );
 };
+

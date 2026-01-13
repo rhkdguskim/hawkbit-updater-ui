@@ -207,6 +207,12 @@
         "running": "Running",
         "finished": "Finished"
     },
+    "delayWidget": {
+        "title": "Target Request Delay",
+        "subtitle": "Time since last poll",
+        "average": "Average Delay",
+        "longestDelays": "Top Longest Delays"
+    },
     "delayedActions": {
         "title": "Delayed Actions (>10m/30m)",
         "target": "Target",
@@ -364,5 +370,14 @@
         "error": "Error",
         "rolloutStart": "Rollout Start",
         "rolloutPause": "Rollout Pause"
+    },
+    "hygiene": {
+        "title": "Fleet Hygiene",
+        "subtitle": "Target distribution health",
+        "orphan": "Orphan Targets",
+        "orphanTip": "Targets not assigned to any distribution set",
+        "neverConnected": "Never Connected",
+        "criticalOffline": "Offline during updates",
+        "fleetCoverage": "Fleet Coverage: {{percentage}}%"
     }
 }

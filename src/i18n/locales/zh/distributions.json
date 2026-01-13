@@ -398,6 +398,7 @@
         "createModuleHint": "您可以在下方创建新模块以分配给此分发集。",
         "selectExistingModules": "选择现有模块",
         "newModulesToCreate": "要创建的新模块",
+        "selectModules": "选择软件模块",
         "addNewModule": "创建新模块",
         "noNewModules": "没有要创建的新模块",
         "noModulesSelected": "未分配模块",

@@ -10,7 +10,7 @@ import { useGetDistributionSets } from '@/api/generated/distribution-sets/distri
 import { useGetSoftwareModules } from '@/api/generated/software-modules/software-modules';
 import type { MgmtDistributionSet, MgmtSoftwareModule, MgmtRolloutResponseBody, MgmtAction } from '@/api/generated/model';
 
-import { isTargetOnline, isActionErrored } from '@/entities';
+import { isTargetOnline, isActionErrored, isActive } from '@/entities';
 import { COLORS } from '@/components/shared/OverviewStyles';
 
 dayjs.extend(relativeTime);
@@ -41,9 +41,7 @@ export const useDashboardMetrics = () => {
             query: {
                 staleTime: 0,
                 refetchInterval: (query) => {
-                    const hasActive = query.state.data?.content?.some(a =>
-                        ['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'retrieved', 'canceling'].includes(a.status?.toLowerCase() || '')
-                    );
+                    const hasActive = query.state.data?.content?.some(a => isActive(a));
                     return hasActive ? 1000 : 10000;
                 }
             },
@@ -146,13 +144,7 @@ export const useDashboardMetrics = () => {
         ['scheduled', 'pending', 'retrieving', 'running', 'waiting_for_confirmation'].includes(a.status?.toLowerCase() || '') &&
         !isActionErrored(a)
     ).length;
-    const activeActionsCount = recentActions.filter(a => {
-        const status = a.status?.toLowerCase() || '';
-        // Exclude canceling/canceled from active count
-        if (['canceled', 'canceling', 'cancelled', 'cancelling'].includes(status)) return false;
-        return ['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'retrieved'].includes(status) &&
-            !isActionErrored(a);
-    }).length;
+    const activeActionsCount = recentActions.filter(a => isActive(a)).length;
     const finishedCount = recentActions.filter(a => a.status?.toLowerCase() === 'finished' && !isActionErrored(a)).length;
     const errorCount = recentActions.filter(a => isActionErrored(a)).length;
 
@@ -172,12 +164,13 @@ export const useDashboardMetrics = () => {
         const activeActions = [...actions]
             .filter(a => {
                 const status = a.status?.toLowerCase() || '';
-                const isActiveStatus = activeStatuses.includes(status);
+                const type = a.type?.toLowerCase() || '';
+                const isCanceled = status.includes('cancel') || type === 'cancel';
+                const isActiveStatus = activeStatuses.includes(status) && !isCanceled;
                 const isRecentlyErrored = isActionErrored(a) && (a.lastModifiedAt || a.createdAt || 0) > now.subtract(10, 'minute').valueOf();
                 return isActiveStatus || isRecentlyErrored;
             })
-            .sort((a, b) => (b.lastModifiedAt || b.createdAt || 0) - (a.lastModifiedAt || a.createdAt || 0))
-            .slice(0, 10);
+            .sort((a, b) => (b.lastModifiedAt || b.createdAt || 0) - (a.lastModifiedAt || a.createdAt || 0));
 
         const DELAY_WARNING_MS = 60 * 60 * 1000; // 1 hour
         const DELAY_CRITICAL_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -439,7 +432,9 @@ export const useDashboardMetrics = () => {
 
     const delayedActions = actions.filter(a => {
         const status = a.status?.toLowerCase() || '';
-        if (!['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'canceling'].includes(status)) return false;
+        const type = a.type?.toLowerCase() || '';
+        // Strict check: must be active AND not canceling
+        if (!isActive(a) || ['canceled', 'canceling', 'cancelled', 'cancelling'].includes(status) || type === 'cancel') return false;
         const time = a.lastModifiedAt || a.createdAt || 0;
         return time > 0 && dayjs(time).isBefore(now.subtract(10, 'minute'));
     });
@@ -447,7 +442,8 @@ export const useDashboardMetrics = () => {
 
     const delayedActions24hCount = actions.filter(a => {
         const status = a.status?.toLowerCase() || '';
-        if (!['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'canceling'].includes(status)) return false;
+        const type = a.type?.toLowerCase() || '';
+        if (!isActive(a) || ['canceled', 'canceling', 'cancelled', 'cancelling'].includes(status) || type === 'cancel') return false;
         const time = a.lastModifiedAt || a.createdAt || 0;
         return time > 0 && dayjs(time).isBefore(now.subtract(24, 'hour'));
     }).length;
@@ -558,6 +554,23 @@ export const useDashboardMetrics = () => {
         })).sort((a, b) => b.count - a.count);
     }, [actions, t]);
 
+    // 16. Target Request Delay Metrics
+    const targetsWithLastRequest = targets.filter(t => t.pollStatus?.lastRequestAt);
+    const nowMs = stableNowMs || Date.now();
+
+    const topDelayedTargets = [...targetsWithLastRequest]
+        .map(t => ({
+            controllerId: t.controllerId,
+            name: t.name || t.controllerId,
+            lastRequestAt: t.pollStatus?.lastRequestAt || 0,
+            delay: nowMs - (t.pollStatus?.lastRequestAt || 0)
+        }))
+        .sort((a, b) => b.delay - a.delay)
+        .slice(0, 5);
+
+    const totalDelay = targetsWithLastRequest.reduce((sum, t) => sum + (nowMs - (t.pollStatus?.lastRequestAt || 0)), 0);
+    const averageDelay = targetsWithLastRequest.length > 0 ? Math.round(totalDelay / targetsWithLastRequest.length) : 0;
+
     return {
         // State
         isLoading,
@@ -620,6 +633,10 @@ export const useDashboardMetrics = () => {
         errorActions1hCount,
         newTargetsTrendData,
         targetTypeCoverageData,
+
+        // Target Delay Metrics
+        topDelayedTargets,
+        averageDelay,
 
         // Fragmentation Metrics
         fragmentationStats,

@@ -80,6 +80,7 @@ const SoftwareModuleList: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('messages.deleteModuleSuccess'));
+                queryClient.invalidateQueries({ queryKey: getGetSoftwareModulesQueryKey() });
                 refetch();
             },
             onError: (error) => {

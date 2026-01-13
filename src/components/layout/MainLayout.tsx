@@ -88,7 +88,7 @@ const MainLayout: React.FC = () => {
           </React.Suspense>
         </StyledContent>
         <StyledFooter>
-          <span>© {currentYear} <a href="https://github.com/rhkdguskim" target="_blank" rel="noopener noreferrer">rhkdguskim</a>. All rights reserved.</span>
+          <span>© {currentYear} Updater UI. All rights reserved.</span>
           <span className="version">v{__APP_VERSION__}</span>
         </StyledFooter>
       </ContentLayout>

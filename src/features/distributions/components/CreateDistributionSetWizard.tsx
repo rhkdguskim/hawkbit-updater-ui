@@ -16,30 +16,36 @@ import {
     Card,
     Empty,
     Checkbox,
-    Divider,
     Typography,
-    Alert,
 } from 'antd';
 import {
     PlusOutlined,
     DeleteOutlined,
     CheckCircleOutlined,
-    AppstoreAddOutlined,
+    FileOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import CreateModuleWizard from './CreateModuleWizard';
 import {
     useCreateDistributionSets,
     useAssignSoftwareModules,
     useCreateMetadata2,
 } from '@/api/generated/distribution-sets/distribution-sets';
-import { useGetDistributionSetTypes } from '@/api/generated/distribution-set-types/distribution-set-types';
-import { useGetSoftwareModules, useCreateSoftwareModules } from '@/api/generated/software-modules/software-modules';
-import { useGetTypes } from '@/api/generated/software-module-types/software-module-types';
+import {
+    useGetSoftwareModules,
+    useGetArtifacts,
+    getGetSoftwareModulesQueryKey
+} from '@/api/generated/software-modules/software-modules';
+import {
+    useGetDistributionSetTypes,
+    useGetMandatoryModules,
+    useGetOptionalModules
+} from '@/api/generated/distribution-set-types/distribution-set-types';
+import { useQueryClient } from '@tanstack/react-query';
 import type {
     MgmtDistributionSetRequestBodyPost,
     MgmtMetadata,
     MgmtSoftwareModule,
-    MgmtSoftwareModuleRequestBodyPost,
 } from '@/api/generated/model';
 
 const { Text } = Typography;
@@ -55,17 +61,24 @@ interface MetadataEntry {
     value: string;
 }
 
-interface NewModuleEntry {
-    id: string; // temp id
-    name: string;
-    version: string;
-    type: string;
-    typeName?: string;
-    vendor?: string;
-    description?: string;
-}
+type CreationPhase = 'idle' | 'creating_set' | 'assigning_modules' | 'adding_metadata' | 'done' | 'error';
 
-type CreationPhase = 'idle' | 'creating_set' | 'creating_modules' | 'assigning_modules' | 'adding_metadata' | 'done' | 'error';
+const ModuleArtifactList: React.FC<{ moduleId: number }> = ({ moduleId }) => {
+    const { data: artifacts, isLoading } = useGetArtifacts(moduleId);
+
+    if (isLoading) return <Badge status="processing" size="small" text="..." />;
+    if (!artifacts || artifacts.length === 0) return <span>-</span>;
+
+    return (
+        <Space size={[0, 4]} wrap>
+            {artifacts.map(art => (
+                <Tag key={art.id} icon={<FileOutlined />} style={{ margin: '2px 0', fontSize: '10px' }}>
+                    {art.providedFilename}
+                </Tag>
+            ))}
+        </Space>
+    );
+};
 
 const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = ({
     visible,
@@ -77,20 +90,28 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
     const [basicInfoForm] = Form.useForm();
     const [metadataForm] = Form.useForm();
     const [newModuleForm] = Form.useForm();
+    const queryClient = useQueryClient();
 
     // DS Types
     const { data: dsTypesData, isLoading: isDsTypesLoading } = useGetDistributionSetTypes({ limit: 100 });
 
     // Software modules
-    const { data: modulesData, isLoading: isModulesLoading } = useGetSoftwareModules({ limit: 500 });
-    const { data: smTypesData, isLoading: isSmTypesLoading } = useGetTypes({ limit: 100 });
+    const { data: modulesData, isLoading: isModulesLoading } = useGetSoftwareModules(
+        { limit: 500 },
+        {
+            query: {
+                staleTime: 0,
+                refetchOnMount: 'always',
+            }
+        }
+    );
 
-    // Selected existing modules
+    // Selected modules
     const [selectedModuleIds, setSelectedModuleIds] = useState<number[]>([]);
 
-    // New modules to create
-    const [newModules, setNewModules] = useState<NewModuleEntry[]>([]);
-    const [showNewModuleForm, setShowNewModuleForm] = useState(false);
+    // Newly created module IDs to highlight
+    const [newlyCreatedIds, setNewlyCreatedIds] = useState<number[]>([]);
+    const [isModuleWizardVisible, setIsModuleWizardVisible] = useState(false);
 
     // Metadata state
     const [metadataList, setMetadataList] = useState<MetadataEntry[]>([]);
@@ -100,9 +121,31 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
 
     // Mutations
     const createDistributionSetMutation = useCreateDistributionSets();
-    const createModulesMutation = useCreateSoftwareModules();
     const assignModulesMutation = useAssignSoftwareModules();
     const createMetadataMutation = useCreateMetadata2();
+
+    const selectedDsTypeKey = Form.useWatch('type', basicInfoForm);
+    const selectedDsTypeId = dsTypesData?.content?.find(t => t.key === selectedDsTypeKey)?.id;
+
+    // Fetch compatible module types
+    const { data: mandatoryTypes } = useGetMandatoryModules(selectedDsTypeId || 0, {
+        query: { enabled: !!selectedDsTypeId }
+    });
+    const { data: optionalTypes } = useGetOptionalModules(selectedDsTypeId || 0, {
+        query: { enabled: !!selectedDsTypeId }
+    });
+
+    const allowedSmTypeKeys = React.useMemo(() => {
+        const mandatory = mandatoryTypes?.map(t => t.key) || [];
+        const optional = optionalTypes?.map(t => t.key) || [];
+        return [...mandatory, ...optional];
+    }, [mandatoryTypes, optionalTypes]);
+
+    const filteredModules = React.useMemo(() => {
+        if (!selectedDsTypeKey) return modulesData?.content || [];
+        if (allowedSmTypeKeys.length === 0) return [];
+        return (modulesData?.content || []).filter(m => allowedSmTypeKeys.includes(m.type));
+    }, [modulesData, selectedDsTypeKey, allowedSmTypeKeys]);
 
     const resetWizard = useCallback(() => {
         setCurrentStep(0);
@@ -110,11 +153,16 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
         metadataForm.resetFields();
         newModuleForm.resetFields();
         setSelectedModuleIds([]);
-        setNewModules([]);
-        setShowNewModuleForm(false);
+        setNewlyCreatedIds([]);
+        setIsModuleWizardVisible(false);
         setMetadataList([]);
         setCreationPhase('idle');
     }, [basicInfoForm, metadataForm, newModuleForm]);
+
+    // Clear selection when DS type changes to prevent compatibility errors
+    React.useEffect(() => {
+        setSelectedModuleIds([]);
+    }, [selectedDsTypeKey]);
 
     const handleCancel = () => {
         resetWizard();
@@ -140,34 +188,13 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
         }
     };
 
-    // Add new module entry
-    const handleAddNewModule = async () => {
-        try {
-            const values = await newModuleForm.validateFields();
-            const typeInfo = smTypesData?.content?.find((t) => t.key === values.type);
-            const id = `new-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-            setNewModules([
-                ...newModules,
-                {
-                    id,
-                    name: values.name,
-                    version: values.version,
-                    type: values.type,
-                    typeName: typeInfo?.name,
-                    vendor: values.vendor,
-                    description: values.description,
-                },
-            ]);
-            newModuleForm.resetFields();
-            setShowNewModuleForm(false);
-        } catch {
-            // Validation failed
-        }
-    };
-
-    // Remove new module entry
-    const handleRemoveNewModule = (id: string) => {
-        setNewModules(newModules.filter((m) => m.id !== id));
+    // Handle newly created modules from sub-wizard
+    const handleModulesCreated = (ids: number[]) => {
+        setSelectedModuleIds(prev => [...prev, ...ids]);
+        setNewlyCreatedIds(prev => [...prev, ...ids]);
+        setIsModuleWizardVisible(false);
+        // Refresh modules list
+        void queryClient.invalidateQueries({ queryKey: getGetSoftwareModulesQueryKey() });
     };
 
     // Add metadata entry
@@ -212,27 +239,9 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
                 throw new Error('Failed to get created Distribution Set ID');
             }
 
-            // Step 2: Create new modules if any
-            const allModuleIds: number[] = [...selectedModuleIds];
+            // Step 2: Assign modules if any
+            const allModuleIds = [...selectedModuleIds];
 
-            if (newModules.length > 0) {
-                setCreationPhase('creating_modules');
-                const modulesPayload: MgmtSoftwareModuleRequestBodyPost[] = newModules.map((m) => ({
-                    name: m.name,
-                    version: m.version,
-                    type: m.type,
-                    vendor: m.vendor,
-                    description: m.description,
-                    encrypted: false,
-                }));
-
-                const createdModules = await createModulesMutation.mutateAsync({ data: modulesPayload });
-                createdModules?.forEach((m) => {
-                    if (m.id) allModuleIds.push(m.id);
-                });
-            }
-
-            // Step 3: Assign modules if any
             if (allModuleIds.length > 0) {
                 setCreationPhase('assigning_modules');
                 const assignments = allModuleIds.map((id) => ({ id }));
@@ -257,6 +266,10 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
 
             setCreationPhase('done');
             message.success(t('messages.createSetSuccess'));
+
+            // Invalidate caches
+            void queryClient.invalidateQueries({ queryKey: getGetSoftwareModulesQueryKey() });
+
             resetWizard();
             onSuccess();
         } catch (error) {
@@ -269,8 +282,6 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
         switch (creationPhase) {
             case 'creating_set':
                 return t('wizard.creatingSet');
-            case 'creating_modules':
-                return t('wizard.creatingModules');
             case 'assigning_modules':
                 return t('wizard.assigningModules');
             case 'adding_metadata':
@@ -320,154 +331,71 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
     );
 
     // Step 2: Assign Modules
-    const renderStep2 = () => {
-        const existingModules = modulesData?.content || [];
-        const hasNoModules = existingModules.length === 0 && newModules.length === 0;
-
-        return (
-            <div>
-                {hasNoModules && (
-                    <Alert
-                        message={t('wizard.noModulesExist')}
-                        description={t('wizard.createModuleHint')}
-                        type="info"
-                        showIcon
-                        style={{ marginBottom: 16 }}
-                    />
-                )}
-
-                {/* Existing Modules Selection */}
-                {existingModules.length > 0 && (
-                    <>
-                        <Text strong>{t('wizard.selectExistingModules')}</Text>
-                        <Table
-                            dataSource={existingModules}
-                            rowKey="id"
-                            size="small"
-                            loading={isModulesLoading}
-                            pagination={{ pageSize: 5, size: 'small' }}
-                            rowSelection={{
-                                selectedRowKeys: selectedModuleIds,
-                                onChange: (keys) => setSelectedModuleIds(keys as number[]),
-                            }}
-                            columns={[
-                                { title: t('list.columns.name'), dataIndex: 'name', key: 'name' },
-                                {
-                                    title: t('list.columns.version'),
-                                    dataIndex: 'version',
-                                    key: 'version',
-                                    render: (v) => <Tag color="blue">{v}</Tag>,
-                                },
-                                {
-                                    title: t('list.columns.type'),
-                                    dataIndex: 'typeName',
-                                    key: 'typeName',
-                                    render: (v) => <Tag color="cyan">{v}</Tag>,
-                                },
-                            ]}
-                            style={{ marginTop: 8, marginBottom: 16 }}
-                        />
-                    </>
-                )}
-
-                <Divider />
-
-                {/* New Modules to Create */}
-                <Space style={{ marginBottom: 16 }}>
-                    <Text strong>{t('wizard.newModulesToCreate')}</Text>
-                    <Button
-                        type="dashed"
-                        icon={<AppstoreAddOutlined />}
-                        onClick={() => setShowNewModuleForm(true)}
-                        size="small"
-                    >
-                        {t('wizard.addNewModule')}
-                    </Button>
-                </Space>
-
-                {showNewModuleForm && (
-                    <Card size="small" style={{ marginBottom: 16, background: 'var(--ant-color-fill-alter, #fafafa)' }}>
-                        <Form form={newModuleForm} layout="vertical" size="small">
-                            <Space style={{ width: '100%' }} direction="vertical">
-                                <Space style={{ width: '100%' }} wrap>
-                                    <Form.Item
-                                        name="name"
-                                        rules={[{ required: true, message: t('modal.placeholders.name') }]}
-                                        style={{ marginBottom: 0 }}
-                                    >
-                                        <Input placeholder={t('modal.name')} style={{ width: 150 }} />
-                                    </Form.Item>
-                                    <Form.Item
-                                        name="version"
-                                        rules={[{ required: true, message: t('modal.placeholders.version') }]}
-                                        style={{ marginBottom: 0 }}
-                                    >
-                                        <Input placeholder={t('modal.version')} style={{ width: 100 }} />
-                                    </Form.Item>
-                                    <Form.Item
-                                        name="type"
-                                        rules={[{ required: true, message: t('modal.placeholders.type') }]}
-                                        style={{ marginBottom: 0 }}
-                                    >
-                                        <Select
-                                            placeholder={t('modal.type')}
-                                            loading={isSmTypesLoading}
-                                            options={smTypesData?.content?.map((t) => ({ label: t.name, value: t.key }))}
-                                            style={{ width: 150 }}
-                                        />
-                                    </Form.Item>
-                                    <Form.Item name="vendor" style={{ marginBottom: 0 }}>
-                                        <Input placeholder={t('modal.vendor')} style={{ width: 120 }} />
-                                    </Form.Item>
-                                </Space>
-                                <Space>
-                                    <Button type="primary" size="small" onClick={handleAddNewModule}>
-                                        {t('wizard.add')}
-                                    </Button>
-                                    <Button size="small" onClick={() => setShowNewModuleForm(false)}>
-                                        {t('common:actions.cancel')}
-                                    </Button>
-                                </Space>
-                            </Space>
-                        </Form>
-                    </Card>
-                )}
-
-                {newModules.length > 0 ? (
-                    <List
-                        size="small"
-                        bordered
-                        dataSource={newModules}
-                        renderItem={(item) => (
-                            <List.Item
-                                actions={[
-                                    <Button
-                                        key="delete"
-                                        type="text"
-                                        danger
-                                        icon={<DeleteOutlined />}
-                                        onClick={() => handleRemoveNewModule(item.id)}
-                                        size="small"
-                                    />,
-                                ]}
-                            >
-                                <Space>
-                                    <Tag color="green">{t('values.new')}</Tag>
-                                    <span>{item.name}</span>
-                                    <Tag color="blue">{item.version}</Tag>
-                                    <Tag color="cyan">{item.typeName || item.type}</Tag>
-                                </Space>
-                            </List.Item>
-                        )}
-                    />
-                ) : (
-                    !showNewModuleForm && (
-                        <Empty description={t('wizard.noNewModules')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                    )
-                )}
+    const renderStep2 = () => (
+        <div>
+            {/* Unified Modules Selection */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <Text strong>{t('wizard.selectModules')}</Text>
+                <Button
+                    type="dashed"
+                    icon={<PlusOutlined />}
+                    onClick={() => setIsModuleWizardVisible(true)}
+                    size="small"
+                >
+                    {t('wizard.addNewModule')}
+                </Button>
             </div>
-        );
-    };
+
+            <Table
+                dataSource={filteredModules}
+                rowKey="id"
+                size="small"
+                loading={isModulesLoading}
+                pagination={{ pageSize: 10, size: 'small' }}
+                rowSelection={{
+                    selectedRowKeys: selectedModuleIds,
+                    onChange: (keys) => setSelectedModuleIds(keys as number[]),
+                }}
+                columns={[
+                    {
+                        title: t('list.columns.name'),
+                        dataIndex: 'name',
+                        key: 'name',
+                        render: (text: string, record: MgmtSoftwareModule) => (
+                            <Space>
+                                {record.id !== undefined && newlyCreatedIds.includes(record.id) && <Tag color="green">{t('values.new')}</Tag>}
+                                {text}
+                            </Space>
+                        )
+                    },
+                    {
+                        title: t('list.columns.version'),
+                        dataIndex: 'version',
+                        key: 'version',
+                        render: (v) => <Tag color="blue">{v}</Tag>,
+                    },
+                    {
+                        title: t('list.columns.type'),
+                        dataIndex: 'typeName',
+                        key: 'typeName',
+                        render: (v) => <Tag color="cyan">{v}</Tag>,
+                    },
+                ]}
+                style={{ marginBottom: 16 }}
+            />
+
+            <CreateModuleWizard
+                visible={isModuleWizardVisible}
+                onCancel={() => setIsModuleWizardVisible(false)}
+                onModulesCreated={handleModulesCreated}
+                initialValues={{
+                    name: basicInfoForm.getFieldValue('name'),
+                    version: basicInfoForm.getFieldValue('version'),
+                }}
+                allowedTypes={allowedSmTypeKeys}
+            />
+        </div>
+    );
 
     // Step 3: Metadata
     const renderStep3 = () => (
@@ -530,9 +458,19 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
     const renderStep4 = () => {
         const values = basicInfoForm.getFieldsValue();
         const selectedType = dsTypesData?.content?.find((t) => t.key === values.type);
-        const selectedModules = (modulesData?.content || []).filter((m: MgmtSoftwareModule) =>
-            selectedModuleIds.includes(m.id!)
-        );
+        const selectedModules = selectedModuleIds.map((id) => {
+            const found = (modulesData?.content || []).find((m) => m.id === id);
+            if (found) return found;
+            return { id, name: `${t('values.new')} (ID: ${id})`, version: '', typeName: '' } as MgmtSoftwareModule;
+        });
+
+        const reviewList = selectedModules.map((m: MgmtSoftwareModule) => ({
+            key: m.id,
+            name: m.name,
+            version: m.version,
+            typeName: m.typeName,
+            isNew: newlyCreatedIds.includes(m.id!),
+        }));
 
         return (
             <div>
@@ -550,34 +488,24 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
                     </Descriptions.Item>
                 </Descriptions>
 
-                <Card size="small" title={t('wizard.step2Title')} style={{ marginBottom: 16 }}>
-                    {selectedModules.length > 0 || newModules.length > 0 ? (
+                <Card size="small" title={t('wizard.dsStep2Title')} style={{ marginBottom: 16 }}>
+                    {reviewList.length > 0 ? (
                         <List
                             size="small"
-                            dataSource={[
-                                ...selectedModules.map((m: MgmtSoftwareModule) => ({
-                                    key: `existing-${m.id}`,
-                                    name: m.name,
-                                    version: m.version,
-                                    typeName: m.typeName,
-                                    isNew: false,
-                                })),
-                                ...newModules.map((m) => ({
-                                    key: m.id,
-                                    name: m.name,
-                                    version: m.version,
-                                    typeName: m.typeName || m.type,
-                                    isNew: true,
-                                })),
-                            ]}
+                            dataSource={reviewList}
                             renderItem={(item) => (
                                 <List.Item>
-                                    <Space>
-                                        {item.isNew && <Tag color="green">{t('values.new')}</Tag>}
-                                        <span>{item.name}</span>
-                                        <Tag color="blue">{item.version}</Tag>
-                                        <Tag color="cyan">{item.typeName}</Tag>
-                                    </Space>
+                                    <div style={{ width: '100%' }}>
+                                        <Space style={{ marginBottom: 4 }}>
+                                            {item.isNew && <Tag color="green">{t('values.new')}</Tag>}
+                                            <span style={{ fontWeight: '500' }}>{item.name || ''}</span>
+                                            <Tag color="blue">{item.version || ''}</Tag>
+                                            <Tag color="cyan">{item.typeName || ''}</Tag>
+                                        </Space>
+                                        <div style={{ marginLeft: 0 }}>
+                                            <ModuleArtifactList moduleId={item.key!} />
+                                        </div>
+                                    </div>
                                 </List.Item>
                             )}
                         />
@@ -586,7 +514,7 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
                     )}
                 </Card>
 
-                <Card size="small" title={t('wizard.step3Title')}>
+                <Card size="small" title={t('wizard.dsMetadataReviewTitle', 'Metadata')} style={{ marginBottom: 16 }}>
                     {metadataList.length > 0 ? (
                         <List
                             size="small"
@@ -617,7 +545,7 @@ const CreateDistributionSetWizard: React.FC<CreateDistributionSetWizardProps> = 
     const steps = [
         { title: t('wizard.step1Title') },
         { title: t('wizard.dsStep2Title') },
-        { title: t('wizard.step3Title'), description: t('wizard.optionalStep') },
+        { title: t('wizard.dsStep3Title', 'Metadata'), description: t('wizard.optionalStep') },
         { title: t('wizard.step4Title') },
     ];
 

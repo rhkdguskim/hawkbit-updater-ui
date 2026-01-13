@@ -13,6 +13,10 @@ const DropdownContent = styled.div`
     max-width: 400px;
     max-height: 320px;
     overflow-y: auto;
+    background-color: var(--ant-color-bg-elevated, #ffffff);
+    border-radius: var(--ant-border-radius-lg, 8px);
+    box-shadow: var(--ant-box-shadow-light, 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05));
+    border: 1px solid var(--ant-color-border-secondary, rgba(5, 5, 5, 0.06));
 `;
 
 const FilterItem = styled.div`

@@ -436,7 +436,7 @@ export const ActiveRolloutsWidget: React.FC<ActiveRolloutsWidgetProps> = ({
                         <AirportSlideList
                             items={activeRollouts}
                             itemHeight={150}
-                            visibleCount={3}
+                            visibleCount={1}
                             scrollSpeed={30}
                             fullHeight={true}
                             renderItem={(rollout: MgmtRolloutResponseBody) => (

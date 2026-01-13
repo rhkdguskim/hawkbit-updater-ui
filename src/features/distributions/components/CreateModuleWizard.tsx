@@ -28,15 +28,27 @@ import {
     CheckCircleOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useCreateSoftwareModules, useUploadArtifact, useCreateMetadata1 } from '@/api/generated/software-modules/software-modules';
+import {
+    useCreateSoftwareModules,
+    useUploadArtifact,
+    useCreateMetadata1,
+    getGetSoftwareModulesQueryKey
+} from '@/api/generated/software-modules/software-modules';
 import { useGetTypes } from '@/api/generated/software-module-types/software-module-types';
 import type { MgmtSoftwareModuleRequestBodyPost, MgmtSoftwareModuleMetadata } from '@/api/generated/model';
 import type { RcFile } from 'antd/es/upload';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface CreateModuleWizardProps {
     visible: boolean;
     onCancel: () => void;
-    onSuccess: () => void;
+    onSuccess?: () => void;
+    onModulesCreated?: (ids: number[]) => void;
+    initialValues?: {
+        name?: string;
+        version?: string;
+    };
+    allowedTypes?: string[];
 }
 
 interface MetadataEntry {
@@ -57,11 +69,25 @@ const CreateModuleWizard: React.FC<CreateModuleWizardProps> = ({
     visible,
     onCancel,
     onSuccess,
+    onModulesCreated,
+    initialValues,
+    allowedTypes,
 }) => {
     const { t } = useTranslation('distributions');
     const [currentStep, setCurrentStep] = useState(0);
     const [basicInfoForm] = Form.useForm();
     const [metadataForm] = Form.useForm();
+    const queryClient = useQueryClient();
+
+    // Reset or Set Initial Values when visible changes
+    React.useEffect(() => {
+        if (visible && initialValues) {
+            basicInfoForm.setFieldsValue({
+                name: initialValues.name,
+                version: initialValues.version,
+            });
+        }
+    }, [visible, initialValues, basicInfoForm]);
 
     // Basic info state
     const { data: typesData, isLoading: isTypesLoading } = useGetTypes({ limit: 100 });
@@ -213,8 +239,18 @@ const CreateModuleWizard: React.FC<CreateModuleWizardProps> = ({
 
             setCreationPhase('done');
             message.success(t('messages.createModuleSuccess'));
+
+            // Invalidate module list cache
+            void queryClient.invalidateQueries({
+                queryKey: getGetSoftwareModulesQueryKey()
+            });
+
             resetWizard();
-            onSuccess();
+            if (onModulesCreated && moduleResult) {
+                const ids = moduleResult.map(m => m.id).filter((id): id is number => !!id);
+                onModulesCreated(ids);
+            }
+            if (onSuccess) onSuccess();
         } catch (error) {
             setCreationPhase('error');
             message.error((error as Error).message || t('messages.createModuleError'));
@@ -261,7 +297,13 @@ const CreateModuleWizard: React.FC<CreateModuleWizardProps> = ({
                 <Select
                     placeholder={t('modal.placeholders.type')}
                     loading={isTypesLoading}
-                    options={typesData?.content?.filter((t) => t.key).map((t) => ({ label: t.name, value: t.key }))}
+                    options={typesData?.content?.filter((t) => {
+                        if (!t.key) return false;
+                        if (allowedTypes && allowedTypes.length > 0) {
+                            return allowedTypes.includes(t.key);
+                        }
+                        return true;
+                    }).map((t) => ({ label: t.name, value: t.key }))}
                 />
             </Form.Item>
             <Form.Item name="vendor" label={t('modal.vendor')}>

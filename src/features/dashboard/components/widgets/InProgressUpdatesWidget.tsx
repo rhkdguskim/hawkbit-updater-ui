@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Flex, Typography, Skeleton, Tag, Button, Tooltip, Badge, Empty, message, Space } from 'antd';
+import { Flex, Typography, Skeleton, Tag, Button, Tooltip, Empty, message, Space } from 'antd';
 import {
     SyncOutlined,
     ClockCircleOutlined,
-    ExclamationCircleFilled,
     ReloadOutlined,
     CloseOutlined,
     RocketOutlined,
-    WarningFilled,
 } from '@ant-design/icons';
-import { AirportSlideList } from '@/components/common';
 import { ListCard, IconBadge } from '../DashboardStyles';
 import { useCancelAction, useGetActionStatusList } from '@/api/generated/targets/targets';
 import { useGetAction1 } from '@/api/generated/actions/actions';
@@ -24,36 +21,13 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
 import 'dayjs/locale/en';
-import { getStatusLabel, translateStatusMessage } from '@/utils/statusUtils';
+import { getStatusLabel, translateStatusMessage, isActionCanceled, isActionInProgress } from '@/utils/statusUtils';
+import { isActive } from '@/entities';
 
 dayjs.extend(relativeTime);
 
 const { Text } = Typography;
 
-
-const pulseAlert = keyframes`
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(0.98); }
-    100% { opacity: 1; transform: scale(1); }
-`;
-
-const WarningBanner = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    margin-bottom: 8px;
-    background: linear-gradient(
-        135deg,
-        rgba(var(--ant-orange-rgb), 0.1) 0%,
-        rgba(var(--ant-red-rgb), 0.05) 100%
-    );
-    border: 1px solid var(--ant-color-warning-border);
-    border-radius: 8px;
-    font-size: 12px;
-    color: var(--ant-color-warning-text);
-    animation: ${pulseAlert} 3s infinite ease-in-out;
-`;
 
 const ActivityItem = styled.div`
     display: flex;
@@ -66,6 +40,12 @@ const ActivityItem = styled.div`
     border-radius: 10px;
     border: 1px solid rgba(0, 0, 0, 0.03);
     transition: all 0.2s ease;
+    animation: fadeIn 0.5s ease-out;
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
     &:hover {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.7) 100%);
@@ -78,35 +58,6 @@ const ActivityItem = styled.div`
     }
 `;
 
-const DelayIndicator = styled.div<{ $level: 'warning' | 'critical' | 'normal' }>`
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 10px;
-    font-weight: 600;
-
-    ${({ $level }) => {
-        switch ($level) {
-            case 'critical':
-                return `
-                    background: rgba(var(--ant-red-rgb), 0.15);
-                    color: var(--ant-color-error);
-                `;
-            case 'warning':
-                return `
-                    background: rgba(var(--ant-orange-rgb), 0.15);
-                    color: var(--ant-color-warning);
-                `;
-            default:
-                return `
-                    background: rgba(var(--ant-green-rgb), 0.15);
-                    color: var(--ant-color-success);
-                `;
-        }
-    }}
-`;
 
 const RolloutInfo = styled.div`
     display: flex;
@@ -128,20 +79,38 @@ const ActionButtons = styled.div`
     border-top: 1px solid var(--ant-color-border-secondary);
 `;
 
-const ListBody = styled.div`
+const ListBody = styled.div<{ $hasMany?: boolean }>`
     flex: 1;
-    max-height: 360px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    min-height: 500px;
+    overflow-y: auto;
+    display: grid;
+    /* Use 2 columns if many items and space permits */
+    grid-template-columns: ${props => props.$hasMany ? 'repeat(auto-fill, minmax(450px, 1fr))' : '1fr'};
+    grid-auto-rows: max-content;
+    align-content: start;
+    gap: 12px;
+    padding-right: 4px;
+
+    /* Custom scrollbar for better appearance */
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: var(--ant-color-border-secondary);
+        border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background: var(--ant-color-border);
+    }
 `;
 
 interface InProgressItem {
     target: MgmtTarget;
     action: MgmtAction;
     rolloutName?: string;
-    delayLevel?: 'normal' | 'warning' | 'critical';
-    delayMs?: number;
 }
 
 interface InProgressActionItemProps {
@@ -190,11 +159,15 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
 
     const statusHistory = statusHistoryData?.content || [];
 
-    // Hide item if polled status shows it's no longer in progress
-    const currentStatus = currentAction.status?.toLowerCase() || '';
-    if (['canceled', 'canceling', 'cancelled', 'cancelling', 'finished'].includes(currentStatus)) {
-        return null;
-    }
+    // We check both the current action status AND the latest history entry
+
+    // Sort history to find the latest event by timestamp (descending)
+    const sortedHistory = [...statusHistory].sort((a, b) => {
+        const tA = a.timestamp || a.reportedAt || 0;
+        const tB = b.timestamp || b.reportedAt || 0;
+        return dayjs(tB).valueOf() - dayjs(tA).valueOf();
+    });
+    // to ensure consistency with the parent widget's count.
 
     const getDelayText = (startTime?: number): string => {
         if (!startTime || !currentTime) return t('inProgress.justNow');
@@ -232,7 +205,6 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
         }
     };
 
-    const delayLevel = item.delayLevel || 'normal';
     const delayText = getDelayText(currentAction.createdAt);
 
     const historyContent = (
@@ -243,7 +215,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
             <div style={{ maxHeight: 300, overflowY: 'auto' }}>
                 <List
                     size="small"
-                    dataSource={statusHistory}
+                    dataSource={sortedHistory}
                     renderItem={(status: MgmtActionStatus) => (
                         <List.Item style={{ padding: '8px 0', borderBottom: '1px dashed var(--ant-color-border-secondary)' }}>
                             <Flex vertical gap={4} style={{ width: '100%' }}>
@@ -296,12 +268,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                                 width: 28,
                                 height: 28,
                                 borderRadius: 6,
-                                background:
-                                    delayLevel === 'critical'
-                                        ? 'rgba(var(--ant-red-rgb), 0.15)'
-                                        : delayLevel === 'warning'
-                                            ? 'rgba(var(--ant-orange-rgb), 0.15)'
-                                            : 'rgba(var(--ant-blue-rgb), 0.15)',
+                                background: 'rgba(var(--ant-blue-rgb), 0.15)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -312,21 +279,6 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                                     style={{
                                         fontSize: 14,
                                         color: 'var(--ant-color-error)',
-                                    }}
-                                />
-                            ) : ['canceling'].includes(currentAction.status?.toLowerCase() || '') ? (
-                                <SyncOutlined
-                                    spin
-                                    style={{ fontSize: 14, color: 'var(--ant-color-warning)' }}
-                                />
-                            ) : delayLevel !== 'normal' ? (
-                                <ExclamationCircleFilled
-                                    style={{
-                                        fontSize: 14,
-                                        color:
-                                            delayLevel === 'critical'
-                                                ? 'var(--ant-color-error)'
-                                                : 'var(--ant-color-warning)',
                                     }}
                                 />
                             ) : (
@@ -368,10 +320,10 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                             </Space>
                         </Flex>
                     </Flex>
-                    <DelayIndicator $level={delayLevel}>
-                        <ClockCircleOutlined style={{ fontSize: 10 }} />
-                        {delayLevel !== 'normal' ? t('inProgress.delayed', { time: delayText }) : delayText}
-                    </DelayIndicator>
+                    <Flex align="center" gap={4} style={{ color: 'var(--ant-color-text-description)', fontSize: 10 }}>
+                        <ClockCircleOutlined />
+                        {delayText}
+                    </Flex>
                 </Flex>
 
                 {item.rolloutName && (
@@ -399,7 +351,11 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                             danger
                             icon={<CloseOutlined />}
                             loading={cancelActionMutation.isPending}
-                            disabled={!['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'wait_for_confirmation', 'waiting_for_confirmation', 'retrieved'].includes(currentAction.status?.toLowerCase() || '') || ['canceled', 'canceling'].includes(currentAction.status?.toLowerCase() || '')}
+                            disabled={
+                                !isActionInProgress(currentAction.status) ||
+                                isActionCanceled(currentAction) ||
+                                currentAction.type?.toLowerCase() === 'cancel'
+                            }
                             onClick={handleCancel}
                         >
                             {t('inProgress.cancel')}
@@ -438,10 +394,9 @@ export const InProgressUpdatesWidget: React.FC<InProgressUpdatesWidgetProps> = (
     }, []);
 
     const sortedData = useMemo(() => {
-        // Filter out canceling/canceled actions - these should not appear in "in progress"
+        // Aggressively filter out canceling/canceled actions
         const filteredData = data.filter((item) => {
-            const status = item.action.status?.toLowerCase() || '';
-            return !['canceled', 'canceling'].includes(status);
+            return isActive(item.action) && !isActionCanceled(item.action);
         });
 
         return [...filteredData].sort((a, b) => {
@@ -452,12 +407,8 @@ export const InProgressUpdatesWidget: React.FC<InProgressUpdatesWidgetProps> = (
         });
     }, [data]);
 
-    const delayedCount = useMemo(() => {
-        return data.filter((item) => item.delayLevel && item.delayLevel !== 'normal').length;
-    }, [data]);
-
     const handleItemClick = (item: InProgressItem) => {
-        navigate(`/targets/${item.target.controllerId}/actions`);
+        navigate(`/actions/${item.action.id}`);
     };
 
     return (
@@ -471,45 +422,27 @@ export const InProgressUpdatesWidget: React.FC<InProgressUpdatesWidgetProps> = (
                     <Flex vertical gap={0}>
                         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('inProgress.title')}</span>
                         <Text type="secondary" style={{ fontSize: 11 }}>
-                            {t('recentActivities.inProgress', { count: data.length })}
+                            {t('recentActivities.inProgress', { count: sortedData.length })}
                         </Text>
                     </Flex>
                 </Flex>
-            }
-            extra={
-                delayedCount > 0 && (
-                    <Badge count={delayedCount} size="small" color="orange" />
-                )
             }
             $delay={9}
         >
             {isLoading ? (
                 <Skeleton active paragraph={{ rows: 4 }} />
             ) : sortedData.length > 0 ? (
-                <ListBody>
-                    {delayedCount > 0 && (
-                        <WarningBanner>
-                            <WarningFilled />
-                            <span>{t('inProgress.delayWarning', { count: delayedCount })}</span>
-                        </WarningBanner>
-                    )}
-                    <AirportSlideList
-                        items={sortedData}
-                        itemHeight={130}
-                        visibleCount={3}
-                        scrollSpeed={30}
-                        fullHeight={true}
-                        renderItem={(item: InProgressItem) => (
-                            <InProgressActionItem
-                                key={`${item.target.controllerId}-${item.action.id}`}
-                                item={item}
-                                currentTime={currentTime}
-                                onRetry={onRetry}
-                                handleItemClick={handleItemClick}
-                                cancelActionMutation={cancelActionMutation}
-                            />
-                        )}
-                    />
+                <ListBody $hasMany={sortedData.length > 5}>
+                    {sortedData.map((item: InProgressItem) => (
+                        <InProgressActionItem
+                            key={`${item.target.controllerId}-${item.action.id}`}
+                            item={item}
+                            currentTime={currentTime}
+                            onRetry={onRetry}
+                            handleItemClick={handleItemClick}
+                            cancelActionMutation={cancelActionMutation}
+                        />
+                    ))}
                 </ListBody>
             ) : (
                 <Flex

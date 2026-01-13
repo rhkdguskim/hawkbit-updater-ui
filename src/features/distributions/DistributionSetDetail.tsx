@@ -12,6 +12,8 @@ import {
     useAssignSoftwareModules,
     useInvalidateDistributionSet,
     useCreateDistributionSets,
+    getGetAssignedSoftwareModulesQueryKey,
+    getGetDistributionSetQueryKey,
 } from '@/api/generated/distribution-sets/distribution-sets';
 import { useAuthStore } from '@/stores/useAuthStore';
 import dayjs from 'dayjs';
@@ -23,6 +25,7 @@ import SetTargetsTab from './components/SetTargetsTab';
 import type { MgmtSoftwareModuleAssignment, MgmtSoftwareModule, MgmtDistributionSetRequestBodyPost } from '@/api/generated/model';
 import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/patterns';
 import { SectionCard } from '@/components/layout/PageLayout';
 import { DetailPageHeader } from '@/components/common';
@@ -40,6 +43,7 @@ const DistributionSetDetail: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const distributionSetId = parseInt(id || '0', 10);
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
@@ -53,7 +57,6 @@ const DistributionSetDetail: React.FC = () => {
     const {
         data: assignedModulesData,
         isLoading: isModulesLoading,
-        refetch: refetchModules
     } = useGetAssignedSoftwareModules(distributionSetId);
 
     // Assign Mutation
@@ -62,7 +65,12 @@ const DistributionSetDetail: React.FC = () => {
             onSuccess: () => {
                 message.success(t('detail.assignSuccess'));
                 setIsAssignModalVisible(false);
-                refetchModules();
+                void queryClient.invalidateQueries({
+                    queryKey: getGetAssignedSoftwareModulesQueryKey(distributionSetId)
+                });
+                void queryClient.invalidateQueries({
+                    queryKey: getGetDistributionSetQueryKey(distributionSetId)
+                });
             },
             onError: (error) => {
                 message.error((error as Error).message || t('detail.assignError'));

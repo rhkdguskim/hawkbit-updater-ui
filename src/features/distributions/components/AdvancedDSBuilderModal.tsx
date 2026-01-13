@@ -31,7 +31,15 @@ const AdvancedDSBuilderModal: React.FC<AdvancedDSBuilderModalProps> = ({
     // API Data
     const { data: dsTypesData, isLoading: isDsTypesLoading } = useGetDistributionSetTypes({ limit: 100 });
     const { data: smTypesData } = useGetSoftwareModuleTypes({ limit: 100 });
-    const { data: modulesData, isLoading: isModulesLoading } = useGetSoftwareModules({ limit: 1000 });
+    const { data: modulesData, isLoading: isModulesLoading } = useGetSoftwareModules(
+        { limit: 1000 },
+        {
+            query: {
+                staleTime: 0,
+                refetchOnMount: 'always',
+            }
+        }
+    );
 
     const createDsMutation = useCreateDistributionSets();
     const assignModulesMutation = useAssignSoftwareModules();

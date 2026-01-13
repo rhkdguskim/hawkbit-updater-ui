@@ -70,7 +70,7 @@ export const ActionRequiredDetailsModal: React.FC<ActionRequiredDetailsModalProp
                                 style={{ padding: 0, height: 'auto', fontWeight: 600 }}
                                 onClick={() => {
                                     onClose();
-                                    navigate(`/targets/${targetId}/actions`);
+                                    navigate(`/actions/${action.id}`);
                                 }}
                             >
                                 {targetId}

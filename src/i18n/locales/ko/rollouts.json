@@ -76,6 +76,7 @@
         "paused": "일시정지됨",
         "finished": "완료됨",
         "error": "오류",
+        "stopped": "중지됨",
         "waitingForApproval": "승인 대기 중",
         "scheduled": "예약됨",
         "clearFilters": "필터 초기화"

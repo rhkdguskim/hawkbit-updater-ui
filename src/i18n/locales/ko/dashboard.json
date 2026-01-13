@@ -208,6 +208,12 @@
         "running": "실행 중",
         "finished": "완료"
     },
+    "delayWidget": {
+        "title": "타겟 요청 지연",
+        "subtitle": "마지막 폴링경과 시간",
+        "average": "평균 지연",
+        "longestDelays": "최장 지연 타겟"
+    },
     "delayedActions": {
         "title": "지연 Action 감지 (>10분/30분)",
         "target": "타겟",
@@ -365,5 +371,14 @@
         "error": "에러",
         "rolloutStart": "롤아웃 시작",
         "rolloutPause": "롤아웃 일시정지"
+    },
+    "hygiene": {
+        "title": "플릿 위생 상태",
+        "subtitle": "타겟 배포 건전성",
+        "orphan": "할당되지 않은 타겟",
+        "orphanTip": "어떤 배포 세트에도 할당되지 않은 타겟",
+        "neverConnected": "미접속 타겟",
+        "criticalOffline": "업데이트 중 오프라인",
+        "fleetCoverage": "플릿 커버리지: {{percentage}}%"
     }
 }

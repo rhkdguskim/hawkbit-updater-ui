@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
-import { TagOutlined, AppstoreOutlined, DeleteOutlined, UploadOutlined, DownloadOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
-import { Button, Space, message } from 'antd';
+import { TagOutlined, AppstoreOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
+import { Space, message } from 'antd';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import {
     DeleteTargetModal,
@@ -10,7 +10,6 @@ import {
     BulkAssignTypeModal,
     BulkDeleteTargetModal,
     SavedFiltersModal,
-    ImportTargetsModal,
     QuickFilters,
     ColumnCustomizer,
     BulkAutoConfirmModal,
@@ -180,20 +179,6 @@ const TargetList: React.FC = () => {
                                 onVisibilityChange={model.setVisibleColumns}
                                 columnLabels={columnLabels}
                             />
-                            <Button
-                                icon={<UploadOutlined />}
-                                onClick={() => model.setImportModalOpen(true)}
-                                disabled={!isAdmin}
-                            >
-                                {t('common:actions.import', { defaultValue: 'Import' })}
-                            </Button>
-                            <Button
-                                icon={<DownloadOutlined />}
-                                onClick={model.handleExport}
-                                disabled={!model.targetsData?.content?.length}
-                            >
-                                {t('common:actions.export', { defaultValue: 'Export' })}
-                            </Button>
                         </Space>
                     }
                 />
@@ -326,14 +311,6 @@ const TargetList: React.FC = () => {
                 onClose={() => model.setSavedFiltersOpen(false)}
             />
 
-            <ImportTargetsModal
-                open={model.importModalOpen}
-                onCancel={() => model.setImportModalOpen(false)}
-                onSuccess={() => {
-                    model.setImportModalOpen(false);
-                    model.refetchTargets();
-                }}
-            />
 
             {/* New Phase 2-6 Modals */}
             <BulkAutoConfirmModal

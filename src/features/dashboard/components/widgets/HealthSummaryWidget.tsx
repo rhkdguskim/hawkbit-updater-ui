@@ -204,7 +204,7 @@ export const HealthSummaryWidget: React.FC<HealthSummaryWidgetProps> = ({
         // Determine status based on rules from request doc
         if (pausedRollouts > 0) {
             reasons.push(t('health.pausedRolloutsReason', { count: pausedRollouts }));
-            status = 'CRITICAL';
+            status = 'WARNING';
         }
 
         if (errorRollouts > 0) {

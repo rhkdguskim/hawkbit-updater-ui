@@ -166,6 +166,7 @@ export const isActionInProgress = (status?: string): boolean => {
         'downloading',
         'wait_for_confirmation',
         'waiting_for_confirmation',
+        'retrieved',
     ].includes(normalized);
 };
 

@@ -21,7 +21,7 @@ import { StatusTag, StatusQuickFilters, type StatusFilterOption } from '@/compon
 import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction, type FilterValue, type FilterField } from '@/components/patterns';
 import type { ColumnsType } from 'antd/es/table';
 import { buildQueryFromFilterValues } from '@/utils/fiql';
-import { getActionDisplayStatus, isActionInProgress } from '@/utils/statusUtils';
+import { getActionDisplayStatus, isActionInProgress, isActionCanceled } from '@/utils/statusUtils';
 
 dayjs.extend(relativeTime);
 
@@ -269,15 +269,15 @@ const ActionList: React.FC = () => {
                 return (
                     <a
                         onClick={(e) => { e.stopPropagation(); navigate(`/targets/${targetId}`); }}
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                     >
-                        <Space direction="vertical" size={2}>
-                            <Text strong ellipsis style={{ maxWidth: 140, fontSize: 'var(--ant-font-size-sm)' }}>
+                        <Space size={4} align="baseline">
+                            <Text strong style={{ fontSize: '13px', lineHeight: '20px' }}>
                                 {targetName}
                             </Text>
                             {targetIp ? (
-                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-xs)' }}>
-                                    ({targetIp})
+                                <Text type="secondary" style={{ fontSize: '11px', fontWeight: 400 }}>
+                                    {targetIp}
                                 </Text>
                             ) : null}
                         </Space>
@@ -354,7 +354,11 @@ const ActionList: React.FC = () => {
                             size="small"
                             danger
                             icon={<StopOutlined />}
-                            disabled={!isActionInProgress(record.status)}
+                            disabled={
+                                !isActionInProgress(record.status) ||
+                                isActionCanceled(record) ||
+                                record.type?.toLowerCase() === 'cancel'
+                            }
                             onClick={(e) => {
                                 e.stopPropagation();
                                 const targetId = getTargetId(record);
