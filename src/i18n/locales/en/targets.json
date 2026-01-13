@@ -175,7 +175,32 @@
         "online": "Online",
         "offline": "Offline",
         "neverConnected": "Never Connected",
-        "connectivity": "Connectivity"
+        "connectivity": "Connectivity",
+        "all": "Show all targets",
+        "errorOnly": "Show error targets only",
+        "offlineOnly": "Show offline targets only",
+        "pendingOnly": "Show pending targets only",
+        "inSyncOnly": "Show in-sync targets only"
+    },
+    "columnCustomizer": {
+        "title": "Customize Columns",
+        "description": "Select columns to display",
+        "button": "Columns"
+    },
+    "contextMenu": {
+        "copyControllerId": "Copy Controller ID"
+    },
+    "bulkAutoConfirm": {
+        "activateTitle": "Activate Auto Confirm",
+        "deactivateTitle": "Deactivate Auto Confirm",
+        "activateDesc": "Auto-confirm will be enabled for {{count}} target(s)",
+        "deactivateDesc": "Auto-confirm will be disabled for {{count}} target(s)",
+        "targetList": "Selected targets:",
+        "success": "Successfully updated {{count}} target(s)",
+        "partialSuccess": "Updated {{success}}, failed {{failed}}",
+        "failed": "All operations failed",
+        "partialCompleteTitle": "Completed with errors",
+        "failedTargets": "Failed targets:"
     },
     "actions": {
         "viewDetails": "View Details",

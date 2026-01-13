@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { EditableCell } from '@/components/common';
-import { TargetTagsCell, TargetTypeCell } from './index';
+import { TargetTagsCell, TargetTypeCell, InstalledModulesCell } from './index';
 import type { MgmtTarget, MgmtTargetType } from '@/api/generated/model';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -139,9 +139,12 @@ export const getTargetTableColumns = ({
             render: (_, record) => {
                 const dsInfo = getInstalledDsInfo(record);
                 return dsInfo ? (
-                    <Link to={`/distributions/sets/${dsInfo.id}`}>
-                        <Text style={{ fontSize: 12 }}>{dsInfo.label}</Text>
-                    </Link>
+                    <Space direction="vertical" size={0}>
+                        <Link to={`/distributions/sets/${dsInfo.id}`}>
+                            <Text style={{ fontSize: 12 }}>{dsInfo.label}</Text>
+                        </Link>
+                        <InstalledModulesCell distributionSetId={Number(dsInfo.id)} />
+                    </Space>
                 ) : (
                     <Text type="secondary" style={{ fontSize: 12 }}>-</Text>
                 );

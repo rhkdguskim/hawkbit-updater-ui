@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import { TagOutlined, AppstoreOutlined, DeleteOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import React, { useMemo, useCallback } from 'react';
+import { TagOutlined, AppstoreOutlined, DeleteOutlined, UploadOutlined, DownloadOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
+import { Button, Space, message } from 'antd';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import {
     DeleteTargetModal,
@@ -11,15 +11,85 @@ import {
     BulkDeleteTargetModal,
     SavedFiltersModal,
     ImportTargetsModal,
+    QuickFilters,
+    ColumnCustomizer,
+    BulkAutoConfirmModal,
+    TargetDetailDrawer,
 } from './components';
 import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction } from '@/components/patterns';
 import { useTargetListModel } from './hooks/useTargetListModel';
-import { getTargetTableColumns } from './components/TargetTableColumns';
+import { getTargetColumns } from './config/targetListConfig';
 import type { MgmtTarget } from '@/api/generated/model';
+import { isTargetOnline } from '@/entities';
+import type { QuickFilterType } from './components/QuickFilters';
 
 const TargetList: React.FC = () => {
     const model = useTargetListModel();
     const { isAdmin, t } = model;
+
+    // Handle quick filter change - use server-supported filters
+    const handleQuickFilterChange = useCallback((filter: QuickFilterType) => {
+        model.setQuickFilter(filter);
+        if (filter === 'all') {
+            model.handleFiltersChange([]);
+        } else if (filter === 'error') {
+            model.handleFiltersChange([{
+                id: 'quick-error',
+                field: 'updateStatus',
+                fieldLabel: t('table.updateStatus'),
+                operator: 'equals',
+                operatorLabel: '=',
+                value: 'error',
+                displayValue: t('status.error'),
+            }]);
+        } else if (filter === 'offline') {
+            // Client-side filtering - don't send API filter, just set quick filter state
+            model.handleFiltersChange([]);
+        } else if (filter === 'pending') {
+            model.handleFiltersChange([{
+                id: 'quick-pending',
+                field: 'updateStatus',
+                fieldLabel: t('table.updateStatus'),
+                operator: 'equals',
+                operatorLabel: '=',
+                value: 'pending',
+                displayValue: t('status.pending'),
+            }]);
+        } else if (filter === 'inSync') {
+            model.handleFiltersChange([{
+                id: 'quick-insync',
+                field: 'updateStatus',
+                fieldLabel: t('table.updateStatus'),
+                operator: 'equals',
+                operatorLabel: '=',
+                value: 'in_sync',
+                displayValue: t('status.inSync'),
+            }]);
+        }
+    }, [model, t]);
+
+    // Handle detail drawer open
+    const handleViewInDrawer = useCallback((target: MgmtTarget) => {
+        model.setDrawerTarget(target);
+        model.setDetailDrawerOpen(true);
+    }, [model]);
+
+    // Column labels for customizer
+    const columnLabels = useMemo(() => ({
+        name: t('table.name'),
+        ipAddress: t('table.ipAddress'),
+        targetType: t('table.targetType'),
+        tags: t('table.tags'),
+        status: t('table.status'),
+        updateStatus: t('table.updateStatus'),
+        installedDS: t('table.installedDS'),
+        lastControllerRequestAt: t('table.lastControllerRequest'),
+        autoConfirmActive: t('table.autoConfirm'),
+        lastModifiedAt: t('table.lastModified'),
+        createdAt: t('overview.created'),
+        securityToken: t('overview.securityToken'),
+        address: t('overview.address'),
+    }), [t]);
 
     // UI-only derived values
     const selectionActions: ToolbarAction[] = useMemo(() => {
@@ -36,7 +106,24 @@ const TargetList: React.FC = () => {
                 icon: <AppstoreOutlined />,
                 onClick: () => model.setBulkTypeModalOpen(true),
             },
-
+            {
+                key: 'activateAutoConfirm',
+                label: t('autoConfirm.activate'),
+                icon: <CheckCircleOutlined />,
+                onClick: () => {
+                    model.setBulkAutoConfirmMode('activate');
+                    model.setBulkAutoConfirmModalOpen(true);
+                },
+            },
+            {
+                key: 'deactivateAutoConfirm',
+                label: t('autoConfirm.deactivate'),
+                icon: <StopOutlined />,
+                onClick: () => {
+                    model.setBulkAutoConfirmMode('deactivate');
+                    model.setBulkAutoConfirmModalOpen(true);
+                },
+            },
         ];
         if (isAdmin) {
             actions.push({
@@ -50,15 +137,18 @@ const TargetList: React.FC = () => {
         return actions;
     }, [t, isAdmin, model]);
 
-    const columns = useMemo(() => getTargetTableColumns({
+    const columns = useMemo(() => getTargetColumns({
         t,
         isAdmin,
         availableTypes: model.availableTypes,
-        onView: (target) => model.handleEditTarget(target),
-        onEdit: (target) => model.handleEditTarget(target),
+        visibleColumns: model.visibleColumns,
+        onView: handleViewInDrawer,
         onDelete: (target) => model.handleDeleteClick(target),
-        onInlineUpdate: model.handleInlineUpdate,
-    }), [t, isAdmin, model]);
+        onCopySecurityToken: (token) => {
+            navigator.clipboard.writeText(token);
+            message.success(t('common:actions.copied', { defaultValue: 'Copied!' }));
+        },
+    }), [t, isAdmin, model.availableTypes, model.visibleColumns, handleViewInDrawer, model]);
 
     return (
         <StandardListLayout
@@ -78,7 +168,18 @@ const TargetList: React.FC = () => {
                     onApplySavedFilter={model.handleApplySavedFilter}
                     onManageSavedFilters={() => model.setSavedFiltersOpen(true)}
                     extra={
-                        <>
+                        <Space>
+                            <QuickFilters
+                                t={t}
+                                activeFilter={model.quickFilter}
+                                onFilterChange={handleQuickFilterChange}
+                            />
+                            <ColumnCustomizer
+                                t={t}
+                                visibleColumns={model.visibleColumns}
+                                onVisibilityChange={model.setVisibleColumns}
+                                columnLabels={columnLabels}
+                            />
                             <Button
                                 icon={<UploadOutlined />}
                                 onClick={() => model.setImportModalOpen(true)}
@@ -93,7 +194,7 @@ const TargetList: React.FC = () => {
                             >
                                 {t('common:actions.export', { defaultValue: 'Export' })}
                             </Button>
-                        </>
+                        </Space>
                     }
                 />
             }
@@ -106,7 +207,13 @@ const TargetList: React.FC = () => {
             >
                 <EnhancedTable<MgmtTarget>
                     columns={columns}
-                    dataSource={model.targetsData?.content || []}
+                    dataSource={
+                        model.quickFilter === 'offline'
+                            ? (model.targetsData?.content || []).filter(target =>
+                                target.pollStatus?.lastRequestAt && !isTargetOnline(target)
+                            )
+                            : (model.targetsData?.content || [])
+                    }
                     rowKey="controllerId"
                     loading={model.targetsLoading}
                     selectedRowKeys={model.selectedTargetIds}
@@ -125,9 +232,13 @@ const TargetList: React.FC = () => {
                     onChange={model.handleTableChange}
                     scroll={{ x: 1340 }}
                     locale={{ emptyText: t('noTargets') }}
+                    onRow={(record) => ({
+                        onDoubleClick: () => handleViewInDrawer(record),
+                    })}
                 />
             </DataView>
 
+            {/* Existing Modals */}
             <BulkAssignTagsModal
                 open={model.bulkTagsModalOpen}
                 targetIds={model.selectedTargetIds as string[]}
@@ -224,8 +335,34 @@ const TargetList: React.FC = () => {
                 }}
             />
 
+            {/* New Phase 2-6 Modals */}
+            <BulkAutoConfirmModal
+                open={model.bulkAutoConfirmModalOpen}
+                targetIds={model.selectedTargetIds as string[]}
+                mode={model.bulkAutoConfirmMode}
+                t={t}
+                onCancel={() => model.setBulkAutoConfirmModalOpen(false)}
+                onSuccess={() => {
+                    model.setBulkAutoConfirmModalOpen(false);
+                    model.setSelectedTargetIds([]);
+                    model.refetchTargets();
+                }}
+            />
+
+            <TargetDetailDrawer
+                open={model.detailDrawerOpen}
+                target={model.drawerTarget}
+                loading={false}
+                t={t}
+                onClose={() => {
+                    model.setDetailDrawerOpen(false);
+                    model.setDrawerTarget(null);
+                }}
+            />
+
         </StandardListLayout>
     );
 };
 
 export default TargetList;
+

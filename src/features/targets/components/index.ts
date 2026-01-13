@@ -14,3 +14,13 @@ export { TargetTagsCell } from './TargetTagsCell';
 export { TargetTypeCell } from './TargetTypeCell';
 export { ImportTargetsModal } from './ImportTargetsModal';
 export { default as BulkEditMetadataModal } from './BulkEditMetadataModal';
+export { InstalledModulesCell } from './InstalledModulesCell';
+
+// New Phase 2-6 Components
+export { StatusIndicator, UpdateStatusIndicator } from './StatusIndicator';
+export { QuickFilters, type QuickFilterType } from './QuickFilters';
+export { ColumnCustomizer } from './ColumnCustomizer';
+export { BulkAutoConfirmModal } from './BulkAutoConfirmModal';
+export { TargetContextMenu } from './TargetContextMenu';
+export { TargetDetailDrawer } from './TargetDetailDrawer';
+

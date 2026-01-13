@@ -41,7 +41,7 @@ export const useTargetListModel = () => {
     } = useServerTable<MgmtTarget>({
         syncToUrl: true,
         defaultSort: undefined,
-        allowedSortFields: [], // Only allow reliably sortable fields
+        allowedSortFields: ['name', 'controllerId', 'lastModifiedAt', 'createdAt', 'lastControllerRequestAt'],
     });
 
     // State
@@ -59,7 +59,21 @@ export const useTargetListModel = () => {
     const [formModalOpen, setFormModalOpen] = useState(false);
     const [assignModalOpen, setAssignModalOpen] = useState(false);
 
-    // Entity States for Modals
+    // New Phase 2-6 Modal States
+    const [bulkAutoConfirmModalOpen, setBulkAutoConfirmModalOpen] = useState(false);
+    const [bulkAutoConfirmMode, setBulkAutoConfirmMode] = useState<'activate' | 'deactivate'>('activate');
+    const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
+    const [drawerTarget, setDrawerTarget] = useState<MgmtTarget | null>(null);
+
+    // Column visibility state
+    const [visibleColumns, setVisibleColumns] = useState<string[]>([
+        'name', 'ipAddress', 'targetType', 'tags', 'status', 'updateStatus', 'installedDS', 'lastControllerRequestAt'
+    ]);
+
+    // Quick filter state
+    const [quickFilter, setQuickFilter] = useState<'all' | 'error' | 'offline' | 'pending' | 'inSync'>('all');
+
+    // Entity States for Modals (restored)
     const [targetToDelete, setTargetToDelete] = useState<MgmtTarget | null>(null);
     const [editingTarget, setEditingTarget] = useState<MgmtTarget | null>(null);
     const [targetToAssign, setTargetToAssign] = useState<MgmtTarget | null>(null);
@@ -71,10 +85,12 @@ export const useTargetListModel = () => {
     const availableTags = useMemo(() => (tagsData?.content as MgmtTag[]) || [], [tagsData]);
     const availableTypes = useMemo(() => (typesData?.content as MgmtTargetType[]) || [], [typesData]);
 
-    // Filter Building
+    // Filter Building - Enhanced with new filter fields
     const filterFields: FilterField[] = useMemo(() => [
         { key: 'name', label: t('table.name'), type: 'text' },
         { key: 'controllerId', label: t('table.controllerId'), type: 'text' },
+        { key: 'ipAddress', label: t('table.ipAddress'), type: 'text' },
+        { key: 'description', label: t('form.description'), type: 'text' },
         {
             key: 'targetType',
             label: t('table.targetType'),
@@ -95,6 +111,16 @@ export const useTargetListModel = () => {
                 { value: 'in_sync', label: t('status.inSync') },
                 { value: 'pending', label: t('status.pending') },
                 { value: 'error', label: t('status.error') },
+                { value: 'registered', label: t('status.registered') },
+            ],
+        },
+        {
+            key: 'autoConfirmActive',
+            label: t('table.autoConfirm'),
+            type: 'select',
+            options: [
+                { value: 'true', label: t('autoConfirm.enabled') },
+                { value: 'false', label: t('autoConfirm.disabled') },
             ],
         },
     ], [t, availableTypes, availableTags]);
@@ -327,6 +353,16 @@ export const useTargetListModel = () => {
         deleteModalOpen, setDeleteModalOpen,
         formModalOpen, setFormModalOpen,
         assignModalOpen, setAssignModalOpen,
+
+        // New Phase 2-6 Modal States
+        bulkAutoConfirmModalOpen, setBulkAutoConfirmModalOpen,
+        bulkAutoConfirmMode, setBulkAutoConfirmMode,
+        detailDrawerOpen, setDetailDrawerOpen,
+        drawerTarget, setDrawerTarget,
+
+        // Column & Quick Filter States
+        visibleColumns, setVisibleColumns,
+        quickFilter, setQuickFilter,
 
         // Entity States
         targetToDelete,

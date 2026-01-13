@@ -18,7 +18,7 @@ import type { MgmtTarget, MgmtTag, MgmtTargetType } from '@/api/generated/model'
 import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { TargetTagsCell } from './TargetTagsCell';
+import { TargetTagsCell, InstalledModulesCell } from './index';
 import { TargetTypeCell } from './TargetTypeCell';
 import { SelectionToolbar, type ToolbarAction } from '@/components/patterns';
 
@@ -319,9 +319,12 @@ const TargetTable: React.FC<TargetTableProps> = ({
                 return (
                     <Space direction="vertical" size={0}>
                         {dsInfo ? (
-                            <Link to={`/distributions/sets/${dsInfo.id}`}>
-                                <Text strong>{dsInfo.label}</Text>
-                            </Link>
+                            <>
+                                <Link to={`/distributions/sets/${dsInfo.id}`}>
+                                    <Text strong>{dsInfo.label}</Text>
+                                </Link>
+                                <InstalledModulesCell distributionSetId={Number(dsInfo.id)} />
+                            </>
                         ) : (
                             <Text type="secondary">-</Text>
                         )}

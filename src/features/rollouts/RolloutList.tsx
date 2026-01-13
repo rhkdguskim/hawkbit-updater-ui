@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Space, Button, Typography, Progress, Tooltip, message } from 'antd';
-import { EyeOutlined, EditOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { EyeOutlined, EditOutlined, PauseCircleOutlined, PlayCircleOutlined, ExclamationCircleOutlined, SyncOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useGetRollouts, usePause, useResume } from '@/api/generated/rollouts/rollouts';
 import type { MgmtRolloutResponseBody } from '@/api/generated/model';
@@ -13,7 +13,7 @@ import { useServerTable } from '@/hooks/useServerTable';
 import dayjs from 'dayjs';
 import { buildQueryFromFilterValues } from '@/utils/fiql';
 import RolloutCreateModal from './RolloutCreateModal';
-import { StatusTag } from '@/components/common/StatusTag';
+import { StatusTag, StatusQuickFilters, type StatusFilterOption } from '@/components/common';
 import type { ColumnsType } from 'antd/es/table';
 
 const { Text } = Typography;
@@ -24,6 +24,7 @@ const RolloutList: React.FC = () => {
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [quickFilter, setQuickFilter] = useState('all');
 
     // Pause/Resume mutations
     const pauseMutation = usePause({
@@ -88,6 +89,33 @@ const RolloutList: React.FC = () => {
         },
     ], [t]);
 
+    // Quick filter options - only use valid API statuses
+    const quickFilterOptions: StatusFilterOption[] = useMemo(() => [
+        { key: 'running', label: t('filter.running'), icon: <SyncOutlined spin />, color: 'processing' },
+        { key: 'paused', label: t('filter.paused'), icon: <PauseCircleOutlined />, color: 'warning' },
+        { key: 'finished', label: t('filter.finished'), icon: <CheckCircleOutlined />, color: 'success' },
+        { key: 'stopped', label: t('filter.stopped'), icon: <ExclamationCircleOutlined />, color: 'error', danger: true },
+    ], [t]);
+
+    // Handle quick filter change
+    const handleQuickFilterChange = useCallback((filter: string) => {
+        setQuickFilter(filter);
+        if (filter === 'all') {
+            setFilters([]);
+        } else {
+            setFilters([{
+                id: `quick-${filter}`,
+                field: 'status',
+                fieldLabel: t('columns.status'),
+                operator: 'equals',
+                operatorLabel: '=',
+                value: filter,
+                displayValue: t(`filter.${filter}`),
+            }]);
+        }
+        resetPagination();
+    }, [t, resetPagination]);
+
     // Build RSQL query from filters
     const buildFinalQuery = useCallback(() => buildQueryFromFilterValues(filters), [filters]);
 
@@ -111,8 +139,9 @@ const RolloutList: React.FC = () => {
     // Handle filter change
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
         setFilters(newFilters);
+        setQuickFilter('all'); // Reset quick filter when manual filter applied
         resetPagination();
-    }, [resetPagination, setFilters]);
+    }, [resetPagination]);
 
     const columns: ColumnsType<MgmtRolloutResponseBody> = [
         {
@@ -235,6 +264,14 @@ const RolloutList: React.FC = () => {
                     canAdd={isAdmin}
                     addLabel={t('createRollout')}
                     loading={isFetching}
+                    extra={
+                        <StatusQuickFilters
+                            t={t}
+                            options={quickFilterOptions}
+                            activeFilter={quickFilter}
+                            onFilterChange={handleQuickFilterChange}
+                        />
+                    }
                 />
             }
         >

@@ -175,7 +175,32 @@
         "online": "在线",
         "offline": "离线",
         "neverConnected": "从未连接",
-        "connectivity": "连接性"
+        "connectivity": "连接性",
+        "all": "显示所有目标",
+        "errorOnly": "仅显示错误目标",
+        "offlineOnly": "仅显示离线目标",
+        "pendingOnly": "仅显示挂起目标",
+        "inSyncOnly": "仅显示已同步目标"
+    },
+    "columnCustomizer": {
+        "title": "自定义列",
+        "description": "选择要显示的列",
+        "button": "列"
+    },
+    "contextMenu": {
+        "copyControllerId": "复制控制 ID"
+    },
+    "bulkAutoConfirm": {
+        "activateTitle": "激活自动确认",
+        "deactivateTitle": "停用自动确认",
+        "activateDesc": "将为 {{count}} 个目标启用自动确认",
+        "deactivateDesc": "将为 {{count}} 个目标禁用自动确认",
+        "targetList": "已选择的目标：",
+        "success": "成功更新 {{count}} 个目标",
+        "partialSuccess": "更新了 {{success}} 个，失败 {{failed}} 个",
+        "failed": "所有操作都失败了",
+        "partialCompleteTitle": "完成但有错误",
+        "failedTargets": "失败的目标："
     },
     "actions": {
         "viewDetails": "查看详情",

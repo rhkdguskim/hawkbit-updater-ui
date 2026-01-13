@@ -4,6 +4,8 @@ import {
     EyeOutlined,
     StopOutlined,
     ThunderboltOutlined,
+    CheckCircleOutlined,
+    ClockCircleOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useGetActions } from '@/api/generated/actions/actions';
@@ -15,43 +17,15 @@ import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useServerTable } from '@/hooks/useServerTable';
-import { StatusTag } from '@/components/common/StatusTag';
+import { StatusTag, StatusQuickFilters, type StatusFilterOption } from '@/components/common';
 import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction, type FilterValue, type FilterField } from '@/components/patterns';
 import type { ColumnsType } from 'antd/es/table';
 import { buildQueryFromFilterValues } from '@/utils/fiql';
+import { getActionDisplayStatus, isActionInProgress } from '@/utils/statusUtils';
 
 dayjs.extend(relativeTime);
 
 const { Text } = Typography;
-
-
-
-const isActionErrored = (action: MgmtAction) => {
-    const status = action.status?.toLowerCase() || '';
-    const detail = action.detailStatus?.toLowerCase() || '';
-    const hasErrorStatus = status === 'error' || status === 'failed';
-    const hasErrorDetail = detail.includes('error') || detail.includes('failed');
-    const hasErrorCode = typeof action.lastStatusCode === 'number' && action.lastStatusCode >= 400;
-    return hasErrorStatus || hasErrorDetail || hasErrorCode;
-};
-
-const getActionDisplayStatus = (action: MgmtAction) => {
-    if (isActionErrored(action)) return 'error';
-    return action.status || 'unknown';
-};
-
-const isCancelableStatus = (status?: string) => {
-    const normalized = status?.toLowerCase() || '';
-    return [
-        'running',
-        'pending',
-        'scheduled',
-        'retrieving',
-        'downloading',
-        'wait_for_confirmation',
-        'waiting_for_confirmation',
-    ].includes(normalized);
-};
 
 const ActionList: React.FC = () => {
     const { t } = useTranslation(['actions', 'common']);
@@ -68,6 +42,7 @@ const ActionList: React.FC = () => {
     const [selectedActions, setSelectedActions] = useState<MgmtAction[]>([]);
     const [selectedTargetIdsMap, setSelectedTargetIdsMap] = useState<Record<number, string>>({});
     const [filters, setFilters] = useState<FilterValue[]>([]);
+    const [quickFilter, setQuickFilter] = useState('all');
 
     // Filter fields
     const filterFields: FilterField[] = useMemo(() => [
@@ -113,7 +88,7 @@ const ActionList: React.FC = () => {
                 refetchInterval: (query) => {
                     // Poll faster if there are active actions in the current view
                     const hasActive = query.state.data?.content?.some(action =>
-                        isCancelableStatus(action.status)
+                        isActionInProgress(action.status)
                     );
                     return hasActive ? 5000 : 20000;
                 }
@@ -186,7 +161,7 @@ const ActionList: React.FC = () => {
         if (selectedActions.length === 0) return;
 
         const cancelableIds = selectedActions
-            .filter(action => isCancelableStatus(action.status))
+            .filter(action => isActionInProgress(action.status))
             .map(action => action.id)
             .filter((id): id is number => typeof id === 'number');
 
@@ -224,14 +199,40 @@ const ActionList: React.FC = () => {
         }
     }, [selectedActions, selectedTargetIdsMap, cancelMutation, t, refetch]);
 
+    // Quick filter options - only use valid API statuses (pending, finished)
+    const quickFilterOptions: StatusFilterOption[] = useMemo(() => [
+        { key: 'pending', label: t('common:status.pending'), icon: <ClockCircleOutlined />, color: 'warning' },
+        { key: 'finished', label: t('common:status.finished'), icon: <CheckCircleOutlined />, color: 'success' },
+    ], [t]);
+
+    // Handle quick filter change
+    const handleQuickFilterChange = useCallback((filter: string) => {
+        setQuickFilter(filter);
+        if (filter === 'all') {
+            setFilters([]);
+        } else {
+            setFilters([{
+                id: `quick-${filter}`,
+                field: 'status',
+                fieldLabel: t('columns.status'),
+                operator: 'equals',
+                operatorLabel: '=',
+                value: filter,
+                displayValue: t(`common:status.${filter}`),
+            }]);
+        }
+        resetPagination();
+    }, [t, resetPagination]);
+
     // Handle filter change
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
         setFilters(newFilters);
+        setQuickFilter('all'); // Reset quick filter when manual filter applied
         resetPagination();
     }, [resetPagination]);
 
     const cancelableSelectionCount = useMemo(
-        () => selectedActions.filter(action => isCancelableStatus(action.status)).length,
+        () => selectedActions.filter(action => isActionInProgress(action.status)).length,
         [selectedActions]
     );
 
@@ -353,7 +354,7 @@ const ActionList: React.FC = () => {
                             size="small"
                             danger
                             icon={<StopOutlined />}
-                            disabled={!isCancelableStatus(record.status)}
+                            disabled={!isActionInProgress(record.status)}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 const targetId = getTargetId(record);
@@ -399,6 +400,14 @@ const ActionList: React.FC = () => {
                     onFiltersChange={handleFiltersChange}
                     onRefresh={refetch}
                     loading={isLoading || isFetching}
+                    extra={
+                        <StatusQuickFilters
+                            t={t}
+                            options={quickFilterOptions}
+                            activeFilter={quickFilter}
+                            onFilterChange={handleQuickFilterChange}
+                        />
+                    }
                 />
             }
         >

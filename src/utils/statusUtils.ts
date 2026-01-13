@@ -116,3 +116,73 @@ export const translateStatusMessage = (
     return message;
 };
 
+/**
+ * Action Status Utilities
+ * Centralized logic for determining action display status
+ */
+
+export interface ActionLike {
+    status?: string;
+    detailStatus?: string;
+    lastStatusCode?: number;
+}
+
+/**
+ * Check if action is in canceled/canceling state
+ */
+export const isActionCanceled = (action: ActionLike): boolean => {
+    const status = action.status?.toLowerCase() || '';
+    return status === 'canceled' || status === 'cancelled' ||
+        status === 'canceling' || status === 'cancelling';
+};
+
+/**
+ * Check if action has error status
+ */
+export const isActionErrored = (action: ActionLike): boolean => {
+    const status = action.status?.toLowerCase() || '';
+    const detail = action.detailStatus?.toLowerCase() || '';
+
+    // Don't treat canceled as error
+    if (isActionCanceled(action)) return false;
+
+    const hasErrorStatus = status === 'error' || status === 'failed';
+    const hasErrorDetail = detail.includes('error') || detail.includes('failed');
+    const hasErrorCode = typeof action.lastStatusCode === 'number' && action.lastStatusCode >= 400;
+
+    return hasErrorStatus || hasErrorDetail || hasErrorCode;
+};
+
+/**
+ * Check if action is in progress (cancellable)
+ */
+export const isActionInProgress = (status?: string): boolean => {
+    const normalized = status?.toLowerCase() || '';
+    return [
+        'running',
+        'pending',
+        'scheduled',
+        'retrieving',
+        'downloading',
+        'wait_for_confirmation',
+        'waiting_for_confirmation',
+    ].includes(normalized);
+};
+
+/**
+ * Get display status for an action with proper priority:
+ * canceled > canceling > error > actual status
+ */
+export const getActionDisplayStatus = (action: ActionLike): string => {
+    const status = action.status?.toLowerCase() || '';
+
+    // 1. Canceled states (highest priority)
+    if (status === 'canceled' || status === 'cancelled') return 'canceled';
+    if (status === 'canceling' || status === 'cancelling') return 'canceling';
+
+    // 2. Error states
+    if (isActionErrored(action)) return 'error';
+
+    // 3. Return actual status
+    return action.status || 'unknown';
+};

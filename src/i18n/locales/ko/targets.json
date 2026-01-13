@@ -185,7 +185,32 @@
         "online": "온라인",
         "offline": "오프라인",
         "neverConnected": "미접속",
-        "connectivity": "연결"
+        "connectivity": "연결",
+        "all": "전체 타겟 보기",
+        "errorOnly": "오류 타겟만 보기",
+        "offlineOnly": "오프라인 타겟만 보기",
+        "pendingOnly": "대기 중 타겟만 보기",
+        "inSyncOnly": "동기화된 타겟만 보기"
+    },
+    "columnCustomizer": {
+        "title": "컬럼 설정",
+        "description": "표시할 컬럼을 선택하세요",
+        "button": "컬럼"
+    },
+    "contextMenu": {
+        "copyControllerId": "컨트롤러 ID 복사"
+    },
+    "bulkAutoConfirm": {
+        "activateTitle": "자동 확인 활성화",
+        "deactivateTitle": "자동 확인 비활성화",
+        "activateDesc": "{{count}}개 타겟에 자동 확인이 활성화됩니다",
+        "deactivateDesc": "{{count}}개 타겟에 자동 확인이 비활성화됩니다",
+        "targetList": "선택된 타겟:",
+        "success": "{{count}}개 타겟이 업데이트되었습니다",
+        "partialSuccess": "{{success}}개 성공, {{failed}}개 실패",
+        "failed": "모든 작업이 실패했습니다",
+        "partialCompleteTitle": "오류와 함께 완료됨",
+        "failedTargets": "실패한 타겟:"
     },
     "actions": {
         "viewDetails": "상세 보기",

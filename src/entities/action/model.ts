@@ -13,9 +13,22 @@ interface ActionLike {
 }
 
 /**
+ * Checks if an action is in canceled/canceling state.
+ */
+export const isActionCanceled = (action: ActionLike): boolean => {
+    const status = (action.status as string)?.toLowerCase() || '';
+    return status === 'canceled' || status === 'cancelled' ||
+        status === 'canceling' || status === 'cancelling';
+};
+
+/**
  * Checks if an action has an error state.
+ * Note: Canceled actions are NOT treated as errors.
  */
 export const isActionErrored = (action: ActionLike): boolean => {
+    // Canceled actions are not errors
+    if (isActionCanceled(action)) return false;
+
     const status = (action.status as string)?.toLowerCase() || '';
     const detail = action.detailStatus?.toLowerCase() || '';
 

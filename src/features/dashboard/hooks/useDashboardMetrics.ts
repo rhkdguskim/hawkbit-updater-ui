@@ -146,10 +146,13 @@ export const useDashboardMetrics = () => {
         ['scheduled', 'pending', 'retrieving', 'running', 'waiting_for_confirmation'].includes(a.status?.toLowerCase() || '') &&
         !isActionErrored(a)
     ).length;
-    const activeActionsCount = recentActions.filter(a =>
-        ['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'canceling', 'retrieved'].includes(a.status?.toLowerCase() || '') &&
-        !isActionErrored(a)
-    ).length;
+    const activeActionsCount = recentActions.filter(a => {
+        const status = a.status?.toLowerCase() || '';
+        // Exclude canceling/canceled from active count
+        if (['canceled', 'canceling', 'cancelled', 'cancelling'].includes(status)) return false;
+        return ['running', 'pending', 'scheduled', 'retrieving', 'downloading', 'retrieved'].includes(status) &&
+            !isActionErrored(a);
+    }).length;
     const finishedCount = recentActions.filter(a => a.status?.toLowerCase() === 'finished' && !isActionErrored(a)).length;
     const errorCount = recentActions.filter(a => isActionErrored(a)).length;
 

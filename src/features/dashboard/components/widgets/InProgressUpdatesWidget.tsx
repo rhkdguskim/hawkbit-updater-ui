@@ -174,7 +174,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
 
     const currentAction = actionData || item.action;
 
-    // Polling for action stats history
+    // Polling for action stats history - MUST be before any conditional returns
     const { data: statusHistoryData } = useGetActionStatusList(
         item.target.controllerId!,
         item.action.id!,
@@ -189,6 +189,12 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
     );
 
     const statusHistory = statusHistoryData?.content || [];
+
+    // Hide item if polled status shows it's no longer in progress
+    const currentStatus = currentAction.status?.toLowerCase() || '';
+    if (['canceled', 'canceling', 'cancelled', 'cancelling', 'finished'].includes(currentStatus)) {
+        return null;
+    }
 
     const getDelayText = (startTime?: number): string => {
         if (!startTime || !currentTime) return t('inProgress.justNow');
