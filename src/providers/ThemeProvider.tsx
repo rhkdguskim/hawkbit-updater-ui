@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ConfigProvider } from 'antd';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { lightTheme, darkTheme } from '@/theme';
@@ -9,42 +9,18 @@ interface ThemeProviderProps {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     const mode = useThemeStore(state => state.mode);
-    const getSystemTheme = () => {
-        if (typeof window !== 'undefined' && window.matchMedia) {
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        return 'light';
-    };
-    const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(getSystemTheme);
+    const systemTheme = useThemeStore(state => state.systemTheme);
 
-    useEffect(() => {
-        if (mode !== 'system' || typeof window === 'undefined' || !window.matchMedia) return;
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleChange = (event: MediaQueryListEvent) => {
-            setSystemTheme(event.matches ? 'dark' : 'light');
-        };
-
-        setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
-
-        if (mediaQuery.addEventListener) {
-            mediaQuery.addEventListener('change', handleChange);
-            return () => mediaQuery.removeEventListener('change', handleChange);
-        }
-
-        mediaQuery.addListener?.(handleChange);
-        return () => mediaQuery.removeListener?.(handleChange);
-    }, [mode]);
-
+    // Determine the actual theme to apply
     const resolvedTheme = useMemo(() => {
         if (mode === 'system') return systemTheme;
         return mode;
     }, [mode, systemTheme]);
 
-
-    // Apply body background color and class for smooth theme transitions
+    // Sync theme to DOM for global CSS and styling
     useEffect(() => {
         const theme = resolvedTheme === 'dark' ? darkTheme : lightTheme;
-        document.body.style.backgroundColor = theme.token?.colorBgLayout || '#f0f2f5';
+        document.body.style.backgroundColor = theme.token?.colorBgLayout as string || '#f0f2f5';
         document.body.style.transition = 'background-color 0.3s ease';
 
         if (resolvedTheme === 'dark') {
@@ -59,7 +35,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     const currentTheme = resolvedTheme === 'dark' ? darkTheme : lightTheme;
 
     return (
-        <ConfigProvider theme={{ ...currentTheme, cssVar: {} }}>
+        <ConfigProvider theme={{ ...currentTheme, cssVar: { key: 'ant' } }}>
             {children}
         </ConfigProvider>
     );

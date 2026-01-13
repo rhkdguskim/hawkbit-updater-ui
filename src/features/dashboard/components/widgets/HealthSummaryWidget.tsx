@@ -9,6 +9,7 @@ import {
     InfoCircleOutlined,
     ArrowRightOutlined,
 } from '@ant-design/icons';
+import EmergencyStopButton from '@/components/shared/EmergencyStopButton';
 
 const { Text } = Typography;
 
@@ -260,9 +261,12 @@ export const HealthSummaryWidget: React.FC<HealthSummaryWidgetProps> = ({
                     {getStatusIcon(healthData.status)}
                     {t(`actionActivity.status.${healthData.status.toLowerCase()}`, healthData.status)}
                 </StatusBadge>
-                <Tooltip title={t('health.infoTooltip')}>
-                    <InfoCircleOutlined style={{ color: 'var(--ant-color-text-tertiary)', cursor: 'help' }} />
-                </Tooltip>
+                <Flex align="center" gap={8}>
+                    <EmergencyStopButton size="small" />
+                    <Tooltip title={t('health.infoTooltip')}>
+                        <InfoCircleOutlined style={{ color: 'var(--ant-color-text-tertiary)', cursor: 'help' }} />
+                    </Tooltip>
+                </Flex>
             </Flex>
 
             <MetricsGrid>

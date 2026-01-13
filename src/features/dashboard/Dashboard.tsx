@@ -49,19 +49,19 @@ const Dashboard: React.FC = () => {
                         onAnalysisClick={() => setIsFailureModalVisible(true)}
                     />
                 }
-                activeRollouts={
-                    <ActiveRolloutsWidget
-                        isLoading={metrics.isLoading}
-                        activeRollouts={metrics.activeRollouts}
-                        isAdmin={true}
-                    />
-                }
                 actionRequired={
                     <ActionRequiredWidget
                         isLoading={metrics.isLoading}
                         delayedActionsCount={metrics.delayedActionsCount}
                         pendingApprovalsCount={metrics.pendingApprovalRolloutCount}
                         onActionClick={onActionRequiredClick}
+                    />
+                }
+                activeRollouts={
+                    <ActiveRolloutsWidget
+                        isLoading={metrics.isLoading}
+                        activeRollouts={metrics.activeRollouts}
+                        isAdmin={true}
                     />
                 }
                 extraDecision={
@@ -94,6 +94,10 @@ const Dashboard: React.FC = () => {
                             isLoading={metrics.isLoading}
                             stats={metrics.fragmentationStats}
                         />
+                        <InProgressUpdatesWidget
+                            isLoading={metrics.isLoading}
+                            data={metrics.recentActivities}
+                        />
                         <TargetRequestDelayWidget
                             isLoading={metrics.isLoading}
                             averageDelay={metrics.averageDelay}
@@ -105,13 +109,6 @@ const Dashboard: React.FC = () => {
                         />
                     </>
                 }
-                // Control Layer (Middle)
-                inProgressUpdates={
-                    <InProgressUpdatesWidget
-                        isLoading={metrics.isLoading}
-                        data={metrics.recentActivities}
-                    />
-                }
                 // Monitoring Layer (Bottom)
                 statusTrend={
                     <StatusTrendChartEnhanced
@@ -122,7 +119,7 @@ const Dashboard: React.FC = () => {
                     />
                 }
                 actionActivity={
-                    <Flex vertical gap={16} style={{ height: '100%' }}>
+                    <Flex vertical gap={12} style={{ height: '100%' }}>
                         <div style={{ flex: 1 }}>
                             <DeploymentVelocityWidget
                                 isLoading={metrics.isLoading}
@@ -139,7 +136,7 @@ const Dashboard: React.FC = () => {
                     </Flex>
                 }
                 recentlyFinishedActions={
-                    <Flex vertical gap={16} style={{ height: '100%' }}>
+                    <Flex vertical gap={12} style={{ height: '100%' }}>
                         <div style={{ height: 'auto' }}>
                             <ActionActivityWidget
                                 isLoading={metrics.isLoading}

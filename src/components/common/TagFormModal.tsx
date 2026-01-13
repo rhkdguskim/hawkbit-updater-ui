@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { Form, Input, ColorPicker } from 'antd';
+import { Form, Input } from 'antd';
 import { StandardModal } from '@/components/patterns';
+import { PresetColorPicker } from './PresetColorPicker';
 import type { MgmtTag } from '@/api/generated/model';
 
 export interface TagFormValues {
@@ -128,7 +129,7 @@ export const TagFormModal: React.FC<TagFormModalProps> = ({
                     name="colour"
                     label={t.colourLabel}
                 >
-                    <ColorPicker format="hex" />
+                    <PresetColorPicker />
                 </Form.Item>
             </Form>
         </StandardModal>

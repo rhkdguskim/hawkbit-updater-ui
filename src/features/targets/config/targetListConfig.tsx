@@ -106,7 +106,7 @@ export const getTargetColumns = ({
             width: 220,
             render: (_: string, record) => (
                 <Tooltip title={record.description || undefined}>
-                    <Text strong ellipsis style={{ maxWidth: 200, fontSize: 'var(--ant-font-size-sm)' }}>
+                    <Text strong ellipsis style={{ maxWidth: 200, fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
                         {record.name || record.controllerId}
                     </Text>
                 </Tooltip>
@@ -118,7 +118,7 @@ export const getTargetColumns = ({
             key: 'ipAddress',
             width: 130,
             render: (ipAddress: string | undefined) => (
-                <Text style={{ fontSize: 12 }}>{ipAddress || '-'}</Text>
+                <Text style={{ fontSize: 12, fontFamily: 'var(--font-mono)' }}>{ipAddress || '-'}</Text>
             ),
         },
         {
@@ -188,7 +188,11 @@ export const getTargetColumns = ({
             sorter: true,
             width: 150,
             render: (value: number | undefined) =>
-                value ? dayjs(value).format('YYYY-MM-DD HH:mm') : <Text type="secondary">-</Text>,
+                value ? (
+                    <Text style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--ant-font-size-sm)' }}>{dayjs(value).format('YYYY-MM-DD HH:mm')}</Text>
+                ) : (
+                    <Text type="secondary" style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--ant-font-size-sm)' }}>-</Text>
+                ),
         },
         {
             title: t('table.autoConfirm'),
@@ -209,7 +213,11 @@ export const getTargetColumns = ({
             sorter: true,
             width: 150,
             render: (value: number | undefined) =>
-                value ? dayjs(value).format('YYYY-MM-DD HH:mm') : <Text type="secondary">-</Text>,
+                value ? (
+                    <Text style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--ant-font-size-sm)' }}>{dayjs(value).format('YYYY-MM-DD HH:mm')}</Text>
+                ) : (
+                    <Text type="secondary" style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--ant-font-size-sm)' }}>-</Text>
+                ),
         },
         {
             title: t('overview.created', { defaultValue: 'Created' }),
@@ -218,7 +226,11 @@ export const getTargetColumns = ({
             sorter: true,
             width: 150,
             render: (value: number | undefined) =>
-                value ? dayjs(value).format('YYYY-MM-DD HH:mm') : <Text type="secondary">-</Text>,
+                value ? (
+                    <Text style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--ant-font-size-sm)' }}>{dayjs(value).format('YYYY-MM-DD HH:mm')}</Text>
+                ) : (
+                    <Text type="secondary" style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--ant-font-size-sm)' }}>-</Text>
+                ),
         },
         {
             title: t('overview.securityToken'),

@@ -13,8 +13,8 @@ const HeaderRow = styled.div`
 const DecisionLayer = styled.section`
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: clamp(10px, 1.2vw, 16px);
-    min-height: 160px;
+    gap: clamp(6px, 0.8vw, 10px);
+    min-height: 140px;
     flex-shrink: 0;
     padding-bottom: var(--ant-margin, 16px);
     border-bottom: 1px solid var(--ant-color-border-secondary, rgba(0, 0, 0, 0.06));
@@ -31,14 +31,13 @@ const DecisionLayer = styled.section`
 // ===== Stats Layer (Between Top & Middle) =====
 const StatsLayer = styled.section`
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: clamp(10px, 1.2vw, 16px);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: clamp(6px, 0.8vw, 10px);
     flex-shrink: 0;
     padding-bottom: var(--ant-margin, 16px);
-    // border-bottom: 1px solid var(--ant-color-border-secondary, rgba(0, 0, 0, 0.03));
 
     @media (max-width: 1600px) {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     @media (max-width: 900px) {
@@ -46,22 +45,13 @@ const StatsLayer = styled.section`
     }
 `;
 
-// ===== Control Layer (MIDDLE) =====
-const ControlLayer = styled.section`
-    display: flex;
-    flex-direction: column;
-    gap: clamp(10px, 1.2vw, 16px);
-    min-height: 380px;
-    flex: 1;
-    padding-bottom: var(--ant-margin, 16px);
-`;
 
 // ===== Monitoring Layer (BOTTOM) =====
 const MonitoringLayer = styled.section`
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(10px, 1.2vw, 16px);
-    min-height: 280px;
+    gap: clamp(6px, 0.8vw, 10px);
+    min-height: 180px;
     flex-shrink: 0;
     padding-top: var(--ant-margin, 16px);
     border-top: 1px solid var(--ant-color-border-secondary, rgba(0, 0, 0, 0.06));
@@ -129,7 +119,6 @@ export interface ThreeLayerDashboardGridProps {
     statsRow?: React.ReactNode;
     // Control Layer
     activeRollouts: React.ReactNode;
-    inProgressUpdates: React.ReactNode;
     // Monitoring Layer
     statusTrend: React.ReactNode;
     actionActivity: React.ReactNode;
@@ -146,7 +135,6 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
     overviewItem4,
     statsRow,
     activeRollouts,
-    inProgressUpdates,
     statusTrend,
     actionActivity,
     recentlyFinishedActions,
@@ -164,8 +152,8 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
                         {showLayerLabels && <SectionLabel>Overview</SectionLabel>}
                         <DecisionLayer>
                             {healthSummary}
-                            {activeRollouts}
                             {actionRequired}
+                            {activeRollouts}
                             {extraDecision}
                             {overviewItem4}
                         </DecisionLayer>
@@ -179,14 +167,6 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
                             </StatsLayer>
                         </SectionWrapper>
                     )}
-
-                    {/* MIDDLE: Control Layer */}
-                    <SectionWrapper>
-                        {showLayerLabels && <SectionLabel>Operations</SectionLabel>}
-                        <ControlLayer>
-                            {inProgressUpdates}
-                        </ControlLayer>
-                    </SectionWrapper>
 
                     {/* BOTTOM: Monitoring Layer */}
                     <SectionWrapper>

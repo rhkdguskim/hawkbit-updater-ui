@@ -23,7 +23,6 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
     const isAdmin = role === 'Admin';
 
     const [popoverOpen, setPopoverOpen] = useState(false);
-    const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
     const [createModalOpen, setCreateModalOpen] = useState(false);
 
     const { data: currentTags, isLoading } = useGetTags(controllerId, {
@@ -46,7 +45,7 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
                 // Auto-select the newly created tag
                 const newTag = data?.[0];
                 if (newTag?.id) {
-                    setSelectedTagIds(prev => [...prev, newTag.id]);
+                    await assignTagMutation.mutateAsync({ controllerId, targetTagId: newTag.id });
                 }
             },
             onError: (error) => {
@@ -56,46 +55,47 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
     });
 
     const handleOpenChange = (open: boolean) => {
-        if (open) {
-            setSelectedTagIds((currentTags || []).map(tag => tag.id!));
-        }
         setPopoverOpen(open);
-    };
-
-    const handleSave = async () => {
-        const currentTagIds = (currentTags || []).map(tag => tag.id!);
-        const toAssign = selectedTagIds.filter(id => !currentTagIds.includes(id));
-        const toUnassign = currentTagIds.filter(id => !selectedTagIds.includes(id));
-
-        try {
-            for (const tagId of toAssign) {
-                await assignTagMutation.mutateAsync({ controllerId, targetTagId: tagId });
-            }
-            for (const tagId of toUnassign) {
-                await unassignTagMutation.mutateAsync({ controllerId, targetTagId: tagId });
-            }
-            message.success(t('messages.tagsUpdated'));
-            queryClient.invalidateQueries({ queryKey: getGetTargetTagsQueryKey() });
-            queryClient.invalidateQueries({ queryKey: getGetTagsQueryKey(controllerId) });
-            setPopoverOpen(false);
-        } catch (error) {
-            message.error((error as Error).message || t('common:messages.error'));
-        }
     };
 
     const handleCreateTag = (values: TagFormValues) => {
         createTagMutation.mutate({ data: [values] });
     };
 
+    const handleSelect = async (value: number) => {
+        try {
+            await assignTagMutation.mutateAsync({ controllerId, targetTagId: value });
+            message.success(t('tagManagement.tagAssigned'));
+            queryClient.invalidateQueries({ queryKey: getGetTargetTagsQueryKey() });
+            queryClient.invalidateQueries({ queryKey: getGetTagsQueryKey(controllerId) });
+        } catch (error) {
+            message.error((error as Error).message || t('common:error'));
+            // Revert selection if needed (handled by refetch)
+        }
+    };
+
+    const handleDeselect = async (value: number) => {
+        try {
+            await unassignTagMutation.mutateAsync({ controllerId, targetTagId: value });
+            message.success(t('tagManagement.tagUnassigned'));
+            queryClient.invalidateQueries({ queryKey: getGetTargetTagsQueryKey() });
+            queryClient.invalidateQueries({ queryKey: getGetTagsQueryKey(controllerId) });
+        } catch (error) {
+            message.error((error as Error).message || t('common:error'));
+        }
+    };
+
     const popoverContent = (
         <div style={{ width: 280 }}>
             <Select
                 mode="multiple"
-                style={{ width: '100%', marginBottom: 8 }}
+                style={{ width: '100%', marginBottom: 0 }}
                 placeholder={t('list.selectTags')}
-                value={selectedTagIds}
-                onChange={setSelectedTagIds}
-                loading={allTagsLoading}
+                value={(currentTags || []).map(tag => tag.id!)}
+                onSelect={handleSelect}
+                onDeselect={handleDeselect}
+                loading={allTagsLoading || assignTagMutation.isPending || unassignTagMutation.isPending}
+                allowClear={false}
                 options={(allTagsData?.content as MgmtTag[] || []).map(tag => ({
                     value: tag.id,
                     label: <Tag color={tag.colour || 'default'}>{tag.name}</Tag>,
@@ -115,19 +115,6 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
                     </>
                 )}
             />
-            <Space>
-                <Button size="small" onClick={() => setPopoverOpen(false)}>
-                    {t('common:actions.cancel')}
-                </Button>
-                <Button
-                    type="primary"
-                    size="small"
-                    onClick={handleSave}
-                    loading={assignTagMutation.isPending || unassignTagMutation.isPending}
-                >
-                    {t('common:actions.save')}
-                </Button>
-            </Space>
         </div>
     );
 

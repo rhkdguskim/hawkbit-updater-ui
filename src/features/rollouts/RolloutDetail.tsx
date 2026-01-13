@@ -41,9 +41,8 @@ import dayjs from 'dayjs';
 import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { StandardDetailLayout } from '@/components/layout';
-import { SectionCard } from '@/components/layout/PageLayout';
 import { StatusTag } from '@/components/common';
-import { PageLayout } from '@/components/patterns';
+import { PageLayout, SectionCard } from '@/components/patterns';
 import RolloutActionConfirmModal, { type RolloutActionType } from './components/RolloutActionConfirmModal';
 
 const { Text } = Typography;
@@ -434,6 +433,7 @@ const RolloutDetail: React.FC = () => {
             onBack={() => navigate('/rollouts')}
             actions={headerActions}
             loading={isLoading}
+            useCardWrapper={false}
         >
             {isAdmin && !canStart && !canPause && !canResume && !canApprove && !canRetry && !canDelete && (
                 <SectionCard style={{ marginBottom: 16 }}>

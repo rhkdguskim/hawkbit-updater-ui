@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import {
     fadeInUp,
     pulse,
@@ -37,17 +37,7 @@ export {
     CHART_THEMES
 };
 
-const ambientShift = keyframes`
-    0% {
-        background-position: 0% 0%, 100% 0%, 0% 100%, 0% 0%;
-    }
-    50% {
-        background-position: 10% 8%, 90% 6%, 6% 92%, 0% 0%;
-    }
-    100% {
-        background-position: 0% 0%, 100% 0%, 0% 100%, 0% 0%;
-    }
-`;
+
 
 export const DashboardSurface = styled.div`
     position: relative;
@@ -58,31 +48,9 @@ export const DashboardSurface = styled.div`
     flex: 1;
     isolation: isolate;
 
-    &::before {
-        content: '';
-        position: absolute;
-        inset: -40px -24px -60px -24px;
-        background-image:
-            radial-gradient(700px circle at 10% -10%, rgba(34, 197, 94, 0.18), transparent 55%),
-            radial-gradient(900px circle at 85% 0%, rgba(14, 165, 233, 0.18), transparent 55%),
-            radial-gradient(900px circle at 90% 90%, rgba(249, 115, 22, 0.12), transparent 60%),
-            linear-gradient(180deg, rgba(248, 250, 252, 1) 0%, rgba(241, 245, 249, 1) 60%, rgba(255, 247, 237, 1) 100%);
-        background-repeat: no-repeat;
-        opacity: 0.95;
-        pointer-events: none;
-        z-index: 0;
-        animation: ${ambientShift} 18s ease-in-out infinite;
-    }
-
-    &::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
-        background-size: 28px 28px;
-        opacity: 0.18;
-        pointer-events: none;
-        z-index: 0;
+    & > * {
+        position: relative;
+        z-index: 1;
     }
 
     & > * {
@@ -118,20 +86,11 @@ export const DashboardSurface = styled.div`
         color: var(--ant-color-text-tertiary);
     }
 
-    [data-theme='dark'] &::before,
-    .dark-mode &::before {
-        background-image:
-            radial-gradient(700px circle at 10% -10%, rgba(34, 197, 94, 0.16), transparent 55%),
-            radial-gradient(900px circle at 85% 0%, rgba(14, 165, 233, 0.14), transparent 55%),
-            radial-gradient(900px circle at 90% 90%, rgba(249, 115, 22, 0.1), transparent 60%),
-            linear-gradient(180deg, rgba(15, 23, 42, 1) 0%, rgba(17, 24, 39, 1) 60%, rgba(30, 41, 59, 1) 100%);
-        opacity: 0.9;
-    }
-
-    [data-theme='dark'] &::after,
-    .dark-mode &::after {
-        background-image: radial-gradient(rgba(148, 163, 184, 0.18) 1px, transparent 1px);
-        opacity: 0.12;
+    [data-theme='dark'] & .ant-card,
+    .dark-mode & .ant-card {
+        background-color: rgba(15, 23, 42, 0.78);
+        border-color: rgba(148, 163, 184, 0.2);
+        box-shadow: 0 14px 32px -24px rgba(0, 0, 0, 0.6);
     }
 
     [data-theme='dark'] & .ant-card,
@@ -147,11 +106,9 @@ export const DashboardSurface = styled.div`
     }
 
     @media (max-width: 768px) {
-        &::before {
-            inset: -20px -16px -30px -16px;
-        }
+        /* Mobile styles */
     }
-`;
+ `;
 
 export const DashboardScrollContent = styled(BaseScrollContent)`
     gap: clamp(12px, 1.4vw, 18px);

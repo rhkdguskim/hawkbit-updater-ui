@@ -82,6 +82,7 @@ export const getTargetTableColumns = ({
                     value={record.name || record.controllerId || ''}
                     onSave={(val) => onInlineUpdate(record.controllerId!, val)}
                     editable={isAdmin}
+                    mono={true}
                 />
             ),
         },
@@ -91,7 +92,7 @@ export const getTargetTableColumns = ({
             key: 'ipAddress',
             width: 140,
             render: (ipAddress: string | undefined) => (
-                <Text style={{ fontSize: 12 }}>
+                <Text style={{ fontSize: 12, fontFamily: 'var(--font-mono)' }}>
                     {ipAddress || '-'}
                 </Text>
             ),
@@ -157,9 +158,9 @@ export const getTargetTableColumns = ({
             render: (_: unknown, record: MgmtTarget) => {
                 const lastPollTime = record.pollStatus?.lastRequestAt;
                 return lastPollTime ? (
-                    <Text style={{ fontSize: 12 }}>{dayjs(lastPollTime).format('YYYY-MM-DD HH:mm')}</Text>
+                    <Text style={{ fontSize: 12, fontFamily: 'var(--font-mono)' }}>{dayjs(lastPollTime).format('YYYY-MM-DD HH:mm')}</Text>
                 ) : (
-                    <Text type="secondary" style={{ fontSize: 12 }}>-</Text>
+                    <Text type="secondary" style={{ fontSize: 12, fontFamily: 'var(--font-mono)' }}>-</Text>
                 );
             },
         },

@@ -56,7 +56,7 @@ const ReleaseNotesArea = styled(TextArea)`
         border-radius: var(--ant-border-radius-lg, 12px);
         background: var(--ant-color-fill-alter);
         line-height: 1.5;
-        font-family: 'IBM Plex Mono', 'SF Mono', Menlo, Monaco, monospace;
+        font-family: var(--font-mono);
     }
 `;
 

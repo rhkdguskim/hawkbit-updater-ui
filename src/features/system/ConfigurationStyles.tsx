@@ -311,7 +311,7 @@ export const ConfigItemLabel = styled.div`
 `;
 
 export const ConfigKeyText = styled.span`
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-family: var(--font-mono);
     font-size: var(--ant-font-size-sm);
     color: #64748b;
     background: rgba(100, 116, 139, 0.1);
@@ -372,7 +372,7 @@ export const BooleanTag = styled.span<{ $enabled?: boolean }>`
 
 // Value Display for non-boolean
 export const ValueDisplay = styled.span`
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-family: var(--font-mono);
     font-size: var(--ant-font-size-sm);
     color: #1e293b;
     background: rgba(99, 102, 241, 0.08);

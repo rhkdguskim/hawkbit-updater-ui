@@ -40,7 +40,7 @@ const FilterName = styled.div`
 const FilterQuery = styled.div`
     font-size: 12px;
     color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45));
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-family: var(--font-mono);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

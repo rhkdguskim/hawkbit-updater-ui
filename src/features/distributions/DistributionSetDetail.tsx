@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Descriptions, Tabs, Table, Button, message, Space, Tag, Modal, Breadcrumb } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Descriptions, Table, Button, message, Space, Tag, Modal, type TableProps } from 'antd';
 import {
     PlusOutlined,
     StopOutlined,
@@ -23,20 +23,13 @@ import SetTagsTab from './components/SetTagsTab';
 import SetStatisticsTab from './components/SetStatisticsTab';
 import SetTargetsTab from './components/SetTargetsTab';
 import type { MgmtSoftwareModuleAssignment, MgmtSoftwareModule, MgmtDistributionSetRequestBodyPost } from '@/api/generated/model';
-import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { PageLayout } from '@/components/patterns';
-import { SectionCard } from '@/components/layout/PageLayout';
-import { DetailPageHeader } from '@/components/common';
+import { StandardDetailLayout } from '@/components/layout';
 import styled from 'styled-components';
 
 const FullWidthSpace = styled(Space)`
     width: 100%;
-`;
-
-const DetailBreadcrumb = styled(Breadcrumb)`
-    margin-bottom: 0;
 `;
 
 const DistributionSetDetail: React.FC = () => {
@@ -249,44 +242,33 @@ const DistributionSetDetail: React.FC = () => {
         </>
     ) : undefined;
 
+    const tabItems = [
+        { key: 'overview', label: t('detail.overview'), children: overviewTab },
+        { key: 'modules', label: t('detail.assignedModules'), children: modulesTab },
+        { key: 'metadata', label: t('detail.metadata'), children: <SetMetadataTab distributionSetId={distributionSetId} isAdmin={isAdmin} /> },
+        { key: 'tags', label: t('detail.tags'), children: <SetTagsTab distributionSetId={distributionSetId} isAdmin={isAdmin} /> },
+        { key: 'statistics', label: t('detail.statistics'), children: <SetStatisticsTab distributionSetId={distributionSetId} /> },
+        { key: 'targets', label: t('detail.targets'), children: <SetTargetsTab distributionSetId={distributionSetId} /> },
+    ];
+
     return (
-        <PageLayout>
-            {/* Breadcrumb */}
-            <DetailBreadcrumb
-                items={[
-                    { title: <Link to="/distributions/sets">{t('sets.title')}</Link> },
-                    { title: setData?.name || id },
-                ]}
-            />
-
-            {/* Header */}
-            <DetailPageHeader
-                onBack={() => navigate('/distributions/sets')}
-                backLabel={t('sets.title')}
-                title={setData?.name || id}
-                description={t('detail.description')}
-                status={setData?.complete ? 'complete' : 'incomplete'}
-                loading={isSetLoading}
-                extra={titleExtra}
-                actions={headerActions}
-            />
-
-            {/* Tabs */}
-            <SectionCard loading={isSetLoading}>
-                <Tabs
-                    activeKey={activeTab}
-                    onChange={setActiveTab}
-                    items={[
-                        { key: 'overview', label: t('detail.overview'), children: overviewTab },
-                        { key: 'modules', label: t('detail.assignedModules'), children: modulesTab },
-                        { key: 'metadata', label: t('detail.metadata'), children: <SetMetadataTab distributionSetId={distributionSetId} isAdmin={isAdmin} /> },
-                        { key: 'tags', label: t('detail.tags'), children: <SetTagsTab distributionSetId={distributionSetId} isAdmin={isAdmin} /> },
-                        { key: 'statistics', label: t('detail.statistics'), children: <SetStatisticsTab distributionSetId={distributionSetId} /> },
-                        { key: 'targets', label: t('detail.targets'), children: <SetTargetsTab distributionSetId={distributionSetId} /> },
-                    ]}
-                />
-            </SectionCard>
-        </PageLayout>
+        <StandardDetailLayout
+            breadcrumbs={[
+                { label: t('sets.title'), path: '/distributions/sets' },
+                { label: setData?.name || id || '' },
+            ]}
+            title={setData?.name || id}
+            description={t('detail.description')}
+            status={setData?.complete ? 'complete' : 'incomplete'}
+            backLabel={t('sets.title')}
+            onBack={() => navigate('/distributions/sets')}
+            loading={isSetLoading}
+            headerExtra={titleExtra}
+            actions={headerActions}
+            tabs={tabItems}
+            activeTabKey={activeTab}
+            onTabChange={setActiveTab}
+        />
     );
 };
 

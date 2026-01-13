@@ -2,9 +2,15 @@ import React from 'react';
 import { Breadcrumb, Tabs } from 'antd';
 import type { TabsProps } from 'antd';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
-import { PageLayout } from '@/components/patterns';
+import styled, { css } from 'styled-components';
+import { PageLayout, SectionCard, FullHeightSectionCard as BaseFullHeightSectionCard } from '@/components/patterns';
 import { DetailPageHeader } from '@/components/common';
+
+const FullHeightSectionCard = styled(BaseFullHeightSectionCard)`
+    .ant-card-body {
+        padding: 0;
+    }
+`;
 
 export interface BreadcrumbItem {
     label: string;
@@ -38,16 +44,41 @@ export interface StandardDetailLayoutProps {
     onTabChange?: (key: string) => void;
     /** Child content (used when tabs are not provided) */
     children?: React.ReactNode;
+    /** Whether to use full height for the page */
+    fullHeight?: boolean;
+    /** Whether to wrap content in a SectionCard (defaults to true) */
+    useCardWrapper?: boolean;
 }
 
 const BreadcrumbWrapper = styled.div`
     margin-bottom: 0;
 `;
 
-const TabsWrapper = styled.div`
-    .ant-tabs-nav {
-        margin-bottom: var(--ant-margin-md);
-    }
+const ContentWrapper = styled.div<{ $fullHeight?: boolean }>`
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    
+    ${props => props.$fullHeight && css`
+        height: 100%;
+        
+        .ant-tabs, .ant-tabs-content {
+            height: 100%;
+        }
+
+        .ant-tabs-tabpane-active {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .ant-tabs-content-holder {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+        }
+    `}
 `;
 
 /**
@@ -68,6 +99,8 @@ export const StandardDetailLayout: React.FC<StandardDetailLayoutProps> = ({
     activeTabKey,
     onTabChange,
     children,
+    fullHeight = false,
+    useCardWrapper = true,
 }) => {
     const breadcrumbItems = breadcrumbs.map((item, index) => ({
         key: index,
@@ -78,8 +111,41 @@ export const StandardDetailLayout: React.FC<StandardDetailLayoutProps> = ({
         ),
     }));
 
+    const renderTabs = () => (
+        <Tabs
+            items={tabs}
+            activeKey={activeTabKey}
+            onChange={onTabChange}
+            size="middle"
+            style={fullHeight ? { height: '100%' } : undefined}
+        />
+    );
+
+    const renderContent = () => {
+        if (tabs) {
+            if (useCardWrapper) {
+                return (
+                    <FullHeightSectionCard loading={loading}>
+                        {renderTabs()}
+                    </FullHeightSectionCard>
+                );
+            }
+            return renderTabs();
+        }
+
+        if (useCardWrapper) {
+            return (
+                <SectionCard loading={loading}>
+                    {children}
+                </SectionCard>
+            );
+        }
+
+        return children;
+    };
+
     return (
-        <PageLayout>
+        <PageLayout fullHeight={fullHeight}>
             <BreadcrumbWrapper>
                 <Breadcrumb items={breadcrumbItems} style={{ marginBottom: 0 }} />
             </BreadcrumbWrapper>
@@ -95,18 +161,9 @@ export const StandardDetailLayout: React.FC<StandardDetailLayoutProps> = ({
                 extra={headerExtra}
             />
 
-            {tabs ? (
-                <TabsWrapper>
-                    <Tabs
-                        items={tabs}
-                        activeKey={activeTabKey}
-                        onChange={onTabChange}
-                        size="middle"
-                    />
-                </TabsWrapper>
-            ) : (
-                children
-            )}
+            <ContentWrapper $fullHeight={fullHeight}>
+                {renderContent()}
+            </ContentWrapper>
         </PageLayout>
     );
 };

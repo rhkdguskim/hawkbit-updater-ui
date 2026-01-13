@@ -114,13 +114,13 @@ export const TargetDetailDrawer: React.FC<TargetDetailDrawerProps> = ({
                                 children: (
                                     <Descriptions column={1} size="small" bordered>
                                         <Descriptions.Item label={t('table.controllerId')}>
-                                            <Text copyable>{target.controllerId}</Text>
+                                            <Text copyable style={{ fontFamily: 'var(--font-mono)' }}>{target.controllerId}</Text>
                                         </Descriptions.Item>
                                         <Descriptions.Item label={t('table.name')}>
                                             {target.name || '-'}
                                         </Descriptions.Item>
                                         <Descriptions.Item label={t('table.ipAddress')}>
-                                            {target.ipAddress || '-'}
+                                            <Text style={{ fontFamily: 'var(--font-mono)' }}>{target.ipAddress || '-'}</Text>
                                         </Descriptions.Item>
                                         <Descriptions.Item label={t('overview.address')}>
                                             {target.address || '-'}
@@ -142,14 +142,18 @@ export const TargetDetailDrawer: React.FC<TargetDetailDrawerProps> = ({
                                             )}
                                         </Descriptions.Item>
                                         <Descriptions.Item label={t('overview.lastPoll')}>
-                                            {target.pollStatus?.lastRequestAt
-                                                ? dayjs(target.pollStatus.lastRequestAt).format('YYYY-MM-DD HH:mm:ss')
-                                                : t('overview.never')}
+                                            <Text style={{ fontFamily: 'var(--font-mono)' }}>
+                                                {target.pollStatus?.lastRequestAt
+                                                    ? dayjs(target.pollStatus.lastRequestAt).format('YYYY-MM-DD HH:mm:ss')
+                                                    : t('overview.never')}
+                                            </Text>
                                         </Descriptions.Item>
                                         <Descriptions.Item label={t('overview.nextPoll')}>
-                                            {target.pollStatus?.nextExpectedRequestAt
-                                                ? dayjs(target.pollStatus.nextExpectedRequestAt).format('YYYY-MM-DD HH:mm:ss')
-                                                : '-'}
+                                            <Text style={{ fontFamily: 'var(--font-mono)' }}>
+                                                {target.pollStatus?.nextExpectedRequestAt
+                                                    ? dayjs(target.pollStatus.nextExpectedRequestAt).format('YYYY-MM-DD HH:mm:ss')
+                                                    : '-'}
+                                            </Text>
                                         </Descriptions.Item>
                                         <Descriptions.Item label={t('overview.created')}>
                                             {target.createdAt

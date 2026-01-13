@@ -17,7 +17,11 @@ import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterVa
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createTagNameColumn, createDateColumn } from '@/utils/columnFactory';
 
-const DistributionSetTagList: React.FC = () => {
+interface DistributionSetTagListProps {
+    standalone?: boolean;
+}
+
+const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standalone = true }) => {
     const { t } = useTranslation(['distributions', 'common']);
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
@@ -147,26 +151,8 @@ const DistributionSetTagList: React.FC = () => {
         }),
     ], [t, isAdmin]);
 
-    return (
-        <StandardListLayout
-            title={t('tagManagement.title')}
-            description={t('tagManagement.description', { defaultValue: 'Manage distribution set tags' })}
-            searchBar={
-                <FilterBuilder
-                    fields={filterFields}
-                    filters={filters}
-                    onFiltersChange={handleFiltersChange}
-                    onRefresh={() => refetch()}
-                    onAdd={isAdmin ? () => {
-                        setEditingTag(null);
-                        setDialogOpen(true);
-                    } : undefined}
-                    canAdd={isAdmin}
-                    addLabel={t('tagManagement.addTag')}
-                    loading={isLoading || isFetching}
-                />
-            }
-        >
+    const listContent = (
+        <>
             <DataView
                 loading={isLoading}
                 error={null}
@@ -209,6 +195,53 @@ const DistributionSetTagList: React.FC = () => {
                     cancelText: t('common:actions.cancel'),
                 }}
             />
+        </>
+    );
+
+    if (!standalone) {
+        return (
+            <div style={{ marginTop: 16 }}>
+                <div style={{ marginBottom: 16 }}>
+                    <FilterBuilder
+                        fields={filterFields}
+                        filters={filters}
+                        onFiltersChange={handleFiltersChange}
+                        onRefresh={() => refetch()}
+                        onAdd={isAdmin ? () => {
+                            setEditingTag(null);
+                            setDialogOpen(true);
+                        } : undefined}
+                        canAdd={isAdmin}
+                        addLabel={t('tagManagement.addTag')}
+                        loading={isLoading || isFetching}
+                    />
+                </div>
+                {listContent}
+            </div>
+        );
+    }
+
+    return (
+        <StandardListLayout
+            title={t('tagManagement.title')}
+            description={t('tagManagement.description', { defaultValue: 'Manage distribution set tags' })}
+            searchBar={
+                <FilterBuilder
+                    fields={filterFields}
+                    filters={filters}
+                    onFiltersChange={handleFiltersChange}
+                    onRefresh={() => refetch()}
+                    onAdd={isAdmin ? () => {
+                        setEditingTag(null);
+                        setDialogOpen(true);
+                    } : undefined}
+                    canAdd={isAdmin}
+                    addLabel={t('tagManagement.addTag')}
+                    loading={isLoading || isFetching}
+                />
+            }
+        >
+            {listContent}
         </StandardListLayout>
     );
 };

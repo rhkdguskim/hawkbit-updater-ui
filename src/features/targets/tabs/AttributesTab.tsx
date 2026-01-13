@@ -65,7 +65,7 @@ const AttributesTab: React.FC<AttributesTabProps> = ({ data, loading }) => {
             dataIndex: 'value',
             key: 'value',
             render: (text: string) => (
-                <Text copyable style={{ wordBreak: 'break-all' }}>
+                <Text copyable style={{ wordBreak: 'break-all', fontFamily: 'var(--font-mono)' }}>
                     {text}
                 </Text>
             ),

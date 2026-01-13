@@ -1,16 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import {
-    Tabs,
-    Button,
-    Breadcrumb,
-    message,
-} from 'antd';
-import {
-    EditOutlined,
-    DeleteOutlined,
-    SendOutlined,
-} from '@ant-design/icons';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Button, message } from 'antd';
+import { EditOutlined, DeleteOutlined, SendOutlined } from '@ant-design/icons';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
     OverviewTab,
     ActionsTab,
@@ -52,44 +43,7 @@ import type { MgmtDistributionSetAssignment, MgmtDistributionSetAssignments, Mgm
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { PageLayout } from '@/components/patterns';
-import { SectionCard } from '@/components/layout/PageLayout';
-import { DetailPageHeader } from '@/components/common';
-import styled from 'styled-components';
-
-const FullHeightPageLayout = styled(PageLayout)`
-    height: 100%;
-    min-height: 0;
-    flex: 1;
-`;
-
-const FullHeightSectionCard = styled(SectionCard)`
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-`;
-
-const FullHeightTabs = styled(Tabs)`
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-
-    .ant-tabs-content-holder {
-        flex: 1;
-        min-height: 0;
-    }
-
-    .ant-tabs-content,
-    .ant-tabs-tabpane {
-        height: 100%;
-    }
-
-    .ant-tabs-tabpane {
-        overflow: hidden;
-    }
-`;
+import { StandardDetailLayout } from '@/components/layout';
 
 const TargetDetail: React.FC = () => {
     const { id: targetId, tab: tabParam } = useParams<{ id: string; tab?: string }>();
@@ -404,13 +358,18 @@ const TargetDetail: React.FC = () => {
     // Error State
     if (targetError) {
         return (
-            <FullHeightPageLayout>
-                <DetailPageHeader
-                    title={t('detail.notFoundTitle')}
-                    backLabel={t('detail.backToTargets')}
-                    onBack={() => navigate('/targets/list')}
-                />
-            </FullHeightPageLayout>
+            <StandardDetailLayout
+                breadcrumbs={[
+                    { label: t('list.title'), path: '/targets' },
+                    { label: targetId || '' },
+                ]}
+                title={t('detail.notFoundTitle')}
+                backLabel={t('detail.backToTargets')}
+                onBack={() => navigate('/targets')}
+                useCardWrapper={false}
+            >
+                <div />
+            </StandardDetailLayout>
         );
     }
 
@@ -515,35 +474,22 @@ const TargetDetail: React.FC = () => {
     );
 
     return (
-        <FullHeightPageLayout>
-            {/* Breadcrumb */}
-            <Breadcrumb
-                items={[
-                    { title: <Link to="/targets">{t('list.title')}</Link> },
-                    { title: targetId },
-                ]}
-                style={{ marginBottom: 0 }}
-            />
-
-            {/* Header */}
-            <DetailPageHeader
-                title={targetData?.name || targetId}
-                description={targetData?.description || t('detail.description')}
-                backLabel={t('actions.back', { ns: 'common' })}
-                onBack={() => navigate('/targets')}
-                loading={targetLoading}
-                actions={headerActions}
-            />
-
-            {/* Tabs */}
-            <FullHeightSectionCard>
-                <FullHeightTabs
-                    activeKey={activeTab}
-                    onChange={handleTabChange}
-                    items={tabItems}
-
-                />
-            </FullHeightSectionCard>
+        <StandardDetailLayout
+            breadcrumbs={[
+                { label: t('list.title'), path: '/targets' },
+                { label: targetId || '' },
+            ]}
+            title={targetData?.name || targetId}
+            description={targetData?.description || t('detail.description')}
+            backLabel={t('actions.back', { ns: 'common' })}
+            onBack={() => navigate('/targets')}
+            loading={targetLoading}
+            actions={headerActions}
+            tabs={tabItems}
+            activeTabKey={activeTab}
+            onTabChange={handleTabChange}
+            fullHeight
+        >
 
             {/* Modals */}
             <DeleteTargetModal
@@ -597,7 +543,7 @@ const TargetDetail: React.FC = () => {
                     setMetadataToDelete(null);
                 }}
             />
-        </FullHeightPageLayout>
+        </StandardDetailLayout>
     );
 };
 

@@ -12,10 +12,14 @@ import { useTranslation } from 'react-i18next';
 import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterValue } from '@/components/patterns';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import SoftwareModuleTypeDialog from './SoftwareModuleTypeDialog';
-import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createDateColumn } from '@/utils/columnFactory';
-import { StrongSmallText, SmallText } from '@/components/shared/Typography';
+import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createDateColumn, createColoredNameColumn } from '@/utils/columnFactory';
+import { SmallText } from '@/components/shared/Typography';
 
-const SoftwareModuleTypeList: React.FC = () => {
+interface SoftwareModuleTypeListProps {
+    standalone?: boolean;
+}
+
+const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standalone = true }) => {
     const { t } = useTranslation(['distributions', 'common']);
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
@@ -92,14 +96,7 @@ const SoftwareModuleTypeList: React.FC = () => {
 
     const columns: ColumnsType<MgmtSoftwareModuleType> = useMemo(() => [
         createIdColumn<MgmtSoftwareModuleType>(t),
-        {
-            title: t('common:table.name'),
-            dataIndex: 'name',
-            key: 'name',
-            width: 180,
-            sorter: true,
-            render: (text: string) => <StrongSmallText>{text}</StrongSmallText>,
-        },
+        createColoredNameColumn<MgmtSoftwareModuleType>({ t }),
         {
             title: t('typeManagement.columns.key'),
             dataIndex: 'key',
@@ -126,26 +123,21 @@ const SoftwareModuleTypeList: React.FC = () => {
         }),
     ], [t, isAdmin]);
 
-    return (
-        <StandardListLayout
-            title={t('typeManagement.smTypeTitle')}
-            description={t('typeManagement.smTypeDescription', { defaultValue: 'Manage software module types' })}
-            searchBar={
-                <FilterBuilder
-                    fields={filterFields}
-                    filters={filters}
-                    onFiltersChange={handleFiltersChange}
-                    onRefresh={() => refetch()}
-                    onAdd={isAdmin ? () => {
-                        setEditingType(null);
-                        setDialogOpen(true);
-                    } : undefined}
-                    canAdd={isAdmin}
-                    addLabel={t('typeManagement.addType')}
-                    loading={isLoading || isFetching}
-                />
-            }
-        >
+    const listContent = (
+        <>
+            <FilterBuilder
+                fields={filterFields}
+                filters={filters}
+                onFiltersChange={handleFiltersChange}
+                onRefresh={() => refetch()}
+                onAdd={isAdmin ? () => {
+                    setEditingType(null);
+                    setDialogOpen(true);
+                } : undefined}
+                canAdd={isAdmin}
+                addLabel={t('typeManagement.addType')}
+                loading={isLoading || isFetching}
+            />
             <DataView
                 loading={isLoading}
                 error={null}
@@ -175,6 +167,19 @@ const SoftwareModuleTypeList: React.FC = () => {
                 onClose={handleDialogClose}
                 onSuccess={handleDialogSuccess}
             />
+        </>
+    );
+
+    if (!standalone) {
+        return listContent;
+    }
+
+    return (
+        <StandardListLayout
+            title={t('typeManagement.smTypeTitle')}
+            description={t('typeManagement.smTypeDescription', { defaultValue: 'Manage software module types' })}
+        >
+            {listContent}
         </StandardListLayout>
     );
 };

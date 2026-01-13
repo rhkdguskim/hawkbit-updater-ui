@@ -61,7 +61,7 @@ export const SummaryTab: React.FC = () => {
                         isAdmin={true}
                     />
                 }
-                inProgressUpdates={
+                statsRow={
                     <InProgressUpdatesWidget
                         isLoading={metrics.isLoading}
                         data={metrics.recentActivities}

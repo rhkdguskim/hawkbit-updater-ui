@@ -50,7 +50,7 @@ const HashRow = styled.div`
 `;
 
 const HashValue = styled.code`
-    font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
     color: #1a1a1a;
     word-break: break-all;

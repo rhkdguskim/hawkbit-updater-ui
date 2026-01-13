@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Descriptions, Tabs, Table, Button, Upload, message, Modal, Space, Tag, Tooltip, List, Badge, Breadcrumb } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Descriptions, Table, Button, Upload, message, Modal, Space, Tag, Tooltip, List, Badge } from 'antd';
 import { DeleteOutlined, DownloadOutlined, FileOutlined, InboxOutlined, InfoCircleOutlined, EyeOutlined } from '@ant-design/icons';
 import ArtifactVerificationCard from './components/ArtifactVerificationCard';
 import {
@@ -16,19 +16,14 @@ import type { MgmtArtifact } from '@/api/generated/model';
 import ModuleMetadataTab from './components/ModuleMetadataTab';
 import { useTranslation } from 'react-i18next';
 import type { RcFile } from 'antd/es/upload';
-import { PageLayout, StandardModal } from '@/components/patterns';
-import { SectionCard } from '@/components/layout/PageLayout';
-import { DetailPageHeader } from '@/components/common';
+import { StandardModal } from '@/components/patterns';
+import { StandardDetailLayout } from '@/components/layout';
 import styled from 'styled-components';
 
 import { formatBytes } from '@/utils/formatUtils';
 
 const FullWidthSpace = styled(Space)`
     width: 100%;
-`;
-
-const DetailBreadcrumb = styled(Breadcrumb)`
-    margin-bottom: 0;
 `;
 
 const ErrorHintIcon = styled(InfoCircleOutlined)`
@@ -328,40 +323,29 @@ const SoftwareModuleDetail: React.FC = () => {
         <Tag color="blue">{moduleData.version}</Tag>
     ) : undefined;
 
+    const tabItems = [
+        { key: 'overview', label: t('detail.overview'), children: overviewTab },
+        { key: 'artifacts', label: t('detail.artifacts'), children: artifactsTab },
+        { key: 'metadata', label: t('detail.metadata'), children: <ModuleMetadataTab softwareModuleId={softwareModuleId} isAdmin={isAdmin} /> },
+    ];
+
     return (
-        <PageLayout>
-            {/* Breadcrumb */}
-            <DetailBreadcrumb
-                items={[
-                    { title: <Link to="/distributions/modules">{t('modules.title')}</Link> },
-                    { title: moduleData?.name || id },
-                ]}
-            />
-
-            {/* Header */}
-            <DetailPageHeader
-                title={moduleData?.name || id}
-                backLabel={t('common:actions.back')}
-                onBack={() => navigate('/distributions/modules')}
-                loading={isModuleLoading}
-                extra={titleExtra}
-                status={moduleData?.locked ? t('status.locked') : undefined}
-                description={t('detail.moduleDescription')}
-            />
-
-            {/* Tabs */}
-            <SectionCard loading={isModuleLoading}>
-                <Tabs
-                    activeKey={activeTab}
-                    onChange={setActiveTab}
-                    items={[
-                        { key: 'overview', label: t('detail.overview'), children: overviewTab },
-                        { key: 'artifacts', label: t('detail.artifacts'), children: artifactsTab },
-                        { key: 'metadata', label: t('detail.metadata'), children: <ModuleMetadataTab softwareModuleId={softwareModuleId} isAdmin={isAdmin} /> },
-                    ]}
-                />
-            </SectionCard>
-
+        <StandardDetailLayout
+            breadcrumbs={[
+                { label: t('modules.title'), path: '/distributions/modules' },
+                { label: moduleData?.name || id || '' },
+            ]}
+            title={moduleData?.name || id}
+            description={t('detail.moduleDescription')}
+            backLabel={t('common:actions.back')}
+            onBack={() => navigate('/distributions/modules')}
+            loading={isModuleLoading}
+            headerExtra={titleExtra}
+            status={moduleData?.locked ? t('status.locked') : undefined}
+            tabs={tabItems}
+            activeTabKey={activeTab}
+            onTabChange={setActiveTab}
+        >
             <StandardModal
                 title={t('detail.verification.title')}
                 open={isVerificationModalOpen}
@@ -377,7 +361,7 @@ const SoftwareModuleDetail: React.FC = () => {
                     />
                 )}
             </StandardModal>
-        </PageLayout>
+        </StandardDetailLayout>
     );
 };
 

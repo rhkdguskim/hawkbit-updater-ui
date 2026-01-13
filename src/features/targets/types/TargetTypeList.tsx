@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { message, Modal, Tag, Space } from 'antd';
+import { message, Modal } from 'antd';
 import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
@@ -19,11 +19,15 @@ import type { MgmtTargetType, MgmtTargetTypeRequestBodyPost, MgmtTargetTypeReque
 import { useAuthStore } from '@/stores/useAuthStore';
 import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterValue } from '@/components/patterns';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
-import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn } from '@/utils/columnFactory';
-import { SmallText, StrongSmallText } from '@/components/shared/Typography';
+import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createColoredNameColumn } from '@/utils/columnFactory';
+import { SmallText } from '@/components/shared/Typography';
 import TargetTypeDialog from './TargetTypeDialog';
 
-const TargetTypeList: React.FC = () => {
+interface TargetTypeListProps {
+    standalone?: boolean;
+}
+
+const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) => {
     const queryClient = useQueryClient();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
@@ -181,24 +185,7 @@ const TargetTypeList: React.FC = () => {
 
     const columns: ColumnsType<MgmtTargetType> = useMemo(() => [
         createIdColumn<MgmtTargetType>(t),
-        {
-            title: t('common:table.name'),
-            dataIndex: 'name',
-            key: 'name',
-            width: 180,
-            sorter: true,
-            render: (name: string, record: MgmtTargetType) => (
-                <Space size={4}>
-                    {record.colour ? (
-                        <Tag color={record.colour} style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)' }}>
-                            {name}
-                        </Tag>
-                    ) : (
-                        <StrongSmallText>{name}</StrongSmallText>
-                    )}
-                </Space>
-            ),
-        },
+        createColoredNameColumn<MgmtTargetType>({ t }),
         {
             title: t('typeManagement.key'),
             dataIndex: 'key',
@@ -221,26 +208,21 @@ const TargetTypeList: React.FC = () => {
     const isSubmitting = createMutation.isPending || updateMutation.isPending ||
         addCompatibleMutation.isPending || removeCompatibleMutation.isPending;
 
-    return (
-        <StandardListLayout
-            title={t('typeManagement.title')}
-            description={t('typeManagement.description', { defaultValue: 'Manage target types for device categorization' })}
-            searchBar={
-                <FilterBuilder
-                    fields={filterFields}
-                    filters={filters}
-                    onFiltersChange={handleFiltersChange}
-                    onRefresh={() => refetch()}
-                    onAdd={isAdmin ? () => {
-                        setEditingType(null);
-                        setDialogOpen(true);
-                    } : undefined}
-                    canAdd={isAdmin}
-                    addLabel={t('typeManagement.add')}
-                    loading={isLoading || isFetching}
-                />
-            }
-        >
+    const listContent = (
+        <>
+            <FilterBuilder
+                fields={filterFields}
+                filters={filters}
+                onFiltersChange={handleFiltersChange}
+                onRefresh={() => refetch()}
+                onAdd={isAdmin ? () => {
+                    setEditingType(null);
+                    setDialogOpen(true);
+                } : undefined}
+                canAdd={isAdmin}
+                addLabel={t('typeManagement.add')}
+                loading={isLoading || isFetching}
+            />
             <DataView
                 loading={isLoading}
                 error={null}
@@ -275,6 +257,19 @@ const TargetTypeList: React.FC = () => {
                     setEditingType(null);
                 }}
             />
+        </>
+    );
+
+    if (!standalone) {
+        return listContent;
+    }
+
+    return (
+        <StandardListLayout
+            title={t('typeManagement.title')}
+            description={t('typeManagement.description', { defaultValue: 'Manage target types for device categorization' })}
+        >
+            {listContent}
         </StandardListLayout>
     );
 };

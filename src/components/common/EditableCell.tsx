@@ -64,9 +64,10 @@ const EditTextArea = styled(Input.TextArea)`
     flex: 1;
 `;
 
-const CellText = styled(Text) <{ $editable: boolean }>`
+const CellText = styled(Text) <{ $editable: boolean; $mono?: boolean }>`
     font-size: var(--ant-font-size-sm);
     cursor: ${props => (props.$editable ? 'pointer' : 'default')};
+    ${props => props.$mono && `font-family: var(--font-mono) !important;`}
 `;
 
 export interface EditableCellProps {
@@ -84,6 +85,10 @@ export interface EditableCellProps {
     type?: 'text' | 'textarea';
     /** Max length for input */
     maxLength?: number;
+    /** Whether to use monospaced font */
+    mono?: boolean;
+    /** Custom render for display mode */
+    renderDisplay?: (value: string) => React.ReactNode;
 }
 
 export const EditableCell: React.FC<EditableCellProps> = ({
@@ -94,6 +99,8 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     placeholder = '-',
     type = 'text',
     maxLength,
+    mono = false,
+    renderDisplay,
 }) => {
     const { t } = useTranslation('common');
     const [editing, setEditing] = useState(false);
@@ -162,6 +169,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             onKeyDown: handleKeyDown,
             onBlur: handleSave,
             maxLength: maxLength,
+            style: mono ? { fontFamily: 'var(--font-mono)' } : undefined,
         };
 
         return (
@@ -183,13 +191,18 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
     return (
         <CellWrapper onClick={handleStartEdit}>
-            <CellText
-                type={secondary ? 'secondary' : undefined}
-                $editable={editable}
-                ellipsis={{ tooltip: value }}
-            >
-                {value || placeholder}
-            </CellText>
+            {renderDisplay ? (
+                renderDisplay(value)
+            ) : (
+                <CellText
+                    type={secondary ? 'secondary' : undefined}
+                    $editable={editable}
+                    $mono={mono}
+                    ellipsis={{ tooltip: value }}
+                >
+                    {value || placeholder}
+                </CellText>
+            )}
             {editable && <EditOutlined className="edit-icon" />}
         </CellWrapper>
     );

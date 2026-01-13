@@ -5,7 +5,9 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 
 interface ThemeState {
     mode: ThemeMode;
+    systemTheme: 'light' | 'dark';
     setMode: (mode: ThemeMode) => void;
+    setSystemTheme: (theme: 'light' | 'dark') => void;
     getResolvedTheme: () => 'light' | 'dark';
 }
 
@@ -20,11 +22,32 @@ export const useThemeStore = create<ThemeState>()(
     persist(
         (set, get) => ({
             mode: 'system',
-            setMode: (mode) => set({ mode }),
+            systemTheme: getSystemTheme(),
+            setMode: (mode) => {
+                set({ mode });
+                const resolved = mode === 'system' ? get().systemTheme : mode;
+                document.documentElement.setAttribute('data-theme', resolved);
+                if (resolved === 'dark') {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            },
+            setSystemTheme: (systemTheme) => {
+                set({ systemTheme });
+                if (get().mode === 'system') {
+                    document.documentElement.setAttribute('data-theme', systemTheme);
+                    if (systemTheme === 'dark') {
+                        document.body.classList.add('dark-mode');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                    }
+                }
+            },
             getResolvedTheme: () => {
-                const { mode } = get();
+                const { mode, systemTheme } = get();
                 if (mode === 'system') {
-                    return getSystemTheme();
+                    return systemTheme;
                 }
                 return mode;
             },
@@ -38,12 +61,14 @@ export const useThemeStore = create<ThemeState>()(
 
 // Listen for system theme changes
 if (typeof window !== 'undefined' && window.matchMedia) {
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        // Force re-render by getting the state (this will be picked up by React components)
-        const { mode } = useThemeStore.getState();
-        if (mode === 'system') {
-            // Trigger a small state update to force re-render
-            useThemeStore.setState({ mode: 'system' });
-        }
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    // Initial sync
+    const initialTheme = mediaQuery.matches ? 'dark' : 'light';
+    useThemeStore.getState().setSystemTheme(initialTheme);
+
+    mediaQuery.addEventListener('change', (e) => {
+        const newTheme = e.matches ? 'dark' : 'light';
+        useThemeStore.getState().setSystemTheme(newTheme);
     });
 }

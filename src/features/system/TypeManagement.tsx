@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Tabs, Space, Breadcrumb } from 'antd';
-import { AppstoreOutlined, BlockOutlined, HomeOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Breadcrumb, Menu, theme, Card } from 'antd';
+import { AppstoreOutlined, BlockOutlined, UserOutlined, TagOutlined } from '@ant-design/icons';
+import { Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import TargetTypeList from '@/features/targets/types/TargetTypeList';
 import DistributionSetTypeList from '@/features/distributions/types/DistributionSetTypeList';
 import SoftwareModuleTypeList from '@/features/distributions/types/SoftwareModuleTypeList';
-import TargetTypeList from '@/features/targets/types/TargetTypeList';
+import TargetTagList from '@/features/targets/tags/TargetTagList';
+import DistributionSetTagList from '@/features/distributions/tags/DistributionSetTagList';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { Navigate } from 'react-router-dom';
-import { PageHeader, PageLayout } from '@/components/patterns';
-import { SectionCard } from '@/components/layout/PageLayout';
+import { PageHeader, PageLayout, FullHeightSectionCard } from '@/components/patterns';
 
 const TypeManagement: React.FC = () => {
     const { t } = useTranslation(['system', 'distributions', 'common', 'targets']);
@@ -22,49 +22,71 @@ const TypeManagement: React.FC = () => {
         return <Navigate to="/" replace />;
     }
 
-    const tabItems = [
+    const { token } = theme.useToken();
+
+    const menuItems: import('antd').MenuProps['items'] = [
         {
-            key: 'target-types',
-            label: (
-                <Space>
-                    <UserOutlined />
-                    {t('typeManagement.targetTypes', { defaultValue: 'Target Types' })}
-                </Space>
-            ),
-            children: <TargetTypeList />,
+            key: 'types-grp',
+            label: t('common:nav.types'),
+            type: 'group',
+            children: [
+                {
+                    key: 'target-types',
+                    icon: <UserOutlined />,
+                    label: t('system:typeManagement.targetTypes'),
+                },
+                {
+                    key: 'ds-types',
+                    icon: <AppstoreOutlined />,
+                    label: t('system:typeManagement.distributionSetTypes'),
+                },
+                {
+                    key: 'sw-types',
+                    icon: <BlockOutlined />,
+                    label: t('system:typeManagement.softwareModuleTypes'),
+                },
+            ],
         },
         {
-            key: 'ds-types',
-            label: (
-                <Space>
-                    <AppstoreOutlined />
-                    {t('typeManagement.distributionSetTypes')}
-                </Space>
-            ),
-            children: <DistributionSetTypeList />,
-        },
-        {
-            key: 'sw-types',
-            label: (
-                <Space>
-                    <BlockOutlined />
-                    {t('typeManagement.softwareModuleTypes')}
-                </Space>
-            ),
-            children: <SoftwareModuleTypeList />,
+            key: 'tags-grp',
+            label: t('common:nav.tags'),
+            type: 'group',
+            children: [
+                {
+                    key: 'target-tags',
+                    icon: <TagOutlined />,
+                    label: t('targets:tagManagement.title'),
+                },
+                {
+                    key: 'ds-tags',
+                    icon: <TagOutlined />,
+                    label: t('distributions:tagManagement.title'),
+                },
+            ],
         },
     ];
 
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'target-types': return <TargetTypeList standalone={false} />;
+            case 'ds-types': return <DistributionSetTypeList standalone={false} />;
+            case 'sw-types': return <SoftwareModuleTypeList standalone={false} />;
+            case 'target-tags': return <TargetTagList standalone={false} />;
+            case 'ds-tags': return <DistributionSetTagList standalone={false} />;
+            default: return <TargetTypeList standalone={false} />;
+        }
+    };
+
     return (
-        <PageLayout>
+        <PageLayout fullHeight>
             <Breadcrumb>
                 <Breadcrumb.Item>
                     <Link to="/">
-                        <HomeOutlined /> {t('common:nav.home')}
+                        {t('common:nav.home')}
                     </Link>
                 </Breadcrumb.Item>
                 <Breadcrumb.Item>
-                    <SettingOutlined /> {t('common:nav.system')}
+                    {t('common:nav.system')}
                 </Breadcrumb.Item>
                 <Breadcrumb.Item>{t('typeManagement.title')}</Breadcrumb.Item>
             </Breadcrumb>
@@ -74,13 +96,24 @@ const TypeManagement: React.FC = () => {
                 description={t('typeManagement.description')}
             />
 
-            <SectionCard>
-                <Tabs
-                    activeKey={activeTab}
-                    onChange={setActiveTab}
-                    items={tabItems}
-                />
-            </SectionCard>
+            <div style={{ display: 'flex', gap: token.marginMD, flex: 1, minHeight: 0 }}>
+                <Card
+                    styles={{ body: { padding: 0 } }}
+                    style={{ width: 250, height: 'fit-content' }}
+                >
+                    <Menu
+                        mode="inline"
+                        selectedKeys={[activeTab]}
+                        onClick={({ key }) => setActiveTab(key)}
+                        items={menuItems}
+                        style={{ borderRight: 'none' }}
+                    />
+                </Card>
+
+                <FullHeightSectionCard style={{ flex: 1 }}>
+                    {renderContent()}
+                </FullHeightSectionCard>
+            </div>
         </PageLayout>
     );
 };

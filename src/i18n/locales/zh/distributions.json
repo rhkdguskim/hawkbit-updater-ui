@@ -306,6 +306,7 @@
         "moduleTypesReadonly": "模块类型创建后无法更改。"
     },
     "tagManagement": {
+        "title": "分发集标签管理",
         "dsTagTitle": "分发集标签",
         "addTag": "添加标签",
         "editTag": "编辑标签",

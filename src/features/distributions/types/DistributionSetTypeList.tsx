@@ -12,10 +12,14 @@ import { useTranslation } from 'react-i18next';
 import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterValue } from '@/components/patterns';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import DistributionSetTypeDialog from './DistributionSetTypeDialog';
-import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createDateColumn } from '@/utils/columnFactory';
+import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createDateColumn, createColoredNameColumn } from '@/utils/columnFactory';
 import { StrongSmallText } from '@/components/shared/Typography';
 
-const DistributionSetTypeList: React.FC = () => {
+interface DistributionSetTypeListProps {
+    standalone?: boolean;
+}
+
+const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ standalone = true }) => {
     const { t } = useTranslation(['distributions', 'common']);
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
@@ -92,14 +96,7 @@ const DistributionSetTypeList: React.FC = () => {
 
     const columns: ColumnsType<MgmtDistributionSetType> = useMemo(() => [
         createIdColumn<MgmtDistributionSetType>(t),
-        {
-            title: t('common:table.name'),
-            dataIndex: 'name',
-            key: 'name',
-            width: 180,
-            sorter: true,
-            render: (text: string) => <StrongSmallText>{text}</StrongSmallText>,
-        },
+        createColoredNameColumn<MgmtDistributionSetType>({ t }),
         {
             title: t('typeManagement.columns.key'),
             dataIndex: 'key',
@@ -119,26 +116,21 @@ const DistributionSetTypeList: React.FC = () => {
         }),
     ], [t, isAdmin]);
 
-    return (
-        <StandardListLayout
-            title={t('typeManagement.dsTypeTitle')}
-            description={t('typeManagement.dsTypeDescription', { defaultValue: 'Manage distribution set types' })}
-            searchBar={
-                <FilterBuilder
-                    fields={filterFields}
-                    filters={filters}
-                    onFiltersChange={handleFiltersChange}
-                    onRefresh={() => refetch()}
-                    onAdd={isAdmin ? () => {
-                        setEditingType(null);
-                        setDialogOpen(true);
-                    } : undefined}
-                    canAdd={isAdmin}
-                    addLabel={t('typeManagement.addType')}
-                    loading={isLoading || isFetching}
-                />
-            }
-        >
+    const listContent = (
+        <>
+            <FilterBuilder
+                fields={filterFields}
+                filters={filters}
+                onFiltersChange={handleFiltersChange}
+                onRefresh={() => refetch()}
+                onAdd={isAdmin ? () => {
+                    setEditingType(null);
+                    setDialogOpen(true);
+                } : undefined}
+                canAdd={isAdmin}
+                addLabel={t('typeManagement.addType')}
+                loading={isLoading || isFetching}
+            />
             <DataView
                 loading={isLoading}
                 error={null}
@@ -168,6 +160,19 @@ const DistributionSetTypeList: React.FC = () => {
                 onClose={handleDialogClose}
                 onSuccess={handleDialogSuccess}
             />
+        </>
+    );
+
+    if (!standalone) {
+        return listContent;
+    }
+
+    return (
+        <StandardListLayout
+            title={t('typeManagement.dsTypeTitle')}
+            description={t('typeManagement.dsTypeDescription', { defaultValue: 'Manage distribution set types' })}
+        >
+            {listContent}
         </StandardListLayout>
     );
 };

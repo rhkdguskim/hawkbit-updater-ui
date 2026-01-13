@@ -24,7 +24,6 @@ export const DistributionSetTagsCell: React.FC<DistributionSetTagsCellProps> = (
     const isAdmin = role === 'Admin';
 
     const [popoverOpen, setPopoverOpen] = useState(false);
-    const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
     const [loadingAssignments, setLoadingAssignments] = useState(false);
     const [assignedTagIds, setAssignedTagIds] = useState<number[]>([]);
     const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -44,7 +43,8 @@ export const DistributionSetTagsCell: React.FC<DistributionSetTagsCellProps> = (
                 // Auto-select the newly created tag
                 const newTag = data?.[0];
                 if (newTag?.id) {
-                    setSelectedTagIds(prev => [...prev, newTag.id]);
+                    await assignMutation.mutateAsync({ distributionsetTagId: newTag.id, distributionsetId: distributionSetId });
+                    setAssignedTagIds(prev => [...prev, newTag.id!]);
                 }
             },
             onError: (error) => {
@@ -84,25 +84,25 @@ export const DistributionSetTagsCell: React.FC<DistributionSetTagsCellProps> = (
     const handleOpenChange = async (open: boolean) => {
         if (open) {
             await fetchAssignments();
-            setSelectedTagIds(assignedTagIds);
         }
         setPopoverOpen(open);
     };
 
-    const handleSave = async () => {
-        const toAssign = selectedTagIds.filter(id => !assignedTagIds.includes(id));
-        const toUnassign = assignedTagIds.filter(id => !selectedTagIds.includes(id));
-
+    const handleSelect = async (value: number) => {
         try {
-            for (const tagId of toAssign) {
-                await assignMutation.mutateAsync({ distributionsetTagId: tagId, distributionsetId: distributionSetId });
-            }
-            for (const tagId of toUnassign) {
-                await unassignMutation.mutateAsync({ distributionsetTagId: tagId, distributionsetId: distributionSetId });
-            }
+            await assignMutation.mutateAsync({ distributionsetTagId: value, distributionsetId: distributionSetId });
             message.success(t('messages.tagsUpdated'));
-            setAssignedTagIds(selectedTagIds);
-            setPopoverOpen(false);
+            setAssignedTagIds(prev => [...prev, value]);
+        } catch (error) {
+            message.error((error as Error).message || t('common:messages.error'));
+        }
+    };
+
+    const handleDeselect = async (value: number) => {
+        try {
+            await unassignMutation.mutateAsync({ distributionsetTagId: value, distributionsetId: distributionSetId });
+            message.success(t('messages.tagsUpdated'));
+            setAssignedTagIds(prev => prev.filter(id => id !== value));
         } catch (error) {
             message.error((error as Error).message || t('common:messages.error'));
         }
@@ -121,11 +121,13 @@ export const DistributionSetTagsCell: React.FC<DistributionSetTagsCellProps> = (
         <div style={{ width: 280 }}>
             <Select
                 mode="multiple"
-                style={{ width: '100%', marginBottom: 8 }}
+                style={{ width: '100%', marginBottom: 0 }}
                 placeholder={t('list.selectTags')}
-                value={selectedTagIds}
-                onChange={setSelectedTagIds}
-                loading={allTagsLoading}
+                value={assignedTagIds}
+                onSelect={handleSelect}
+                onDeselect={handleDeselect}
+                loading={allTagsLoading || assignMutation.isPending || unassignMutation.isPending}
+                allowClear={false}
                 options={allTags.map(tag => ({
                     value: tag.id,
                     label: <Tag color={tag.colour || 'default'}>{tag.name}</Tag>,
@@ -145,19 +147,6 @@ export const DistributionSetTagsCell: React.FC<DistributionSetTagsCellProps> = (
                     </>
                 )}
             />
-            <Space>
-                <Button size="small" onClick={() => setPopoverOpen(false)}>
-                    {t('common:actions.cancel')}
-                </Button>
-                <Button
-                    type="primary"
-                    size="small"
-                    onClick={handleSave}
-                    loading={assignMutation.isPending || unassignMutation.isPending}
-                >
-                    {t('common:actions.save')}
-                </Button>
-            </Space>
         </div>
     );
 

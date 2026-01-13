@@ -258,9 +258,9 @@ const TargetTable: React.FC<TargetTableProps> = ({
             width: 220,
             render: (_: string, record) => (
                 <Space direction="vertical" size={0}>
-                    <Text strong>{record.name || record.controllerId}</Text>
+                    <Text strong style={{ fontFamily: 'var(--font-mono)' }}>{record.name || record.controllerId}</Text>
                     {record.ipAddress && (
-                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
                             {record.ipAddress}
                         </Text>
                     )}
@@ -329,7 +329,7 @@ const TargetTable: React.FC<TargetTableProps> = ({
                             <Text type="secondary">-</Text>
                         )}
                         {record.installedAt && (
-                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
                                 {dayjs(record.installedAt).format('YYYY-MM-DD HH:mm')}
                             </Text>
                         )}
@@ -343,7 +343,11 @@ const TargetTable: React.FC<TargetTableProps> = ({
             key: 'lastControllerRequestAt',
             width: 160,
             render: (value: number | undefined) =>
-                value ? dayjs(value).format('YYYY-MM-DD HH:mm') : <Text type="secondary">-</Text>,
+                value ? (
+                    <Text style={{ fontFamily: 'var(--font-mono)' }}>{dayjs(value).format('YYYY-MM-DD HH:mm')}</Text>
+                ) : (
+                    <Text type="secondary" style={{ fontFamily: 'var(--font-mono)' }}>-</Text>
+                ),
         },
         {
             title: t('table.autoConfirm'),
@@ -364,7 +368,11 @@ const TargetTable: React.FC<TargetTableProps> = ({
             sorter: true,
             width: 150,
             render: (value: number | undefined) =>
-                value ? dayjs(value).format('YYYY-MM-DD HH:mm') : <Text type="secondary">-</Text>,
+                value ? (
+                    <Text style={{ fontFamily: 'var(--font-mono)' }}>{dayjs(value).format('YYYY-MM-DD HH:mm')}</Text>
+                ) : (
+                    <Text type="secondary" style={{ fontFamily: 'var(--font-mono)' }}>-</Text>
+                ),
         },
         {
             title: '',

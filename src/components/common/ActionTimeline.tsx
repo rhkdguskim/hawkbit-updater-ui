@@ -10,6 +10,7 @@ import {
     ThunderboltOutlined,
 } from '@ant-design/icons';
 import type { MgmtAction } from '@/api/generated/model';
+import { isActionErrored, isActionCanceled } from '@/utils/statusUtils';
 
 // Animations
 const pulse = keyframes`
@@ -124,23 +125,20 @@ export const ActionTimeline: React.FC<ActionTimelineProps> = ({ action }) => {
     const detail = lastMessage || action.detailStatus || '';
 
     // Determine state based on status and detailStatus
-    // If detailStatus has content like "Downloading", "Updating", etc. (e.g. in Korean "다운로드 중", "업데이트 중"), treat as running
     type State = 'pending' | 'scheduled' | 'running' | 'finished' | 'error';
     let state: State = 'pending';
 
-    // First check for error/finished states
-    if (['error', 'failed', 'canceled'].includes(status)) {
+    if (isActionErrored(action as any) || isActionCanceled(action as any)) {
         state = 'error';
-    } else if (['finished'].includes(status)) {
+    } else if (['finished', 'success', 'completed'].includes(status)) {
         state = 'finished';
-    } else if (['running', 'retrieving', 'retrieved', 'downloading', 'download'].includes(status)) {
+    } else if (['running', 'retrieving', 'retrieved', 'downloading', 'download', 'processing', 'active'].includes(status)) {
         // Explicitly running states
         state = 'running';
-    } else if (detail && detail.length > 0 && !['scheduled', 'wait_for_confirmation'].includes(status)) {
+    } else if (detail && detail.length > 0 && !['scheduled', 'wait_for_confirmation', 'pending'].includes(status)) {
         // If there's a detailStatus message, it means activity is happening -> running
-        // This handles cases where status is 'pending' but detailStatus shows real progress
         state = 'running';
-    } else if (['scheduled', 'pending', 'wait_for_confirmation'].includes(status)) {
+    } else if (['scheduled', 'pending', 'wait_for_confirmation', 'waiting_for_confirmation', 'creating'].includes(status)) {
         // Waiting states without activity
         state = 'scheduled';
     }

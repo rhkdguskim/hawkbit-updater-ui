@@ -24,6 +24,57 @@ export function createIdColumn<T>(t: TFunction): ColumnType<T> {
 }
 
 /**
+ * Creates a standard name column that can be colored
+ */
+export function createColoredNameColumn<T extends { id?: number | string; name?: string; colour?: string }>(options: {
+    t: TFunction;
+    width?: number;
+    editable?: boolean;
+    onEdit?: (record: T, value: string) => void | Promise<void>;
+    onClick?: (record: T) => void;
+    useTag?: boolean;
+}): ColumnType<T> {
+    const { t, width = 200, editable = false, onEdit, onClick, useTag = true } = options;
+
+    return {
+        title: t('common:table.name', { defaultValue: 'Name' }),
+        dataIndex: 'name',
+        key: 'name',
+        sorter: true,
+        width,
+        render: (text: string, record: T) => {
+            const name = text || String(record.id || '');
+            const content = useTag ? (
+                <Tag color={record.colour || 'default'} style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)' }}>
+                    {name}
+                </Tag>
+            ) : (
+                <StrongSmallText style={{ color: record.colour }}>{name}</StrongSmallText>
+            );
+
+            if (editable && onEdit) {
+                return (
+                    <EditableCell
+                        value={text || ''}
+                        onSave={async (val) => { await onEdit(record, val); }}
+                        editable
+                        renderDisplay={() => content}
+                    />
+                );
+            }
+            if (onClick) {
+                return (
+                    <a onClick={(e) => { e.stopPropagation(); onClick(record); }}>
+                        {content}
+                    </a>
+                );
+            }
+            return content;
+        },
+    };
+}
+
+/**
  * Creates a standard name column
  */
 export function createNameColumn<T extends { id?: number | string; name?: string }>(options: {
@@ -182,7 +233,7 @@ export function createTypeColumn<T>(options: {
     t: TFunction;
     width?: number;
     dataIndex?: string;
-    color?: string;
+    color?: string | ((record: T) => string | undefined);
 }): ColumnType<T> {
     const { t, width = 120, dataIndex = 'typeName', color = 'blue' } = options;
 
@@ -191,9 +242,12 @@ export function createTypeColumn<T>(options: {
         dataIndex,
         key: 'type',
         width,
-        render: (text: string) => (
-            <Tag color={color}>{text || t('common:notSelected')}</Tag>
-        ),
+        render: (text: string, record: T) => {
+            const resolvedColor = typeof color === 'function' ? color(record) : color;
+            return (
+                <Tag color={resolvedColor || 'default'}>{text || t('common:notSelected')}</Tag>
+            );
+        },
     };
 }
 
@@ -278,7 +332,9 @@ export function createTagNameColumn<T extends { name?: string; colour?: string }
         width,
         sorter: true,
         render: (name: string, record: T) => (
-            <Tag color={record.colour || 'default'}>{name}</Tag>
+            <Tag color={record.colour || 'default'} style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)' }}>
+                {name}
+            </Tag>
         ),
     };
 }

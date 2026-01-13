@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Select, Spin, Typography, Divider, Tag, Space } from 'antd';
+import { PresetColorPicker } from '@/components/common/PresetColorPicker';
 import { useTranslation } from 'react-i18next';
 import type { MgmtTargetType, MgmtTargetTypeRequestBodyPost, MgmtTargetTypeRequestBodyPut, MgmtDistributionSetType } from '@/api/generated/model';
 import { useGetDistributionSetTypes } from '@/api/generated/distribution-set-types/distribution-set-types';
@@ -15,12 +16,6 @@ const FullWidthSelect = styled(Select)`
     }
 `;
 
-const ColorInput = styled(Input)`
-    && {
-        width: 60px;
-        padding: var(--ant-padding-xxs, 4px);
-    }
-`;
 
 const SectionDivider = styled(Divider)`
     && {
@@ -164,7 +159,7 @@ const TargetTypeDialog: React.FC<TargetTypeDialogProps> = ({
                     name="colour"
                     label={t('typeManagement.colour')}
                 >
-                    <ColorInput type="color" />
+                    <PresetColorPicker />
                 </Form.Item>
 
                 <SectionDivider />

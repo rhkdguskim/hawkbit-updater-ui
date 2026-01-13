@@ -48,28 +48,28 @@ interface StatusTrendChartProps {
 const ChartContainer = styled.div`
     background: var(--ant-color-bg-container);
     border-radius: var(--ant-border-radius-lg);
-    padding: 20px 24px;
+    padding: 10px 16px;
     border: 1px solid var(--ant-color-border-secondary);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
     height: 100%;
-    min-height: 300px;
+    min-height: 180px;
 `;
 
 const HeaderRow = styled(Flex)`
     border-bottom: 1px solid var(--ant-color-border-secondary);
-    padding-bottom: 12px;
+    padding-bottom: 4px;
 `;
 
 const IconBadge = styled.div`
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
     background: var(--ant-color-info-bg);
     color: var(--ant-color-info);
 `;
@@ -80,7 +80,7 @@ const ChartWrapper = styled.div`
 `;
 
 const LegendContainer = styled(Flex)`
-    padding-top: 8px;
+    padding-top: 4px;
     border-top: 1px solid var(--ant-color-border-secondary);
 `;
 

@@ -9,6 +9,7 @@ export const darkTheme: ThemeConfig = {
         colorSuccess: modernColors.colorSuccess,
         colorWarning: modernColors.colorWarning,
         colorError: modernColors.colorError,
+        colorTextHeading: '#ffffff',
         colorInfo: modernColors.colorInfo,
 
         // Deeper backgrounds (Zinc-950 and Zinc-900)
@@ -85,7 +86,7 @@ export const darkTheme: ThemeConfig = {
         },
         Table: {
             headerBg: '#2c2c2e',
-            headerColor: '#8e8e93',
+            headerColor: '#ffffff',
             rowHoverBg: '#3a3a3c',
             borderColor: '#3a3a3c',
             headerBorderRadius: 16,

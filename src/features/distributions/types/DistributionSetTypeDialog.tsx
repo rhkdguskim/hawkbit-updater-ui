@@ -1,5 +1,6 @@
 import React from 'react';
-import { Form, Input, message, ColorPicker, Select, Divider, Typography, Spin } from 'antd';
+import { Form, Input, message, Select, Divider, Typography, Spin } from 'antd';
+import { PresetColorPicker } from '@/components/common/PresetColorPicker';
 import { useTranslation } from 'react-i18next';
 import {
     useCreateDistributionSetTypes,
@@ -209,7 +210,7 @@ const DistributionSetTypeDialog: React.FC<DistributionSetTypeDialogProps> = ({
                         name="colour"
                         label={t('typeManagement.columns.colour')}
                     >
-                        <ColorPicker format="hex" />
+                        <PresetColorPicker />
                     </Form.Item>
 
                     <SectionDivider />

@@ -263,7 +263,7 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
         return theme?.accentBorder || 'rgba(0, 0, 0, 0.04)';
     }};
         flex-shrink: 0;
-        padding: var(--ant-padding-sm, 12px) var(--ant-padding, 16px);
+        padding: var(--ant-padding-xs, 8px) var(--ant-padding-sm, 12px);
         min-height: auto;
         background: transparent;
     }
@@ -277,7 +277,7 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
 
     .ant-card-body {
         flex: 1;
-        padding: var(--ant-padding-sm, 12px) var(--ant-padding, 16px);
+        padding: var(--ant-padding-xs, 8px) var(--ant-padding-sm, 12px);
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -376,6 +376,7 @@ export const ChartLegendItem = styled.div`
         border: 1px solid var(--ant-color-border-secondary);
         
         span { color: var(--ant-color-text-description) !important; }
+        color: var(--ant-color-text-description);
     }
 `;
 
@@ -402,6 +403,7 @@ export const ActivityItem = styled.div`
     .dark-mode & {
         background: var(--ant-color-bg-container-secondary, rgba(255, 255, 255, 0.04));
         border: 1px solid var(--ant-color-border-secondary);
+        color: var(--ant-color-text-description);
     }
 `;
 

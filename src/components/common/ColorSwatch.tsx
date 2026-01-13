@@ -18,7 +18,7 @@ const ColorBox = styled.div<{ $color: string; $size: number }>`
 
 const HexCode = styled.span`
     font-size: var(--ant-font-size-sm);
-    font-family: monospace;
+    font-family: var(--font-mono);
     color: var(--ant-color-text-secondary);
 `;
 

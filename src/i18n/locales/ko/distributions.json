@@ -307,6 +307,7 @@
         "moduleTypesReadonly": "모듈 타입은 생성 후 변경할 수 없습니다."
     },
     "tagManagement": {
+        "title": "배포 세트 태그 관리",
         "dsTagTitle": "배포 세트 태그",
         "addTag": "태그 추가",
         "editTag": "태그 수정",

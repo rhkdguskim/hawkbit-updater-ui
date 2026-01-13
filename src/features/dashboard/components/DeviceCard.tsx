@@ -249,7 +249,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ target, recentAction, targetTyp
                                     {target.targetTypeName}
                                 </Tag>
                             )}
-                            <Text type="secondary" style={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>
+                            <Text type="secondary" style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
                                 {target.ipAddress || target.address || ''}
                             </Text>
                         </Flex>

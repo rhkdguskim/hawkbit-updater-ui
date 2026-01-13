@@ -17,7 +17,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher, ThemeSwitcher } from '@/components/common';
-import { EmergencyStopButton } from '@/components/shared/EmergencyStopButton';
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -292,7 +291,6 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
             </HeaderLeft>
 
             <HeaderRight>
-                {role === 'Admin' && <EmergencyStopButton />}
 
                 <SettingsGroup>
                     <ThemeSwitcher />

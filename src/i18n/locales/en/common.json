@@ -240,6 +240,13 @@
         "months": "{{count}}mo ago",
         "years": "{{count}}y ago"
     },
+    "duration": {
+        "days": "{{count}}d",
+        "hours": "{{count}}h",
+        "minutes": "{{count}}m",
+        "seconds": "{{count}}s",
+        "ms": "{{count}}ms"
+    },
     "theme": {
         "light": "Light",
         "dark": "Dark",

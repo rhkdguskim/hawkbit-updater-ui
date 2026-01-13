@@ -64,7 +64,7 @@ export const InstalledModulesCell: React.FC<InstalledModulesCellProps> = ({ dist
                         <Text strong style={{ fontSize: 11, marginRight: 4 }}>
                             {module.typeName}:
                         </Text>
-                        <Text style={{ fontSize: 11 }}>
+                        <Text style={{ fontSize: 11, fontFamily: 'var(--font-mono)' }}>
                             {module.name} ({module.version})
                         </Text>
                     </ModuleTag>

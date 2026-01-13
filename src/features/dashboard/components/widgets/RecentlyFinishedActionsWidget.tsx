@@ -37,18 +37,18 @@ interface RecentlyFinishedActionsWidgetProps {
 const WidgetContainer = styled.div`
     background: var(--ant-color-bg-container);
     border-radius: var(--ant-border-radius-lg);
-    padding: 20px 24px;
+    padding: 12px 16px;
     border: 1px solid var(--ant-color-border-secondary);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     height: 100%;
     overflow: hidden;
 `;
 
 const HeaderRow = styled(Flex)`
     border-bottom: 1px solid var(--ant-color-border-secondary);
-    padding-bottom: 12px;
+    padding-bottom: 8px;
     flex-shrink: 0;
 `;
 
@@ -62,9 +62,9 @@ const ActionCard = styled.div<{ $status: 'success' | 'error' | 'canceled' }>`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    border-radius: 10px;
+    padding: 6px 12px;
+    margin-bottom: 4px;
+    border-radius: 8px;
     background: ${({ $status }) =>
         $status === 'error' ? 'rgba(var(--ant-red-rgb), 0.06)' :
             $status === 'canceled' ? 'rgba(var(--ant-orange-rgb), 0.06)' :

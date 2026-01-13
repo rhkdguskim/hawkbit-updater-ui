@@ -1,26 +1,5 @@
-import React from 'react';
-import { Card, theme } from 'antd';
-import { PageLayout, PageHeader } from '@/components/patterns';
+import { PageLayout, PageHeader, FullHeightSectionCard } from '@/components/patterns';
 import styled from 'styled-components';
-
-const FullHeightLayout = styled(PageLayout)`
-    min-height: 100vh;
-`;
-
-const ContentCard = styled(Card)<{ $bodyPadding: string }>`
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    
-    .ant-card-body {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        padding: ${props => props.$bodyPadding};
-        min-height: 0;
-    }
-`;
 
 const TableWrapper = styled.div`
     flex: 1;
@@ -37,7 +16,7 @@ const TableWrapper = styled.div`
         position: sticky;
         top: 0;
         z-index: 2;
-        background: var(--ant-color-bg-container, #fff);
+        background: var(--ant-table-header-bg) !important;
     }
 
     /* Prevent tbody rows from stretching */
@@ -62,6 +41,8 @@ interface StandardListLayoutProps {
     bulkActionBar?: React.ReactNode;
     children: React.ReactNode;
     noCardPadding?: boolean;
+    /** Whether to render as a standalone page (default: true) */
+    standalone?: boolean;
 }
 
 export const StandardListLayout: React.FC<StandardListLayoutProps> = ({
@@ -74,12 +55,27 @@ export const StandardListLayout: React.FC<StandardListLayoutProps> = ({
     bulkActionBar,
     children,
     noCardPadding = true,
+    standalone = true,
 }) => {
-    const { token } = theme.useToken();
-    const bodyPadding = noCardPadding ? '0' : `${token.paddingLG}px`;
+    const content = (
+        <>
+            {searchBar}
+            {bulkActionBar}
+
+            <FullHeightSectionCard style={{ padding: noCardPadding ? 0 : undefined }}>
+                <TableWrapper>
+                    {children}
+                </TableWrapper>
+            </FullHeightSectionCard>
+        </>
+    );
+
+    if (!standalone) {
+        return content;
+    }
 
     return (
-        <FullHeightLayout>
+        <PageLayout fullHeight>
             <PageHeader
                 title={title}
                 subtitle={subtitle}
@@ -87,17 +83,8 @@ export const StandardListLayout: React.FC<StandardListLayoutProps> = ({
                 subtitleExtra={headerSubtitleExtra}
                 actions={headerExtra}
             />
-
-            {searchBar}
-
-            {bulkActionBar}
-
-            <ContentCard $bodyPadding={bodyPadding}>
-                <TableWrapper>
-                    {children}
-                </TableWrapper>
-            </ContentCard>
-        </FullHeightLayout>
+            {content}
+        </PageLayout>
     );
 };
 

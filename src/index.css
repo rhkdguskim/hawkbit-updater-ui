@@ -2,6 +2,7 @@
 
 /* Import Google Fonts - Inter for English, Pretendard for Korean */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
 
 /* Root Variables */
@@ -245,6 +246,21 @@ textarea {
 .ant-tabs,
 .ant-breadcrumb {
     font-family: var(--font-sans) !important;
+}
+
+/* Recharts Typography Overrides */
+.recharts-default-tooltip,
+.recharts-tooltip-label,
+.recharts-tooltip-item,
+.recharts-cartesian-axis-tick-value,
+.recharts-legend-item-text,
+.recharts-text {
+    font-family: var(--font-sans) !important;
+}
+
+.recharts-cartesian-axis-tick-value {
+    font-size: 10px;
+    fill: var(--ant-color-text-description);
 }
 
 /* Cards with hover effect */
@@ -1144,63 +1160,68 @@ textarea {
 
 /* NProgress Custom Styles */
 #nprogress {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 #nprogress .bar {
-  background: var(--ant-color-primary) !important;
-  position: fixed;
-  z-index: 10000;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  box-shadow: 0 0 10px rgba(var(--ant-color-primary-rgb), 0.5);
+    background: var(--ant-color-primary) !important;
+    position: fixed;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    box-shadow: 0 0 10px rgba(var(--ant-color-primary-rgb), 0.5);
 }
 
 /* Fancy blur effect */
 #nprogress .peg {
-  display: block;
-  position: absolute;
-  right: 0px;
-  width: 100px;
-  height: 100%;
-  box-shadow: 0 0 10px var(--ant-color-primary), 0 0 5px var(--ant-color-primary);
-  opacity: 1.0;
-  transform: rotate(3deg) translate(0px, -4px);
+    display: block;
+    position: absolute;
+    right: 0px;
+    width: 100px;
+    height: 100%;
+    box-shadow: 0 0 10px var(--ant-color-primary), 0 0 5px var(--ant-color-primary);
+    opacity: 1.0;
+    transform: rotate(3deg) translate(0px, -4px);
 }
 
 /* Spinner */
 #nprogress .spinner {
-  display: block;
-  position: fixed;
-  z-index: 10000;
-  top: 15px;
-  right: 15px;
+    display: block;
+    position: fixed;
+    z-index: 10000;
+    top: 15px;
+    right: 15px;
 }
 
 #nprogress .spinner-icon {
-  width: 18px;
-  height: 18px;
-  box-sizing: border-box;
-  border: solid 2px transparent;
-  border-top-color: var(--ant-color-primary);
-  border-left-color: var(--ant-color-primary);
-  border-radius: 50%;
-  animation: nprogress-spinner 400ms linear infinite;
+    width: 18px;
+    height: 18px;
+    box-sizing: border-box;
+    border: solid 2px transparent;
+    border-top-color: var(--ant-color-primary);
+    border-left-color: var(--ant-color-primary);
+    border-radius: 50%;
+    animation: nprogress-spinner 400ms linear infinite;
 }
 
 .nprogress-custom-parent {
-  overflow: hidden;
-  position: relative;
+    overflow: hidden;
+    position: relative;
 }
 
 .nprogress-custom-parent #nprogress .spinner,
 .nprogress-custom-parent #nprogress .bar {
-  position: absolute;
+    position: absolute;
 }
 
 @keyframes nprogress-spinner {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }

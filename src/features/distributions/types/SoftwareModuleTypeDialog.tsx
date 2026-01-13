@@ -1,5 +1,6 @@
 import React from 'react';
-import { Form, Input, message, ColorPicker, InputNumber } from 'antd';
+import { Form, Input, message, InputNumber } from 'antd';
+import { PresetColorPicker } from '@/components/common/PresetColorPicker';
 import { useTranslation } from 'react-i18next';
 import {
     useCreateSoftwareModuleTypes,
@@ -143,7 +144,7 @@ const SoftwareModuleTypeDialog: React.FC<SoftwareModuleTypeDialogProps> = ({
                     name="colour"
                     label={t('typeManagement.columns.colour')}
                 >
-                    <ColorPicker format="hex" />
+                    <PresetColorPicker />
                 </Form.Item>
             </Form>
         </StandardModal>

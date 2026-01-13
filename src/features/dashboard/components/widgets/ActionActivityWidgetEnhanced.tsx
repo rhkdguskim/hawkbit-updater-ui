@@ -31,27 +31,27 @@ interface ActionActivityWidgetProps {
 const WidgetContainer = styled.div`
     background: var(--ant-color-bg-container);
     border-radius: var(--ant-border-radius-lg);
-    padding: 20px 24px;
+    padding: 12px 16px;
     border: 1px solid var(--ant-color-border-secondary);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     height: 100%;
 `;
 
 const HeaderRow = styled(Flex)`
     border-bottom: 1px solid var(--ant-color-border-secondary);
-    padding-bottom: 12px;
+    padding-bottom: 8px;
 `;
 
 const IconBadge = styled.div<{ $status: 'normal' | 'warning' | 'critical' }>`
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
     background: ${({ $status }) =>
         $status === 'critical' ? 'var(--ant-color-error-bg)' :
             $status === 'warning' ? 'var(--ant-color-warning-bg)' :
@@ -67,7 +67,7 @@ const IconBadge = styled.div<{ $status: 'normal' | 'warning' | 'critical' }>`
 const MetricCard = styled.div`
     background: var(--ant-color-fill-quaternary);
     border-radius: var(--ant-border-radius);
-    padding: 12px 16px;
+    padding: 8px 12px;
     flex: 1;
 `;
 
@@ -79,7 +79,7 @@ const MetricLabel = styled(Text)`
 `;
 
 const MetricValue = styled.div<{ $status?: 'normal' | 'warning' | 'critical' }>`
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
     color: ${({ $status }) =>
         $status === 'critical' ? 'var(--ant-color-error)' :
@@ -107,12 +107,12 @@ const pulse = keyframes`
 const BottleneckBanner = styled.div<{ $status: 'warning' | 'critical' }>`
     background: ${({ $status }) => $status === 'critical' ? 'var(--ant-color-error-bg)' : 'var(--ant-color-warning-bg)'};
     border-radius: var(--ant-border-radius);
-    padding: 12px;
+    padding: 8px 10px;
     border: 1px solid ${({ $status }) => $status === 'critical' ? 'var(--ant-color-error-border)' : 'var(--ant-color-warning-border)'};
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 4px;
+    margin-top: 4px;
 
     ${({ $status }) => $status === 'critical' && css`
         animation: ${pulse} 2s infinite ease-in-out;

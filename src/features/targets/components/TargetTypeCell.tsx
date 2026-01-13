@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Tag, Popover, Select, Button, Space, Typography, message, Divider, Modal, Form, Input, ColorPicker } from 'antd';
+import { Tag, Popover, Select, Button, Typography, message, Divider, Modal, Form, Input } from 'antd';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useGetTargetTypes, useCreateTargetTypes, getGetTargetTypesQueryKey } from '@/api/generated/target-types/target-types';
 import { useAssignTargetType, useUnassignTargetType, getGetTargetsQueryKey } from '@/api/generated/targets/targets';
@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/useAuthStore';
 import type { MgmtTargetType } from '@/api/generated/model';
+import { PresetColorPicker } from '@/components/common/PresetColorPicker';
 
 const { Text } = Typography;
 
@@ -30,7 +31,6 @@ export const TargetTypeCell: React.FC<TargetTypeCellProps> = ({
     const [form] = Form.useForm();
 
     const [popoverOpen, setPopoverOpen] = useState(false);
-    const [selectedTypeId, setSelectedTypeId] = useState<number | undefined>(currentTypeId);
     const [createModalOpen, setCreateModalOpen] = useState(false);
 
     const { data: typesData, isLoading: typesLoading, refetch: refetchTypes } = useGetTargetTypes({ limit: 100 });
@@ -49,7 +49,11 @@ export const TargetTypeCell: React.FC<TargetTypeCellProps> = ({
                 // Auto-select the newly created type
                 const newType = data?.[0];
                 if (newType?.id) {
-                    setSelectedTypeId(newType.id);
+                    await assignTypeMutation.mutateAsync({
+                        targetId: controllerId,
+                        data: { id: newType.id }
+                    });
+                    queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
                 }
             },
             onError: (error) => {
@@ -59,26 +63,27 @@ export const TargetTypeCell: React.FC<TargetTypeCellProps> = ({
     });
 
     const handleOpenChange = (open: boolean) => {
-        if (open) {
-            setSelectedTypeId(currentTypeId);
-        }
         setPopoverOpen(open);
     };
 
-    const handleSave = async () => {
+    const handleSelect = async (value: number) => {
         try {
-            if (selectedTypeId && selectedTypeId !== currentTypeId) {
-                await assignTypeMutation.mutateAsync({
-                    targetId: controllerId,
-                    data: { id: selectedTypeId }
-                });
-                message.success(t('messages.typeUpdated'));
-            } else if (!selectedTypeId && currentTypeId) {
-                await unassignTypeMutation.mutateAsync({ targetId: controllerId });
-                message.success(t('messages.typeRemoved'));
-            }
+            await assignTypeMutation.mutateAsync({
+                targetId: controllerId,
+                data: { id: value }
+            });
+            message.success(t('messages.typeUpdated'));
             queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
-            setPopoverOpen(false);
+        } catch (error) {
+            message.error((error as Error).message || t('common:messages.error'));
+        }
+    };
+
+    const handleClear = async () => {
+        try {
+            await unassignTypeMutation.mutateAsync({ targetId: controllerId });
+            message.success(t('messages.typeRemoved'));
+            queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
         } catch (error) {
             message.error((error as Error).message || t('common:messages.error'));
         }
@@ -107,11 +112,12 @@ export const TargetTypeCell: React.FC<TargetTypeCellProps> = ({
     const popoverContent = (
         <div style={{ width: 250 }}>
             <Select
-                style={{ width: '100%', marginBottom: 8 }}
+                style={{ width: '100%', marginBottom: 0 }}
                 placeholder={t('list.selectType')}
-                value={selectedTypeId}
-                onChange={setSelectedTypeId}
-                loading={typesLoading}
+                value={currentTypeId}
+                onSelect={handleSelect}
+                onClear={handleClear}
+                loading={typesLoading || assignTypeMutation.isPending || unassignTypeMutation.isPending}
                 allowClear
                 options={(typesData?.content as MgmtTargetType[] || []).map(type => ({
                     value: type.id,
@@ -132,19 +138,6 @@ export const TargetTypeCell: React.FC<TargetTypeCellProps> = ({
                     </>
                 )}
             />
-            <Space>
-                <Button size="small" onClick={() => setPopoverOpen(false)}>
-                    {t('common:actions.cancel')}
-                </Button>
-                <Button
-                    type="primary"
-                    size="small"
-                    onClick={handleSave}
-                    loading={assignTypeMutation.isPending || unassignTypeMutation.isPending}
-                >
-                    {t('common:actions.save')}
-                </Button>
-            </Space>
         </div>
     );
 
@@ -218,7 +211,7 @@ export const TargetTypeCell: React.FC<TargetTypeCellProps> = ({
                         name="colour"
                         label={t('tagManagement.colour')}
                     >
-                        <ColorPicker format="hex" />
+                        <PresetColorPicker />
                     </Form.Item>
                 </Form>
             </Modal>

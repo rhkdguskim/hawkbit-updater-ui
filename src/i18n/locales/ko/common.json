@@ -242,6 +242,13 @@
         "months": "{{count}}개월 전",
         "years": "{{count}}년 전"
     },
+    "duration": {
+        "days": "{{count}}일",
+        "hours": "{{count}}시간",
+        "minutes": "{{count}}분",
+        "seconds": "{{count}}초",
+        "ms": "{{count}}ms"
+    },
     "theme": {
         "light": "라이트",
         "dark": "다크",

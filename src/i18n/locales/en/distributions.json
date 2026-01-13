@@ -307,6 +307,7 @@
         "moduleTypesReadonly": "Module types cannot be changed after creation."
     },
     "tagManagement": {
+        "title": "Distribution Set Tag Management",
         "dsTagTitle": "Distribution Set Tags",
         "addTag": "Add Tag",
         "editTag": "Edit Tag",

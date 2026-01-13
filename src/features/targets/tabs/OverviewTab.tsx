@@ -156,7 +156,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 size="middle"
             >
                 <Descriptions.Item label={t('table.controllerId')}>
-                    <Text strong copyable>
+                    <Text strong copyable style={{ fontFamily: 'var(--font-mono)' }}>
                         {target.controllerId}
                     </Text>
                 </Descriptions.Item>
@@ -171,7 +171,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 </Descriptions.Item>
                 <Descriptions.Item label={t('overview.securityToken')}>
                     {target.securityToken ? (
-                        <Text code copyable>
+                        <Text code copyable style={{ fontFamily: 'var(--font-mono)' }}>
                             {target.securityToken}
                         </Text>
                     ) : (
@@ -181,7 +181,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 <Descriptions.Item label={t('overview.created')}>
                     {target.createdAt ? (
                         <>
-                            {dayjs(target.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                            <Text style={{ fontFamily: 'var(--font-mono)' }}>
+                                {dayjs(target.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                            </Text>
                             <Tag style={{ marginLeft: 8 }}>{target.createdBy}</Tag>
                         </>
                     ) : (
@@ -191,7 +193,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 <Descriptions.Item label={t('overview.lastModified')}>
                     {target.lastModifiedAt ? (
                         <>
-                            {dayjs(target.lastModifiedAt).format('YYYY-MM-DD HH:mm:ss')}
+                            <Text style={{ fontFamily: 'var(--font-mono)' }}>
+                                {dayjs(target.lastModifiedAt).format('YYYY-MM-DD HH:mm:ss')}
+                            </Text>
                             <Tag style={{ marginLeft: 8 }}>{target.lastModifiedBy}</Tag>
                         </>
                     ) : (

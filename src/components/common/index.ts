@@ -16,4 +16,6 @@ export { ActionCell } from './ActionCell';
 export type { ActionCellProps, ActionButton } from './ActionCell';
 export { StatusQuickFilters } from './StatusQuickFilters';
 export type { StatusFilterOption } from './StatusQuickFilters';
+export { PresetColorPicker } from './PresetColorPicker';
+export type { PresetColorPickerProps } from './PresetColorPicker';
 

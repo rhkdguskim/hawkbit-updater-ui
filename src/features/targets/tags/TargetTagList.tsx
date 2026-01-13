@@ -25,7 +25,11 @@ interface MgmtTagRequestBodyPost {
     colour?: string;
 }
 
-const TargetTagList: React.FC = () => {
+interface TargetTagListProps {
+    standalone?: boolean;
+}
+
+const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
     const queryClient = useQueryClient();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
@@ -140,26 +144,8 @@ const TargetTagList: React.FC = () => {
         }),
     ], [t, isAdmin]);
 
-    return (
-        <StandardListLayout
-            title={t('tagManagement.title')}
-            description={t('tagManagement.description', { defaultValue: 'Manage target tags for categorization' })}
-            searchBar={
-                <FilterBuilder
-                    fields={filterFields}
-                    filters={filters}
-                    onFiltersChange={handleFiltersChange}
-                    onRefresh={() => refetch()}
-                    onAdd={() => {
-                        setEditingTag(null);
-                        setDialogOpen(true);
-                    }}
-                    canAdd={isAdmin}
-                    addLabel={t('tagManagement.add')}
-                    loading={isLoading || isFetching}
-                />
-            }
-        >
+    const listContent = (
+        <>
             <DataView
                 loading={isLoading}
                 error={null}
@@ -205,6 +191,53 @@ const TargetTagList: React.FC = () => {
                     cancelText: t('common:actions.cancel'),
                 }}
             />
+        </>
+    );
+
+    if (!standalone) {
+        return (
+            <div style={{ marginTop: 16 }}>
+                <div style={{ marginBottom: 16 }}>
+                    <FilterBuilder
+                        fields={filterFields}
+                        filters={filters}
+                        onFiltersChange={handleFiltersChange}
+                        onRefresh={() => refetch()}
+                        onAdd={() => {
+                            setEditingTag(null);
+                            setDialogOpen(true);
+                        }}
+                        canAdd={isAdmin}
+                        addLabel={t('tagManagement.add')}
+                        loading={isLoading || isFetching}
+                    />
+                </div>
+                {listContent}
+            </div>
+        );
+    }
+
+    return (
+        <StandardListLayout
+            title={t('tagManagement.title')}
+            description={t('tagManagement.description', { defaultValue: 'Manage target tags for categorization' })}
+            searchBar={
+                <FilterBuilder
+                    fields={filterFields}
+                    filters={filters}
+                    onFiltersChange={handleFiltersChange}
+                    onRefresh={() => refetch()}
+                    onAdd={() => {
+                        setEditingTag(null);
+                        setDialogOpen(true);
+                    }}
+                    canAdd={isAdmin}
+                    addLabel={t('tagManagement.add')}
+                    loading={isLoading || isFetching}
+                />
+            }
+        >
+            {listContent}
         </StandardListLayout>
     );
 };
