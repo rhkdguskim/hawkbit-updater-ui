@@ -10,24 +10,35 @@ import type { MgmtRolloutResponseBody } from '@/api/generated/model';
 const { Text, Title } = Typography;
 
 const EmergencyButton = styled(Button)`
-    background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%);
-    border: none;
-    box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4);
-    font-weight: 600;
+    /* Industrial Emergency Stop Button Style */
+    background: var(--ant-color-error); /* Solid red for clarity */
+    border: 1px solid #b91c1c;
+    box-shadow: 0 4px 0 #991b1b; /* Physical button depth */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    height: auto;
+    padding: 6px 16px;
+    border-radius: 4px; /* Sharp corners */
+    transition: all 0.1s;
     
     &:hover:not(:disabled) {
-        background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%);
-        box-shadow: 0 6px 16px rgba(255, 77, 79, 0.5);
+        background: #ef4444;
+        transform: translateY(2px);
+        box-shadow: 0 2px 0 #991b1b;
     }
     
     &:active:not(:disabled) {
-        background: linear-gradient(135deg, #cf1322 0%, #a8071a 100%);
+        transform: translateY(4px);
+        box-shadow: none;
     }
 
     &:disabled {
-        background: rgba(0, 0, 0, 0.04);
+        background: var(--ant-color-bg-container-disabled);
+        border-color: var(--ant-color-border);
         box-shadow: none;
-        color: rgba(0, 0, 0, 0.25);
+        color: var(--ant-color-text-disabled);
+        transform: none;
     }
 `;
 
@@ -35,9 +46,10 @@ const RolloutItem = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
-    background: var(--ant-color-bg-container-disabled, #fafafa);
-    border-radius: 8px;
+    padding: 8px 12px;
+    background: var(--ant-color-bg-container);
+    border: 1px solid var(--ant-color-border);
+    border-radius: var(--ant-border-radius, 6px);
     margin-bottom: 8px;
 `;
 
@@ -49,11 +61,14 @@ const StatusIndicator = styled.div<{ $status: 'pending' | 'success' | 'error' }>
     display: flex;
     align-items: center;
     gap: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
     color: ${props => {
         switch (props.$status) {
-            case 'success': return '#52c41a';
-            case 'error': return '#ff4d4f';
-            default: return '#1677ff';
+            case 'success': return 'var(--ant-color-success)';
+            case 'error': return 'var(--ant-color-error)';
+            default: return 'var(--ant-color-primary)';
         }
     }};
 `;
@@ -200,8 +215,6 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
         </Button>
     ) : (
         <EmergencyButton
-            type="primary"
-            danger
             icon={<PauseCircleOutlined />}
             size={size}
             onClick={handleOpenModal}
@@ -211,7 +224,7 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
             {hasRunningRollouts && (
                 <Badge
                     count={runningRollouts.length}
-                    style={{ marginLeft: 8, backgroundColor: '#fff', color: '#ff4d4f' }}
+                    style={{ marginLeft: 8, backgroundColor: '#fff', color: '#ff4d4f', fontWeight: 'bold' }}
                 />
             )}
         </EmergencyButton>
@@ -224,8 +237,8 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
             <Modal
                 title={
                     <Space>
-                        <WarningOutlined style={{ color: '#ff4d4f' }} />
-                        {t('emergencyStop.title')}
+                        <WarningOutlined style={{ color: 'var(--ant-color-error)' }} />
+                        <Text strong style={{ textTransform: 'uppercase' }}>{t('emergencyStop.title')}</Text>
                     </Space>
                 }
                 open={modalOpen}
@@ -245,6 +258,7 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                             onClick={handleEmergencyStop}
                             loading={processing}
                             disabled={isLoading || !hasRunningRollouts}
+                            style={{ fontWeight: 600, borderRadius: 4 }}
                         >
                             {t('emergencyStop.confirm')}
                         </Button>
@@ -258,9 +272,9 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                             type="warning"
                             showIcon
                             icon={<ExclamationCircleOutlined />}
-                            message={t('emergencyStop.warning')}
+                            message={<Text strong>{t('emergencyStop.warning')}</Text>}
                             description={t('emergencyStop.warningDesc')}
-                            style={{ marginBottom: 16 }}
+                            style={{ marginBottom: 16, border: '1px solid var(--ant-color-warning-border)' }}
                         />
 
                         {isLoading ? (
@@ -278,7 +292,7 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                             />
                         ) : (
                             <>
-                                <Title level={5}>
+                                <Title level={5} style={{ fontFamily: 'var(--font-mono)' }}>
                                     {t('emergencyStop.affectedRollouts', { count: runningRollouts.length })}
                                 </Title>
                                 <List
@@ -288,11 +302,11 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                                             <RolloutInfo>
                                                 <Text strong>{rollout.name}</Text>
                                                 <br />
-                                                <Text type="secondary" style={{ fontSize: 12 }}>
+                                                <Text type="secondary" style={{ fontSize: 12, fontFamily: 'var(--font-mono)' }}>
                                                     {t('emergencyStop.totalTargets', { count: rollout.totalTargets })}
                                                 </Text>
                                             </RolloutInfo>
-                                            <Tag color="processing">
+                                            <Tag color="processing" style={{ borderRadius: 2 }}>
                                                 {t('status.running', { ns: 'common' })}
                                             </Tag>
                                         </RolloutItem>
@@ -310,6 +324,7 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                             percent={progress}
                             status={phase === 'complete' ? 'success' : 'active'}
                             style={{ marginBottom: 16 }}
+                            strokeLinecap="square"
                         />
 
                         <List

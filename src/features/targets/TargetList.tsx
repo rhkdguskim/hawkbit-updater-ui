@@ -1,4 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TagOutlined, AppstoreOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
 import { Space, message } from 'antd';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
@@ -23,6 +24,7 @@ import { isTargetOnline } from '@/entities';
 import type { QuickFilterType } from './components/QuickFilters';
 
 const TargetList: React.FC = () => {
+    const navigate = useNavigate();
     const model = useTargetListModel();
     const { isAdmin, t } = model;
 
@@ -67,11 +69,10 @@ const TargetList: React.FC = () => {
         }
     }, [model, t]);
 
-    // Handle detail drawer open
-    const handleViewInDrawer = useCallback((target: MgmtTarget) => {
-        model.setDrawerTarget(target);
-        model.setDetailDrawerOpen(true);
-    }, [model]);
+    // Handle detail navigation
+    const handleViewDetail = useCallback((target: MgmtTarget) => {
+        navigate(`/targets/${target.controllerId}`);
+    }, [navigate]);
 
     // Column labels for customizer
     const columnLabels = useMemo(() => ({
@@ -141,13 +142,13 @@ const TargetList: React.FC = () => {
         isAdmin,
         availableTypes: model.availableTypes,
         visibleColumns: model.visibleColumns,
-        onView: handleViewInDrawer,
+        onView: handleViewDetail,
         onDelete: (target) => model.handleDeleteClick(target),
         onCopySecurityToken: (token) => {
             navigator.clipboard.writeText(token);
             message.success(t('common:actions.copied', { defaultValue: 'Copied!' }));
         },
-    }), [t, isAdmin, model.availableTypes, model.visibleColumns, handleViewInDrawer, model]);
+    }), [t, isAdmin, model.availableTypes, model.visibleColumns, handleViewDetail, model]);
 
     return (
         <StandardListLayout
@@ -218,7 +219,7 @@ const TargetList: React.FC = () => {
                     scroll={{ x: 1340 }}
                     locale={{ emptyText: t('noTargets') }}
                     onRow={(record) => ({
-                        onDoubleClick: () => handleViewInDrawer(record),
+                        onDoubleClick: () => handleViewDetail(record),
                     })}
                 />
             </DataView>

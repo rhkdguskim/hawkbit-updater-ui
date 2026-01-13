@@ -9,8 +9,9 @@ import styled, { keyframes, css } from 'styled-components';
 const { Text } = Typography;
 
 const pulse = keyframes`
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    0% { box-shadow: 0 0 0 0 rgba(var(--ant-color-primary-rgb), 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(var(--ant-color-primary-rgb), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--ant-color-primary-rgb), 0); }
 `;
 
 interface StatusDotProps {
@@ -19,8 +20,8 @@ interface StatusDotProps {
 
 const StatusDot = styled.span<StatusDotProps>`
     display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     flex-shrink: 0;
     
@@ -29,23 +30,22 @@ const StatusDot = styled.span<StatusDotProps>`
             case 'online':
                 return css`
                     background-color: var(--ant-color-success);
-                    box-shadow: 0 0 0 2px var(--ant-color-success-bg);
+                    box-shadow: 0 0 4px var(--ant-color-success); /* LED Glow */
                 `;
             case 'offline':
                 return css`
-                    background-color: var(--ant-color-error);
-                    box-shadow: 0 0 0 2px var(--ant-color-error-bg);
+                    background-color: var(--ant-color-text-tertiary); /* Dimmed for offline */
+                    border: 1px solid var(--ant-color-border);
                 `;
             case 'pending':
                 return css`
                     background-color: var(--ant-color-primary);
-                    box-shadow: 0 0 0 2px var(--ant-color-primary-bg);
-                    animation: ${pulse} 1.5s ease-in-out infinite;
+                    animation: ${pulse} 2s infinite;
                 `;
             default:
                 return css`
-                    background-color: var(--ant-color-text-quaternary);
-                    box-shadow: 0 0 0 2px var(--ant-color-fill-quaternary);
+                    background-color: transparent;
+                    border: 1px solid var(--ant-color-text-quaternary);
                 `;
         }
     }}
@@ -75,9 +75,9 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
             : t('status.offline');
 
     return (
-        <StatusWrapper size={6}>
+        <StatusWrapper size={8}>
             <StatusDot $status={status} />
-            <Text style={{ fontSize: 12 }}>{label}</Text>
+            <Text style={{ fontSize: 12, fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>{label}</Text>
         </StatusWrapper>
     );
 };
@@ -98,7 +98,7 @@ export const UpdateStatusIndicator: React.FC<UpdateStatusIndicatorProps> = ({
             case 'pending':
                 return 'pending';
             case 'error':
-                return 'offline';
+                return 'offline'; // Reuse offline color (red usually defined in global) for simple error dot, or add specific error type
             default:
                 return 'unknown';
         }
@@ -119,10 +119,12 @@ export const UpdateStatusIndicator: React.FC<UpdateStatusIndicatorProps> = ({
         }
     };
 
+    // Override error style in dot logic if needed, or stick to simple mapping
+
     return (
-        <StatusWrapper size={6}>
-            <StatusDot $status={getStatus()} />
-            <Text style={{ fontSize: 12 }}>{getLabel()}</Text>
+        <StatusWrapper size={8}>
+            <StatusDot $status={getStatus()} style={updateStatus === 'error' ? { backgroundColor: 'var(--ant-color-error)', boxShadow: 'none' } : {}} />
+            <Text style={{ fontSize: 12, fontFamily: 'var(--font-mono)' }}>{getLabel()}</Text>
         </StatusWrapper>
     );
 };

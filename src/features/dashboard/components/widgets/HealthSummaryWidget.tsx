@@ -27,62 +27,58 @@ interface HealthData {
 
 // Pulse animation for CRITICAL status
 const pulse = keyframes`
-    0% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-    }
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 `;
 
 const statusColors = {
     SAFE: {
-        bg: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)',
-        border: 'rgba(16, 185, 129, 0.3)',
-        badge: '#10b981',
-        text: '#059669',
+        bg: 'var(--ant-color-bg-container)', // Solid BG
+        border: 'var(--ant-color-success)',
+        badge: 'rgba(var(--ant-color-success-rgb), 0.15)',
+        badgeText: 'var(--ant-color-success)',
+        text: 'var(--ant-color-success)',
     },
     WARNING: {
-        bg: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)',
-        border: 'rgba(245, 158, 11, 0.3)',
-        badge: '#f59e0b',
-        text: '#d97706',
+        bg: 'var(--ant-color-bg-container)',
+        border: 'var(--ant-color-warning)',
+        badge: 'rgba(var(--ant-color-warning-rgb), 0.15)',
+        badgeText: 'var(--ant-color-warning)',
+        text: 'var(--ant-color-warning)',
     },
     CRITICAL: {
-        bg: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%)',
-        border: 'rgba(239, 68, 68, 0.4)',
-        badge: '#ef4444',
-        text: '#dc2626',
+        bg: 'var(--ant-color-bg-container)',
+        border: 'var(--ant-color-error)',
+        badge: 'rgba(var(--ant-color-error-rgb), 0.15)',
+        badgeText: 'var(--ant-color-error)',
+        text: 'var(--ant-color-error)',
     },
 };
 
 const Container = styled.div<{ $status: HealthStatus }>`
     background: ${props => statusColors[props.$status].bg};
-    border: 2px solid ${props => statusColors[props.$status].border};
-    border-radius: 16px;
-    padding: 20px;
+    /* Top Border Indicator instead of full border? Or full border for critical */
+    border: 1px solid ${props => props.$status === 'SAFE' ? 'var(--ant-color-border)' : statusColors[props.$status].border};
+    border-top: 4px solid ${props => statusColors[props.$status].text}; /* Industrial Status Bar */
+    
+    border-radius: var(--ant-border-radius-lg, 12px);
+    padding: 16px; /* Tighter padding */
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     height: 100%;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
 
     ${props => props.$status === 'CRITICAL' && css`
         animation: ${pulse} 2s infinite;
+        border-color: var(--ant-color-error);
     `}
 
-    [data-theme='dark'] &,
-    .dark-mode & {
-        background: ${props =>
-        props.$status === 'SAFE'
-            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%)'
-            : props.$status === 'WARNING'
-                ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%)'
-                : 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%)'
-    };
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
 `;
 
@@ -90,34 +86,38 @@ const StatusBadge = styled.div<{ $status: HealthStatus }>`
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    border-radius: 999px;
+    padding: 4px 12px;
+    border-radius: 4px; /* Industrial capsule */
     background: ${props => statusColors[props.$status].badge};
-    color: white;
+    color: ${props => statusColors[props.$status].badgeText};
+    border: 1px solid ${props => statusColors[props.$status].border};
     font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.5px;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 `;
 
 const MetricsGrid = styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 12px 16px;
 `;
 
 const MetricItem = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 2px;
 `;
 
 const MetricLabel = styled(Text)`
     font-size: 11px;
-    color: var(--ant-color-text-secondary);
+    color: var(--ant-color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 `;
 
 const MetricValue = styled.span`
-    font-size: 18px;
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
     font-weight: 600;
     color: var(--ant-color-text);
 `;
@@ -127,14 +127,9 @@ const ReasonsList = styled.div<{ $status: HealthStatus }>`
     flex-direction: column;
     gap: 4px;
     padding: 8px 12px;
-    background: ${props =>
-        props.$status === 'CRITICAL'
-            ? 'rgba(239, 68, 68, 0.1)'
-            : props.$status === 'WARNING'
-                ? 'rgba(245, 158, 11, 0.1)'
-                : 'rgba(16, 185, 129, 0.1)'
-    };
-    border-radius: 8px;
+    background: var(--ant-color-bg-container-secondary);
+    border: 1px solid ${props => statusColors[props.$status].border};
+    border-radius: 6px;
     font-size: 12px;
 `;
 
@@ -144,6 +139,7 @@ const ReasonItem = styled.div<{ $status: HealthStatus; $type?: 'error' | 'warnin
     gap: 8px;
     color: ${props => props.$type === 'error' ? 'var(--ant-color-error)' : props.$type === 'warning' ? 'var(--ant-color-warning)' : statusColors[props.$status].text};
     font-weight: 500;
+    font-family: var(--font-mono); /* Technical error log look */
 `;
 
 const ViewAnalysisButton = styled.div<{ $status: HealthStatus }>`
@@ -152,27 +148,18 @@ const ViewAnalysisButton = styled.div<{ $status: HealthStatus }>`
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.4);
-    border-radius: 8px;
+    padding: 8px;
+    background: transparent;
+    border-radius: 6px;
     color: ${props => statusColors[props.$status].text};
+    border: 1px solid ${props => statusColors[props.$status].border};
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    border: 1px solid rgba(255, 255, 255, 0.2);
 
     &:hover {
-        background: rgba(255, 255, 255, 0.8);
-        transform: translateY(-2px);
-    }
-
-    [data-theme='dark'] &,
-    .dark-mode & {
-        background: rgba(0, 0, 0, 0.2);
-        &:hover {
-            background: rgba(0, 0, 0, 0.4);
-        }
+        background: ${props => statusColors[props.$status].badge};
     }
 `;
 

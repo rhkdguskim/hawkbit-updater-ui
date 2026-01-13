@@ -7,9 +7,7 @@ import { PageLayout, SectionCard, FullHeightSectionCard as BaseFullHeightSection
 import { DetailPageHeader } from '@/components/common';
 
 const FullHeightSectionCard = styled(BaseFullHeightSectionCard)`
-    .ant-card-body {
-        padding: 0;
-    }
+    /* Restore standard padding */
 `;
 
 export interface BreadcrumbItem {
@@ -127,10 +125,16 @@ export const StandardDetailLayout: React.FC<StandardDetailLayoutProps> = ({
                 return (
                     <FullHeightSectionCard loading={loading}>
                         {renderTabs()}
+                        {children}
                     </FullHeightSectionCard>
                 );
             }
-            return renderTabs();
+            return (
+                <>
+                    {renderTabs()}
+                    {children}
+                </>
+            );
         }
 
         if (useCardWrapper) {

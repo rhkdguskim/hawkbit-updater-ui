@@ -95,7 +95,7 @@ export const useTargetListModel = () => {
             key: 'targetType',
             label: t('table.targetType'),
             type: 'select',
-            options: availableTypes.map(tp => ({ value: tp.name || '', label: tp.name || '' })),
+            options: availableTypes.map(tp => ({ value: String(tp.name), label: tp.name || '' })),
         },
         {
             key: 'tag',
@@ -128,7 +128,7 @@ export const useTargetListModel = () => {
     const buildFinalQuery = useCallback((targetFilters: FilterValue[] = filters): string => {
         return buildQueryFromFilterValues(targetFilters, {
             fieldMap: {
-                targetType: 'targetTypeName',
+                targetType: 'targetType.name', // Requires sub-attribute [key, name]
                 tag: 'tag',
             },
             rawFields: ['query'],

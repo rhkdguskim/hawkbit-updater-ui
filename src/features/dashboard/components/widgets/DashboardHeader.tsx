@@ -12,47 +12,41 @@ const GradientTitle = styled(Title)`
         margin: 0;
         font-weight: 700;
         letter-spacing: -0.02em;
-        background: linear-gradient(135deg, #0f172a 0%, #2563eb 50%, #0891b2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--ant-color-text); /* Solid color for industrial clarity */
     }
     
-    .dark-mode & {
-        background: linear-gradient(135deg, #e2e8f0 0%, #38bdf8 50%, #22c55e 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-    }
+    /* Optional: Subtle gradient only in high-impact mode or leave solid */
 `;
 
 const HeaderShell = styled.div`
-    padding: clamp(12px, 1.6vw, 20px);
-    border-radius: 18px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.7) 100%);
-    border: 1px solid rgba(148, 163, 184, 0.25);
-    box-shadow: 0 16px 36px -28px rgba(15, 23, 42, 0.35);
-    backdrop-filter: blur(16px);
+    padding: clamp(12px, 1.6vw, 16px);
+    border-radius: var(--ant-border-radius-lg, 12px);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(20px);
+    margin-bottom: 4px;
 
     [data-theme='dark'] &,
     .dark-mode & {
-        background: rgba(15, 23, 42, 0.75);
-        border-color: rgba(148, 163, 184, 0.2);
-        box-shadow: 0 20px 40px -28px rgba(0, 0, 0, 0.65);
+        background: var(--glass-bg);
+        border-color: var(--glass-border);
+        box-shadow: var(--shadow-md);
     }
 `;
 
 const HeaderMeta = styled(Flex)`
     align-items: center;
     gap: 10px;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: rgba(15, 23, 42, 0.04);
-    border: 1px solid rgba(148, 163, 184, 0.25);
+    padding: 6px 12px;
+    border-radius: var(--ant-border-radius, 6px);
+    background: var(--ant-color-bg-container);
+    border: 1px solid var(--ant-color-border);
 
     [data-theme='dark'] &,
     .dark-mode & {
-        background: rgba(148, 163, 184, 0.12);
-        border-color: rgba(148, 163, 184, 0.2);
+        background: var(--ant-color-bg-elevated);
+        border-color: var(--ant-color-border-secondary);
     }
 `;
 
@@ -87,7 +81,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 )}
                 actions={(
                     <HeaderMeta>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                        <Text className="text-mono" type="secondary" style={{ fontSize: 12 }}>
                             {t('updated', 'Updated')}: {lastUpdated}
                         </Text>
                         <Button

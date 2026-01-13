@@ -23,7 +23,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/rest': {
-        target: 'http://110.110.10.102:9200',
+        target: 'http://localhost:9100',
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {

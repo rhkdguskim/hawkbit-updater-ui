@@ -75,7 +75,8 @@
         "live": "실시간",
         "idle": "대기",
         "active": "활성",
-        "total": "합계"
+        "total": "합계",
+        "locked": "잠금"
     },
     "actions": {
         "save": "저장",

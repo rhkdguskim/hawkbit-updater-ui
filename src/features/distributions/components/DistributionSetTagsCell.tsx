@@ -24,67 +24,77 @@ export const DistributionSetTagsCell: React.FC<DistributionSetTagsCellProps> = (
     const isAdmin = role === 'Admin';
 
     const [popoverOpen, setPopoverOpen] = useState(false);
-    const [loadingAssignments, setLoadingAssignments] = useState(false);
-    const [assignedTagIds, setAssignedTagIds] = useState<number[]>([]);
     const [createModalOpen, setCreateModalOpen] = useState(false);
+
+    // State for assigned tags
+    const [assignedTagIds, setAssignedTagIds] = useState<number[]>([]);
+    const [loadingAssignments, setLoadingAssignments] = useState(true);
 
     const { data: allTagsData, isLoading: allTagsLoading, refetch: refetchAllTags } = useGetDistributionSetTags({ limit: 100 });
     const allTags = useMemo(() => allTagsData?.content || [], [allTagsData]);
 
-    const assignMutation = useAssignDistributionSet();
-    const unassignMutation = useUnassignDistributionSet();
+    // Fetch assignments manually on mount (N+1 approach as authorized)
+    React.useEffect(() => {
+        const fetchAssignments = async () => {
+            if (!allTags.length) {
+                setLoadingAssignments(false);
+                return;
+            }
+            // Only show loading if we don't have tags yet (or maybe always?)
+            // setAssignedTagIds([]); // Don't clear if we want to keep showing while updating? 
+            // Better to clear or show loading to avoid stale data.
+            setLoadingAssignments(true);
 
-    const createTagMutation = useCreateDistributionSetTags({
-        mutation: {
-            onSuccess: async (data) => {
-                message.success(t('tagManagement.createSuccess'));
-                setCreateModalOpen(false);
-                await refetchAllTags();
-                // Auto-select the newly created tag
-                const newTag = data?.[0];
-                if (newTag?.id) {
-                    await assignMutation.mutateAsync({ distributionsetTagId: newTag.id, distributionsetId: distributionSetId });
-                    setAssignedTagIds(prev => [...prev, newTag.id!]);
-                }
-            },
-            onError: (error) => {
-                message.error((error as Error).message || t('common:error'));
-            },
-        },
-    });
+            const assigned: number[] = [];
+            const token = useAuthStore.getState().token;
 
-    const fetchAssignments = async () => {
-        if (!allTags.length) return;
-        setLoadingAssignments(true);
-        const assigned: number[] = [];
-        const token = useAuthStore.getState().token;
-
-        try {
-            const promises = allTags.map(async (tag) => {
-                if (!tag.id) return;
-                const response = await fetch(`/rest/v1/distributionsettags/${tag.id}/assigned?q=id==${distributionSetId}`, {
-                    headers: {
-                        'Authorization': `Basic ${token}`,
-                    },
+            try {
+                // Optimization: Limit concurrency if needed, but for now simple Promise.all
+                const promises = allTags.map(async (tag) => {
+                    if (!tag.id) return;
+                    try {
+                        const response = await fetch(`/rest/v1/distributionsettags/${tag.id}/assigned?q=id==${distributionSetId}`, {
+                            headers: {
+                                'Authorization': `Basic ${token}`,
+                            },
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.content && data.content.length > 0) {
+                                assigned.push(tag.id);
+                            }
+                        }
+                    } catch (e) {
+                        // ignore error
+                    }
                 });
-                const data = await response.json();
-                if (data.content && data.content.length > 0) {
-                    assigned.push(tag.id);
-                }
-            });
-            await Promise.all(promises);
-            setAssignedTagIds(assigned);
-        } catch (error) {
-            console.error('Failed to fetch DS tags', error);
-        } finally {
+                await Promise.all(promises);
+                setAssignedTagIds(assigned);
+            } catch (error) {
+                console.error('Failed to fetch DS tags', error);
+            } finally {
+                setLoadingAssignments(false);
+            }
+        };
+
+        if (allTags.length > 0) {
+            fetchAssignments();
+        } else if (!allTagsLoading) {
             setLoadingAssignments(false);
         }
-    };
+    }, [allTags, distributionSetId, allTagsLoading]);
+
+    const assignedTags = useMemo(() =>
+        allTags.filter(t => t.id && assignedTagIds.includes(t.id)),
+        [allTags, assignedTagIds]
+    );
+
+    const assignMutation = useAssignDistributionSet();
+    const unassignMutation = useUnassignDistributionSet();
+    const createTagMutation = useCreateDistributionSetTags();
+
 
     const handleOpenChange = async (open: boolean) => {
-        if (open) {
-            await fetchAssignments();
-        }
         setPopoverOpen(open);
     };
 
@@ -108,14 +118,26 @@ export const DistributionSetTagsCell: React.FC<DistributionSetTagsCellProps> = (
         }
     };
 
-    const handleCreateTag = (values: TagFormValues) => {
-        createTagMutation.mutate({ data: [values] });
+    const handleCreateTag = async (values: TagFormValues) => {
+        try {
+            const data = await createTagMutation.mutateAsync({ data: [values] });
+            message.success(t('tagManagement.createSuccess'));
+            setCreateModalOpen(false);
+
+            await refetchAllTags();
+
+            // Auto-select the newly created tag
+            const newTag = data?.[0];
+            if (newTag?.id) {
+                await assignMutation.mutateAsync({ distributionsetTagId: newTag.id, distributionsetId: distributionSetId });
+                setAssignedTagIds(prev => [...prev, newTag.id!]);
+            }
+        } catch (error) {
+            message.error((error as Error).message || t('common:error'));
+        }
     };
 
-    const assignedTags = useMemo(() =>
-        allTags.filter(t => t.id && assignedTagIds.includes(t.id)),
-        [allTags, assignedTagIds]
-    );
+
 
     const popoverContent = (
         <div style={{ width: 280 }}>

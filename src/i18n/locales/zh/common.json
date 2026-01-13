@@ -73,7 +73,8 @@
         "registered": "已注册",
         "live": "实时",
         "idle": "空闲",
-        "active": "活动"
+        "active": "活动",
+        "locked": "已锁定"
     },
     "actions": {
         "save": "保存",

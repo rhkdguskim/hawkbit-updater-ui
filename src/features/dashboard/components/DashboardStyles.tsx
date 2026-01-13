@@ -37,91 +37,56 @@ export {
     CHART_THEMES
 };
 
-
-
 export const DashboardSurface = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: clamp(12px, 1.4vw, 18px);
+    gap: clamp(12px, 1.4vw, 16px);
     min-height: 100%;
     flex: 1;
     isolation: isolate;
 
-    & > * {
-        position: relative;
-        z-index: 1;
-    }
-
-    & > * {
-        position: relative;
-        z-index: 1;
-    }
-
+    /* Global Card Overrides for Dashboard Density */
     .ant-card {
-        background-color: rgba(255, 255, 255, 0.84);
-        background-blend-mode: soft-light;
-        border: 1px solid rgba(148, 163, 184, 0.35);
-        box-shadow: 0 12px 30px -22px rgba(15, 23, 42, 0.35);
-        backdrop-filter: blur(14px);
+        border: 1px solid var(--ant-color-border);
+        box-shadow: var(--shadow-sm);
+        /* Ensure precise corners */
+        border-radius: var(--ant-border-radius-lg, 12px);
     }
 
     .ant-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 22px 48px -32px rgba(15, 23, 42, 0.45);
-    }
-
-    .ant-card-head {
-        background: transparent;
-    }
-
-    .ant-card-head-title {
-        letter-spacing: 0.02em;
-    }
-
-    .ant-statistic-title {
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--ant-color-text-tertiary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--ant-color-primary-border);
     }
 
     [data-theme='dark'] & .ant-card,
     .dark-mode & .ant-card {
-        background-color: rgba(15, 23, 42, 0.78);
-        border-color: rgba(148, 163, 184, 0.2);
-        box-shadow: 0 14px 32px -24px rgba(0, 0, 0, 0.6);
-    }
-
-    [data-theme='dark'] & .ant-card,
-    .dark-mode & .ant-card {
-        background-color: rgba(15, 23, 42, 0.78);
-        border-color: rgba(148, 163, 184, 0.2);
-        box-shadow: 0 14px 32px -24px rgba(0, 0, 0, 0.6);
+        background-color: var(--ant-color-bg-container);
+        border-color: var(--ant-color-border-secondary);
+        box-shadow: var(--shadow-sm);
     }
 
     [data-theme='dark'] & .ant-card:hover,
     .dark-mode & .ant-card:hover {
-        box-shadow: 0 24px 56px -34px rgba(0, 0, 0, 0.7);
-    }
-
-    @media (max-width: 768px) {
-        /* Mobile styles */
+        box-shadow: var(--shadow-md);
+        border-color: var(--ant-color-primary);
     }
  `;
 
 export const DashboardScrollContent = styled(BaseScrollContent)`
-    gap: clamp(12px, 1.4vw, 18px);
+    gap: clamp(12px, 1.4vw, 16px);
+    padding: var(--ant-padding-sm, 12px);
 `;
 
 // Dashboard Specific Layouts
 export const IntegratedKPIGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-rows: repeat(4, minmax(100px, 1fr));
-    gap: var(--ant-margin-xs, 8px);
+    /* Fixed height rows for uniformity */
+    grid-template-rows: repeat(1, minmax(100px, 1fr)); 
+    gap: var(--ant-margin-sm, 12px);
     width: 100%;
-    height: 100%;
     align-content: stretch;
 `;
 
@@ -139,27 +104,20 @@ export const IntegratedTopRow = styled.div`
     gap: var(--ant-margin, 16px);
     flex: 0 0 auto;
     align-items: stretch;
-    min-height: 540px;
+    min-height: 480px; /* Reduced specific height */
 `;
 
 export const IntegratedChartsGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-rows: repeat(3, minmax(160px, 1fr));
-    grid-auto-rows: minmax(160px, 1fr);
-    grid-auto-flow: row;
+    grid-template-rows: repeat(2, minmax(180px, 1fr)); /* 2 substantial rows */
     gap: var(--ant-margin-sm, 12px);
     flex: 1;
     min-width: 0;
-    min-height: 0;
-    align-content: stretch;
     width: 100%;
-    height: 100%;
 
     @media (max-width: 1400px) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        grid-auto-flow: row;
-        min-height: 0;
     }
 
     @media (max-width: 992px) {
@@ -175,13 +133,6 @@ export const IntegratedBottomRow = styled.div`
     min-height: 260px;
 
     @media (max-width: 1200px) {
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(2, 280px);
-        flex: none;
-        height: auto;
-    }
-
-    @media (max-width: 768px) {
         grid-template-columns: 1fr;
         grid-template-rows: repeat(2, 280px);
         height: auto;

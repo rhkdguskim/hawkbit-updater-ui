@@ -73,7 +73,8 @@
         "registered": "Registered",
         "live": "Live",
         "idle": "Idle",
-        "active": "Active"
+        "active": "Active",
+        "locked": "Locked"
     },
     "actions": {
         "save": "Save",
