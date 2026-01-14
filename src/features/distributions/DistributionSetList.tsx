@@ -1,122 +1,23 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { Tag, Tooltip, Space, Button, message, Modal, Typography } from 'antd';
+import React, { useMemo } from 'react';
+import { Tag, Tooltip, Space, Button, Typography } from 'antd';
 import { EyeOutlined, DeleteOutlined, TagOutlined, EditOutlined } from '@ant-design/icons';
 import { EditableCell } from '@/components/common';
-import { useNavigate } from 'react-router-dom';
-import {
-    useGetDistributionSets,
-    useDeleteDistributionSet,
-    useUpdateDistributionSet,
-    getGetDistributionSetsQueryKey,
-} from '@/api/generated/distribution-sets/distribution-sets';
 import type { MgmtDistributionSet } from '@/api/generated/model';
-import { useAuthStore } from '@/stores/useAuthStore';
 import CreateDistributionSetWizard from './components/CreateDistributionSetWizard';
 import dayjs from 'dayjs';
 import { DistributionSetTagsCell } from './components/DistributionSetTagsCell';
-import { useTranslation } from 'react-i18next';
-import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
 import BulkManageSetTagsModal from './components/BulkManageSetTagsModal';
 import BulkDeleteDistributionSetModal from './components/BulkDeleteDistributionSetModal';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
-import { useServerTable } from '@/hooks/useServerTable';
-import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction, type FilterValue, type FilterField } from '@/components/patterns';
+import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction } from '@/components/patterns';
 import type { ColumnsType } from 'antd/es/table';
-import { buildQueryFromFilterValues } from '@/utils/fiql';
+import { useDistributionSetListModel } from './hooks/useDistributionSetListModel';
 
 const { Text } = Typography;
 
 const DistributionSetList: React.FC = () => {
-    const { t } = useTranslation(['distributions', 'common']);
-    const navigate = useNavigate();
-    const queryClient = useQueryClient();
-    const { role } = useAuthStore();
-    const isAdmin = role === 'Admin';
-
-    const {
-        pagination,
-        offset,
-        sort,
-        handleTableChange,
-        resetPagination,
-    } = useServerTable<MgmtDistributionSet>({ syncToUrl: true });
-
-    const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
-    const [selectedSetIds, setSelectedSetIds] = useState<React.Key[]>([]);
-    const [bulkTagsModalOpen, setBulkTagsModalOpen] = useState(false);
-    const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
-    const [filters, setFilters] = useState<FilterValue[]>([]);
-
-    // Filter fields
-    const filterFields: FilterField[] = useMemo(() => [
-        { key: 'name', label: t('list.columns.name'), type: 'text' },
-        { key: 'version', label: t('list.columns.version'), type: 'text' },
-        { key: 'typeName', label: t('list.columns.type'), type: 'text' },
-        {
-            key: 'complete',
-            label: t('list.columns.completeness'),
-            type: 'select',
-            options: [
-                { value: 'true', label: t('tags.complete') },
-                { value: 'false', label: t('tags.incomplete') },
-            ],
-        },
-    ], [t]);
-
-    // Build RSQL query from filters
-    const buildFinalQuery = useCallback(() => buildQueryFromFilterValues(filters), [filters]);
-
-    const query = buildFinalQuery();
-    const {
-        data,
-        isLoading,
-        isFetching,
-        error,
-        refetch,
-    } = useGetDistributionSets(
-        {
-            offset,
-            limit: pagination.pageSize,
-            sort: sort || undefined,
-            q: query || undefined,
-        },
-        {
-            query: {
-                placeholderData: keepPreviousData,
-                refetchOnWindowFocus: false,
-                refetchOnReconnect: false,
-            },
-        }
-    );
-
-    const deleteMutation = useDeleteDistributionSet({
-        mutation: {
-            onSuccess: () => {
-                message.success(t('messages.deleteSetSuccess'));
-                refetch();
-            },
-            onError: (error) => {
-                message.error((error as Error).message || t('messages.deleteSetError'));
-            },
-        },
-    });
-
-    const handleDelete = (id: number) => {
-        Modal.confirm({
-            title: t('messages.deleteSetConfirmTitle'),
-            content: t('messages.deleteSetConfirmDesc'),
-            okText: t('actions.delete'),
-            okType: 'danger',
-            cancelText: t('common:actions.cancel'),
-            onOk: () => deleteMutation.mutate({ distributionSetId: id }),
-        });
-    };
-
-    // Handle filter change
-    const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
-        setFilters(newFilters);
-        resetPagination();
-    }, [resetPagination]);
+    const model = useDistributionSetListModel();
+    const { t, isAdmin, navigate } = model;
 
     // Selection toolbar actions
     const selectionActions: ToolbarAction[] = useMemo(() => {
@@ -125,7 +26,7 @@ const DistributionSetList: React.FC = () => {
                 key: 'manageTags',
                 label: t('bulkAssignment.manageTags'),
                 icon: <TagOutlined />,
-                onClick: () => setBulkTagsModalOpen(true),
+                onClick: () => model.setBulkTagsModalOpen(true),
             },
         ];
         if (isAdmin) {
@@ -133,33 +34,12 @@ const DistributionSetList: React.FC = () => {
                 key: 'delete',
                 label: t('common:actions.delete'),
                 icon: <DeleteOutlined />,
-                onClick: () => setBulkDeleteModalOpen(true),
+                onClick: () => model.setBulkDeleteModalOpen(true),
                 danger: true,
             });
         }
         return actions;
-    }, [t, isAdmin]);
-
-    // Update mutation for inline editing
-    const updateMutation = useUpdateDistributionSet({
-        mutation: {
-            onSuccess: () => {
-                message.success(t('messages.updateSuccess'));
-                queryClient.invalidateQueries({ queryKey: getGetDistributionSetsQueryKey() });
-                refetch();
-            },
-            onError: (error) => {
-                message.error((error as Error).message || t('common:messages.error'));
-            },
-        },
-    });
-
-    const handleInlineUpdate = useCallback(async (id: number, field: 'name' | 'description', value: string) => {
-        await updateMutation.mutateAsync({
-            distributionSetId: id,
-            data: { [field]: value },
-        });
-    }, [updateMutation]);
+    }, [t, isAdmin, model]);
 
     const columns: ColumnsType<MgmtDistributionSet> = [
         {
@@ -178,7 +58,7 @@ const DistributionSetList: React.FC = () => {
             render: (text, record) => (
                 <EditableCell
                     value={text || ''}
-                    onSave={(val) => handleInlineUpdate(record.id, 'name', val)}
+                    onSave={(val) => model.handleInlineUpdate(record.id, 'name', val)}
                     editable={isAdmin}
                 />
             ),
@@ -206,7 +86,7 @@ const DistributionSetList: React.FC = () => {
             render: (text, record) => (
                 <EditableCell
                     value={text || ''}
-                    onSave={(val) => handleInlineUpdate(record.id, 'description', val)}
+                    onSave={(val) => model.handleInlineUpdate(record.id, 'description', val)}
                     editable={isAdmin}
                     secondary
                 />
@@ -269,7 +149,7 @@ const DistributionSetList: React.FC = () => {
                                 size="small"
                                 danger
                                 icon={<DeleteOutlined />}
-                                onClick={() => handleDelete(record.id)}
+                                onClick={() => model.handleDelete(record.id)}
                             />
                         </Tooltip>
                     )}
@@ -284,70 +164,70 @@ const DistributionSetList: React.FC = () => {
             description={t('list.description')}
             searchBar={
                 <FilterBuilder
-                    fields={filterFields}
-                    filters={filters}
-                    onFiltersChange={handleFiltersChange}
-                    onRefresh={refetch}
-                    onAdd={() => setIsCreateModalVisible(true)}
+                    fields={model.filterFields}
+                    filters={model.filters}
+                    onFiltersChange={model.handleFiltersChange}
+                    onRefresh={model.refetch}
+                    onAdd={() => model.setIsCreateModalVisible(true)}
                     canAdd={isAdmin}
                     addLabel={t('actions.createSet')}
-                    loading={isLoading || isFetching}
+                    loading={model.isLoading || model.isFetching}
                 />
             }
         >
             <DataView
-                loading={isLoading || isFetching}
-                error={error as Error}
-                isEmpty={data?.content?.length === 0}
+                loading={model.isLoading || model.isFetching}
+                error={model.error as Error}
+                isEmpty={model.data?.content?.length === 0}
                 emptyText={t('list.empty')}
             >
                 <EnhancedTable<MgmtDistributionSet>
                     columns={columns}
-                    dataSource={data?.content || []}
+                    dataSource={model.data?.content || []}
                     rowKey="id"
                     pagination={{
-                        ...pagination,
-                        total: data?.total || 0,
+                        ...model.pagination,
+                        total: model.data?.total || 0,
                         showSizeChanger: true,
                         pageSizeOptions: ['10', '20', '50', '100'],
                         position: ['topRight'],
                     }}
-                    loading={isLoading || isFetching}
-                    onChange={handleTableChange}
-                    selectedRowKeys={selectedSetIds}
-                    onSelectionChange={(keys) => setSelectedSetIds(keys)}
+                    loading={model.isLoading || model.isFetching}
+                    onChange={model.handleTableChange}
+                    selectedRowKeys={model.selectedSetIds}
+                    onSelectionChange={(keys) => model.setSelectedSetIds(keys)}
                     selectionActions={selectionActions}
                     selectionLabel={t('common:filter.selected')}
                     scroll={{ x: 1000 }}
                 />
             </DataView>
             <CreateDistributionSetWizard
-                visible={isCreateModalVisible}
-                onCancel={() => setIsCreateModalVisible(false)}
+                visible={model.isCreateModalVisible}
+                onCancel={() => model.setIsCreateModalVisible(false)}
                 onSuccess={() => {
-                    setIsCreateModalVisible(false);
-                    refetch();
+                    model.setIsCreateModalVisible(false);
+                    model.refetch();
                 }}
             />
             <BulkManageSetTagsModal
-                open={bulkTagsModalOpen}
-                setIds={selectedSetIds as number[]}
-                onCancel={() => setBulkTagsModalOpen(false)}
+                open={model.bulkTagsModalOpen}
+                setIds={model.selectedSetIds as number[]}
+                onCancel={() => model.setBulkTagsModalOpen(false)}
                 onSuccess={() => {
-                    setBulkTagsModalOpen(false);
-                    setSelectedSetIds([]);
-                    refetch();
+                    model.setBulkTagsModalOpen(false);
+                    model.setSelectedSetIds([]);
+                    model.refetch();
                 }}
             />
             <BulkDeleteDistributionSetModal
-                open={bulkDeleteModalOpen}
-                setIds={selectedSetIds as number[]}
-                setNames={(data?.content || []).filter(ds => selectedSetIds.includes(ds.id)).map(ds => `${ds.name} v${ds.version}`)}
-                onCancel={() => setBulkDeleteModalOpen(false)}
+                open={model.bulkDeleteModalOpen}
+                setIds={model.selectedSetIds as number[]}
+                setNames={(model.data?.content || []).filter(ds => model.selectedSetIds.includes(ds.id)).map(ds => `${ds.name} v${ds.version}`)}
+                onCancel={() => model.setBulkDeleteModalOpen(false)}
                 onSuccess={() => {
-                    setBulkDeleteModalOpen(false);
-                    setSelectedSetIds([]);
-                    refetch();
+                    model.setBulkDeleteModalOpen(false);
+                    model.setSelectedSetIds([]);
+                    model.refetch();
                 }}
             />
         </StandardListLayout>

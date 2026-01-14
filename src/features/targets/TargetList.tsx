@@ -12,6 +12,7 @@ import {
     BulkDeleteTargetModal,
     SavedFiltersModal,
     QuickFilters,
+    type QuickFilterType,
     ColumnCustomizer,
     BulkAutoConfirmModal,
     TargetDetailDrawer,
@@ -21,7 +22,7 @@ import { useTargetListModel } from './hooks/useTargetListModel';
 import { getTargetColumns } from './config/targetListConfig';
 import type { MgmtTarget } from '@/api/generated/model';
 import { isTargetOnline } from '@/entities';
-import type { QuickFilterType } from './components/QuickFilters';
+
 
 const TargetList: React.FC = () => {
     const navigate = useNavigate();
