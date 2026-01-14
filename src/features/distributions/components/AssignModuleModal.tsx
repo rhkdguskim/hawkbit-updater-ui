@@ -3,7 +3,8 @@ import { Modal, Table, message } from 'antd';
 import type { TableProps } from 'antd';
 import { useGetSoftwareModules } from '@/api/generated/software-modules/software-modules';
 import type { MgmtSoftwareModule } from '@/api/generated/model';
-import DistributionSearchBar from './DistributionSearchBar';
+import { Input, Button, Flex } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
 
 interface AssignModuleModalProps {
     visible: boolean;
@@ -120,15 +121,21 @@ const AssignModuleModal: React.FC<AssignModuleModalProps> = ({
             width={800}
             destroyOnHidden
         >
-            <DistributionSearchBar
-                type="module"
-                onSearch={handleSearch}
-                onRefresh={() => {
-                    setPagination(prev => ({ ...prev, current: 1 }));
-                    refetch();
-                }}
-                canAdd={false}
-            />
+            <Flex gap={8} style={{ marginBottom: 16 }}>
+                <Input.Search
+                    placeholder={t('common:actions.search')}
+                    onSearch={handleSearch}
+                    allowClear
+                    style={{ flex: 1 }}
+                />
+                <Button
+                    icon={<ReloadOutlined />}
+                    onClick={() => {
+                        setPagination(prev => ({ ...prev, current: 1 }));
+                        refetch();
+                    }}
+                />
+            </Flex>
             <Table
                 rowSelection={rowSelection}
                 columns={columns}

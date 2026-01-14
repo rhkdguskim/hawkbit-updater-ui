@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Tag, Tooltip, Space, Button, Typography } from 'antd';
-import { EyeOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { EditableCell } from '@/components/common';
 import type { MgmtSoftwareModule } from '@/api/generated/model';
 import CreateModuleWizard from './components/CreateModuleWizard';
@@ -118,14 +118,7 @@ const SoftwareModuleList: React.FC = () => {
                             onClick={() => navigate(`/distributions/modules/${record.id}`)}
                         />
                     </Tooltip>
-                    <Tooltip title={t('common:actions.edit')}>
-                        <Button
-                            type="text"
-                            size="small"
-                            icon={<EditOutlined />}
-                            onClick={() => navigate(`/distributions/modules/${record.id}`)}
-                        />
-                    </Tooltip>
+
                     {isAdmin && (
                         <Tooltip title={t('actions.delete')}>
                             <Button

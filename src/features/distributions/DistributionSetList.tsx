@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Tag, Tooltip, Space, Button, Typography } from 'antd';
-import { EyeOutlined, DeleteOutlined, TagOutlined, EditOutlined } from '@ant-design/icons';
+import { EyeOutlined, DeleteOutlined, TagOutlined } from '@ant-design/icons';
 import { EditableCell } from '@/components/common';
 import type { MgmtDistributionSet } from '@/api/generated/model';
 import CreateDistributionSetWizard from './components/CreateDistributionSetWizard';
@@ -134,14 +134,7 @@ const DistributionSetList: React.FC = () => {
                             onClick={() => navigate(`/distributions/sets/${record.id}`)}
                         />
                     </Tooltip>
-                    <Tooltip title={t('common:actions.edit')}>
-                        <Button
-                            type="text"
-                            size="small"
-                            icon={<EditOutlined />}
-                            onClick={() => navigate(`/distributions/sets/${record.id}`)}
-                        />
-                    </Tooltip>
+
                     {isAdmin && (
                         <Tooltip title={t('actions.delete')}>
                             <Button
