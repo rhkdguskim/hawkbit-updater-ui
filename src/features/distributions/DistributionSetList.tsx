@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Tag, Tooltip, Space, Button, Typography } from 'antd';
+import { Tag, Tooltip, Space, Button, Typography, Flex } from 'antd';
 import { EyeOutlined, DeleteOutlined, TagOutlined } from '@ant-design/icons';
 import { EditableCell } from '@/components/common';
 import type { MgmtDistributionSet } from '@/api/generated/model';
@@ -47,7 +47,7 @@ const DistributionSetList: React.FC = () => {
             dataIndex: 'id',
             key: 'id',
             width: 80,
-            render: (id: number) => <Text style={{ fontSize: 'var(--ant-font-size-sm)', color: '#666' }}>{id}</Text>,
+            render: (id: number) => <Text style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)', color: '#666' }}>{id}</Text>,
         },
         {
             title: t('list.columns.name'),
@@ -56,11 +56,22 @@ const DistributionSetList: React.FC = () => {
             sorter: true,
             width: 200,
             render: (text, record) => (
-                <EditableCell
-                    value={text || ''}
-                    onSave={(val) => model.handleInlineUpdate(record.id, 'name', val)}
-                    editable={isAdmin}
-                />
+                <Flex align="center" gap={8}>
+                    <EditableCell
+                        value={text || ''}
+                        onSave={(val) => model.handleInlineUpdate(record.id, 'name', val)}
+                        editable={isAdmin}
+                    />
+                    <Tooltip title={t('actions.viewDetails')}>
+                        <Button
+                            type="text"
+                            size="small"
+                            icon={<EyeOutlined />}
+                            style={{ fontSize: 12, padding: 0, height: 'auto' }}
+                            onClick={() => navigate(`/distributions/sets/${record.id}`)}
+                        />
+                    </Tooltip>
+                </Flex>
             ),
         },
         {
@@ -116,7 +127,7 @@ const DistributionSetList: React.FC = () => {
             sorter: true,
             width: 130,
             render: (val: number) => (
-                <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}</Text>
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>{val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}</Text>
             ),
         },
         {

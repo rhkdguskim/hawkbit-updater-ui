@@ -346,7 +346,8 @@ export const useDashboardMetrics = () => {
     // 11. Rollout running count for KPI
     const runningRolloutCount = rollouts.filter(r => r.status === 'running').length;
     const pausedRolloutCount = rollouts.filter(r => r.status === 'paused').length;
-    const scheduledRolloutCount = rollouts.filter(r => r.status === 'scheduled' || r.status === 'ready').length;
+    const scheduledRolloutCount = rollouts.filter(r => r.status === 'scheduled').length;
+    const readyRolloutCount = rollouts.filter(r => r.status === 'ready').length;
 
     const isActivePolling = activeRolloutCount > 0 || pendingCount > 0;
 
@@ -525,7 +526,43 @@ export const useDashboardMetrics = () => {
         }));
     }, [targets, targetTypeColorMap, t]);
 
-    // 15. Error Analysis Calculation
+    // 15. Software Module Type Distribution
+    const softwareModuleTypeDistribution = useMemo(() => {
+        const counts = new Map<string, number>();
+        const modules = softwareModulesData?.content || [];
+        modules.forEach(m => {
+            const typeName = m.typeName || t('common:status.unknown', 'Unknown');
+            counts.set(typeName, (counts.get(typeName) || 0) + 1);
+        });
+        return Array.from(counts.entries())
+            .map(([name, value]) => ({ name, value }))
+            .sort((a, b) => b.value - a.value);
+    }, [softwareModulesData, t]);
+
+    // 16. High Error Targets (Targets with most failures in recent history)
+    const highErrorTargets = useMemo(() => {
+        const counts = new Map<string, { count: number; name: string }>();
+        actions.forEach(a => {
+            if (isActionErrored(a)) {
+                const targetId = a._links?.target?.href?.split('/').pop() || 'unknown';
+                const current = counts.get(targetId) || { count: 0, name: targetId };
+
+                if (current.name === 'unknown' || current.name === targetId) {
+                    const target = targets.find(t => t.controllerId === targetId);
+                    if (target?.name) current.name = target.name;
+                }
+
+                current.count++;
+                counts.set(targetId, current);
+            }
+        });
+        return Array.from(counts.entries())
+            .map(([id, data]) => ({ id, ...data }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+    }, [actions, targets]);
+
+    // 18. Error Analysis Calculation (formerly 15)
     const errorAnalysis = useMemo(() => {
         const errorActions = actions.filter(a => isActionErrored(a) || a.status?.toLowerCase() === 'canceled');
 
@@ -571,6 +608,10 @@ export const useDashboardMetrics = () => {
     const totalDelay = targetsWithLastRequest.reduce((sum, t) => sum + (nowMs - (t.pollStatus?.lastRequestAt || 0)), 0);
     const averageDelay = targetsWithLastRequest.length > 0 ? Math.round(totalDelay / targetsWithLastRequest.length) : 0;
 
+    // 17. Security Coverage
+    const securityTokenCount = targets.filter(t => t.securityToken && t.securityToken.length > 0).length;
+    const securityCoverage = totalDevices > 0 ? Math.round((securityTokenCount / totalDevices) * 100) : 0;
+
     return {
         // State
         isLoading,
@@ -600,6 +641,7 @@ export const useDashboardMetrics = () => {
         runningRolloutCount,
         pausedRolloutCount,
         scheduledRolloutCount,
+        readyRolloutCount,
         finishedRolloutCount,
         errorRolloutCount,
 
@@ -638,8 +680,16 @@ export const useDashboardMetrics = () => {
         topDelayedTargets,
         averageDelay,
 
+        // Security Metrics
+        securityCoverage,
+        securityTokenCount,
+
         // Fragmentation Metrics
         fragmentationStats,
+
+        // Advanced Distribution Metrics
+        softwareModuleTypeDistribution,
+        highErrorTargets,
 
         // Lists
         recentDevices,

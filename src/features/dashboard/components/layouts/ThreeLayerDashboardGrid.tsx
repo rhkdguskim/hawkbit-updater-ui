@@ -12,35 +12,45 @@ const HeaderRow = styled.div`
 // ===== Decision Layer (TOP) =====
 const DecisionLayer = styled.section`
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: clamp(6px, 0.8vw, 10px);
-    min-height: 140px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(12px, 1vw, 16px);
+    min-height: 110px;
     flex-shrink: 0;
     padding-bottom: var(--ant-margin, 16px);
-    border-bottom: 1px solid var(--ant-color-border-secondary, rgba(0, 0, 0, 0.06));
 
-    @media (max-width: 1600px) {
-        grid-template-columns: repeat(3, 1fr);
+    @media (max-width: 1400px) {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     @media (max-width: 768px) {
         grid-template-columns: 1fr;
     }
 `;
-
-// ===== Stats Layer (Between Top & Middle) =====
-const StatsLayer = styled.section`
+const ControlLayer = styled.section`
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: clamp(6px, 0.8vw, 10px);
+    grid-template-columns: 2.2fr 1fr;
+    gap: clamp(12px, 1vw, 16px);
+    min-height: 420px;
     flex-shrink: 0;
     padding-bottom: var(--ant-margin, 16px);
 
-    @media (max-width: 1600px) {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+    @media (max-width: 1200px) {
+        grid-template-columns: 1fr;
+    }
+`;
+// ===== Stats Layer (Between Top & Middle) =====
+const StatsLayer = styled.section`
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(12px, 1vw, 16px);
+    flex-shrink: 0;
+    padding-bottom: var(--ant-margin, 16px);
+
+    @media (max-width: 1400px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 768px) {
         grid-template-columns: 1fr;
     }
 `;
@@ -49,12 +59,11 @@ const StatsLayer = styled.section`
 // ===== Monitoring Layer (BOTTOM) =====
 const MonitoringLayer = styled.section`
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(6px, 0.8vw, 10px);
-    min-height: 180px;
-    flex-shrink: 0;
-    padding-top: var(--ant-margin, 16px);
-    border-top: 1px solid var(--ant-color-border-secondary, rgba(0, 0, 0, 0.06));
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: clamp(12px, 1vw, 16px);
+    min-height: 200px;
+    flex-shrink: 1;
+    padding-top: var(--ant-margin, 8px);
 
     @media (max-width: 1400px) {
         grid-template-columns: 1fr 1fr;
@@ -67,21 +76,23 @@ const MonitoringLayer = styled.section`
 `;
 
 const SectionLabel = styled.div`
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--ant-color-text-quaternary);
-    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+    color: var(--ant-color-text-secondary);
+    opacity: 0.8;
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    user-select: none;
 
     &::after {
         content: '';
         flex: 1;
         height: 1px;
-        background: var(--ant-color-border-secondary);
+        background: linear-gradient(to right, var(--ant-color-border-secondary), transparent);
     }
 `;
 
@@ -115,10 +126,11 @@ export interface ThreeLayerDashboardGridProps {
     actionRequired: React.ReactNode;
     extraDecision?: React.ReactNode;
     overviewItem4?: React.ReactNode;
-    // Stats Layer
-    statsRow?: React.ReactNode;
     // Control Layer
     activeRollouts: React.ReactNode;
+    inProgressUpdates?: React.ReactNode;
+    // Stats Layer
+    statsRow?: React.ReactNode;
     // Monitoring Layer
     statusTrend: React.ReactNode;
     actionActivity: React.ReactNode;
@@ -135,6 +147,7 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
     overviewItem4,
     statsRow,
     activeRollouts,
+    inProgressUpdates,
     statusTrend,
     actionActivity,
     recentlyFinishedActions,
@@ -147,30 +160,39 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
                     {header}
                 </HeaderRow>
                 <DashboardScrollContent>
-                    {/* TOP: Decision Layer */}
+                    {/* TOP: Overview & Metrics Layer */}
                     <SectionWrapper>
-                        {showLayerLabels && <SectionLabel>Overview</SectionLabel>}
+                        {showLayerLabels && <SectionLabel>Decision Support</SectionLabel>}
                         <DecisionLayer>
                             {healthSummary}
                             {actionRequired}
-                            {activeRollouts}
                             {extraDecision}
                             {overviewItem4}
                         </DecisionLayer>
                     </SectionWrapper>
 
-                    {/* NEW: Stats Layer */}
+                    {/* MIDDLE: Control & Activity Layer */}
+                    <SectionWrapper>
+                        {showLayerLabels && <SectionLabel>Active Operations</SectionLabel>}
+                        <ControlLayer>
+                            {activeRollouts}
+                            {inProgressUpdates}
+                        </ControlLayer>
+                    </SectionWrapper>
+
+                    {/* NEW: Performance Stats Layer */}
                     {statsRow && (
                         <SectionWrapper>
+                            {showLayerLabels && <SectionLabel>Performance Analytics</SectionLabel>}
                             <StatsLayer>
                                 {statsRow}
                             </StatsLayer>
                         </SectionWrapper>
                     )}
 
-                    {/* BOTTOM: Monitoring Layer */}
+                    {/* BOTTOM: Monitoring & History Layer */}
                     <SectionWrapper>
-                        {showLayerLabels && <SectionLabel>Analytics & Trends</SectionLabel>}
+                        {showLayerLabels && <SectionLabel>Trend & History Analysis</SectionLabel>}
                         <MonitoringLayer>
                             {statusTrend}
                             {actionActivity}

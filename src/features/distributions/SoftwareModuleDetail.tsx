@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Descriptions, Table, Button, Upload, message, Modal, Space, Tag, Tooltip, List, Badge } from 'antd';
+import { Descriptions, Table, Button, Upload, message, Modal, Space, Tag, Tooltip, List, Badge, Typography } from 'antd';
+const { Text } = Typography;
 import { DeleteOutlined, DownloadOutlined, FileOutlined, InboxOutlined, InfoCircleOutlined, EyeOutlined } from '@ant-design/icons';
 import ArtifactVerificationCard from './components/ArtifactVerificationCard';
 import {
@@ -196,11 +197,11 @@ const SoftwareModuleDetail: React.FC = () => {
             <Descriptions.Item label={t('detail.labels.description')}>{moduleData?.description}</Descriptions.Item>
             <Descriptions.Item label={t('detail.labels.createdBy')}>{moduleData?.createdBy}</Descriptions.Item>
             <Descriptions.Item label={t('detail.labels.createdAt')}>
-                {moduleData?.createdAt ? dayjs(moduleData.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                <Text style={{ fontFamily: 'var(--font-mono)' }}>{moduleData?.createdAt ? dayjs(moduleData.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}</Text>
             </Descriptions.Item>
             <Descriptions.Item label={t('detail.labels.lastModifiedBy')}>{moduleData?.lastModifiedBy}</Descriptions.Item>
             <Descriptions.Item label={t('detail.labels.lastModifiedAt')}>
-                {moduleData?.lastModifiedAt ? dayjs(moduleData.lastModifiedAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                <Text style={{ fontFamily: 'var(--font-mono)' }}>{moduleData?.lastModifiedAt ? dayjs(moduleData.lastModifiedAt).format('YYYY-MM-DD HH:mm:ss') : '-'}</Text>
             </Descriptions.Item>
         </Descriptions>
     );
@@ -272,9 +273,9 @@ const SoftwareModuleDetail: React.FC = () => {
                         key: 'hashes',
                         render: (_, record: MgmtArtifact) => (
                             <Space direction="vertical" size="small">
-                                <Tag>MD5: {record.hashes?.md5?.substring(0, 8)}...</Tag>
-                                <Tag>SHA1: {record.hashes?.sha1?.substring(0, 8)}...</Tag>
-                                <Tag>SHA256: {record.hashes?.sha256?.substring(0, 8)}...</Tag>
+                                <Tag style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--ant-font-size-sm)' }}>MD5: {record.hashes?.md5?.substring(0, 8)}...</Tag>
+                                <Tag style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--ant-font-size-sm)' }}>SHA1: {record.hashes?.sha1?.substring(0, 8)}...</Tag>
+                                <Tag style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--ant-font-size-sm)' }}>SHA256: {record.hashes?.sha256?.substring(0, 8)}...</Tag>
                             </Space>
                         ),
                     },

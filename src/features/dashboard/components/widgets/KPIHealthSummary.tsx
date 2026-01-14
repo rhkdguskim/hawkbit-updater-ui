@@ -13,6 +13,7 @@ interface KPIHealthSummaryProps {
     errorRate: number | null;
     pendingCount: number;
     runningRolloutCount: number;
+    securityCoverage?: number | null;
 }
 
 export const KPIHealthSummary: React.FC<KPIHealthSummaryProps> = ({
@@ -22,6 +23,7 @@ export const KPIHealthSummary: React.FC<KPIHealthSummaryProps> = ({
     errorRate,
     pendingCount,
     runningRolloutCount,
+    securityCoverage,
 }) => {
     const { t } = useTranslation(['dashboard', 'common']);
 
@@ -63,6 +65,7 @@ export const KPIHealthSummary: React.FC<KPIHealthSummaryProps> = ({
                     {renderRateRow(t('snapshot.onlineRate', 'Online rate'), onlineRate, 'var(--ant-color-success)')}
                     {renderRateRow(t('snapshot.deploymentRate', 'Deployment rate'), deploymentRate, 'var(--ant-color-primary)')}
                     {renderRateRow(t('snapshot.errorRate', 'Action error rate'), errorRate, 'var(--ant-color-error)')}
+                    {securityCoverage !== undefined && renderRateRow(t('snapshot.securityCoverage', 'Security coverage'), securityCoverage, 'var(--ant-color-warning)')}
                     <Flex justify="space-between" align="center" style={{ marginTop: 4 }}>
                         <Text type="secondary" style={{ fontSize: 11 }}>
                             {t('snapshot.pendingActions', 'Pending actions')}

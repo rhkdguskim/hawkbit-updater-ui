@@ -443,4 +443,14 @@ export const COLORS = {
     distributions: 'var(--ant-color-primary, #6366f1)',
     actions: 'var(--ant-color-info, #3b82f6)',
     rollouts: 'var(--ant-color-warning, #f59e0b)',
+    chartPalette: [
+        '#6366f1', // Indigo
+        '#10b981', // Emerald
+        '#f59e0b', // Amber
+        '#ef4444', // Red
+        '#3b82f6', // Blue
+        '#8b5cf6', // Violet
+        '#ec4899', // Pink
+        '#06b6d4', // Cyan
+    ],
 };

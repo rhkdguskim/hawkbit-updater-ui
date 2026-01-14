@@ -101,7 +101,10 @@
         "last24h": "过去 24h",
         "fragmentation": "目标更新状态",
         "velocity": "部署速度",
-        "velocityDesc": "每分钟操作完成率"
+        "velocityDesc": "每分钟操作完成率",
+        "moduleTypeCoverage": "模块类型分布",
+        "completeness": "分发集完整度",
+        "securityCoverage": "安全覆盖率"
     },
     "velocity": {
         "title": "部署速度监控",
@@ -268,6 +271,7 @@
         "errorRate": "操作错误率",
         "pendingActions": "挂起操作",
         "activeRollouts": "活动发布",
+        "securityCoverage": "安全覆盖率",
         "attention": "需要注意",
         "stable": "稳定"
     },
@@ -358,7 +362,9 @@
         "subtitle": "需要立即关注的项目",
         "delayedActions": "延迟操作",
         "pendingApprovals": "待批准项目",
-        "noItems": "一切正常"
+        "noItems": "一切正常",
+        "highErrorTargets": "可靠性警报 (高错误率目标)",
+        "allHealthy": "所有目标健康"
     },
     "statusTrend": {
         "title": "状态趋势 (24h)",

@@ -101,7 +101,10 @@
         "last24h": "Last 24h",
         "fragmentation": "Target Update Status",
         "velocity": "Deployment Velocity",
-        "velocityDesc": "Action completion rate per minute"
+        "velocityDesc": "Action completion rate per minute",
+        "moduleTypeCoverage": "Module Type Distribution",
+        "completeness": "Distribution Completeness",
+        "securityCoverage": "Security Coverage"
     },
     "velocity": {
         "title": "Deployment Velocity Monitor",
@@ -358,7 +361,9 @@
         "subtitle": "Items needing immediate attention",
         "delayedActions": "Delayed Actions",
         "pendingApprovals": "Pending Approvals",
-        "noItems": "Everything is on track"
+        "noItems": "Everything is on track",
+        "highErrorTargets": "Reliability Alert (High Error Targets)",
+        "allHealthy": "All targets healthy"
     },
     "statusTrend": {
         "title": "Status Trend (24h)",

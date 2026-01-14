@@ -101,7 +101,10 @@
         "last24h": "최근 24시간",
         "fragmentation": "타겟 업데이트 상태",
         "velocity": "배포 속도 (분/완료)",
-        "velocityDesc": "분당 액션 완료 속도"
+        "velocityDesc": "분당 액션 완료 속도",
+        "moduleTypeCoverage": "모듈 유형 분포",
+        "completeness": "배포 세트 완성도",
+        "securityCoverage": "보안 커버리지"
     },
     "velocity": {
         "title": "배포 속도 모니터링",
@@ -269,6 +272,7 @@
         "errorRate": "액션 오류율",
         "pendingActions": "대기 중 액션",
         "activeRollouts": "진행 중 롤아웃",
+        "securityCoverage": "보안 커버리지",
         "attention": "확인 필요",
         "stable": "안정"
     },
@@ -359,7 +363,9 @@
         "subtitle": "즉각적인 확인이 필요한 항목",
         "delayedActions": "지연된 액션",
         "pendingApprovals": "승인 대기 중",
-        "noItems": "모든 항목이 정상입니다"
+        "noItems": "모든 항목이 정상입니다",
+        "highErrorTargets": "신뢰성 경고 (오류 빈번 타겟)",
+        "allHealthy": "모든 타겟이 정상입니다"
     },
     "statusTrend": {
         "title": "상태 추이 (24시간)",

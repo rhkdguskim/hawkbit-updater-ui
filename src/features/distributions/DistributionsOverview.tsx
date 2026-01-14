@@ -165,9 +165,9 @@ const DistributionsOverview: React.FC = () => {
                 <ChartLegendItem key={entry.name}>
                     <Flex align="center" gap={6}>
                         <div style={{ width: 10, height: 10, borderRadius: 3, background: entry.color, boxShadow: `0 1px 3px ${entry.color}40` }} />
-                        <Text type="secondary" style={{ fontSize: 11 }}>{entry.name}</Text>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{entry.name}</Text>
                     </Flex>
-                    <Text strong style={{ fontSize: 12, color: entry.color }}>{entry.value}</Text>
+                    <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', color: entry.color, fontFamily: 'var(--font-mono)' }}>{entry.value}</Text>
                 </ChartLegendItem>
             ))}
         </Flex>
@@ -179,7 +179,7 @@ const DistributionsOverview: React.FC = () => {
                 title={t('overview.title')}
                 description={
                     <Flex align="center" gap={12}>
-                        <Text type="secondary" style={{ fontSize: 13 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size)' }}>
                             {t('overview.subtitle', 'Distribution sets and software modules overview')}
                         </Text>
                         <LiveIndicator $active={setsCount > 0} $color={COLORS.distributions}>
@@ -189,7 +189,7 @@ const DistributionsOverview: React.FC = () => {
                 }
                 actions={
                     <Flex align="center" gap={8}>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {t('common:updated', 'Updated')}: {lastUpdated}
                         </Text>
                         <Button
@@ -219,7 +219,7 @@ const DistributionsOverview: React.FC = () => {
                                         <AppstoreOutlined />
                                     </IconBadge>
                                     <BigNumber $color={COLORS.distributions}>{setsCount}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
                                         {t('overview.distributionSets')}
                                     </Text>
                                 </Flex>
@@ -498,16 +498,16 @@ const DistributionsOverview: React.FC = () => {
                                                     <CodeOutlined style={{ fontSize: 16, color: '#3b82f6' }} />
                                                 </div>
                                                 <Flex vertical gap={0} style={{ minWidth: 0 }}>
-                                                    <Text strong style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    <Text strong style={{ fontSize: 'var(--ant-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                         {record.name}
                                                     </Text>
                                                     <Flex gap={4} align="center">
-                                                        <Tag color="cyan" style={{ margin: 0, fontSize: 10, padding: '0 4px', borderRadius: 999 }}>v{record.version}</Tag>
-                                                        <Text type="secondary" style={{ fontSize: 10 }}>{record.typeName}</Text>
+                                                        <Tag color="cyan" style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)', padding: '0 4px', borderRadius: 999, fontFamily: 'var(--font-mono)' }}>v{record.version}</Tag>
+                                                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{record.typeName}</Text>
                                                     </Flex>
                                                 </Flex>
                                             </Flex>
-                                            <Text type="secondary" style={{ fontSize: 10 }}>
+                                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
                                                 {record.createdAt ? dayjs(record.createdAt).format('MM-DD HH:mm') : '-'}
                                             </Text>
                                         </ActivityItem>

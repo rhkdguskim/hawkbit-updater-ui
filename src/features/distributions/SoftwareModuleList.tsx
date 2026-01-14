@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Tag, Tooltip, Space, Button, Typography } from 'antd';
+import { Tag, Tooltip, Space, Button, Typography, Flex } from 'antd';
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { EditableCell } from '@/components/common';
 import type { MgmtSoftwareModule } from '@/api/generated/model';
@@ -37,7 +37,7 @@ const SoftwareModuleList: React.FC = () => {
             dataIndex: 'id',
             key: 'id',
             width: 80,
-            render: (id: number) => <Text style={{ fontSize: 'var(--ant-font-size-sm)', color: '#666' }}>{id}</Text>,
+            render: (id: number) => <Text style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)', color: '#666' }}>{id}</Text>,
         },
         {
             title: t('list.columns.name'),
@@ -46,9 +46,22 @@ const SoftwareModuleList: React.FC = () => {
             sorter: true,
             width: 200,
             render: (text, record) => (
-                <Text strong style={{ fontSize: 12 }}>
-                    <a onClick={() => navigate(`/distributions/modules/${record.id}`)}>{text}</a>
-                </Text>
+                <Flex align="center" gap={8}>
+                    <EditableCell
+                        value={text || ''}
+                        onSave={(val) => model.handleInlineUpdate(record.id, 'name', val)}
+                        editable={isAdmin}
+                    />
+                    <Tooltip title={t('actions.viewDetails')}>
+                        <Button
+                            type="text"
+                            size="small"
+                            icon={<EyeOutlined />}
+                            style={{ fontSize: 'var(--ant-font-size-sm)', padding: 0, height: 'auto' }}
+                            onClick={() => navigate(`/distributions/modules/${record.id}`)}
+                        />
+                    </Tooltip>
+                </Flex>
             ),
         },
         {
@@ -64,7 +77,7 @@ const SoftwareModuleList: React.FC = () => {
             dataIndex: 'typeName',
             key: 'typeName',
             width: 120,
-            render: (text) => <Tag color="cyan">{text || t('common:notSelected')}</Tag>,
+            render: (text) => <Tag color="blue">{text || t('common:notSelected')}</Tag>,
         },
         {
             title: t('list.columns.vendor'),
@@ -100,7 +113,7 @@ const SoftwareModuleList: React.FC = () => {
             sorter: true,
             width: 130,
             render: (val: number) => (
-                <Text style={{ fontSize: 12 }}>{val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}</Text>
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>{val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}</Text>
             ),
         },
         {

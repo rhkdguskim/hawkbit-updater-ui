@@ -129,7 +129,7 @@ export const useSoftwareModuleListModel = () => {
         },
     });
 
-    const handleInlineUpdate = useCallback(async (id: number, field: 'vendor' | 'description', value: string) => {
+    const handleInlineUpdate = useCallback(async (id: number, field: 'name' | 'vendor' | 'description', value: string) => {
         await updateMutation.mutateAsync({
             softwareModuleId: id,
             data: { [field]: value },

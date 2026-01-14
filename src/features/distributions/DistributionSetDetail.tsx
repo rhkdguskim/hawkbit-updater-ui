@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Descriptions, Table, Button, message, Space, Tag, Modal, type TableProps } from 'antd';
+import { Descriptions, Table, Button, message, Space, Tag, Modal, Typography, type TableProps } from 'antd';
+const { Text } = Typography;
 import {
     PlusOutlined,
     StopOutlined,
@@ -155,11 +156,11 @@ const DistributionSetDetail: React.FC = () => {
             </Descriptions.Item>
             <Descriptions.Item label={t('detail.labels.createdBy')}>{setData?.createdBy}</Descriptions.Item>
             <Descriptions.Item label={t('detail.labels.createdAt')}>
-                {setData?.createdAt ? dayjs(setData.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                <Text style={{ fontFamily: 'var(--font-mono)' }}>{setData?.createdAt ? dayjs(setData.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}</Text>
             </Descriptions.Item>
             <Descriptions.Item label={t('detail.labels.lastModifiedBy')}>{setData?.lastModifiedBy}</Descriptions.Item>
             <Descriptions.Item label={t('detail.labels.lastModifiedAt')}>
-                {setData?.lastModifiedAt ? dayjs(setData.lastModifiedAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                <Text style={{ fontFamily: 'var(--font-mono)' }}>{setData?.lastModifiedAt ? dayjs(setData.lastModifiedAt).format('YYYY-MM-DD HH:mm:ss') : '-'}</Text>
             </Descriptions.Item>
         </Descriptions>
     );
@@ -177,11 +178,13 @@ const DistributionSetDetail: React.FC = () => {
             title: t('list.columns.version'),
             dataIndex: 'version',
             key: 'version',
+            render: (text) => <Tag color="blue" style={{ fontFamily: 'var(--font-mono)', margin: 0 }}>{text}</Tag>,
         },
         {
             title: t('list.columns.type'),
             dataIndex: 'typeName',
             key: 'typeName',
+            render: (text) => <Tag color="blue" style={{ margin: 0 }}>{text || t('common:notSelected')}</Tag>,
         },
         {
             title: t('list.columns.vendor'),

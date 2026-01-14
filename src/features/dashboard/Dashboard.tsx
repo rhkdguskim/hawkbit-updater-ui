@@ -21,6 +21,11 @@ import { TargetTypeCoverageChart } from './components/widgets/TargetTypeCoverage
 import { DeploymentVelocityWidget } from './components/widgets/DeploymentVelocityWidget';
 import { NewTargetsTrendChart } from './components/widgets/NewTargetsTrendChart';
 import { DistributionSummaryWidget } from './components/widgets/DistributionSummaryWidget';
+import { ModuleTypeCoverageChart } from './components/widgets/ModuleTypeCoverageChart';
+import { HighErrorTargetsWidget } from './components/widgets/HighErrorTargetsWidget';
+import { DistributionCompletenessChart } from './components/widgets/DistributionCompletenessChart';
+import { RolloutStatusChart } from './components/widgets/RolloutStatusChart';
+import { RolloutQueueChart } from './components/widgets/RolloutQueueChart';
 import RolloutCreateModal from '@/features/rollouts/RolloutCreateModal';
 
 const Dashboard: React.FC = () => {
@@ -64,6 +69,12 @@ const Dashboard: React.FC = () => {
                         isAdmin={true}
                     />
                 }
+                inProgressUpdates={
+                    <InProgressUpdatesWidget
+                        isLoading={metrics.isLoading}
+                        data={metrics.recentActivities}
+                    />
+                }
                 extraDecision={
                     <KPIHealthSummary
                         isLoading={metrics.isLoading}
@@ -72,6 +83,7 @@ const Dashboard: React.FC = () => {
                         errorRate={metrics.errorRate}
                         pendingCount={metrics.pendingCount}
                         runningRolloutCount={metrics.runningRolloutCount}
+                        securityCoverage={metrics.securityCoverage}
                     />
                 }
                 overviewItem4={
@@ -94,21 +106,38 @@ const Dashboard: React.FC = () => {
                             isLoading={metrics.isLoading}
                             stats={metrics.fragmentationStats}
                         />
-                        <InProgressUpdatesWidget
+                        <RolloutStatusChart
                             isLoading={metrics.isLoading}
-                            data={metrics.recentActivities}
+                            activeRolloutCount={metrics.activeRolloutCount}
+                            finishedRolloutCount={metrics.finishedRolloutCount}
+                            errorRolloutCount={metrics.errorRolloutCount}
+                        />
+                        <RolloutQueueChart
+                            isLoading={metrics.isLoading}
+                            pendingApprovalCount={metrics.pendingApprovalRolloutCount}
+                            pausedCount={metrics.pausedRolloutCount}
+                            scheduledReadyCount={metrics.readyRolloutCount + metrics.scheduledRolloutCount}
+                        />
+                        <TargetTypeCoverageChart
+                            isLoading={metrics.isLoading}
+                            data={metrics.targetTypeCoverageData}
+                        />
+                        <ModuleTypeCoverageChart
+                            isLoading={metrics.isLoading}
+                            data={metrics.softwareModuleTypeDistribution}
+                        />
+                        <DistributionCompletenessChart
+                            isLoading={metrics.isLoading}
+                            data={metrics.completenessData}
                         />
                         <TargetRequestDelayWidget
                             isLoading={metrics.isLoading}
                             averageDelay={metrics.averageDelay}
                             topDelayedTargets={metrics.topDelayedTargets}
                         />
-                        <TargetTypeCoverageChart
-                            isLoading={metrics.isLoading}
-                            data={metrics.targetTypeCoverageData}
-                        />
                     </>
                 }
+                showLayerLabels={true}
                 // Monitoring Layer (Bottom)
                 statusTrend={
                     <StatusTrendChart
@@ -128,26 +157,27 @@ const Dashboard: React.FC = () => {
                             />
                         </div>
                         <div style={{ flex: 1 }}>
-                            <NewTargetsTrendChart
+                            <HighErrorTargetsWidget
                                 isLoading={metrics.isLoading}
-                                data={metrics.newTargetsTrendData}
+                                data={metrics.highErrorTargets}
                             />
                         </div>
                     </Flex>
                 }
                 recentlyFinishedActions={
                     <Flex vertical gap={12} style={{ height: '100%' }}>
+                        <div style={{ flex: 1, minHeight: 0 }}>
+                            <RecentlyFinishedActionsWidget
+                                isLoading={metrics.isLoading}
+                                recentlyFinishedItems={metrics.recentlyFinishedItems}
+                                maxItems={3}
+                            />
+                        </div>
                         <div style={{ height: 'auto' }}>
                             <ActionActivityWidget
                                 isLoading={metrics.isLoading}
                                 runningActions={metrics.actions.filter(a => isActive(a))}
                                 recentFinishedActions={metrics.actions.filter(a => ['finished', 'canceled', 'error'].includes(a.status?.toLowerCase() || ''))}
-                            />
-                        </div>
-                        <div style={{ flex: 1, minHeight: 0 }}>
-                            <RecentlyFinishedActionsWidget
-                                isLoading={metrics.isLoading}
-                                recentlyFinishedItems={metrics.recentlyFinishedItems}
                             />
                         </div>
                     </Flex>
