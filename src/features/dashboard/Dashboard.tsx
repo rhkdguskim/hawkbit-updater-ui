@@ -83,93 +83,133 @@ const Dashboard: React.FC = () => {
                     />
                 )}
                 topRow={[
-                    <HealthSummaryWidget
-                        key="health"
-                        isLoading={metrics.isLoading}
-                        totalTargets={metrics.totalDevices}
-                        updatingCount={metrics.activeActionsCount}
-                        pausedRollouts={metrics.pausedRolloutCount}
-                        errorRollouts={metrics.errorRolloutCount}
-                        errorActions1h={metrics.errorActions1hCount}
-                        onAnalysisClick={() => setIsFailureModalVisible(true)}
-                    />,
-                    <KPIHealthSummary
-                        key="kpi"
-                        isLoading={metrics.isLoading}
-                        onlineRate={metrics.onlineRate}
-                        deploymentRate={metrics.deploymentRate}
-                        errorRate={metrics.errorRate}
-                        pendingCount={metrics.pendingCount}
-                        runningRolloutCount={metrics.runningRolloutCount}
-                        securityCoverage={metrics.securityCoverage}
-                    />,
-                    <ActionRequiredWidget
-                        key="action-required"
-                        isLoading={metrics.isLoading}
-                        delayedActionsCount={metrics.delayedActionsCount}
-                        pendingApprovalsCount={metrics.pendingApprovalRolloutCount}
-                        onActionClick={onActionRequiredClick}
-                    />,
-                    <DistributionSummaryWidget
-                        key="distribution-summary"
-                        isLoading={metrics.isLoading}
-                        distributionSetsCount={metrics.distributionSetsCount}
-                        softwareModulesCount={metrics.softwareModulesCount}
-                        recentSets={metrics.recentDistributionSets}
-                    />,
+                    {
+                        node: (
+                            <HealthSummaryWidget
+                                isLoading={metrics.isLoading}
+                                totalTargets={metrics.totalDevices}
+                                updatingCount={metrics.activeActionsCount}
+                                pausedRollouts={metrics.pausedRolloutCount}
+                                errorRollouts={metrics.errorRolloutCount}
+                                errorActions1h={metrics.errorActions1hCount}
+                                onAnalysisClick={() => setIsFailureModalVisible(true)}
+                            />
+                        )
+                    },
+                    {
+                        node: (
+                            <KPIHealthSummary
+                                isLoading={metrics.isLoading}
+                                onlineRate={metrics.onlineRate}
+                                deploymentRate={metrics.deploymentRate}
+                                errorRate={metrics.errorRate}
+                                pendingCount={metrics.pendingCount}
+                                runningRolloutCount={metrics.runningRolloutCount}
+                                securityCoverage={metrics.securityCoverage}
+                            />
+                        )
+                    },
+                    {
+                        node: (
+                            <ActionRequiredWidget
+                                isLoading={metrics.isLoading}
+                                delayedActionsCount={metrics.delayedActionsCount}
+                                pendingApprovalsCount={metrics.pendingApprovalRolloutCount}
+                                onActionClick={onActionRequiredClick}
+                            />
+                        )
+                    },
+                    {
+                        node: (
+                            <DistributionSummaryWidget
+                                isLoading={metrics.isLoading}
+                                distributionSetsCount={metrics.distributionSetsCount}
+                                softwareModulesCount={metrics.softwareModulesCount}
+                                recentSets={metrics.recentDistributionSets}
+                            />
+                        )
+                    },
                 ]}
                 opsLeft={[
-                    <ActiveRolloutsWidget
-                        key="active-rollouts"
-                        isLoading={metrics.isLoading}
-                        activeRollouts={metrics.activeRollouts}
-                        isAdmin={true}
-                        onCreateClick={() => setIsCreateRolloutVisible(true)}
-                    />,
-                    <InProgressUpdatesWidget
-                        key="in-progress"
-                        isLoading={metrics.isLoading}
-                        data={metrics.recentActivities}
-                    />,
+                    {
+                        flex: 1,
+                        node: (
+                            <ActiveRolloutsWidget
+                                isLoading={metrics.isLoading}
+                                activeRollouts={metrics.activeRollouts}
+                                isAdmin={true}
+                                onCreateClick={() => setIsCreateRolloutVisible(true)}
+                            />
+                        ),
+                    },
+                    {
+                        flex: 1.4,
+                        node: (
+                            <InProgressUpdatesWidget
+                                isLoading={metrics.isLoading}
+                                data={metrics.recentActivities}
+                            />
+                        ),
+                    },
                 ]}
                 opsRight={[
-                    <RecentlyFinishedActionsWidget
-                        key="recent-finished"
-                        isLoading={metrics.isLoading}
-                        recentlyFinishedItems={metrics.recentlyFinishedItems}
-                        maxItems={6}
-                    />,
-                    <HighErrorTargetsWidget
-                        key="high-error-targets"
-                        isLoading={metrics.isLoading}
-                        data={metrics.highErrorTargets}
-                    />,
+                    {
+                        flex: 1.6,
+                        node: (
+                            <RecentlyFinishedActionsWidget
+                                isLoading={metrics.isLoading}
+                                recentlyFinishedItems={metrics.recentlyFinishedItems}
+                                maxItems={8}
+                            />
+                        ),
+                    },
+                    {
+                        flex: 0.6,
+                        node: (
+                            <HighErrorTargetsWidget
+                                isLoading={metrics.isLoading}
+                                data={metrics.highErrorTargets}
+                            />
+                        ),
+                    },
                 ]}
                 signals={[
-                    <ConnectivityChart
-                        key="connectivity"
-                        isLoading={metrics.isLoading}
-                        onlineCount={metrics.onlineCount}
-                        offlineCount={metrics.offlineCount}
-                    />,
-                    <RolloutQueueChart
-                        key="rollout-queue"
-                        isLoading={metrics.isLoading}
-                        pendingApprovalCount={metrics.pendingApprovalRolloutCount}
-                        pausedCount={metrics.pausedRolloutCount}
-                        scheduledReadyCount={metrics.readyRolloutCount + metrics.scheduledRolloutCount}
-                    />,
-                    <FragmentationChart
-                        key="fragmentation"
-                        isLoading={metrics.isLoading}
-                        stats={metrics.fragmentationStats}
-                    />,
-                    <TargetRequestDelayWidget
-                        key="delay"
-                        isLoading={metrics.isLoading}
-                        averageDelay={metrics.averageDelay}
-                        topDelayedTargets={metrics.topDelayedTargets}
-                    />,
+                    {
+                        node: (
+                            <ConnectivityChart
+                                isLoading={metrics.isLoading}
+                                onlineCount={metrics.onlineCount}
+                                offlineCount={metrics.offlineCount}
+                            />
+                        )
+                    },
+                    {
+                        node: (
+                            <RolloutQueueChart
+                                isLoading={metrics.isLoading}
+                                pendingApprovalCount={metrics.pendingApprovalRolloutCount}
+                                pausedCount={metrics.pausedRolloutCount}
+                                scheduledReadyCount={metrics.readyRolloutCount + metrics.scheduledRolloutCount}
+                            />
+                        )
+                    },
+                    {
+                        node: (
+                            <FragmentationChart
+                                isLoading={metrics.isLoading}
+                                stats={metrics.fragmentationStats}
+                            />
+                        )
+                    },
+                    {
+                        node: (
+                            <TargetRequestDelayWidget
+                                isLoading={metrics.isLoading}
+                                averageDelay={metrics.averageDelay}
+                                topDelayedTargets={metrics.topDelayedTargets}
+                            />
+                        )
+                    },
                 ]}
                 trendLeft={(
                     <StatusTrendChart
@@ -180,18 +220,26 @@ const Dashboard: React.FC = () => {
                     />
                 )}
                 trendRight={[
-                    <DeploymentVelocityWidget
-                        key="velocity"
-                        isLoading={metrics.isLoading}
-                        data={metrics.velocityData.trend}
-                        currentVelocity={metrics.velocityData.currentVelocity}
-                    />,
-                    <ActionActivityWidget
-                        key="action-activity"
-                        isLoading={metrics.isLoading}
-                        runningActions={metrics.actions.filter(a => isActive(a))}
-                        recentFinishedActions={metrics.actions.filter(a => ['finished', 'canceled', 'error'].includes(a.status?.toLowerCase() || ''))}
-                    />,
+                    {
+                        flex: 0.7,
+                        node: (
+                            <DeploymentVelocityWidget
+                                isLoading={metrics.isLoading}
+                                data={metrics.velocityData.trend}
+                                currentVelocity={metrics.velocityData.currentVelocity}
+                            />
+                        )
+                    },
+                    {
+                        flex: 1.3,
+                        node: (
+                            <ActionActivityWidget
+                                isLoading={metrics.isLoading}
+                                runningActions={metrics.actions.filter(a => isActive(a))}
+                                recentFinishedActions={metrics.actions.filter(a => ['finished', 'canceled', 'error'].includes(a.status?.toLowerCase() || ''))}
+                            />
+                        )
+                    },
                 ]}
             />
 

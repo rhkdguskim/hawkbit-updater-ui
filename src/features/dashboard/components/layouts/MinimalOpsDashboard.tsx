@@ -23,7 +23,7 @@ const OpsRow = styled.section`
     display: grid;
     grid-template-columns: 1.4fr 1fr;
     gap: 8px;
-    min-height: 380px;
+    min-height: 340px;
     align-items: stretch;
 
     @media (max-width: 1200px) {
@@ -39,8 +39,8 @@ const OpsStack = styled.div`
     min-height: 0;
 `;
 
-const StackItem = styled.div`
-    flex: 1;
+const StackItem = styled.div<{ $flex?: number }>`
+    flex: ${props => props.$flex ?? 1} 1 0;
     min-height: 0;
     display: flex;
     flex-direction: column;
@@ -66,7 +66,7 @@ const TrendRow = styled.section`
     display: grid;
     grid-template-columns: 1.4fr 1fr;
     gap: 8px;
-    min-height: 260px;
+    min-height: 240px;
     align-items: stretch;
 
     @media (max-width: 1200px) {
@@ -74,14 +74,19 @@ const TrendRow = styled.section`
     }
 `;
 
+interface DashboardItem {
+    node: React.ReactNode;
+    flex?: number;
+}
+
 interface MinimalOpsDashboardProps {
     header: React.ReactNode;
-    topRow: React.ReactNode[];
-    opsLeft: React.ReactNode[];
-    opsRight: React.ReactNode[];
-    signals: React.ReactNode[];
+    topRow: DashboardItem[];
+    opsLeft: DashboardItem[];
+    opsRight: DashboardItem[];
+    signals: DashboardItem[];
     trendLeft: React.ReactNode;
-    trendRight: React.ReactNode[];
+    trendRight: DashboardItem[];
 }
 
 export const MinimalOpsDashboard: React.FC<MinimalOpsDashboardProps> = ({
@@ -99,32 +104,42 @@ export const MinimalOpsDashboard: React.FC<MinimalOpsDashboardProps> = ({
                 {header}
                 <DashboardScrollContent>
                     <TopRow>
-                        {topRow.map((node, index) => (
-                            <StackItem key={`top-${index}`}>{node}</StackItem>
+                        {topRow.map((item, index) => (
+                            <StackItem key={`top-${index}`} $flex={item.flex}>
+                                {item.node}
+                            </StackItem>
                         ))}
                     </TopRow>
                     <OpsRow>
                         <OpsStack>
-                            {opsLeft.map((node, index) => (
-                                <StackItem key={`ops-left-${index}`}>{node}</StackItem>
+                            {opsLeft.map((item, index) => (
+                                <StackItem key={`ops-left-${index}`} $flex={item.flex}>
+                                    {item.node}
+                                </StackItem>
                             ))}
                         </OpsStack>
                         <OpsStack>
-                            {opsRight.map((node, index) => (
-                                <StackItem key={`ops-right-${index}`}>{node}</StackItem>
+                            {opsRight.map((item, index) => (
+                                <StackItem key={`ops-right-${index}`} $flex={item.flex}>
+                                    {item.node}
+                                </StackItem>
                             ))}
                         </OpsStack>
                     </OpsRow>
                     <SignalsRow>
-                        {signals.map((node, index) => (
-                            <StackItem key={`signal-${index}`}>{node}</StackItem>
+                        {signals.map((item, index) => (
+                            <StackItem key={`signal-${index}`} $flex={item.flex}>
+                                {item.node}
+                            </StackItem>
                         ))}
                     </SignalsRow>
                     <TrendRow>
                         <StackItem>{trendLeft}</StackItem>
                         <OpsStack>
-                            {trendRight.map((node, index) => (
-                                <StackItem key={`trend-right-${index}`}>{node}</StackItem>
+                            {trendRight.map((item, index) => (
+                                <StackItem key={`trend-right-${index}`} $flex={item.flex}>
+                                    {item.node}
+                                </StackItem>
                             ))}
                         </OpsStack>
                     </TrendRow>

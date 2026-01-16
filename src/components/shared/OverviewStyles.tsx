@@ -20,64 +20,68 @@ export const shimmer = keyframes`
 `;
 
 // Color Theme Definitions - Industrial Clean
+// Color Theme Definitions - Industrial Clean
 export const OVERVIEW_THEMES = {
     targets: {
         gradient: 'linear-gradient(135deg, var(--ant-color-success) 0%, var(--ant-color-success-active) 100%)',
-        accentLight: 'rgba(var(--ant-color-success-rgb), 0.05)',
-        accentBorder: 'rgba(var(--ant-color-success-rgb), 0.2)',
+        accentLight: 'rgba(16, 185, 129, 0.1)',
+        accentBorder: 'rgba(16, 185, 129, 0.3)',
         iconBg: 'var(--ant-color-success)',
         color: 'var(--ant-color-success)',
     },
     distributions: {
         gradient: 'linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)',
-        accentLight: 'rgba(var(--ant-color-primary-rgb), 0.05)',
-        accentBorder: 'rgba(var(--ant-color-primary-rgb), 0.2)',
+        accentLight: 'rgba(6, 182, 212, 0.1)', // Cyan tint
+        accentBorder: 'rgba(6, 182, 212, 0.3)',
         iconBg: 'var(--ant-color-primary)',
         color: 'var(--ant-color-primary)',
     },
     actions: {
         gradient: 'linear-gradient(135deg, var(--ant-color-info) 0%, var(--ant-color-info-active) 100%)',
-        accentLight: 'rgba(var(--ant-color-info-rgb), 0.05)',
-        accentBorder: 'rgba(var(--ant-color-info-rgb), 0.2)',
+        accentLight: 'rgba(59, 130, 246, 0.1)',
+        accentBorder: 'rgba(59, 130, 246, 0.3)',
         iconBg: 'var(--ant-color-info)',
         color: 'var(--ant-color-info)',
     },
     rollouts: {
         gradient: 'linear-gradient(135deg, var(--ant-color-warning) 0%, var(--ant-color-warning-active) 100%)',
-        accentLight: 'rgba(var(--ant-color-warning-rgb), 0.05)',
-        accentBorder: 'rgba(var(--ant-color-warning-rgb), 0.2)',
+        accentLight: 'rgba(245, 158, 11, 0.1)',
+        accentBorder: 'rgba(245, 158, 11, 0.3)',
         iconBg: 'var(--ant-color-warning)',
         color: 'var(--ant-color-warning)',
     },
     connectivity: {
         gradient: 'linear-gradient(135deg, var(--ant-color-success) 0%, var(--ant-color-success-active) 100%)',
-        accentLight: 'rgba(var(--ant-color-success-rgb), 0.05)',
-        accentBorder: 'rgba(var(--ant-color-success-rgb), 0.2)',
+        accentLight: 'rgba(16, 185, 129, 0.1)',
+        accentBorder: 'rgba(16, 185, 129, 0.3)',
         iconBg: 'var(--ant-color-success)',
         color: 'var(--ant-color-success)',
     },
     deployment: {
         gradient: 'linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)',
-        accentLight: 'rgba(var(--ant-color-primary-rgb), 0.05)',
-        accentBorder: 'rgba(var(--ant-color-primary-rgb), 0.2)',
+        accentLight: 'rgba(6, 182, 212, 0.1)',
+        accentBorder: 'rgba(6, 182, 212, 0.3)',
         iconBg: 'var(--ant-color-primary)',
         color: 'var(--ant-color-primary)',
     },
     fragmentation: {
         gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
-        accentLight: 'rgba(236, 72, 153, 0.05)',
-        accentBorder: 'rgba(236, 72, 153, 0.2)',
+        accentLight: 'rgba(236, 72, 153, 0.1)',
+        accentBorder: 'rgba(236, 72, 153, 0.3)',
         iconBg: '#ec4899',
         color: '#ec4899',
     },
     activity: {
         gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
-        accentLight: 'rgba(6, 182, 212, 0.05)',
-        accentBorder: 'rgba(6, 182, 212, 0.2)',
+        accentLight: 'rgba(6, 182, 212, 0.1)',
+        accentBorder: 'rgba(6, 182, 212, 0.3)',
         iconBg: '#06b6d4',
         color: '#06b6d4',
     },
 };
+
+// ... existing components ...
+
 
 // Layout Components
 export const OverviewPageContainer = styled.div`
@@ -426,31 +430,31 @@ export const ProgressBar = styled.div<{ $progress: number; $color?: string }>`
 
 export const COLORS = {
     // Update Status Colors
-    inSync: 'var(--ant-color-success, #10b981)',
-    pending: 'var(--ant-color-info, #3b82f6)',
-    error: 'var(--ant-color-error, #ef4444)',
-    unknown: 'var(--ant-color-text-quaternary, #94a3b8)',
+    inSync: 'var(--ant-color-success)',
+    pending: 'var(--ant-color-info)',
+    error: 'var(--ant-color-error)',
+    unknown: 'var(--ant-color-text-quaternary)',
     // Connectivity Colors
-    online: 'var(--ant-color-success, #10b981)',
-    offline: 'var(--ant-color-warning, #f59e0b)',
+    online: 'var(--ant-color-success)',
+    offline: 'var(--ant-color-warning)',
     // General
-    success: 'var(--ant-color-success, #10b981)',
-    running: 'var(--ant-color-info, #3b82f6)',
-    finished: 'var(--ant-color-success, #10b981)',
-    canceled: 'var(--ant-color-text-quaternary, #94a3b8)',
+    success: 'var(--ant-color-success)',
+    running: 'var(--ant-color-info)',
+    finished: 'var(--ant-color-success)',
+    canceled: 'var(--ant-color-text-quaternary)',
     // Theme
-    targets: 'var(--ant-color-success, #10b981)',
-    distributions: 'var(--ant-color-primary, #6366f1)',
-    actions: 'var(--ant-color-info, #3b82f6)',
-    rollouts: 'var(--ant-color-warning, #f59e0b)',
+    targets: 'var(--ant-color-success)',
+    distributions: 'var(--ant-color-primary)',
+    actions: 'var(--ant-color-info)',
+    rollouts: 'var(--ant-color-warning)',
     chartPalette: [
-        '#6366f1', // Indigo
+        '#06b6d4', // Cyan (Primary)
         '#10b981', // Emerald
         '#f59e0b', // Amber
         '#ef4444', // Red
         '#3b82f6', // Blue
         '#8b5cf6', // Violet
-        '#ec4899', // Pink
-        '#06b6d4', // Cyan
+        '#d946ef', // Fuchsia
+        '#6366f1', // Indigo
     ],
 };

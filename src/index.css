@@ -49,15 +49,55 @@
 
 /* Dark mode overrides */
 [data-theme='dark'] {
-    --glass-bg: rgba(30, 41, 59, 0.85);
-    /* Slate-800 frosted */
-    --glass-border: rgba(51, 65, 85, 0.5);
-    --glass-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    --gradient-sidebar: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    --glass-bg: rgba(10, 18, 28, 0.75); /* Deep PCB Glass */
+    --glass-border: rgba(34, 211, 238, 0.35); /* Cyan trace hint */
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --gradient-sidebar: linear-gradient(180deg, #0a0f16 0%, #0a111f 100%);
+
+    --pcb-bg: #0a0f14;
+    --pcb-line: rgba(34, 211, 238, 0.12);
+    --pcb-line-strong: rgba(34, 211, 238, 0.2);
+    --pcb-node: rgba(125, 211, 252, 0.18);
+    --pcb-glow: rgba(34, 211, 238, 0.3);
 
     /* Glow Effects */
-    --shadow-glow-primary: 0 0 15px rgba(var(--ant-color-primary-rgb), 0.3);
-    --shadow-glow-error: 0 0 15px rgba(var(--ant-color-error-rgb), 0.3);
+    --shadow-glow-primary: 0 0 22px rgba(34, 211, 238, 0.35);
+    --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.3);
+    --shadow-glow-error: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+[data-theme='dark'] body {
+    background-color: var(--pcb-bg);
+    background-image:
+        linear-gradient(120deg, rgba(34, 211, 238, 0.04), transparent 55%),
+        radial-gradient(circle at 20% 20%, var(--pcb-glow), transparent 35%),
+        radial-gradient(circle at 80% 10%, rgba(59, 130, 246, 0.18), transparent 40%),
+        radial-gradient(circle at 15% 80%, rgba(16, 185, 129, 0.16), transparent 45%),
+        linear-gradient(var(--pcb-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px),
+        linear-gradient(var(--pcb-line-strong) 1px, transparent 1px),
+        linear-gradient(90deg, var(--pcb-line-strong) 1px, transparent 1px),
+        radial-gradient(circle, var(--pcb-node) 1px, transparent 1px);
+    background-size:
+        100% 100%,
+        900px 900px,
+        1100px 1100px,
+        1200px 1200px,
+        48px 48px,
+        48px 48px,
+        240px 240px,
+        240px 240px,
+        80px 80px;
+    background-position:
+        center center,
+        10% 0%,
+        90% -10%,
+        15% 110%,
+        center top,
+        center top,
+        center top,
+        center top,
+        20px 20px;
 }
 
 /* Base Styles */
