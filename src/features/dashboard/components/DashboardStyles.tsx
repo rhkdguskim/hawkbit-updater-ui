@@ -52,12 +52,20 @@ export const DashboardSurface = styled.div`
         box-shadow: var(--shadow-sm);
         /* Ensure precise corners */
         border-radius: var(--ant-border-radius-lg, 12px);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
     }
 
     .ant-card:hover {
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
         border-color: var(--ant-color-primary-border);
+    }
+
+    .ant-card-body {
+        min-height: 0;
+        overflow: visible;
     }
 
     [data-theme='dark'] & .ant-card,
@@ -90,8 +98,8 @@ export const DashboardSurface = styled.div`
  `;
 
 export const DashboardScrollContent = styled(BaseScrollContent)`
-    gap: clamp(8px, 1vw, 12px);
-    padding: 8px;
+    gap: 16px;
+    padding: 4px 8px 16px;
 `;
 
 // Dashboard Specific Layouts

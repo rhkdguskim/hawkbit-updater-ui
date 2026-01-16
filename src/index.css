@@ -49,44 +49,50 @@
 
 /* Dark mode overrides */
 [data-theme='dark'] {
-    --glass-bg: rgba(10, 18, 28, 0.75); /* Deep PCB Glass */
-    --glass-border: rgba(34, 211, 238, 0.35); /* Cyan trace hint */
+    --glass-bg: rgba(6, 10, 18, 0.8);
+    --glass-border: rgba(34, 211, 238, 0.35);
     --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    --gradient-sidebar: linear-gradient(180deg, #0a0f16 0%, #0a111f 100%);
+    --gradient-sidebar: linear-gradient(180deg, #060a12 0%, #0b1220 100%);
 
-    --pcb-bg: #0a0f14;
-    --pcb-line: rgba(34, 211, 238, 0.12);
-    --pcb-line-strong: rgba(34, 211, 238, 0.2);
-    --pcb-node: rgba(125, 211, 252, 0.18);
-    --pcb-glow: rgba(34, 211, 238, 0.3);
+    --ai-bg: #05070c;
+    --ai-grid: rgba(34, 211, 238, 0.12);
+    --ai-grid-strong: rgba(34, 211, 238, 0.22);
+    --ai-node: rgba(125, 211, 252, 0.22);
+    --ai-glow: rgba(34, 211, 238, 0.35);
+    --ai-violet: rgba(168, 85, 247, 0.18);
+    --ai-amber: rgba(251, 191, 36, 0.12);
 
     /* Glow Effects */
-    --shadow-glow-primary: 0 0 22px rgba(34, 211, 238, 0.35);
-    --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.3);
-    --shadow-glow-error: 0 0 20px rgba(239, 68, 68, 0.3);
+    --shadow-glow-primary: 0 0 26px rgba(34, 211, 238, 0.45);
+    --shadow-glow-success: 0 0 22px rgba(52, 211, 153, 0.35);
+    --shadow-glow-error: 0 0 22px rgba(248, 113, 113, 0.35);
+    --ai-pulse: rgba(34, 211, 238, 0.6);
+    --ai-pulse-soft: rgba(34, 211, 238, 0.25);
 }
 
 [data-theme='dark'] body {
-    background-color: var(--pcb-bg);
+    background-color: var(--ai-bg);
     background-image:
-        linear-gradient(120deg, rgba(34, 211, 238, 0.04), transparent 55%),
-        radial-gradient(circle at 20% 20%, var(--pcb-glow), transparent 35%),
-        radial-gradient(circle at 80% 10%, rgba(59, 130, 246, 0.18), transparent 40%),
-        radial-gradient(circle at 15% 80%, rgba(16, 185, 129, 0.16), transparent 45%),
-        linear-gradient(var(--pcb-line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px),
-        linear-gradient(var(--pcb-line-strong) 1px, transparent 1px),
-        linear-gradient(90deg, var(--pcb-line-strong) 1px, transparent 1px),
-        radial-gradient(circle, var(--pcb-node) 1px, transparent 1px);
+        linear-gradient(120deg, rgba(34, 211, 238, 0.06), transparent 55%),
+        radial-gradient(circle at 15% 15%, var(--ai-glow), transparent 38%),
+        radial-gradient(circle at 82% 12%, var(--ai-violet), transparent 40%),
+        radial-gradient(circle at 60% 85%, var(--ai-amber), transparent 45%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 6px),
+        repeating-linear-gradient(90deg, var(--ai-grid) 0 1px, transparent 1px 60px),
+        repeating-linear-gradient(0deg, var(--ai-grid) 0 1px, transparent 1px 60px),
+        repeating-linear-gradient(90deg, var(--ai-grid-strong) 0 1px, transparent 1px 240px),
+        repeating-linear-gradient(0deg, var(--ai-grid-strong) 0 1px, transparent 1px 240px),
+        radial-gradient(circle, var(--ai-node) 1px, transparent 1px);
     background-size:
         100% 100%,
         900px 900px,
         1100px 1100px,
         1200px 1200px,
-        48px 48px,
-        48px 48px,
-        240px 240px,
-        240px 240px,
+        100% 100%,
+        100% 100%,
+        100% 100%,
+        100% 100%,
+        100% 100%,
         80px 80px;
     background-position:
         center center,
@@ -98,6 +104,75 @@
         center top,
         center top,
         20px 20px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+@keyframes aiPulseGlow {
+    0% {
+        box-shadow: 0 0 0 0 var(--ai-pulse-soft), 0 0 20px 0 rgba(34, 211, 238, 0.15);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(34, 211, 238, 0), 0 0 32px 6px rgba(34, 211, 238, 0.35);
+    }
+    100% {
+        box-shadow: 0 0 0 0 var(--ai-pulse-soft), 0 0 22px 0 rgba(34, 211, 238, 0.2);
+    }
+}
+
+@keyframes aiScan {
+    0% {
+        opacity: 0.35;
+        transform: translateY(-20%);
+    }
+    50% {
+        opacity: 0.55;
+    }
+    100% {
+        opacity: 0.2;
+        transform: translateY(120%);
+    }
+}
+
+@keyframes aiNoiseDrift {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-2%, 3%, 0);
+    }
+}
+
+[data-theme='dark'] body::before,
+[data-theme='dark'] body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+[data-theme='dark'] body::before {
+    background:
+        radial-gradient(800px 500px at 20% 10%, rgba(34, 211, 238, 0.18), transparent 60%),
+        radial-gradient(900px 600px at 85% 20%, rgba(168, 85, 247, 0.16), transparent 65%),
+        radial-gradient(900px 700px at 60% 90%, rgba(251, 191, 36, 0.12), transparent 70%);
+    opacity: 0.8;
+    mix-blend-mode: screen;
+    animation: aiNoiseDrift 16s linear infinite alternate;
+}
+
+[data-theme='dark'] body::after {
+    background:
+        linear-gradient(180deg, transparent 0%, rgba(34, 211, 238, 0.12) 45%, transparent 90%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px);
+    opacity: 0.35;
+    animation: aiScan 8s ease-in-out infinite;
+}
+
+[data-theme='dark'] #root {
+    position: relative;
+    z-index: 1;
 }
 
 /* Base Styles */
@@ -178,6 +253,14 @@ pre,
     /* Highlight on hover */
 }
 
+[data-theme='dark'] .ant-card {
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.08), 0 12px 28px rgba(5, 7, 12, 0.6);
+}
+
+[data-theme='dark'] .ant-card:hover {
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.18), 0 0 22px rgba(34, 211, 238, 0.25), 0 16px 36px rgba(5, 7, 12, 0.7);
+}
+
 /* Tables - Data Grid Style */
 .ant-table-wrapper {
     border: 1px solid var(--border-color);
@@ -210,6 +293,43 @@ pre,
 
 .ant-btn-primary {
     /* Slight glow in dark mode handled by theme config */
+}
+
+[data-theme='dark'] .ant-btn-primary {
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.5);
+}
+
+[data-theme='dark'] .ant-btn-primary:hover {
+    box-shadow: 0 0 24px rgba(34, 211, 238, 0.65);
+}
+
+[data-theme='dark'] .dashboard-clickable {
+    position: relative;
+}
+
+[data-theme='dark'] .dashboard-clickable::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    border: 1px solid rgba(34, 211, 238, 0.25);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);
+    opacity: 0;
+    transition: opacity var(--transition-normal) ease;
+    pointer-events: none;
+}
+
+[data-theme='dark'] .dashboard-clickable:hover::after,
+[data-theme='dark'] .dashboard-clickable:focus-visible::after {
+    opacity: 1;
+}
+
+[data-theme='dark'] .status-badge {
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.2);
+}
+
+[data-theme='dark'] .ant-tag {
+    box-shadow: 0 0 14px rgba(34, 211, 238, 0.15);
 }
 
 /* Status Indicators - LED Style */

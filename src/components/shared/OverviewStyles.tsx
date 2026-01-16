@@ -214,6 +214,7 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
     animation-delay: ${props => (props.$delay || 0) * 0.05}s;
     animation-fill-mode: both;
     height: 100%;
+    min-height: 200px;
     flex: 1;
     min-width: 0;
     display: flex;
@@ -263,6 +264,7 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        min-height: 0;
     }
 `;
 

@@ -4,30 +4,30 @@ import { modernColors } from './constants';
 
 export const darkTheme: ThemeConfig = {
     token: {
-        // Semiconductor / IoT High Contrast Palette
-        colorPrimary: '#06b6d4', // Cyan-500: Electric Tech Blue
-        colorSuccess: '#10b981', // Emerald-500: Industrial Green
-        colorWarning: '#f59e0b', // Amber-500: Warning Yellow
-        colorError: '#ef4444',   // Red-500: Critical Red
-        colorInfo: '#3b82f6',    // Blue-500: Information
-        colorTextHeading: '#f1f5f9', // Slate-100: High Readability
+        // AI ops palette - Neon, high contrast
+        colorPrimary: '#22d3ee', // Neon Cyan
+        colorSuccess: '#34d399', // Emerald Glow
+        colorWarning: '#fbbf24', // Amber Signal
+        colorError: '#f87171',   // Soft Red
+        colorInfo: '#a855f7',    // Violet Accent
+        colorTextHeading: '#e2e8f0', // Bright slate
 
-        // Deep Space / Facility Backgrounds
-        colorBgBase: '#0b1121',      // Deepest Blue-Black (Void)
-        colorBgLayout: '#0b1121',    // Main Layout Background
-        colorBgContainer: '#151e32', // Container/Card Background (Dark Slate Blue)
-        colorBgElevated: '#1e293b',  // Dropdowns/Modals (Slate-800)
-        colorBgSpotlight: '#334155', // Tooltips (Slate-700)
+        // Deep grid backgrounds
+        colorBgBase: '#05070c',      // Near-black
+        colorBgLayout: '#05070c',    // Main Layout Background
+        colorBgContainer: '#0b1220', // Card Background
+        colorBgElevated: '#121a2c',  // Dropdowns/Modals
+        colorBgSpotlight: '#1a2440', // Tooltips
 
-        // Typography - Crisp & Technical
+        // Typography
         colorText: '#e2e8f0',        // Slate-200
         colorTextSecondary: '#94a3b8', // Slate-400
         colorTextTertiary: '#64748b',  // Slate-500
         colorTextQuaternary: '#475569', // Slate-600
 
-        // Borders - Subtle Structure
-        colorBorder: '#2e3a50',      // Muted Blue-Grey Border
-        colorBorderSecondary: '#1e293b', // Darker Divider
+        // Borders - Sharp, technical
+        colorBorder: '#1f2a44',
+        colorBorderSecondary: '#121a2c',
 
         // Shapes - Industrial Precision
         borderRadius: 4,      // Sharper corners for "Machine" feel
@@ -56,42 +56,42 @@ export const darkTheme: ThemeConfig = {
         motionDurationSlow: '0.3s',
 
         // Effects - Glows & Depth
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)',
-        boxShadowSecondary: '0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3)',
+        boxShadow: '0 0 0 1px rgba(34, 211, 238, 0.08), 0 10px 24px rgba(5, 7, 12, 0.65)',
+        boxShadowSecondary: '0 0 0 1px rgba(168, 85, 247, 0.1), 0 18px 36px rgba(5, 7, 12, 0.7)',
     },
     algorithm: theme.darkAlgorithm,
     components: {
         Layout: {
-            siderBg: '#0e1525', // Slightly lighter than body for depth
-            headerBg: '#151e32', // Matches container
-            bodyBg: '#0b1121',
+            siderBg: '#0a0f1b',
+            headerBg: '#0b1220',
+            bodyBg: '#05070c',
             headerPadding: '0 24px',
         },
         Menu: {
             darkItemBg: 'transparent',
             darkSubMenuItemBg: 'transparent',
-            darkItemSelectedBg: 'rgba(6, 182, 212, 0.15)', // Cyan tint
-            darkItemHoverBg: 'rgba(6, 182, 212, 0.08)',
+            darkItemSelectedBg: 'rgba(34, 211, 238, 0.16)',
+            darkItemHoverBg: 'rgba(34, 211, 238, 0.08)',
             itemBorderRadius: 4,
             itemMarginInline: 8,
             itemPaddingInline: 16,
             iconSize: 18,
             collapsedIconSize: 20,
-            itemSelectedColor: '#22d3ee', // Bright Cyan Text
+            itemSelectedColor: '#67e8f9',
         },
         Card: {
-            colorBgContainer: '#151e32',
+            colorBgContainer: '#0b1220',
             borderRadiusLG: 8,
-            boxShadowTertiary: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+            boxShadowTertiary: '0 0 0 1px rgba(34, 211, 238, 0.08), 0 10px 24px rgba(5, 7, 12, 0.55)',
             paddingLG: 24,
             headerFontSize: 16,
-            actionsBg: '#1e293b',
+            actionsBg: '#0f172a',
         },
         Table: {
-            headerBg: '#1e293b',
-            headerColor: '#94a3b8', // Muted header text
-            rowHoverBg: '#1e293b',  // Subtle hover
-            borderColor: '#2e3a50',
+            headerBg: '#0f172a',
+            headerColor: '#7dd3fc',
+            rowHoverBg: '#121a2c',
+            borderColor: '#1f2a44',
             headerBorderRadius: 4,
             padding: 12,
         },
@@ -102,19 +102,19 @@ export const darkTheme: ThemeConfig = {
             paddingInline: 16,
             paddingInlineLG: 24,
             fontWeight: 600,
-            primaryShadow: '0 0 12px rgba(6, 182, 212, 0.4)', // Neon Cyan Glow
+            primaryShadow: '0 0 16px rgba(34, 211, 238, 0.45)',
         },
         Input: {
             borderRadius: 4,
             paddingInline: 12,
-            activeShadow: '0 0 0 2px rgba(6, 182, 212, 0.2)',
-            colorBgContainer: '#0b1121', // Deep Dark Input
-            colorBorder: '#2e3a50',
-            hoverBorderColor: '#06b6d4',
+            activeShadow: '0 0 0 2px rgba(34, 211, 238, 0.22)',
+            colorBgContainer: '#060a12',
+            colorBorder: '#1f2a44',
+            hoverBorderColor: '#22d3ee',
         },
         Select: {
             borderRadius: 4,
-            optionSelectedBg: 'rgba(6, 182, 212, 0.15)',
+            optionSelectedBg: 'rgba(34, 211, 238, 0.15)',
         },
         Tag: {
             borderRadiusSM: 2,
@@ -123,34 +123,34 @@ export const darkTheme: ThemeConfig = {
             dotSize: 8,
         },
         Tabs: {
-            cardBg: '#0b1121',
-            itemActiveColor: '#22d3ee',
-            itemHoverColor: '#22d3ee',
-            inkBarColor: '#22d3ee',
+            cardBg: '#05070c',
+            itemActiveColor: '#67e8f9',
+            itemHoverColor: '#67e8f9',
+            inkBarColor: '#67e8f9',
             horizontalItemPadding: '12px 16px',
         },
         Modal: {
-            contentBg: '#151e32',
-            headerBg: '#151e32',
+            contentBg: '#0b1220',
+            headerBg: '#0b1220',
             borderRadiusLG: 8,
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.4)', // Deep shadow
+            boxShadow: '0 0 0 1px rgba(34, 211, 238, 0.12), 0 30px 40px rgba(5, 7, 12, 0.75)',
         },
         Drawer: {
-            colorBgElevated: '#151e32',
+            colorBgElevated: '#0b1220',
             borderRadiusLG: 8,
         },
         Statistic: {
             contentFontSize: 24,
         },
         Tooltip: {
-            colorBgSpotlight: '#334155',
+            colorBgSpotlight: '#1a2440',
             borderRadius: 4,
         },
         Alert: {
             borderRadiusLG: 4,
         },
         Progress: {
-            defaultColor: '#06b6d4',
+            defaultColor: '#22d3ee',
         }
     },
 };

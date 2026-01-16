@@ -6,9 +6,11 @@ import { DashboardScrollContent, DashboardSurface } from '../DashboardStyles';
 const TopRow = styled.section`
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
+    gap: 12px;
     align-items: stretch;
-    grid-auto-rows: minmax(0, 1fr);
+    grid-auto-rows: minmax(230px, auto);
+    align-content: start;
+    flex-shrink: 0;
 
     @media (max-width: 1400px) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -22,36 +24,46 @@ const TopRow = styled.section`
 const OpsRow = styled.section`
     display: grid;
     grid-template-columns: 1.4fr 1fr;
-    gap: 8px;
-    min-height: 340px;
+    gap: 12px;
     align-items: stretch;
+    min-height: 380px;
+    flex-shrink: 0;
 
     @media (max-width: 1200px) {
         grid-template-columns: 1fr;
+        min-height: auto;
     }
 `;
 
 const OpsStack = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
     min-width: 0;
-    min-height: 0;
+    min-height: 100%;
 `;
 
 const StackItem = styled.div<{ $flex?: number }>`
-    flex: ${props => props.$flex ?? 1} 1 0;
-    min-height: 0;
+    flex: ${props => props.$flex ?? 1} 1 auto;
+    min-height: 180px;
     display: flex;
     flex-direction: column;
+    
+    /* Ensure child widgets fill the container */
+    & > * {
+        flex: 1;
+        min-height: 0;
+    }
 `;
 
 const SignalsRow = styled.section`
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
+    gap: 12px;
     align-items: stretch;
-    grid-auto-rows: minmax(200px, 1fr);
+    grid-auto-rows: minmax(230px, auto);
+    align-content: start;
+    flex-shrink: 0;
 
     @media (max-width: 1400px) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -65,12 +77,14 @@ const SignalsRow = styled.section`
 const TrendRow = styled.section`
     display: grid;
     grid-template-columns: 1.4fr 1fr;
-    gap: 8px;
-    min-height: 240px;
+    gap: 12px;
     align-items: stretch;
+    min-height: 360px;
+    flex-shrink: 0;
 
     @media (max-width: 1200px) {
         grid-template-columns: 1fr;
+        min-height: auto;
     }
 `;
 

@@ -6,12 +6,13 @@ const { Text } = Typography;
 export const WidgetContainer = styled.div`
     background: var(--ant-color-bg-container);
     border-radius: var(--ant-border-radius-lg);
-    padding: 12px 16px;
+    padding: 16px;
     border: 1px solid var(--ant-color-border-secondary);
     display: flex;
     flex-direction: column;
     gap: 12px;
     height: 100%;
+    min-height: 180px;
     overflow: hidden;
 `;
 
@@ -116,7 +117,13 @@ export const BottleneckDesc = styled(Text)`
 
 export const ChartWrapper = styled.div`
     flex: 1;
-    min-height: 0;
+    min-height: 160px;
+    position: relative;
+    
+    /* Ensure ResponsiveContainer has dimensions to work with */
+    & > .recharts-responsive-container {
+        min-height: 100%;
+    }
 `;
 
 export const LegendContainer = styled(Flex)`

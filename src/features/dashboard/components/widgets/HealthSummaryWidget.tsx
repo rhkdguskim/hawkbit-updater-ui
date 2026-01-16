@@ -66,8 +66,10 @@ const Container = styled.div<{ $status: HealthStatus }>`
     padding: 16px; /* Tighter padding */
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     height: 100%;
+    min-height: 0;
+    overflow: hidden;
     transition: all 0.2s ease;
     box-shadow: var(--shadow-sm);
 
