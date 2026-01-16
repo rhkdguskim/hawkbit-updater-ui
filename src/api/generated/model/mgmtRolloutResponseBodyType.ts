@@ -13,7 +13,7 @@
 export type MgmtRolloutResponseBodyType = typeof MgmtRolloutResponseBodyType[keyof typeof MgmtRolloutResponseBodyType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MgmtRolloutResponseBodyType = {
   soft: 'soft',
   forced: 'forced',

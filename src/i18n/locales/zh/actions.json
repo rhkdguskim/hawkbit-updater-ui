@@ -169,6 +169,7 @@
         "finished": "已完成",
         "error": "错误",
         "canceled": "已取消",
+        "canceling": "取消中",
         "unknown": "未知"
     },
     "history": {

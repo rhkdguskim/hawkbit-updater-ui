@@ -13,7 +13,7 @@
 export type MgmtRolloutRestRequestBodyPostType = typeof MgmtRolloutRestRequestBodyPostType[keyof typeof MgmtRolloutRestRequestBodyPostType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MgmtRolloutRestRequestBodyPostType = {
   soft: 'soft',
   forced: 'forced',

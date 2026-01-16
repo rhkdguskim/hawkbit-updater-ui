@@ -7,9 +7,11 @@ const TableWrapper = styled.div`
     display: flex;
     flex-direction: column;
 
-    /* Table should not stretch rows - only use content height */
     .ant-table-wrapper {
-        /* Don't use flex: 1 here - let table size naturally */
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
     }
 
     .ant-table-thead > tr > th {

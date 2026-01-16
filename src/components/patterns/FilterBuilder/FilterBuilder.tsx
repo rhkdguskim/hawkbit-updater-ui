@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { FilterChip } from './FilterChip';
 import { FilterCondition, type FilterField, type FilterConditionValue } from './FilterCondition';
 import { SavedFilterDropdown } from './SavedFilterDropdown';
+import { ColumnCustomizer, type ColumnOption } from './ColumnCustomizer';
 
 const Container = styled.div`
     display: flex;
@@ -70,6 +71,11 @@ export interface FilterBuilderProps {
     onApplySavedFilter?: (query: string, name?: string) => void;
     onManageSavedFilters?: () => void;
     buildQuery?: (filters: FilterValue[]) => string;
+
+    // Column Customization integration
+    columns?: ColumnOption[];
+    visibleColumns?: string[];
+    onVisibilityChange?: (columns: string[]) => void;
 }
 
 export const FilterBuilder: React.FC<FilterBuilderProps> = ({
@@ -85,6 +91,9 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     onApplySavedFilter,
     onManageSavedFilters,
     buildQuery,
+    columns,
+    visibleColumns,
+    onVisibilityChange,
 }) => {
     const { t } = useTranslation('common');
     const [conditionOpen, setConditionOpen] = useState(false);
@@ -212,6 +221,14 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
 
                 <ActionsSection>
                     {extra}
+                    {columns && visibleColumns && onVisibilityChange && (
+                        <ColumnCustomizer
+                            t={t}
+                            columns={columns}
+                            visibleColumns={visibleColumns}
+                            onVisibilityChange={onVisibilityChange}
+                        />
+                    )}
                     {onRefresh && (
                         <Button
                             icon={<ReloadOutlined />}

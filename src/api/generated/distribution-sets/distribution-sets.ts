@@ -7,18 +7,23 @@
  * OpenAPI spec version: v1
  */
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -77,6 +82,12 @@ export const getDistributionSet = (
 
 
 
+export const getGetDistributionSetInfiniteQueryKey = (distributionSetId?: number,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets/${distributionSetId}`
+    ] as const;
+    }
+
 export const getGetDistributionSetQueryKey = (distributionSetId?: number,) => {
     return [
     `/rest/v1/distributionsets/${distributionSetId}`
@@ -84,6 +95,73 @@ export const getGetDistributionSetQueryKey = (distributionSetId?: number,) => {
     }
 
     
+export const getGetDistributionSetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getDistributionSet>>>, TError = ExceptionInfo>(distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDistributionSetInfiniteQueryKey(distributionSetId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDistributionSet>>> = ({ signal }) => getDistributionSet(distributionSetId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(distributionSetId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetDistributionSetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getDistributionSet>>>
+export type GetDistributionSetInfiniteQueryError = ExceptionInfo
+
+
+export function useGetDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDistributionSet>>,
+          TError,
+          Awaited<ReturnType<typeof getDistributionSet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDistributionSet>>,
+          TError,
+          Awaited<ReturnType<typeof getDistributionSet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return single Distribution Set
+ */
+
+export function useGetDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetDistributionSetInfiniteQueryOptions(distributionSetId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetDistributionSetQueryOptions = <TData = Awaited<ReturnType<typeof getDistributionSet>>, TError = ExceptionInfo>(distributionSetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -298,6 +376,13 @@ export const getMetadataValue2 = (
 
 
 
+export const getGetMetadataValue2InfiniteQueryKey = (distributionSetId?: number,
+    metadataKey?: string,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets/${distributionSetId}/metadata/${metadataKey}`
+    ] as const;
+    }
+
 export const getGetMetadataValue2QueryKey = (distributionSetId?: number,
     metadataKey?: string,) => {
     return [
@@ -306,6 +391,78 @@ export const getGetMetadataValue2QueryKey = (distributionSetId?: number,
     }
 
     
+export const getGetMetadataValue2InfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getMetadataValue2>>>, TError = ExceptionInfo>(distributionSetId: number,
+    metadataKey: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue2>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMetadataValue2InfiniteQueryKey(distributionSetId,metadataKey);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMetadataValue2>>> = ({ signal }) => getMetadataValue2(distributionSetId,metadataKey, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(distributionSetId && metadataKey), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue2>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMetadataValue2InfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getMetadataValue2>>>
+export type GetMetadataValue2InfiniteQueryError = ExceptionInfo
+
+
+export function useGetMetadataValue2Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadataValue2>>>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    metadataKey: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue2>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMetadataValue2>>,
+          TError,
+          Awaited<ReturnType<typeof getMetadataValue2>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMetadataValue2Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadataValue2>>>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    metadataKey: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue2>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMetadataValue2>>,
+          TError,
+          Awaited<ReturnType<typeof getMetadataValue2>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMetadataValue2Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadataValue2>>>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    metadataKey: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue2>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return single meta data value for a specific key of a Distribution Set
+ */
+
+export function useGetMetadataValue2Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadataValue2>>>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    metadataKey: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue2>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMetadataValue2InfiniteQueryOptions(distributionSetId,metadataKey,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetMetadataValue2QueryOptions = <TData = Awaited<ReturnType<typeof getMetadataValue2>>, TError = ExceptionInfo>(distributionSetId: number,
     metadataKey: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetadataValue2>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
@@ -527,6 +684,12 @@ export const getDistributionSets = (
 
 
 
+export const getGetDistributionSetsInfiniteQueryKey = (params?: GetDistributionSetsParams,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetDistributionSetsQueryKey = (params?: GetDistributionSetsParams,) => {
     return [
     `/rest/v1/distributionsets`, ...(params ? [params]: [])
@@ -534,6 +697,73 @@ export const getGetDistributionSetsQueryKey = (params?: GetDistributionSetsParam
     }
 
     
+export const getGetDistributionSetsInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getDistributionSets>>, GetDistributionSetsParams['offset']>, TError = ExceptionInfo>(params?: GetDistributionSetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSets>>, TError, TData, QueryKey, GetDistributionSetsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDistributionSetsInfiniteQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDistributionSets>>, QueryKey, GetDistributionSetsParams['offset']> = ({ signal, pageParam }) => getDistributionSets({...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSets>>, TError, TData, QueryKey, GetDistributionSetsParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetDistributionSetsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getDistributionSets>>>
+export type GetDistributionSetsInfiniteQueryError = ExceptionInfo
+
+
+export function useGetDistributionSetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDistributionSets>>, GetDistributionSetsParams['offset']>, TError = ExceptionInfo>(
+ params: undefined |  GetDistributionSetsParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSets>>, TError, TData, QueryKey, GetDistributionSetsParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDistributionSets>>,
+          TError,
+          Awaited<ReturnType<typeof getDistributionSets>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDistributionSetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDistributionSets>>, GetDistributionSetsParams['offset']>, TError = ExceptionInfo>(
+ params?: GetDistributionSetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSets>>, TError, TData, QueryKey, GetDistributionSetsParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDistributionSets>>,
+          TError,
+          Awaited<ReturnType<typeof getDistributionSets>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDistributionSetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDistributionSets>>, GetDistributionSetsParams['offset']>, TError = ExceptionInfo>(
+ params?: GetDistributionSetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSets>>, TError, TData, QueryKey, GetDistributionSetsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return all Distribution Sets
+ */
+
+export function useGetDistributionSetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDistributionSets>>, GetDistributionSetsParams['offset']>, TError = ExceptionInfo>(
+ params?: GetDistributionSetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDistributionSets>>, TError, TData, QueryKey, GetDistributionSetsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetDistributionSetsInfiniteQueryOptions(params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetDistributionSetsQueryOptions = <TData = Awaited<ReturnType<typeof getDistributionSets>>, TError = ExceptionInfo>(params?: GetDistributionSetsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDistributionSets>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -687,6 +917,13 @@ export const getMetadata2 = (
 
 
 
+export const getGetMetadata2InfiniteQueryKey = (distributionSetId?: number,
+    params?: GetMetadata2Params,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets/${distributionSetId}/metadata`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetMetadata2QueryKey = (distributionSetId?: number,
     params?: GetMetadata2Params,) => {
     return [
@@ -695,6 +932,78 @@ export const getGetMetadata2QueryKey = (distributionSetId?: number,
     }
 
     
+export const getGetMetadata2InfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getMetadata2>>, GetMetadata2Params['offset']>, TError = ExceptionInfo>(distributionSetId: number,
+    params?: GetMetadata2Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata2>>, TError, TData, QueryKey, GetMetadata2Params['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMetadata2InfiniteQueryKey(distributionSetId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMetadata2>>, QueryKey, GetMetadata2Params['offset']> = ({ signal, pageParam }) => getMetadata2(distributionSetId,{...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(distributionSetId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata2>>, TError, TData, QueryKey, GetMetadata2Params['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMetadata2InfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getMetadata2>>>
+export type GetMetadata2InfiniteQueryError = ExceptionInfo
+
+
+export function useGetMetadata2Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadata2>>, GetMetadata2Params['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params: undefined |  GetMetadata2Params, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata2>>, TError, TData, QueryKey, GetMetadata2Params['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMetadata2>>,
+          TError,
+          Awaited<ReturnType<typeof getMetadata2>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMetadata2Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadata2>>, GetMetadata2Params['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetMetadata2Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata2>>, TError, TData, QueryKey, GetMetadata2Params['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMetadata2>>,
+          TError,
+          Awaited<ReturnType<typeof getMetadata2>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMetadata2Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadata2>>, GetMetadata2Params['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetMetadata2Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata2>>, TError, TData, QueryKey, GetMetadata2Params['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return meta data for Distribution Set
+ */
+
+export function useGetMetadata2Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadata2>>, GetMetadata2Params['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetMetadata2Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata2>>, TError, TData, QueryKey, GetMetadata2Params['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMetadata2InfiniteQueryOptions(distributionSetId,params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetMetadata2QueryOptions = <TData = Awaited<ReturnType<typeof getMetadata2>>, TError = ExceptionInfo>(distributionSetId: number,
     params?: GetMetadata2Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetadata2>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
@@ -924,6 +1233,13 @@ export const getAssignedTargets1 = (
 
 
 
+export const getGetAssignedTargets1InfiniteQueryKey = (distributionSetId?: number,
+    params?: GetAssignedTargets1Params,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets/${distributionSetId}/assignedTargets`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetAssignedTargets1QueryKey = (distributionSetId?: number,
     params?: GetAssignedTargets1Params,) => {
     return [
@@ -932,6 +1248,78 @@ export const getGetAssignedTargets1QueryKey = (distributionSetId?: number,
     }
 
     
+export const getGetAssignedTargets1InfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getAssignedTargets1>>, GetAssignedTargets1Params['offset']>, TError = ExceptionInfo>(distributionSetId: number,
+    params?: GetAssignedTargets1Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedTargets1>>, TError, TData, QueryKey, GetAssignedTargets1Params['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAssignedTargets1InfiniteQueryKey(distributionSetId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAssignedTargets1>>, QueryKey, GetAssignedTargets1Params['offset']> = ({ signal, pageParam }) => getAssignedTargets1(distributionSetId,{...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(distributionSetId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedTargets1>>, TError, TData, QueryKey, GetAssignedTargets1Params['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAssignedTargets1InfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getAssignedTargets1>>>
+export type GetAssignedTargets1InfiniteQueryError = ExceptionInfo
+
+
+export function useGetAssignedTargets1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedTargets1>>, GetAssignedTargets1Params['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params: undefined |  GetAssignedTargets1Params, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedTargets1>>, TError, TData, QueryKey, GetAssignedTargets1Params['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAssignedTargets1>>,
+          TError,
+          Awaited<ReturnType<typeof getAssignedTargets1>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAssignedTargets1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedTargets1>>, GetAssignedTargets1Params['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetAssignedTargets1Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedTargets1>>, TError, TData, QueryKey, GetAssignedTargets1Params['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAssignedTargets1>>,
+          TError,
+          Awaited<ReturnType<typeof getAssignedTargets1>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAssignedTargets1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedTargets1>>, GetAssignedTargets1Params['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetAssignedTargets1Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedTargets1>>, TError, TData, QueryKey, GetAssignedTargets1Params['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return assigned targets to a specific distribution set
+ */
+
+export function useGetAssignedTargets1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedTargets1>>, GetAssignedTargets1Params['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetAssignedTargets1Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedTargets1>>, TError, TData, QueryKey, GetAssignedTargets1Params['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAssignedTargets1InfiniteQueryOptions(distributionSetId,params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetAssignedTargets1QueryOptions = <TData = Awaited<ReturnType<typeof getAssignedTargets1>>, TError = ExceptionInfo>(distributionSetId: number,
     params?: GetAssignedTargets1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAssignedTargets1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
@@ -1093,6 +1481,13 @@ export const getAssignedSoftwareModules = (
 
 
 
+export const getGetAssignedSoftwareModulesInfiniteQueryKey = (distributionSetId?: number,
+    params?: GetAssignedSoftwareModulesParams,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets/${distributionSetId}/assignedSM`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetAssignedSoftwareModulesQueryKey = (distributionSetId?: number,
     params?: GetAssignedSoftwareModulesParams,) => {
     return [
@@ -1101,6 +1496,78 @@ export const getGetAssignedSoftwareModulesQueryKey = (distributionSetId?: number
     }
 
     
+export const getGetAssignedSoftwareModulesInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, GetAssignedSoftwareModulesParams['offset']>, TError = ExceptionInfo>(distributionSetId: number,
+    params?: GetAssignedSoftwareModulesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, TError, TData, QueryKey, GetAssignedSoftwareModulesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAssignedSoftwareModulesInfiniteQueryKey(distributionSetId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, QueryKey, GetAssignedSoftwareModulesParams['offset']> = ({ signal, pageParam }) => getAssignedSoftwareModules(distributionSetId,{...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(distributionSetId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, TError, TData, QueryKey, GetAssignedSoftwareModulesParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAssignedSoftwareModulesInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getAssignedSoftwareModules>>>
+export type GetAssignedSoftwareModulesInfiniteQueryError = ExceptionInfo
+
+
+export function useGetAssignedSoftwareModulesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, GetAssignedSoftwareModulesParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params: undefined |  GetAssignedSoftwareModulesParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, TError, TData, QueryKey, GetAssignedSoftwareModulesParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAssignedSoftwareModules>>,
+          TError,
+          Awaited<ReturnType<typeof getAssignedSoftwareModules>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAssignedSoftwareModulesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, GetAssignedSoftwareModulesParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetAssignedSoftwareModulesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, TError, TData, QueryKey, GetAssignedSoftwareModulesParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAssignedSoftwareModules>>,
+          TError,
+          Awaited<ReturnType<typeof getAssignedSoftwareModules>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAssignedSoftwareModulesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, GetAssignedSoftwareModulesParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetAssignedSoftwareModulesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, TError, TData, QueryKey, GetAssignedSoftwareModulesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return the assigned software modules of a specific distribution set
+ */
+
+export function useGetAssignedSoftwareModulesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, GetAssignedSoftwareModulesParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetAssignedSoftwareModulesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, TError, TData, QueryKey, GetAssignedSoftwareModulesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAssignedSoftwareModulesInfiniteQueryOptions(distributionSetId,params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetAssignedSoftwareModulesQueryOptions = <TData = Awaited<ReturnType<typeof getAssignedSoftwareModules>>, TError = ExceptionInfo>(distributionSetId: number,
     params?: GetAssignedSoftwareModulesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAssignedSoftwareModules>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
@@ -1260,6 +1727,12 @@ export const getStatisticsForDistributionSet = (
 
 
 
+export const getGetStatisticsForDistributionSetInfiniteQueryKey = (distributionSetId?: number,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets/${distributionSetId}/statistics`
+    ] as const;
+    }
+
 export const getGetStatisticsForDistributionSetQueryKey = (distributionSetId?: number,) => {
     return [
     `/rest/v1/distributionsets/${distributionSetId}/statistics`
@@ -1267,6 +1740,73 @@ export const getGetStatisticsForDistributionSetQueryKey = (distributionSetId?: n
     }
 
     
+export const getGetStatisticsForDistributionSetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>>, TError = ExceptionInfo>(distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetStatisticsForDistributionSetInfiniteQueryKey(distributionSetId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>> = ({ signal }) => getStatisticsForDistributionSet(distributionSetId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(distributionSetId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetStatisticsForDistributionSetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>>
+export type GetStatisticsForDistributionSetInfiniteQueryError = ExceptionInfo
+
+
+export function useGetStatisticsForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStatisticsForDistributionSet>>,
+          TError,
+          Awaited<ReturnType<typeof getStatisticsForDistributionSet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStatisticsForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStatisticsForDistributionSet>>,
+          TError,
+          Awaited<ReturnType<typeof getStatisticsForDistributionSet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStatisticsForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return Rollouts, Actions and Auto Assignments counts by Status for Distribution Set
+ */
+
+export function useGetStatisticsForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetStatisticsForDistributionSetInfiniteQueryOptions(distributionSetId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetStatisticsForDistributionSetQueryOptions = <TData = Awaited<ReturnType<typeof getStatisticsForDistributionSet>>, TError = ExceptionInfo>(distributionSetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStatisticsForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -1353,6 +1893,12 @@ export const getRolloutsCountByStatusForDistributionSet = (
 
 
 
+export const getGetRolloutsCountByStatusForDistributionSetInfiniteQueryKey = (distributionSetId?: number,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets/${distributionSetId}/statistics/rollouts`
+    ] as const;
+    }
+
 export const getGetRolloutsCountByStatusForDistributionSetQueryKey = (distributionSetId?: number,) => {
     return [
     `/rest/v1/distributionsets/${distributionSetId}/statistics/rollouts`
@@ -1360,6 +1906,73 @@ export const getGetRolloutsCountByStatusForDistributionSetQueryKey = (distributi
     }
 
     
+export const getGetRolloutsCountByStatusForDistributionSetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>>, TError = ExceptionInfo>(distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRolloutsCountByStatusForDistributionSetInfiniteQueryKey(distributionSetId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>> = ({ signal }) => getRolloutsCountByStatusForDistributionSet(distributionSetId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(distributionSetId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRolloutsCountByStatusForDistributionSetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>>
+export type GetRolloutsCountByStatusForDistributionSetInfiniteQueryError = ExceptionInfo
+
+
+export function useGetRolloutsCountByStatusForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>,
+          TError,
+          Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutsCountByStatusForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>,
+          TError,
+          Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutsCountByStatusForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return Rollouts count by status for Distribution Set
+ */
+
+export function useGetRolloutsCountByStatusForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetRolloutsCountByStatusForDistributionSetInfiniteQueryOptions(distributionSetId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetRolloutsCountByStatusForDistributionSetQueryOptions = <TData = Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>, TError = ExceptionInfo>(distributionSetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolloutsCountByStatusForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -1446,6 +2059,12 @@ export const getAutoAssignmentsCountForDistributionSet = (
 
 
 
+export const getGetAutoAssignmentsCountForDistributionSetInfiniteQueryKey = (distributionSetId?: number,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets/${distributionSetId}/statistics/autoassignments`
+    ] as const;
+    }
+
 export const getGetAutoAssignmentsCountForDistributionSetQueryKey = (distributionSetId?: number,) => {
     return [
     `/rest/v1/distributionsets/${distributionSetId}/statistics/autoassignments`
@@ -1453,6 +2072,73 @@ export const getGetAutoAssignmentsCountForDistributionSetQueryKey = (distributio
     }
 
     
+export const getGetAutoAssignmentsCountForDistributionSetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>>, TError = ExceptionInfo>(distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAutoAssignmentsCountForDistributionSetInfiniteQueryKey(distributionSetId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>> = ({ signal }) => getAutoAssignmentsCountForDistributionSet(distributionSetId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(distributionSetId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAutoAssignmentsCountForDistributionSetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>>
+export type GetAutoAssignmentsCountForDistributionSetInfiniteQueryError = ExceptionInfo
+
+
+export function useGetAutoAssignmentsCountForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>,
+          TError,
+          Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAutoAssignmentsCountForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>,
+          TError,
+          Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAutoAssignmentsCountForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return Auto Assignments count for Distribution Set
+ */
+
+export function useGetAutoAssignmentsCountForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAutoAssignmentsCountForDistributionSetInfiniteQueryOptions(distributionSetId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetAutoAssignmentsCountForDistributionSetQueryOptions = <TData = Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>, TError = ExceptionInfo>(distributionSetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAutoAssignmentsCountForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -1539,6 +2225,12 @@ export const getActionsCountByStatusForDistributionSet = (
 
 
 
+export const getGetActionsCountByStatusForDistributionSetInfiniteQueryKey = (distributionSetId?: number,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets/${distributionSetId}/statistics/actions`
+    ] as const;
+    }
+
 export const getGetActionsCountByStatusForDistributionSetQueryKey = (distributionSetId?: number,) => {
     return [
     `/rest/v1/distributionsets/${distributionSetId}/statistics/actions`
@@ -1546,6 +2238,73 @@ export const getGetActionsCountByStatusForDistributionSetQueryKey = (distributio
     }
 
     
+export const getGetActionsCountByStatusForDistributionSetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>>, TError = ExceptionInfo>(distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetActionsCountByStatusForDistributionSetInfiniteQueryKey(distributionSetId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>> = ({ signal }) => getActionsCountByStatusForDistributionSet(distributionSetId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(distributionSetId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetActionsCountByStatusForDistributionSetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>>
+export type GetActionsCountByStatusForDistributionSetInfiniteQueryError = ExceptionInfo
+
+
+export function useGetActionsCountByStatusForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>,
+          TError,
+          Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetActionsCountByStatusForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>,
+          TError,
+          Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetActionsCountByStatusForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return Actions count by status for Distribution Set
+ */
+
+export function useGetActionsCountByStatusForDistributionSetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>>, TError = ExceptionInfo>(
+ distributionSetId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetActionsCountByStatusForDistributionSetInfiniteQueryOptions(distributionSetId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetActionsCountByStatusForDistributionSetQueryOptions = <TData = Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>, TError = ExceptionInfo>(distributionSetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActionsCountByStatusForDistributionSet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -1634,6 +2393,13 @@ export const getInstalledTargets = (
 
 
 
+export const getGetInstalledTargetsInfiniteQueryKey = (distributionSetId?: number,
+    params?: GetInstalledTargetsParams,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets/${distributionSetId}/installedTargets`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetInstalledTargetsQueryKey = (distributionSetId?: number,
     params?: GetInstalledTargetsParams,) => {
     return [
@@ -1642,6 +2408,78 @@ export const getGetInstalledTargetsQueryKey = (distributionSetId?: number,
     }
 
     
+export const getGetInstalledTargetsInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getInstalledTargets>>, GetInstalledTargetsParams['offset']>, TError = ExceptionInfo>(distributionSetId: number,
+    params?: GetInstalledTargetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getInstalledTargets>>, TError, TData, QueryKey, GetInstalledTargetsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetInstalledTargetsInfiniteQueryKey(distributionSetId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getInstalledTargets>>, QueryKey, GetInstalledTargetsParams['offset']> = ({ signal, pageParam }) => getInstalledTargets(distributionSetId,{...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(distributionSetId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getInstalledTargets>>, TError, TData, QueryKey, GetInstalledTargetsParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetInstalledTargetsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getInstalledTargets>>>
+export type GetInstalledTargetsInfiniteQueryError = ExceptionInfo
+
+
+export function useGetInstalledTargetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getInstalledTargets>>, GetInstalledTargetsParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params: undefined |  GetInstalledTargetsParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getInstalledTargets>>, TError, TData, QueryKey, GetInstalledTargetsParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getInstalledTargets>>,
+          TError,
+          Awaited<ReturnType<typeof getInstalledTargets>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetInstalledTargetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getInstalledTargets>>, GetInstalledTargetsParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetInstalledTargetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getInstalledTargets>>, TError, TData, QueryKey, GetInstalledTargetsParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getInstalledTargets>>,
+          TError,
+          Awaited<ReturnType<typeof getInstalledTargets>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetInstalledTargetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getInstalledTargets>>, GetInstalledTargetsParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetInstalledTargetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getInstalledTargets>>, TError, TData, QueryKey, GetInstalledTargetsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return installed targets to a specific distribution set
+ */
+
+export function useGetInstalledTargetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getInstalledTargets>>, GetInstalledTargetsParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetInstalledTargetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getInstalledTargets>>, TError, TData, QueryKey, GetInstalledTargetsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetInstalledTargetsInfiniteQueryOptions(distributionSetId,params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetInstalledTargetsQueryOptions = <TData = Awaited<ReturnType<typeof getInstalledTargets>>, TError = ExceptionInfo>(distributionSetId: number,
     params?: GetInstalledTargetsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInstalledTargets>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
@@ -1735,6 +2573,13 @@ export const getAutoAssignTargetFilterQueries = (
 
 
 
+export const getGetAutoAssignTargetFilterQueriesInfiniteQueryKey = (distributionSetId?: number,
+    params?: GetAutoAssignTargetFilterQueriesParams,) => {
+    return [
+    'infinite', `/rest/v1/distributionsets/${distributionSetId}/autoAssignTargetFilters`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetAutoAssignTargetFilterQueriesQueryKey = (distributionSetId?: number,
     params?: GetAutoAssignTargetFilterQueriesParams,) => {
     return [
@@ -1743,6 +2588,78 @@ export const getGetAutoAssignTargetFilterQueriesQueryKey = (distributionSetId?: 
     }
 
     
+export const getGetAutoAssignTargetFilterQueriesInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, GetAutoAssignTargetFilterQueriesParams['offset']>, TError = ExceptionInfo>(distributionSetId: number,
+    params?: GetAutoAssignTargetFilterQueriesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, TError, TData, QueryKey, GetAutoAssignTargetFilterQueriesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAutoAssignTargetFilterQueriesInfiniteQueryKey(distributionSetId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, QueryKey, GetAutoAssignTargetFilterQueriesParams['offset']> = ({ signal, pageParam }) => getAutoAssignTargetFilterQueries(distributionSetId,{...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(distributionSetId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, TError, TData, QueryKey, GetAutoAssignTargetFilterQueriesParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAutoAssignTargetFilterQueriesInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>>
+export type GetAutoAssignTargetFilterQueriesInfiniteQueryError = ExceptionInfo
+
+
+export function useGetAutoAssignTargetFilterQueriesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, GetAutoAssignTargetFilterQueriesParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params: undefined |  GetAutoAssignTargetFilterQueriesParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, TError, TData, QueryKey, GetAutoAssignTargetFilterQueriesParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>,
+          TError,
+          Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAutoAssignTargetFilterQueriesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, GetAutoAssignTargetFilterQueriesParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetAutoAssignTargetFilterQueriesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, TError, TData, QueryKey, GetAutoAssignTargetFilterQueriesParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>,
+          TError,
+          Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAutoAssignTargetFilterQueriesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, GetAutoAssignTargetFilterQueriesParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetAutoAssignTargetFilterQueriesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, TError, TData, QueryKey, GetAutoAssignTargetFilterQueriesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return target filter queries that have the given distribution set as auto assign DS
+ */
+
+export function useGetAutoAssignTargetFilterQueriesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, GetAutoAssignTargetFilterQueriesParams['offset']>, TError = ExceptionInfo>(
+ distributionSetId: number,
+    params?: GetAutoAssignTargetFilterQueriesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, TError, TData, QueryKey, GetAutoAssignTargetFilterQueriesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAutoAssignTargetFilterQueriesInfiniteQueryOptions(distributionSetId,params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetAutoAssignTargetFilterQueriesQueryOptions = <TData = Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, TError = ExceptionInfo>(distributionSetId: number,
     params?: GetAutoAssignTargetFilterQueriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAutoAssignTargetFilterQueries>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {

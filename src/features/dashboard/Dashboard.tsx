@@ -75,6 +75,13 @@ const Dashboard: React.FC = () => {
                         data={metrics.recentActivities}
                     />
                 }
+                recentlyFinishedActions={
+                    <RecentlyFinishedActionsWidget
+                        isLoading={metrics.isLoading}
+                        recentlyFinishedItems={metrics.recentlyFinishedItems}
+                        maxItems={5}
+                    />
+                }
                 extraDecision={
                     <KPIHealthSummary
                         isLoading={metrics.isLoading}
@@ -160,17 +167,6 @@ const Dashboard: React.FC = () => {
                             <HighErrorTargetsWidget
                                 isLoading={metrics.isLoading}
                                 data={metrics.highErrorTargets}
-                            />
-                        </div>
-                    </Flex>
-                }
-                recentlyFinishedActions={
-                    <Flex vertical gap={12} style={{ height: '100%' }}>
-                        <div style={{ flex: 1, minHeight: 0 }}>
-                            <RecentlyFinishedActionsWidget
-                                isLoading={metrics.isLoading}
-                                recentlyFinishedItems={metrics.recentlyFinishedItems}
-                                maxItems={3}
                             />
                         </div>
                         <div style={{ height: 'auto' }}>

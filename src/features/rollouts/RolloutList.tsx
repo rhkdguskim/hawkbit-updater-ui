@@ -1,20 +1,20 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Space, Button, Typography, Progress, Tooltip, message } from 'antd';
-import { EyeOutlined, EditOutlined, PauseCircleOutlined, PlayCircleOutlined, ExclamationCircleOutlined, SyncOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { EyeOutlined, EditOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useGetRollouts, usePause, useResume } from '@/api/generated/rollouts/rollouts';
-import type { MgmtRolloutResponseBody } from '@/api/generated/model';
+import { useGetRolloutsInfinite, usePause, useResume } from '@/api/generated/rollouts/rollouts';
+import type { MgmtRolloutResponseBody, PagedListMgmtRolloutResponseBody } from '@/api/generated/model';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { keepPreviousData } from '@tanstack/react-query';
 import { DataView, EnhancedTable, FilterBuilder, type FilterValue, type FilterField } from '@/components/patterns';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import { useServerTable } from '@/hooks/useServerTable';
 import dayjs from 'dayjs';
 import { buildQueryFromFilterValues } from '@/utils/fiql';
 import RolloutCreateModal from './RolloutCreateModal';
-import { StatusTag, StatusQuickFilters, type StatusFilterOption } from '@/components/common';
+import { StatusTag } from '@/components/common';
 import type { ColumnsType } from 'antd/es/table';
+import { useListFilterStore } from '@/stores/useListFilterStore';
 
 const { Text } = Typography;
 
@@ -24,7 +24,33 @@ const RolloutList: React.FC = () => {
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [quickFilter, setQuickFilter] = useState('all');
+
+    // List Filter Store Integration
+    const {
+        rollouts: rolloutPersistentState,
+        setRollouts: setRolloutPersistentState
+    } = useListFilterStore();
+
+    const {
+        filters: persistentFilters,
+        visibleColumns
+    } = rolloutPersistentState;
+
+    const filters = persistentFilters;
+
+    const setFilters = useCallback((newFilters: FilterValue[]) => {
+        setRolloutPersistentState({ filters: newFilters });
+    }, [setRolloutPersistentState]);
+
+    const setVisibleColumns = useCallback((columns: string[]) => {
+        setRolloutPersistentState({ visibleColumns: columns });
+    }, [setRolloutPersistentState]);
+
+    const {
+        pagination,
+        handleTableChange,
+        resetPagination,
+    } = useServerTable<MgmtRolloutResponseBody>({ syncToUrl: true });
 
     // Pause/Resume mutations
     const pauseMutation = usePause({
@@ -59,15 +85,6 @@ const RolloutList: React.FC = () => {
         }
     };
 
-    const {
-        pagination,
-        offset,
-        handleTableChange,
-        resetPagination,
-    } = useServerTable<MgmtRolloutResponseBody>({ syncToUrl: true });
-
-    const [filters, setFilters] = useState<FilterValue[]>([]);
-
     // Filter fields
     const filterFields: FilterField[] = useMemo(() => [
         { key: 'name', label: t('columns.name'), type: 'text' },
@@ -89,59 +106,48 @@ const RolloutList: React.FC = () => {
         },
     ], [t]);
 
-    // Quick filter options - only use valid API statuses
-    const quickFilterOptions: StatusFilterOption[] = useMemo(() => [
-        { key: 'running', label: t('filter.running'), icon: <SyncOutlined spin />, color: 'processing' },
-        { key: 'paused', label: t('filter.paused'), icon: <PauseCircleOutlined />, color: 'warning' },
-        { key: 'finished', label: t('filter.finished'), icon: <CheckCircleOutlined />, color: 'success' },
-        { key: 'stopped', label: t('filter.stopped'), icon: <ExclamationCircleOutlined />, color: 'error', danger: true },
-    ], [t]);
-
-    // Handle quick filter change
-    const handleQuickFilterChange = useCallback((filter: string) => {
-        setQuickFilter(filter);
-        if (filter === 'all') {
-            setFilters([]);
-        } else {
-            setFilters([{
-                id: `quick-${filter}`,
-                field: 'status',
-                fieldLabel: t('columns.status'),
-                operator: 'equals',
-                operatorLabel: '=',
-                value: filter,
-                displayValue: t(`filter.${filter}`),
-            }]);
-        }
-        resetPagination();
-    }, [t, resetPagination]);
 
     // Build RSQL query from filters
     const buildFinalQuery = useCallback(() => buildQueryFromFilterValues(filters), [filters]);
 
     const query = buildFinalQuery();
-    const { data, isLoading, isFetching, error, refetch } = useGetRollouts(
+    const {
+        data: infiniteData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isFetching,
+        error,
+        refetch
+    } = useGetRolloutsInfinite(
         {
-            offset,
             limit: pagination.pageSize,
             q: query || undefined,
         },
         {
             query: {
-                placeholderData: keepPreviousData,
+                getNextPageParam: (lastPage: PagedListMgmtRolloutResponseBody, allPages: PagedListMgmtRolloutResponseBody[]) => {
+                    const total = lastPage.total || 0;
+                    const currentOffset = allPages.length * (pagination.pageSize || 20);
+                    return currentOffset < total ? currentOffset : undefined;
+                },
+                initialPageParam: 0,
                 refetchOnWindowFocus: false,
                 refetchOnReconnect: false,
-                refetchInterval: 2000,
             },
         }
     );
 
+    const rolloutsContent = useMemo(() => {
+        return infiniteData?.pages.flatMap((page: PagedListMgmtRolloutResponseBody) => page.content || []) || [];
+    }, [infiniteData]);
+
     // Handle filter change
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
         setFilters(newFilters);
-        setQuickFilter('all'); // Reset quick filter when manual filter applied
         resetPagination();
-    }, [resetPagination]);
+    }, [resetPagination, setFilters]);
 
     const columns: ColumnsType<MgmtRolloutResponseBody> = [
         {
@@ -250,6 +256,24 @@ const RolloutList: React.FC = () => {
         },
     ];
 
+    // Filter columns based on visibility
+    const displayColumns = useMemo(() => {
+        if (!visibleColumns || visibleColumns.length === 0) return columns;
+        return columns.filter(col =>
+            col.key === 'actions' || visibleColumns.includes(col.key as string)
+        );
+    }, [columns, visibleColumns]);
+
+    // Column options for FilterBuilder
+    const columnOptions = useMemo(() => [
+        { key: 'id', label: t('common:id'), defaultVisible: false },
+        { key: 'name', label: t('columns.name'), defaultVisible: true },
+        { key: 'totalTargets', label: t('columns.totalTargets'), defaultVisible: true },
+        { key: 'status', label: t('columns.status'), defaultVisible: true },
+        { key: 'createdAt', label: t('common:table.createdAt'), defaultVisible: true },
+        { key: 'progress', label: t('columns.progress'), defaultVisible: true },
+    ], [t]);
+
     return (
         <StandardListLayout
             title={t('list.title')}
@@ -264,46 +288,37 @@ const RolloutList: React.FC = () => {
                     canAdd={isAdmin}
                     addLabel={t('createRollout')}
                     loading={isFetching}
-                    extra={
-                        <StatusQuickFilters
-                            t={t}
-                            options={quickFilterOptions}
-                            activeFilter={quickFilter}
-                            onFilterChange={handleQuickFilterChange}
-                        />
-                    }
+                    // Integrated Column Customization
+                    columns={columnOptions}
+                    visibleColumns={visibleColumns}
+                    onVisibilityChange={setVisibleColumns}
                 />
             }
         >
             <DataView
                 loading={isLoading}
                 error={error as Error}
-                isEmpty={!isLoading && data?.content?.length === 0}
+                isEmpty={!isLoading && rolloutsContent.length === 0}
                 emptyText={t('empty')}
             >
                 <EnhancedTable<MgmtRolloutResponseBody>
-                    dataSource={data?.content || []}
-                    columns={columns}
+                    dataSource={rolloutsContent}
+                    columns={displayColumns}
                     rowKey="id"
-                    loading={isLoading}
-                    pagination={{
-                        current: pagination.current,
-                        pageSize: pagination.pageSize,
-                        total: data?.total || 0,
-                        showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50', '100'],
-                        showTotal: (total, range) => t('pagination.range', { start: range[0], end: range[1], total }),
-                        position: ['topRight'],
-                    }}
+                    loading={isLoading || isFetching}
+                    pagination={false}
                     onChange={handleTableChange}
                     scroll={{ x: 800 }}
+                    onFetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    isFetchingNextPage={isFetchingNextPage}
                 />
             </DataView>
 
             <RolloutCreateModal
                 open={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
-                onSuccess={(id) => {
+                onSuccess={(id: number) => {
                     setIsCreateModalOpen(false);
                     navigate(`/rollouts/${id}`);
                 }}

@@ -13,7 +13,7 @@
 export type MgmtInvalidateDistributionSetRequestBodyActionCancelationType = typeof MgmtInvalidateDistributionSetRequestBodyActionCancelationType[keyof typeof MgmtInvalidateDistributionSetRequestBodyActionCancelationType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MgmtInvalidateDistributionSetRequestBodyActionCancelationType = {
   soft: 'soft',
   force: 'force',

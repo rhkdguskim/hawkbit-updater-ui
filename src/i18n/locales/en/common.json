@@ -285,10 +285,32 @@
     "yes": "Yes",
     "no": "No",
     "notSelected": "Not selected",
+    "noDescription": "No description",
     "labels": {
         "ofTotal": "of total errors",
         "targets": "targets",
         "andMoreCount": "and {{count}} more",
         "viewAll": "View All"
-    }
+    },
+    "columnCustomizer": {
+        "title": "Customize Columns",
+        "button": "Columns",
+        "description": "Select columns to display",
+        "columns": {
+            "name": "Name",
+            "ipAddress": "IP Address",
+            "targetType": "Target Type",
+            "tags": "Tags",
+            "status": "Status",
+            "updateStatus": "Update Status",
+            "installedDS": "Installed DS",
+            "lastControllerRequestAt": "Last Request",
+            "autoConfirmActive": "Auto Confirm",
+            "lastModifiedAt": "Last Modified",
+            "createdAt": "Created At",
+            "securityToken": "Security Token",
+            "address": "Address"
+        }
+    },
+    "optional": "Optional"
 }

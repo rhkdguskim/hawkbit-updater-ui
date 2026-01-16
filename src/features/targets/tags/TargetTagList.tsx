@@ -1,6 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { message, Modal } from 'antd';
-import type { TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -18,6 +17,8 @@ import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterVa
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createTagNameColumn } from '@/utils/columnFactory';
 import type { ColumnsType } from 'antd/es/table';
+import { useListFilterStore } from '@/stores/useListFilterStore';
+import { useServerTable } from '@/hooks/useServerTable';
 
 interface MgmtTagRequestBodyPost {
     name: string;
@@ -35,12 +36,31 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
     const isAdmin = role === 'Admin';
     const { t } = useTranslation(['targets', 'common']);
 
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [editingTag, setEditingTag] = useState<MgmtTag | null>(null);
-    const [filters, setFilters] = useState<FilterValue[]>([]);
+    // List Filter Store Integration
+    const {
+        targetTags: persistentState,
+        setTargetTags: setPersistentState
+    } = useListFilterStore();
 
-    const offset = (pagination.current - 1) * pagination.pageSize;
+    const { filters, visibleColumns } = persistentState;
+
+    const setFilters = useCallback((newFilters: FilterValue[]) => {
+        setPersistentState({ filters: newFilters });
+    }, [setPersistentState]);
+
+    const setVisibleColumns = useCallback((columns: string[]) => {
+        setPersistentState({ visibleColumns: columns });
+    }, [setPersistentState]);
+
+    const {
+        pagination,
+        offset,
+        handleTableChange,
+        resetPagination,
+    } = useServerTable<MgmtTag>({ syncToUrl: standalone });
+
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+    const [editingTag, setEditingTag] = React.useState<MgmtTag | null>(null);
 
     const { data, isLoading, isFetching, refetch } = useGetTargetTags({
         offset,
@@ -55,8 +75,8 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
 
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
         setFilters(newFilters);
-        setPagination(prev => ({ ...prev, current: 1 }));
-    }, []);
+        resetPagination();
+    }, [resetPagination, setFilters]);
 
     const deleteMutation = useDeleteTargetTag({
         mutation: {
@@ -123,13 +143,6 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
         setDialogOpen(true);
     };
 
-    const handleTableChange: TableProps<MgmtTag>['onChange'] = (newPagination) => {
-        setPagination({
-            current: newPagination.current || 1,
-            pageSize: newPagination.pageSize || 20,
-        });
-    };
-
     const columns: ColumnsType<MgmtTag> = useMemo(() => [
         createIdColumn<MgmtTag>(t),
         createTagNameColumn<MgmtTag>({ t }),
@@ -157,8 +170,41 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
         }),
     ], [t, isAdmin]);
 
+    // Handle column visibility
+    const displayColumns = useMemo(() => {
+        if (!visibleColumns || visibleColumns.length === 0) return columns;
+        return columns.filter(col =>
+            col.key === 'actions' || visibleColumns.includes(col.key as string)
+        );
+    }, [columns, visibleColumns]);
+
+    const columnOptions = useMemo(() => [
+        { key: 'id', label: t('common:table.id'), defaultVisible: false },
+        { key: 'name', label: t('common:table.name'), defaultVisible: true },
+        { key: 'description', label: t('common:table.description'), defaultVisible: true },
+        { key: 'colour', label: t('common:table.color'), defaultVisible: true },
+    ], [t]);
+
     const listContent = (
         <>
+            <div style={{ marginBottom: 16 }}>
+                <FilterBuilder
+                    fields={filterFields}
+                    filters={filters}
+                    onFiltersChange={handleFiltersChange}
+                    onRefresh={() => refetch()}
+                    onAdd={() => {
+                        setEditingTag(null);
+                        setDialogOpen(true);
+                    }}
+                    canAdd={isAdmin}
+                    addLabel={t('tagManagement.add')}
+                    loading={isLoading || isFetching}
+                    columns={columnOptions}
+                    visibleColumns={visibleColumns}
+                    onVisibilityChange={setVisibleColumns}
+                />
+            </div>
             <DataView
                 loading={isLoading}
                 error={null}
@@ -166,7 +212,7 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
                 emptyText={t('common:messages.noData')}
             >
                 <EnhancedTable<MgmtTag>
-                    columns={columns}
+                    columns={displayColumns}
                     dataSource={data?.content || []}
                     rowKey="id"
                     loading={isLoading}
@@ -210,21 +256,6 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
     if (!standalone) {
         return (
             <div style={{ marginTop: 16 }}>
-                <div style={{ marginBottom: 16 }}>
-                    <FilterBuilder
-                        fields={filterFields}
-                        filters={filters}
-                        onFiltersChange={handleFiltersChange}
-                        onRefresh={() => refetch()}
-                        onAdd={() => {
-                            setEditingTag(null);
-                            setDialogOpen(true);
-                        }}
-                        canAdd={isAdmin}
-                        addLabel={t('tagManagement.add')}
-                        loading={isLoading || isFetching}
-                    />
-                </div>
                 {listContent}
             </div>
         );
@@ -234,21 +265,6 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
         <StandardListLayout
             title={t('tagManagement.title')}
             description={t('tagManagement.description', { defaultValue: 'Manage target tags for categorization' })}
-            searchBar={
-                <FilterBuilder
-                    fields={filterFields}
-                    filters={filters}
-                    onFiltersChange={handleFiltersChange}
-                    onRefresh={() => refetch()}
-                    onAdd={() => {
-                        setEditingTag(null);
-                        setDialogOpen(true);
-                    }}
-                    canAdd={isAdmin}
-                    addLabel={t('tagManagement.add')}
-                    loading={isLoading || isFetching}
-                />
-            }
         >
             {listContent}
         </StandardListLayout>

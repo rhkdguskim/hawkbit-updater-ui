@@ -13,7 +13,7 @@
 export type MgmtRolloutErrorActionAction = typeof MgmtRolloutErrorActionAction[keyof typeof MgmtRolloutErrorActionAction];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MgmtRolloutErrorActionAction = {
   PAUSE: 'PAUSE',
 } as const;

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Tag, message, Modal } from 'antd';
 import type { TableProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -14,6 +14,8 @@ import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterVa
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import DistributionSetTypeDialog from './DistributionSetTypeDialog';
 import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createDateColumn, createColoredNameColumn } from '@/utils/columnFactory';
+import { useListFilterStore } from '@/stores/useListFilterStore';
+import { useServerTable } from '@/hooks/useServerTable';
 
 interface DistributionSetTypeListProps {
     standalone?: boolean;
@@ -24,16 +26,38 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
 
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [editingType, setEditingType] = useState<MgmtDistributionSetType | null>(null);
-    const [filters, setFilters] = useState<FilterValue[]>([]);
+    // List Filter Store Integration
+    const {
+        distributionSetTypes: persistentState,
+        setDistributionSetTypes: setPersistentState
+    } = useListFilterStore();
 
-    const offset = (pagination.current - 1) * pagination.pageSize;
+    const { filters, visibleColumns } = persistentState;
+
+    const setFilters = useCallback((newFilters: FilterValue[]) => {
+        setPersistentState({ filters: newFilters });
+    }, [setPersistentState]);
+
+    const setVisibleColumns = useCallback((columns: string[]) => {
+        setPersistentState({ visibleColumns: columns });
+    }, [setPersistentState]);
+
+    const {
+        pagination,
+        offset,
+        handleTableChange,
+        resetPagination,
+    } = useServerTable<MgmtDistributionSetType>({ syncToUrl: standalone });
+
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+    const [editingType, setEditingType] = React.useState<MgmtDistributionSetType | null>(null);
 
     const { data, isLoading, isFetching, refetch } = useGetDistributionSetTypes({
         offset,
         limit: pagination.pageSize,
+        // HawkBit doesn't support RSQL for types/tags in some endpoints, 
+        // but let's check if name filtering is possible. 
+        // Typically name/description/key are filterable.
     });
 
     // Filter fields
@@ -45,8 +69,8 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
 
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
         setFilters(newFilters);
-        setPagination(prev => ({ ...prev, current: 1 }));
-    }, []);
+        resetPagination();
+    }, [resetPagination, setFilters]);
 
     const deleteMutation = useDeleteDistributionSetType({
         mutation: {
@@ -98,14 +122,6 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
         refetch();
     };
 
-    const handleTableChange: TableProps<MgmtDistributionSetType>['onChange'] = (newPagination) => {
-        setPagination((prev) => ({
-            ...prev,
-            current: newPagination.current || 1,
-            pageSize: newPagination.pageSize || 20,
-        }));
-    };
-
     const columns: ColumnsType<MgmtDistributionSetType> = useMemo(() => [
         createIdColumn<MgmtDistributionSetType>(t),
         createColoredNameColumn<MgmtDistributionSetType>({ t }),
@@ -140,6 +156,23 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
         }),
     ], [t, isAdmin]);
 
+    // Handle column visibility
+    const displayColumns = useMemo(() => {
+        if (!visibleColumns || visibleColumns.length === 0) return columns;
+        return columns.filter(col =>
+            col.key === 'actions' || visibleColumns.includes(col.key as string)
+        );
+    }, [columns, visibleColumns]);
+
+    const columnOptions = useMemo(() => [
+        { key: 'id', label: t('common:table.id'), defaultVisible: false },
+        { key: 'name', label: t('common:table.name'), defaultVisible: true },
+        { key: 'key', label: t('typeManagement.columns.key'), defaultVisible: true },
+        { key: 'description', label: t('common:table.description'), defaultVisible: true },
+        { key: 'colour', label: t('common:table.color'), defaultVisible: true },
+        { key: 'lastModifiedAt', label: t('common:table.lastModified'), defaultVisible: true },
+    ], [t]);
+
     const listContent = (
         <>
             <FilterBuilder
@@ -154,6 +187,9 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
                 canAdd={isAdmin}
                 addLabel={t('typeManagement.addType')}
                 loading={isLoading || isFetching}
+                columns={columnOptions}
+                visibleColumns={visibleColumns}
+                onVisibilityChange={setVisibleColumns}
             />
             <DataView
                 loading={isLoading}
@@ -162,7 +198,7 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
                 emptyText={t('common:messages.noData')}
             >
                 <EnhancedTable<MgmtDistributionSetType>
-                    columns={columns}
+                    columns={displayColumns}
                     dataSource={data?.content || []}
                     rowKey="id"
                     pagination={{

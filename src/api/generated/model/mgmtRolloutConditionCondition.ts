@@ -13,7 +13,7 @@
 export type MgmtRolloutConditionCondition = typeof MgmtRolloutConditionCondition[keyof typeof MgmtRolloutConditionCondition];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MgmtRolloutConditionCondition = {
   THRESHOLD: 'THRESHOLD',
 } as const;

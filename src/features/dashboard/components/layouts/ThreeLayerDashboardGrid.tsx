@@ -28,11 +28,15 @@ const DecisionLayer = styled.section`
 `;
 const ControlLayer = styled.section`
     display: grid;
-    grid-template-columns: 2.2fr 1fr;
+    grid-template-columns: 1.8fr 1fr 1fr;
     gap: clamp(12px, 1vw, 16px);
     min-height: 420px;
     flex-shrink: 0;
     padding-bottom: var(--ant-margin, 16px);
+
+    @media (max-width: 1600px) {
+        grid-template-columns: 1.2fr 1fr 1fr;
+    }
 
     @media (max-width: 1200px) {
         grid-template-columns: 1fr;
@@ -59,15 +63,11 @@ const StatsLayer = styled.section`
 // ===== Monitoring Layer (BOTTOM) =====
 const MonitoringLayer = styled.section`
     display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: clamp(12px, 1vw, 16px);
     min-height: 200px;
     flex-shrink: 1;
     padding-top: var(--ant-margin, 8px);
-
-    @media (max-width: 1400px) {
-        grid-template-columns: 1fr 1fr;
-    }
 
     @media (max-width: 992px) {
         grid-template-columns: 1fr;
@@ -129,12 +129,12 @@ export interface ThreeLayerDashboardGridProps {
     // Control Layer
     activeRollouts: React.ReactNode;
     inProgressUpdates?: React.ReactNode;
+    recentlyFinishedActions?: React.ReactNode;
     // Stats Layer
     statsRow?: React.ReactNode;
     // Monitoring Layer
     statusTrend: React.ReactNode;
     actionActivity: React.ReactNode;
-    recentlyFinishedActions?: React.ReactNode;
     // Labels
     showLayerLabels?: boolean;
 }
@@ -148,9 +148,9 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
     statsRow,
     activeRollouts,
     inProgressUpdates,
+    recentlyFinishedActions,
     statusTrend,
     actionActivity,
-    recentlyFinishedActions,
     showLayerLabels = false,
 }) => {
     return (
@@ -177,6 +177,7 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
                         <ControlLayer>
                             {activeRollouts}
                             {inProgressUpdates}
+                            {recentlyFinishedActions}
                         </ControlLayer>
                     </SectionWrapper>
 
@@ -196,7 +197,6 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
                         <MonitoringLayer>
                             {statusTrend}
                             {actionActivity}
-                            {recentlyFinishedActions}
                         </MonitoringLayer>
                     </SectionWrapper>
                 </DashboardScrollContent>

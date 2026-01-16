@@ -3,7 +3,7 @@ import { defineConfig } from 'orval';
 export default defineConfig({
     hawkBit: {
         input: {
-            target: './docs/api-spec/management/openapi.json',
+            target: './docs/api-spec/mm/openapi.json',
         },
         output: {
             mode: 'tags-split',
@@ -12,6 +12,10 @@ export default defineConfig({
             client: 'react-query',
             mock: false,
             override: {
+                query: {
+                    useInfinite: true,
+                    useInfiniteQueryParam: 'offset',
+                },
                 mutator: {
                     path: './src/api/axios-instance.ts',
                     name: 'axiosInstance',

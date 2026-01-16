@@ -13,7 +13,7 @@
 export type MgmtRolloutSuccessActionAction = typeof MgmtRolloutSuccessActionAction[keyof typeof MgmtRolloutSuccessActionAction];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MgmtRolloutSuccessActionAction = {
   NEXTGROUP: 'NEXTGROUP',
 } as const;

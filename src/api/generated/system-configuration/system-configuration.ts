@@ -7,18 +7,23 @@
  * OpenAPI spec version: v1
  */
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -61,6 +66,12 @@ export const getTenantConfiguration = (
 
 
 
+export const getGetTenantConfigurationInfiniteQueryKey = () => {
+    return [
+    'infinite', `/rest/v1/system/configs`
+    ] as const;
+    }
+
 export const getGetTenantConfigurationQueryKey = () => {
     return [
     `/rest/v1/system/configs`
@@ -68,6 +79,73 @@ export const getGetTenantConfigurationQueryKey = () => {
     }
 
     
+export const getGetTenantConfigurationInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getTenantConfiguration>>>, TError = ExceptionInfo>( options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfiguration>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTenantConfigurationInfiniteQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTenantConfiguration>>> = ({ signal }) => getTenantConfiguration(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfiguration>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTenantConfigurationInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getTenantConfiguration>>>
+export type GetTenantConfigurationInfiniteQueryError = ExceptionInfo
+
+
+export function useGetTenantConfigurationInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTenantConfiguration>>>, TError = ExceptionInfo>(
+  options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfiguration>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTenantConfiguration>>,
+          TError,
+          Awaited<ReturnType<typeof getTenantConfiguration>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTenantConfigurationInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTenantConfiguration>>>, TError = ExceptionInfo>(
+  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfiguration>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTenantConfiguration>>,
+          TError,
+          Awaited<ReturnType<typeof getTenantConfiguration>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTenantConfigurationInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTenantConfiguration>>>, TError = ExceptionInfo>(
+  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfiguration>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return all tenant specific configuration values
+ */
+
+export function useGetTenantConfigurationInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTenantConfiguration>>>, TError = ExceptionInfo>(
+  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfiguration>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTenantConfigurationInfiniteQueryOptions(options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetTenantConfigurationQueryOptions = <TData = Awaited<ReturnType<typeof getTenantConfiguration>>, TError = ExceptionInfo>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTenantConfiguration>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -217,6 +295,12 @@ export const getTenantConfigurationValue = (
 
 
 
+export const getGetTenantConfigurationValueInfiniteQueryKey = (keyName?: string,) => {
+    return [
+    'infinite', `/rest/v1/system/configs/${keyName}`
+    ] as const;
+    }
+
 export const getGetTenantConfigurationValueQueryKey = (keyName?: string,) => {
     return [
     `/rest/v1/system/configs/${keyName}`
@@ -224,6 +308,73 @@ export const getGetTenantConfigurationValueQueryKey = (keyName?: string,) => {
     }
 
     
+export const getGetTenantConfigurationValueInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getTenantConfigurationValue>>>, TError = ExceptionInfo>(keyName: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfigurationValue>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTenantConfigurationValueInfiniteQueryKey(keyName);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTenantConfigurationValue>>> = ({ signal }) => getTenantConfigurationValue(keyName, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(keyName), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfigurationValue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTenantConfigurationValueInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getTenantConfigurationValue>>>
+export type GetTenantConfigurationValueInfiniteQueryError = ExceptionInfo
+
+
+export function useGetTenantConfigurationValueInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTenantConfigurationValue>>>, TError = ExceptionInfo>(
+ keyName: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfigurationValue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTenantConfigurationValue>>,
+          TError,
+          Awaited<ReturnType<typeof getTenantConfigurationValue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTenantConfigurationValueInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTenantConfigurationValue>>>, TError = ExceptionInfo>(
+ keyName: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfigurationValue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTenantConfigurationValue>>,
+          TError,
+          Awaited<ReturnType<typeof getTenantConfigurationValue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTenantConfigurationValueInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTenantConfigurationValue>>>, TError = ExceptionInfo>(
+ keyName: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfigurationValue>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return a tenant specific configuration value
+ */
+
+export function useGetTenantConfigurationValueInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTenantConfigurationValue>>>, TError = ExceptionInfo>(
+ keyName: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTenantConfigurationValue>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTenantConfigurationValueInfiniteQueryOptions(keyName,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetTenantConfigurationValueQueryOptions = <TData = Awaited<ReturnType<typeof getTenantConfigurationValue>>, TError = ExceptionInfo>(keyName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTenantConfigurationValue>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 

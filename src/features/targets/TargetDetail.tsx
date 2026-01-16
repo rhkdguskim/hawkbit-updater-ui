@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Button, message } from 'antd';
 import { EditOutlined, DeleteOutlined, SendOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -69,6 +69,8 @@ const TargetDetail: React.FC = () => {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [assignModalOpen, setAssignModalOpen] = useState(false);
+    const [dsSearch, setDsSearch] = useState('');
+    const [onlyCompatible, setOnlyCompatible] = useState(true);
 
     // Metadata Modal States
     const [metadataFormOpen, setMetadataFormOpen] = useState(false);
@@ -139,8 +141,20 @@ const TargetDetail: React.FC = () => {
         { query: { enabled: !!targetId } }
     );
 
+    const dsQuery = useMemo(() => {
+        let query = '';
+        if (onlyCompatible && targetData?.targetTypeName) {
+            query += `type.key==${targetData.targetTypeName}`;
+        }
+        if (dsSearch) {
+            if (query) query += ';';
+            query += `(name==*${dsSearch}*,version==*${dsSearch}*)`;
+        }
+        return query;
+    }, [onlyCompatible, targetData?.targetTypeName, dsSearch]);
+
     const { data: dsListData, isLoading: dsListLoading } = useGetDistributionSets(
-        { limit: 100 },
+        { limit: 100, q: dsQuery || undefined },
         { query: { enabled: assignModalOpen } }
     );
 
@@ -517,7 +531,15 @@ const TargetDetail: React.FC = () => {
                 dsLoading={dsListLoading}
                 canForced={isAdmin}
                 onConfirm={handleAssignDS}
-                onCancel={() => setAssignModalOpen(false)}
+                onCancel={() => {
+                    setAssignModalOpen(false);
+                    setDsSearch('');
+                }}
+                searchTerm={dsSearch}
+                onSearch={setDsSearch}
+                onlyCompatible={onlyCompatible}
+                onCompatibleChange={setOnlyCompatible}
+                hasTargetType={!!targetData?.targetTypeName}
             />
 
             {/* Metadata Modals */}

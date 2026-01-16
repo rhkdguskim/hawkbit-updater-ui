@@ -2,9 +2,9 @@ import { useState, useCallback, useMemo } from 'react';
 import { message, type TableProps } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import {
-    useGetTargets,
+    useGetTargetsInfinite,
     useDeleteTarget,
     useCreateTargets,
     useUpdateTarget,
@@ -15,9 +15,11 @@ import { useGetDistributionSets } from '@/api/generated/distribution-sets/distri
 import { useGetTargetTags } from '@/api/generated/target-tags/target-tags';
 import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useListFilterStore } from '@/stores/useListFilterStore';
 import { useServerTable } from '@/hooks/useServerTable';
 import { buildQueryFromFilterValues } from '@/utils/fiql';
-import type { MgmtTarget, MgmtTag, MgmtTargetType, MgmtDistributionSetAssignment, MgmtDistributionSetAssignments, MgmtDistributionSetAssignmentType } from '@/api/generated/model';
+import { COLUMN_CONFIG } from '../config/targetListConfig';
+import type { MgmtTarget, MgmtTag, MgmtTargetType, MgmtDistributionSetAssignment, MgmtDistributionSetAssignments, MgmtDistributionSetAssignmentType, PagedListMgmtTarget, ExceptionInfo } from '@/api/generated/model';
 import type { FilterValue, FilterField } from '@/components/patterns';
 import type { AssignPayload } from '../components';
 import Papa from 'papaparse';
@@ -33,7 +35,6 @@ export const useTargetListModel = () => {
     // Pagination/Sort Hook
     const {
         pagination,
-        offset,
         // sort,
         handleTableChange: serverTableChange,
         resetPagination,
@@ -44,34 +45,37 @@ export const useTargetListModel = () => {
         allowedSortFields: ['name', 'controllerId', 'lastModifiedAt', 'createdAt', 'lastControllerRequestAt'],
     });
 
-    // State
-    const [filters, setFilters] = useState<FilterValue[]>([]);
+    // List Filter Store Integration
+    const {
+        targets: targetPersistentState,
+        setTargets: setTargetPersistentState
+    } = useListFilterStore();
+
+    const {
+        filters,
+        quickFilter,
+        visibleColumns
+    } = targetPersistentState;
+
     const [selectedTargetIds, setSelectedTargetIds] = useState<React.Key[]>([]);
 
     // Modal Open States
     const [bulkTagsModalOpen, setBulkTagsModalOpen] = useState(false);
     const [bulkTypeModalOpen, setBulkTypeModalOpen] = useState(false);
     const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
-    const [savedFiltersOpen, setSavedFiltersOpen] = useState(false);
     const [importModalOpen, setImportModalOpen] = useState(false);
     const [bulkEditModalOpen, setBulkEditModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [formModalOpen, setFormModalOpen] = useState(false);
     const [assignModalOpen, setAssignModalOpen] = useState(false);
+    const [dsSearch, setDsSearch] = useState('');
+    const [onlyCompatible, setOnlyCompatible] = useState(true);
 
     // New Phase 2-6 Modal States
     const [bulkAutoConfirmModalOpen, setBulkAutoConfirmModalOpen] = useState(false);
     const [bulkAutoConfirmMode, setBulkAutoConfirmMode] = useState<'activate' | 'deactivate'>('activate');
     const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
     const [drawerTarget, setDrawerTarget] = useState<MgmtTarget | null>(null);
-
-    // Column visibility state
-    const [visibleColumns, setVisibleColumns] = useState<string[]>([
-        'name', 'ipAddress', 'targetType', 'tags', 'status', 'updateStatus', 'installedDS', 'lastControllerRequestAt'
-    ]);
-
-    // Quick filter state
-    const [quickFilter, setQuickFilter] = useState<'all' | 'error' | 'offline' | 'pending' | 'inSync'>('all');
 
     // Entity States for Modals (restored)
     const [targetToDelete, setTargetToDelete] = useState<MgmtTarget | null>(null);
@@ -135,39 +139,45 @@ export const useTargetListModel = () => {
         });
     }, [filters]);
 
+    // Setters for persistent state
+    const setFilters = useCallback((newFilters: FilterValue[]) => {
+        setTargetPersistentState({ filters: newFilters });
+    }, [setTargetPersistentState]);
+
+    const setVisibleColumns = useCallback((columns: string[]) => {
+        setTargetPersistentState({ visibleColumns: columns });
+    }, [setTargetPersistentState]);
+
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
         setFilters(newFilters);
+        setTargetPersistentState({ quickFilter: 'all' });
         resetPagination();
-    }, [resetPagination]);
+    }, [setFilters, setTargetPersistentState, resetPagination]);
 
-    const handleApplySavedFilter = useCallback((query: string, name?: string) => {
-        handleFiltersChange([{
-            id: `saved-${Date.now()}`,
-            field: 'query',
-            fieldLabel: t('filters.query'),
-            operator: 'equals',
-            operatorLabel: '=',
-            value: query,
-            displayValue: name || query,
-        }]);
-    }, [handleFiltersChange, t]);
 
     // Main Data Query
     const {
-        data: targetsData,
+        data: infiniteData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
         isLoading: targetsLoading,
         isFetching: targetsFetching,
         error: targetsError,
         refetch: refetchTargets,
-    } = useGetTargets(
+    } = useGetTargetsInfinite(
         {
-            offset,
             limit: pagination.pageSize,
             q: buildFinalQuery() || undefined,
         },
         {
             query: {
-                placeholderData: keepPreviousData,
+                getNextPageParam: (lastPage: PagedListMgmtTarget, allPages: PagedListMgmtTarget[]) => {
+                    const total = lastPage.total || 0;
+                    const currentOffset = allPages.length * (pagination.pageSize || 20);
+                    return currentOffset < total ? currentOffset : undefined;
+                },
+                initialPageParam: 0,
                 refetchOnWindowFocus: true,
                 staleTime: 5000,
                 refetchInterval: 20000, // Background poll every 20s
@@ -175,10 +185,36 @@ export const useTargetListModel = () => {
         }
     );
 
+    const targetsContent = useMemo(() => {
+        return infiniteData?.pages.flatMap((page: PagedListMgmtTarget) => page.content || []) || [];
+    }, [infiniteData]);
+
+    const totalTargets = useMemo(() => {
+        return infiniteData?.pages[0]?.total || 0;
+    }, [infiniteData]);
+
     const { data: dsData, isLoading: dsLoading } = useGetDistributionSets(
-        { limit: 100 },
+        {
+            limit: 100,
+            q: useMemo(() => {
+                const parts: string[] = [];
+                if (dsSearch) parts.push(`name==*${dsSearch}*,description==*${dsSearch}*`);
+                if (onlyCompatible && targetToAssign?.targetTypeName) {
+                    parts.push(`type.key==${targetToAssign.targetTypeName}`);
+                }
+                return parts.length > 0 ? parts.join(';') : undefined;
+            }, [dsSearch, onlyCompatible, targetToAssign])
+        },
         { query: { enabled: assignModalOpen } }
     );
+
+    const handleDsSearch = useCallback((value: string) => {
+        setDsSearch(value);
+    }, []);
+
+    const handleCompatibleChange = useCallback((checked: boolean) => {
+        setOnlyCompatible(checked);
+    }, []);
 
     // Mutations
     const deleteTargetMutation = useDeleteTarget({
@@ -301,15 +337,15 @@ export const useTargetListModel = () => {
     }, [targetToAssign, assignDSMutation]);
 
     const handleExport = useCallback(() => {
-        if (!targetsData?.content) return;
-        const csvData = targetsData.content.map(t => ({
-            controllerId: t.controllerId,
-            name: t.name,
-            description: t.description,
-            ipAddress: t.ipAddress,
-            targetType: t.targetTypeName,
-            lastModifiedAt: t.lastModifiedAt ? dayjs(t.lastModifiedAt).format('YYYY-MM-DD HH:mm:ss') : '',
-            status: t.pollStatus?.overdue ? 'offline' : 'online'
+        if (!targetsContent) return;
+        const csvData = targetsContent.map(target => ({
+            controllerId: target.controllerId,
+            name: target.name,
+            description: target.description,
+            ipAddress: target.ipAddress,
+            targetType: target.targetTypeName,
+            lastModifiedAt: target.lastModifiedAt ? dayjs(target.lastModifiedAt).format('YYYY-MM-DD HH:mm:ss') : '',
+            status: target.pollStatus?.overdue ? 'offline' : 'online'
         }));
         const csv = Papa.unparse(csvData);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -320,7 +356,7 @@ export const useTargetListModel = () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    }, [targetsData]);
+    }, [targetsContent]);
 
     return {
         // Auth/Permissions
@@ -328,7 +364,8 @@ export const useTargetListModel = () => {
         t,
 
         // Data
-        targetsData,
+        targetsData: targetsContent,
+        totalTargets,
         targetsLoading,
         targetsFetching,
         targetsError,
@@ -343,11 +380,15 @@ export const useTargetListModel = () => {
         filters,
         filterFields,
 
+        // Infinite Scroll State
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+
         // Modal States
         bulkTagsModalOpen, setBulkTagsModalOpen,
         bulkTypeModalOpen, setBulkTypeModalOpen,
         bulkDeleteModalOpen, setBulkDeleteModalOpen,
-        savedFiltersOpen, setSavedFiltersOpen,
         importModalOpen, setImportModalOpen,
         bulkEditModalOpen, setBulkEditModalOpen,
         deleteModalOpen, setDeleteModalOpen,
@@ -361,18 +402,19 @@ export const useTargetListModel = () => {
         drawerTarget, setDrawerTarget,
 
         // Column & Quick Filter States
-        visibleColumns, setVisibleColumns,
-        quickFilter, setQuickFilter,
+        visibleColumns,
+        quickFilter,
 
         // Entity States
         targetToDelete,
         editingTarget,
         targetToAssign, setTargetToAssign,
+        dsSearch,
+        onlyCompatible,
 
         // Handlers
         handleTableChange,
         handleFiltersChange,
-        handleApplySavedFilter,
         buildFinalQuery,
         refetchTargets,
         handleAddTarget,
@@ -382,9 +424,19 @@ export const useTargetListModel = () => {
         handleCreateTarget,
         handleInlineUpdate,
         handleAssignDS,
+        handleDsSearch,
+        handleCompatibleChange,
         handleExport,
         setSelectedTargetIds,
         setPagination,
+        setVisibleColumns,
+
+        // Column options for FilterBuilder
+        columnOptions: useMemo(() => COLUMN_CONFIG.filter(c => c.key !== 'actions').map(c => ({
+            key: c.key,
+            label: t(`table.${c.key}`),
+            defaultVisible: c.defaultVisible
+        })), [t]),
 
         // Mutation States
         deletePending: deleteTargetMutation.isPending,

@@ -75,6 +75,7 @@
         "running": "运行中",
         "paused": "已暂停",
         "finished": "已完成",
+        "stopped": "已停止",
         "error": "错误",
         "waitingForApproval": "等待批准",
         "scheduled": "已计划",
@@ -232,7 +233,9 @@
             "previewColumns": {
                 "controllerId": "控制 ID",
                 "name": "名称",
-                "type": "类型"
+                "ipAddress": "IP 地址",
+                "type": "类型",
+                "tags": "标签"
             }
         },
         "groupSettings": {

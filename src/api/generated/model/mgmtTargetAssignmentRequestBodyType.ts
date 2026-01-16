@@ -13,7 +13,7 @@
 export type MgmtTargetAssignmentRequestBodyType = typeof MgmtTargetAssignmentRequestBodyType[keyof typeof MgmtTargetAssignmentRequestBodyType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MgmtTargetAssignmentRequestBodyType = {
   soft: 'soft',
   forced: 'forced',

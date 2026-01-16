@@ -152,6 +152,12 @@ export interface EnhancedTableProps<T> extends Omit<TableProps<T>, 'rowSelection
     selectionLabel?: string;
     /** Row key field */
     rowKeyField?: string;
+    /** Infinite scroll: Callback to fetch next page */
+    onFetchNextPage?: () => void;
+    /** Infinite scroll: Whether there are more pages to fetch */
+    hasNextPage?: boolean;
+    /** Infinite scroll: Whether the next page is currently being fetched */
+    isFetchingNextPage?: boolean;
 }
 
 export function EnhancedTable<T extends object>({
@@ -160,35 +166,69 @@ export function EnhancedTable<T extends object>({
     onSelectionChange,
     selectionLabel,
     rowKeyField = 'id',
+    onFetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     ...tableProps
 }: EnhancedTableProps<T>) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [scrollY, setScrollY] = useState<number | undefined>(undefined);
 
+    // Handle infinite scroll
+    useEffect(() => {
+        if (!onFetchNextPage || !hasNextPage || isFetchingNextPage) return;
+
+        const tableBody = containerRef.current?.querySelector('.ant-table-body');
+        if (!tableBody) return;
+
+        const handleScroll = (e: Event) => {
+            const target = e.target as HTMLElement;
+            const scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+
+            // Trigger fetch when 50px from bottom
+            if (scrollBottom < 50) {
+                onFetchNextPage();
+            }
+        };
+
+        tableBody.addEventListener('scroll', handleScroll);
+        return () => tableBody.removeEventListener('scroll', handleScroll);
+    }, [onFetchNextPage, hasNextPage, isFetchingNextPage]);
+
     useEffect(() => {
         const calculateScrollHeight = () => {
             if (containerRef.current) {
-                const containerHeight = containerRef.current.clientHeight;
-                // Approximate heights: toolbar (~48px if visible), pagination (~40px), header (~40px)
-                const toolbarHeight = selectedRowKeys.length > 0 ? 48 : 0;
-                const paginationHeight = tableProps.pagination !== false ? 40 : 0;
-                const headerHeight = 40;
-                const calculatedHeight = containerHeight - toolbarHeight - paginationHeight - headerHeight - 16; // 16px for margins
+                const containerHeight = containerRef.current.offsetHeight;
+                // Approximate heights of elements within TableContainer:
+                // SelectionToolbar: ~44px
+                // Table Header: ~35px (small size)
+                // Pagination: ~48px (including margins)
+                const toolbarHeight = selectedRowKeys.length > 0 ? 44 : 0;
+                const paginationHeight = tableProps.pagination !== false ? 48 : 0;
+                const headerHeight = 35;
+
+                // Subtract heights of other elements to find available space for table body
+                const calculatedHeight = containerHeight - toolbarHeight - paginationHeight - headerHeight - 8;
                 setScrollY(calculatedHeight > 100 ? calculatedHeight : undefined);
             }
         };
 
-        calculateScrollHeight();
-        window.addEventListener('resize', calculateScrollHeight);
+        // Use ResizeObserver for more reliable container size tracking
+        const observer = new ResizeObserver(() => {
+            calculateScrollHeight();
+        });
 
-        // Recalculate when selection changes (toolbar appears/disappears)
-        const timer = setTimeout(calculateScrollHeight, 0);
+        if (containerRef.current) {
+            observer.observe(containerRef.current);
+        }
+
+        // Initial calculation
+        calculateScrollHeight();
 
         return () => {
-            window.removeEventListener('resize', calculateScrollHeight);
-            clearTimeout(timer);
+            observer.disconnect();
         };
-    }, [selectedRowKeys.length, tableProps.pagination]);
+    }, [selectedRowKeys.length, tableProps.pagination, tableProps.dataSource?.length]);
 
     const handleClearSelection = () => {
         onSelectionChange?.([], []);
@@ -224,6 +264,19 @@ export function EnhancedTable<T extends object>({
                 size="small"
                 scroll={scroll}
                 sticky
+                summary={
+                    isFetchingNextPage ? () => (
+                        <Table.Summary fixed="bottom">
+                            <Table.Summary.Row>
+                                <Table.Summary.Cell index={0} colSpan={tableProps.columns?.length || 10}>
+                                    <div style={{ textAlign: 'center', padding: '12px', color: 'var(--ant-color-text-secondary)' }}>
+                                        Loading more...
+                                    </div>
+                                </Table.Summary.Cell>
+                            </Table.Summary.Row>
+                        </Table.Summary>
+                    ) : undefined
+                }
             />
         </TableContainer>
     );

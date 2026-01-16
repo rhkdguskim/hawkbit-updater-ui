@@ -75,6 +75,7 @@
         "running": "Running",
         "paused": "Paused",
         "finished": "Finished",
+        "stopped": "Stopped",
         "error": "Error",
         "waitingForApproval": "Waiting for Approval",
         "scheduled": "Scheduled",

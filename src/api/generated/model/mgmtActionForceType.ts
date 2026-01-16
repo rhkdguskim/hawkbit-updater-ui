@@ -10,7 +10,7 @@
 export type MgmtActionForceType = typeof MgmtActionForceType[keyof typeof MgmtActionForceType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MgmtActionForceType = {
   soft: 'soft',
   forced: 'forced',

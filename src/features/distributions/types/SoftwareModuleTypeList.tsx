@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Tag, message, Modal } from 'antd';
 import type { TableProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -15,6 +15,8 @@ import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import SoftwareModuleTypeDialog from './SoftwareModuleTypeDialog';
 import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createDateColumn, createColoredNameColumn } from '@/utils/columnFactory';
 import { SmallText } from '@/components/shared/Typography';
+import { useListFilterStore } from '@/stores/useListFilterStore';
+import { useServerTable } from '@/hooks/useServerTable';
 
 interface SoftwareModuleTypeListProps {
     standalone?: boolean;
@@ -25,12 +27,31 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
 
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [editingType, setEditingType] = useState<MgmtSoftwareModuleType | null>(null);
-    const [filters, setFilters] = useState<FilterValue[]>([]);
+    // List Filter Store Integration
+    const {
+        softwareModuleTypes: persistentState,
+        setSoftwareModuleTypes: setPersistentState
+    } = useListFilterStore();
 
-    const offset = (pagination.current - 1) * pagination.pageSize;
+    const { filters, visibleColumns } = persistentState;
+
+    const setFilters = useCallback((newFilters: FilterValue[]) => {
+        setPersistentState({ filters: newFilters });
+    }, [setPersistentState]);
+
+    const setVisibleColumns = useCallback((columns: string[]) => {
+        setPersistentState({ visibleColumns: columns });
+    }, [setPersistentState]);
+
+    const {
+        pagination,
+        offset,
+        handleTableChange,
+        resetPagination,
+    } = useServerTable<MgmtSoftwareModuleType>({ syncToUrl: standalone });
+
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+    const [editingType, setEditingType] = React.useState<MgmtSoftwareModuleType | null>(null);
 
     const { data, isLoading, isFetching, refetch } = useGetTypes({
         offset,
@@ -46,8 +67,8 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
 
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
         setFilters(newFilters);
-        setPagination(prev => ({ ...prev, current: 1 }));
-    }, []);
+        resetPagination();
+    }, [resetPagination, setFilters]);
 
     const deleteMutation = useDeleteSoftwareModuleType({
         mutation: {
@@ -99,14 +120,6 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
         refetch();
     };
 
-    const handleTableChange: TableProps<MgmtSoftwareModuleType>['onChange'] = (newPagination) => {
-        setPagination((prev) => ({
-            ...prev,
-            current: newPagination.current || 1,
-            pageSize: newPagination.pageSize || 20,
-        }));
-    };
-
     const columns: ColumnsType<MgmtSoftwareModuleType> = useMemo(() => [
         createIdColumn<MgmtSoftwareModuleType>(t),
         createColoredNameColumn<MgmtSoftwareModuleType>({ t }),
@@ -148,6 +161,24 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
         }),
     ], [t, isAdmin]);
 
+    // Handle column visibility
+    const displayColumns = useMemo(() => {
+        if (!visibleColumns || visibleColumns.length === 0) return columns;
+        return columns.filter(col =>
+            col.key === 'actions' || visibleColumns.includes(col.key as string)
+        );
+    }, [columns, visibleColumns]);
+
+    const columnOptions = useMemo(() => [
+        { key: 'id', label: t('common:table.id'), defaultVisible: false },
+        { key: 'name', label: t('common:table.name'), defaultVisible: true },
+        { key: 'key', label: t('typeManagement.columns.key'), defaultVisible: true },
+        { key: 'description', label: t('common:table.description'), defaultVisible: true },
+        { key: 'maxAssignments', label: t('typeManagement.columns.maxAssignments'), defaultVisible: true },
+        { key: 'colour', label: t('common:table.color'), defaultVisible: true },
+        { key: 'lastModifiedAt', label: t('common:table.lastModified'), defaultVisible: true },
+    ], [t]);
+
     const listContent = (
         <>
             <FilterBuilder
@@ -162,6 +193,9 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
                 canAdd={isAdmin}
                 addLabel={t('typeManagement.addType')}
                 loading={isLoading || isFetching}
+                columns={columnOptions}
+                visibleColumns={visibleColumns}
+                onVisibilityChange={setVisibleColumns}
             />
             <DataView
                 loading={isLoading}
@@ -170,7 +204,7 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
                 emptyText={t('common:messages.noData')}
             >
                 <EnhancedTable<MgmtSoftwareModuleType>
-                    columns={columns}
+                    columns={displayColumns}
                     dataSource={data?.content || []}
                     rowKey="id"
                     pagination={{

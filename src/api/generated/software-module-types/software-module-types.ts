@@ -7,18 +7,23 @@
  * OpenAPI spec version: v1
  */
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -60,6 +65,12 @@ export const getSoftwareModuleType = (
 
 
 
+export const getGetSoftwareModuleTypeInfiniteQueryKey = (softwareModuleTypeId?: number,) => {
+    return [
+    'infinite', `/rest/v1/softwaremoduletypes/${softwareModuleTypeId}`
+    ] as const;
+    }
+
 export const getGetSoftwareModuleTypeQueryKey = (softwareModuleTypeId?: number,) => {
     return [
     `/rest/v1/softwaremoduletypes/${softwareModuleTypeId}`
@@ -67,6 +78,73 @@ export const getGetSoftwareModuleTypeQueryKey = (softwareModuleTypeId?: number,)
     }
 
     
+export const getGetSoftwareModuleTypeInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModuleType>>>, TError = ExceptionInfo>(softwareModuleTypeId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModuleType>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSoftwareModuleTypeInfiniteQueryKey(softwareModuleTypeId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSoftwareModuleType>>> = ({ signal }) => getSoftwareModuleType(softwareModuleTypeId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(softwareModuleTypeId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModuleType>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSoftwareModuleTypeInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getSoftwareModuleType>>>
+export type GetSoftwareModuleTypeInfiniteQueryError = ExceptionInfo
+
+
+export function useGetSoftwareModuleTypeInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModuleType>>>, TError = ExceptionInfo>(
+ softwareModuleTypeId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModuleType>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSoftwareModuleType>>,
+          TError,
+          Awaited<ReturnType<typeof getSoftwareModuleType>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSoftwareModuleTypeInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModuleType>>>, TError = ExceptionInfo>(
+ softwareModuleTypeId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModuleType>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSoftwareModuleType>>,
+          TError,
+          Awaited<ReturnType<typeof getSoftwareModuleType>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSoftwareModuleTypeInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModuleType>>>, TError = ExceptionInfo>(
+ softwareModuleTypeId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModuleType>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return single Software Module Type
+ */
+
+export function useGetSoftwareModuleTypeInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModuleType>>>, TError = ExceptionInfo>(
+ softwareModuleTypeId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModuleType>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSoftwareModuleTypeInfiniteQueryOptions(softwareModuleTypeId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetSoftwareModuleTypeQueryOptions = <TData = Awaited<ReturnType<typeof getSoftwareModuleType>>, TError = ExceptionInfo>(softwareModuleTypeId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSoftwareModuleType>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -281,6 +359,12 @@ export const getTypes = (
 
 
 
+export const getGetTypesInfiniteQueryKey = (params?: GetTypesParams,) => {
+    return [
+    'infinite', `/rest/v1/softwaremoduletypes`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetTypesQueryKey = (params?: GetTypesParams,) => {
     return [
     `/rest/v1/softwaremoduletypes`, ...(params ? [params]: [])
@@ -288,6 +372,73 @@ export const getGetTypesQueryKey = (params?: GetTypesParams,) => {
     }
 
     
+export const getGetTypesInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getTypes>>, GetTypesParams['offset']>, TError = ExceptionInfo>(params?: GetTypesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTypes>>, TError, TData, QueryKey, GetTypesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTypesInfiniteQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTypes>>, QueryKey, GetTypesParams['offset']> = ({ signal, pageParam }) => getTypes({...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTypes>>, TError, TData, QueryKey, GetTypesParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTypesInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getTypes>>>
+export type GetTypesInfiniteQueryError = ExceptionInfo
+
+
+export function useGetTypesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTypes>>, GetTypesParams['offset']>, TError = ExceptionInfo>(
+ params: undefined |  GetTypesParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTypes>>, TError, TData, QueryKey, GetTypesParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTypes>>,
+          TError,
+          Awaited<ReturnType<typeof getTypes>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTypesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTypes>>, GetTypesParams['offset']>, TError = ExceptionInfo>(
+ params?: GetTypesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTypes>>, TError, TData, QueryKey, GetTypesParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTypes>>,
+          TError,
+          Awaited<ReturnType<typeof getTypes>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTypesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTypes>>, GetTypesParams['offset']>, TError = ExceptionInfo>(
+ params?: GetTypesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTypes>>, TError, TData, QueryKey, GetTypesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return all Software Module Types
+ */
+
+export function useGetTypesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTypes>>, GetTypesParams['offset']>, TError = ExceptionInfo>(
+ params?: GetTypesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTypes>>, TError, TData, QueryKey, GetTypesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTypesInfiniteQueryOptions(params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetTypesQueryOptions = <TData = Awaited<ReturnType<typeof getTypes>>, TError = ExceptionInfo>(params?: GetTypesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTypes>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 

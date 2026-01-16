@@ -7,18 +7,23 @@
  * OpenAPI spec version: v1
  */
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -61,6 +66,12 @@ export const getFilter = (
 
 
 
+export const getGetFilterInfiniteQueryKey = (filterId?: number,) => {
+    return [
+    'infinite', `/rest/v1/targetfilters/${filterId}`
+    ] as const;
+    }
+
 export const getGetFilterQueryKey = (filterId?: number,) => {
     return [
     `/rest/v1/targetfilters/${filterId}`
@@ -68,6 +79,73 @@ export const getGetFilterQueryKey = (filterId?: number,) => {
     }
 
     
+export const getGetFilterInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getFilter>>>, TError = ExceptionInfo>(filterId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilter>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFilterInfiniteQueryKey(filterId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFilter>>> = ({ signal }) => getFilter(filterId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(filterId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilter>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetFilterInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getFilter>>>
+export type GetFilterInfiniteQueryError = ExceptionInfo
+
+
+export function useGetFilterInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getFilter>>>, TError = ExceptionInfo>(
+ filterId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilter>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFilter>>,
+          TError,
+          Awaited<ReturnType<typeof getFilter>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFilterInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getFilter>>>, TError = ExceptionInfo>(
+ filterId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilter>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFilter>>,
+          TError,
+          Awaited<ReturnType<typeof getFilter>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFilterInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getFilter>>>, TError = ExceptionInfo>(
+ filterId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilter>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return target filter query by id
+ */
+
+export function useGetFilterInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getFilter>>>, TError = ExceptionInfo>(
+ filterId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilter>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetFilterInfiniteQueryOptions(filterId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetFilterQueryOptions = <TData = Awaited<ReturnType<typeof getFilter>>, TError = ExceptionInfo>(filterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFilter>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -282,6 +360,12 @@ export const getFilters = (
 
 
 
+export const getGetFiltersInfiniteQueryKey = (params?: GetFiltersParams,) => {
+    return [
+    'infinite', `/rest/v1/targetfilters`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetFiltersQueryKey = (params?: GetFiltersParams,) => {
     return [
     `/rest/v1/targetfilters`, ...(params ? [params]: [])
@@ -289,6 +373,73 @@ export const getGetFiltersQueryKey = (params?: GetFiltersParams,) => {
     }
 
     
+export const getGetFiltersInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getFilters>>, GetFiltersParams['offset']>, TError = ExceptionInfo>(params?: GetFiltersParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilters>>, TError, TData, QueryKey, GetFiltersParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFiltersInfiniteQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFilters>>, QueryKey, GetFiltersParams['offset']> = ({ signal, pageParam }) => getFilters({...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilters>>, TError, TData, QueryKey, GetFiltersParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetFiltersInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getFilters>>>
+export type GetFiltersInfiniteQueryError = ExceptionInfo
+
+
+export function useGetFiltersInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getFilters>>, GetFiltersParams['offset']>, TError = ExceptionInfo>(
+ params: undefined |  GetFiltersParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilters>>, TError, TData, QueryKey, GetFiltersParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFilters>>,
+          TError,
+          Awaited<ReturnType<typeof getFilters>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFiltersInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getFilters>>, GetFiltersParams['offset']>, TError = ExceptionInfo>(
+ params?: GetFiltersParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilters>>, TError, TData, QueryKey, GetFiltersParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFilters>>,
+          TError,
+          Awaited<ReturnType<typeof getFilters>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFiltersInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getFilters>>, GetFiltersParams['offset']>, TError = ExceptionInfo>(
+ params?: GetFiltersParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilters>>, TError, TData, QueryKey, GetFiltersParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return all target filter queries
+ */
+
+export function useGetFiltersInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getFilters>>, GetFiltersParams['offset']>, TError = ExceptionInfo>(
+ params?: GetFiltersParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getFilters>>, TError, TData, QueryKey, GetFiltersParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetFiltersInfiniteQueryOptions(params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetFiltersQueryOptions = <TData = Awaited<ReturnType<typeof getFilters>>, TError = ExceptionInfo>(params?: GetFiltersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFilters>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -440,6 +591,12 @@ export const getAssignedDistributionSet1 = (
 
 
 
+export const getGetAssignedDistributionSet1InfiniteQueryKey = (filterId?: number,) => {
+    return [
+    'infinite', `/rest/v1/targetfilters/${filterId}/autoAssignDS`
+    ] as const;
+    }
+
 export const getGetAssignedDistributionSet1QueryKey = (filterId?: number,) => {
     return [
     `/rest/v1/targetfilters/${filterId}/autoAssignDS`
@@ -447,6 +604,73 @@ export const getGetAssignedDistributionSet1QueryKey = (filterId?: number,) => {
     }
 
     
+export const getGetAssignedDistributionSet1InfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getAssignedDistributionSet1>>>, TError = ExceptionInfo>(filterId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedDistributionSet1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAssignedDistributionSet1InfiniteQueryKey(filterId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAssignedDistributionSet1>>> = ({ signal }) => getAssignedDistributionSet1(filterId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(filterId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedDistributionSet1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAssignedDistributionSet1InfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getAssignedDistributionSet1>>>
+export type GetAssignedDistributionSet1InfiniteQueryError = ExceptionInfo
+
+
+export function useGetAssignedDistributionSet1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedDistributionSet1>>>, TError = ExceptionInfo>(
+ filterId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedDistributionSet1>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAssignedDistributionSet1>>,
+          TError,
+          Awaited<ReturnType<typeof getAssignedDistributionSet1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAssignedDistributionSet1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedDistributionSet1>>>, TError = ExceptionInfo>(
+ filterId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedDistributionSet1>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAssignedDistributionSet1>>,
+          TError,
+          Awaited<ReturnType<typeof getAssignedDistributionSet1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAssignedDistributionSet1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedDistributionSet1>>>, TError = ExceptionInfo>(
+ filterId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedDistributionSet1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return distribution set for auto assignment of a specific target filter
+ */
+
+export function useGetAssignedDistributionSet1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAssignedDistributionSet1>>>, TError = ExceptionInfo>(
+ filterId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAssignedDistributionSet1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAssignedDistributionSet1InfiniteQueryOptions(filterId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetAssignedDistributionSet1QueryOptions = <TData = Awaited<ReturnType<typeof getAssignedDistributionSet1>>, TError = ExceptionInfo>(filterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAssignedDistributionSet1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 

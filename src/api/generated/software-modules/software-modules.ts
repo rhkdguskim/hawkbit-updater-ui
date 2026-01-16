@@ -7,18 +7,23 @@
  * OpenAPI spec version: v1
  */
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -69,6 +74,12 @@ export const getSoftwareModule = (
 
 
 
+export const getGetSoftwareModuleInfiniteQueryKey = (softwareModuleId?: number,) => {
+    return [
+    'infinite', `/rest/v1/softwaremodules/${softwareModuleId}`
+    ] as const;
+    }
+
 export const getGetSoftwareModuleQueryKey = (softwareModuleId?: number,) => {
     return [
     `/rest/v1/softwaremodules/${softwareModuleId}`
@@ -76,6 +87,73 @@ export const getGetSoftwareModuleQueryKey = (softwareModuleId?: number,) => {
     }
 
     
+export const getGetSoftwareModuleInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModule>>>, TError = ExceptionInfo>(softwareModuleId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModule>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSoftwareModuleInfiniteQueryKey(softwareModuleId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSoftwareModule>>> = ({ signal }) => getSoftwareModule(softwareModuleId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(softwareModuleId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModule>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSoftwareModuleInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getSoftwareModule>>>
+export type GetSoftwareModuleInfiniteQueryError = ExceptionInfo
+
+
+export function useGetSoftwareModuleInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModule>>>, TError = ExceptionInfo>(
+ softwareModuleId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModule>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSoftwareModule>>,
+          TError,
+          Awaited<ReturnType<typeof getSoftwareModule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSoftwareModuleInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModule>>>, TError = ExceptionInfo>(
+ softwareModuleId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModule>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSoftwareModule>>,
+          TError,
+          Awaited<ReturnType<typeof getSoftwareModule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSoftwareModuleInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModule>>>, TError = ExceptionInfo>(
+ softwareModuleId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModule>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return Software Module by id
+ */
+
+export function useGetSoftwareModuleInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModule>>>, TError = ExceptionInfo>(
+ softwareModuleId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModule>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSoftwareModuleInfiniteQueryOptions(softwareModuleId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetSoftwareModuleQueryOptions = <TData = Awaited<ReturnType<typeof getSoftwareModule>>, TError = ExceptionInfo>(softwareModuleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSoftwareModule>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -290,6 +368,13 @@ export const getMetadataValue1 = (
 
 
 
+export const getGetMetadataValue1InfiniteQueryKey = (softwareModuleId?: number,
+    metadataKey?: string,) => {
+    return [
+    'infinite', `/rest/v1/softwaremodules/${softwareModuleId}/metadata/${metadataKey}`
+    ] as const;
+    }
+
 export const getGetMetadataValue1QueryKey = (softwareModuleId?: number,
     metadataKey?: string,) => {
     return [
@@ -298,6 +383,78 @@ export const getGetMetadataValue1QueryKey = (softwareModuleId?: number,
     }
 
     
+export const getGetMetadataValue1InfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getMetadataValue1>>>, TError = ExceptionInfo>(softwareModuleId: number,
+    metadataKey: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMetadataValue1InfiniteQueryKey(softwareModuleId,metadataKey);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMetadataValue1>>> = ({ signal }) => getMetadataValue1(softwareModuleId,metadataKey, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(softwareModuleId && metadataKey), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMetadataValue1InfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getMetadataValue1>>>
+export type GetMetadataValue1InfiniteQueryError = ExceptionInfo
+
+
+export function useGetMetadataValue1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadataValue1>>>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    metadataKey: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue1>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMetadataValue1>>,
+          TError,
+          Awaited<ReturnType<typeof getMetadataValue1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMetadataValue1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadataValue1>>>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    metadataKey: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue1>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMetadataValue1>>,
+          TError,
+          Awaited<ReturnType<typeof getMetadataValue1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMetadataValue1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadataValue1>>>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    metadataKey: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return single metadata value for a specific key of a Software Module
+ */
+
+export function useGetMetadataValue1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadataValue1>>>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    metadataKey: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadataValue1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMetadataValue1InfiniteQueryOptions(softwareModuleId,metadataKey,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetMetadataValue1QueryOptions = <TData = Awaited<ReturnType<typeof getMetadataValue1>>, TError = ExceptionInfo>(softwareModuleId: number,
     metadataKey: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetadataValue1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
@@ -519,6 +676,12 @@ export const getSoftwareModules = (
 
 
 
+export const getGetSoftwareModulesInfiniteQueryKey = (params?: GetSoftwareModulesParams,) => {
+    return [
+    'infinite', `/rest/v1/softwaremodules`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetSoftwareModulesQueryKey = (params?: GetSoftwareModulesParams,) => {
     return [
     `/rest/v1/softwaremodules`, ...(params ? [params]: [])
@@ -526,6 +689,73 @@ export const getGetSoftwareModulesQueryKey = (params?: GetSoftwareModulesParams,
     }
 
     
+export const getGetSoftwareModulesInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModules>>, GetSoftwareModulesParams['offset']>, TError = ExceptionInfo>(params?: GetSoftwareModulesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModules>>, TError, TData, QueryKey, GetSoftwareModulesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSoftwareModulesInfiniteQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSoftwareModules>>, QueryKey, GetSoftwareModulesParams['offset']> = ({ signal, pageParam }) => getSoftwareModules({...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModules>>, TError, TData, QueryKey, GetSoftwareModulesParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSoftwareModulesInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getSoftwareModules>>>
+export type GetSoftwareModulesInfiniteQueryError = ExceptionInfo
+
+
+export function useGetSoftwareModulesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModules>>, GetSoftwareModulesParams['offset']>, TError = ExceptionInfo>(
+ params: undefined |  GetSoftwareModulesParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModules>>, TError, TData, QueryKey, GetSoftwareModulesParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSoftwareModules>>,
+          TError,
+          Awaited<ReturnType<typeof getSoftwareModules>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSoftwareModulesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModules>>, GetSoftwareModulesParams['offset']>, TError = ExceptionInfo>(
+ params?: GetSoftwareModulesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModules>>, TError, TData, QueryKey, GetSoftwareModulesParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSoftwareModules>>,
+          TError,
+          Awaited<ReturnType<typeof getSoftwareModules>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSoftwareModulesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModules>>, GetSoftwareModulesParams['offset']>, TError = ExceptionInfo>(
+ params?: GetSoftwareModulesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModules>>, TError, TData, QueryKey, GetSoftwareModulesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return all Software modules
+ */
+
+export function useGetSoftwareModulesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSoftwareModules>>, GetSoftwareModulesParams['offset']>, TError = ExceptionInfo>(
+ params?: GetSoftwareModulesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSoftwareModules>>, TError, TData, QueryKey, GetSoftwareModulesParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSoftwareModulesInfiniteQueryOptions(params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetSoftwareModulesQueryOptions = <TData = Awaited<ReturnType<typeof getSoftwareModules>>, TError = ExceptionInfo>(params?: GetSoftwareModulesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSoftwareModules>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -679,6 +909,13 @@ export const getMetadata1 = (
 
 
 
+export const getGetMetadata1InfiniteQueryKey = (softwareModuleId?: number,
+    params?: GetMetadata1Params,) => {
+    return [
+    'infinite', `/rest/v1/softwaremodules/${softwareModuleId}/metadata`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetMetadata1QueryKey = (softwareModuleId?: number,
     params?: GetMetadata1Params,) => {
     return [
@@ -687,6 +924,78 @@ export const getGetMetadata1QueryKey = (softwareModuleId?: number,
     }
 
     
+export const getGetMetadata1InfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getMetadata1>>, GetMetadata1Params['offset']>, TError = ExceptionInfo>(softwareModuleId: number,
+    params?: GetMetadata1Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata1>>, TError, TData, QueryKey, GetMetadata1Params['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMetadata1InfiniteQueryKey(softwareModuleId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMetadata1>>, QueryKey, GetMetadata1Params['offset']> = ({ signal, pageParam }) => getMetadata1(softwareModuleId,{...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(softwareModuleId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata1>>, TError, TData, QueryKey, GetMetadata1Params['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMetadata1InfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getMetadata1>>>
+export type GetMetadata1InfiniteQueryError = ExceptionInfo
+
+
+export function useGetMetadata1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadata1>>, GetMetadata1Params['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    params: undefined |  GetMetadata1Params, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata1>>, TError, TData, QueryKey, GetMetadata1Params['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMetadata1>>,
+          TError,
+          Awaited<ReturnType<typeof getMetadata1>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMetadata1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadata1>>, GetMetadata1Params['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    params?: GetMetadata1Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata1>>, TError, TData, QueryKey, GetMetadata1Params['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMetadata1>>,
+          TError,
+          Awaited<ReturnType<typeof getMetadata1>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMetadata1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadata1>>, GetMetadata1Params['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    params?: GetMetadata1Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata1>>, TError, TData, QueryKey, GetMetadata1Params['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return metadata for a Software Module
+ */
+
+export function useGetMetadata1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getMetadata1>>, GetMetadata1Params['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    params?: GetMetadata1Params, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetadata1>>, TError, TData, QueryKey, GetMetadata1Params['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMetadata1InfiniteQueryOptions(softwareModuleId,params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetMetadata1QueryOptions = <TData = Awaited<ReturnType<typeof getMetadata1>>, TError = ExceptionInfo>(softwareModuleId: number,
     params?: GetMetadata1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetadata1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
@@ -846,6 +1155,13 @@ export const getArtifacts = (
 
 
 
+export const getGetArtifactsInfiniteQueryKey = (softwareModuleId?: number,
+    params?: GetArtifactsParams,) => {
+    return [
+    'infinite', `/rest/v1/softwaremodules/${softwareModuleId}/artifacts`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetArtifactsQueryKey = (softwareModuleId?: number,
     params?: GetArtifactsParams,) => {
     return [
@@ -854,6 +1170,78 @@ export const getGetArtifactsQueryKey = (softwareModuleId?: number,
     }
 
     
+export const getGetArtifactsInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getArtifacts>>, GetArtifactsParams['offset']>, TError = ExceptionInfo>(softwareModuleId: number,
+    params?: GetArtifactsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifacts>>, TError, TData, QueryKey, GetArtifactsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetArtifactsInfiniteQueryKey(softwareModuleId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getArtifacts>>, QueryKey, GetArtifactsParams['offset']> = ({ signal, pageParam }) => getArtifacts(softwareModuleId,{...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(softwareModuleId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifacts>>, TError, TData, QueryKey, GetArtifactsParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetArtifactsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getArtifacts>>>
+export type GetArtifactsInfiniteQueryError = ExceptionInfo
+
+
+export function useGetArtifactsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getArtifacts>>, GetArtifactsParams['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    params: undefined |  GetArtifactsParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifacts>>, TError, TData, QueryKey, GetArtifactsParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getArtifacts>>,
+          TError,
+          Awaited<ReturnType<typeof getArtifacts>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetArtifactsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getArtifacts>>, GetArtifactsParams['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    params?: GetArtifactsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifacts>>, TError, TData, QueryKey, GetArtifactsParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getArtifacts>>,
+          TError,
+          Awaited<ReturnType<typeof getArtifacts>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetArtifactsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getArtifacts>>, GetArtifactsParams['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    params?: GetArtifactsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifacts>>, TError, TData, QueryKey, GetArtifactsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return all metadata of artifacts assigned to a software module
+ */
+
+export function useGetArtifactsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getArtifacts>>, GetArtifactsParams['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    params?: GetArtifactsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifacts>>, TError, TData, QueryKey, GetArtifactsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetArtifactsInfiniteQueryOptions(softwareModuleId,params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetArtifactsQueryOptions = <TData = Awaited<ReturnType<typeof getArtifacts>>, TError = ExceptionInfo>(softwareModuleId: number,
     params?: GetArtifactsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtifacts>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
@@ -1018,6 +1406,14 @@ export const getArtifact = (
 
 
 
+export const getGetArtifactInfiniteQueryKey = (softwareModuleId?: number,
+    artifactId?: number,
+    params?: GetArtifactParams,) => {
+    return [
+    'infinite', `/rest/v1/softwaremodules/${softwareModuleId}/artifacts/${artifactId}`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetArtifactQueryKey = (softwareModuleId?: number,
     artifactId?: number,
     params?: GetArtifactParams,) => {
@@ -1027,6 +1423,83 @@ export const getGetArtifactQueryKey = (softwareModuleId?: number,
     }
 
     
+export const getGetArtifactInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getArtifact>>, GetArtifactParams['offset']>, TError = ExceptionInfo>(softwareModuleId: number,
+    artifactId: number,
+    params?: GetArtifactParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifact>>, TError, TData, QueryKey, GetArtifactParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetArtifactInfiniteQueryKey(softwareModuleId,artifactId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getArtifact>>, QueryKey, GetArtifactParams['offset']> = ({ signal, pageParam }) => getArtifact(softwareModuleId,artifactId,{...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(softwareModuleId && artifactId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifact>>, TError, TData, QueryKey, GetArtifactParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetArtifactInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getArtifact>>>
+export type GetArtifactInfiniteQueryError = ExceptionInfo
+
+
+export function useGetArtifactInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getArtifact>>, GetArtifactParams['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    artifactId: number,
+    params: undefined |  GetArtifactParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifact>>, TError, TData, QueryKey, GetArtifactParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getArtifact>>,
+          TError,
+          Awaited<ReturnType<typeof getArtifact>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetArtifactInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getArtifact>>, GetArtifactParams['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    artifactId: number,
+    params?: GetArtifactParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifact>>, TError, TData, QueryKey, GetArtifactParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getArtifact>>,
+          TError,
+          Awaited<ReturnType<typeof getArtifact>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetArtifactInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getArtifact>>, GetArtifactParams['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    artifactId: number,
+    params?: GetArtifactParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifact>>, TError, TData, QueryKey, GetArtifactParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return single Artifact metadata
+ */
+
+export function useGetArtifactInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getArtifact>>, GetArtifactParams['offset']>, TError = ExceptionInfo>(
+ softwareModuleId: number,
+    artifactId: number,
+    params?: GetArtifactParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getArtifact>>, TError, TData, QueryKey, GetArtifactParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetArtifactInfiniteQueryOptions(softwareModuleId,artifactId,params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetArtifactQueryOptions = <TData = Awaited<ReturnType<typeof getArtifact>>, TError = ExceptionInfo>(softwareModuleId: number,
     artifactId: number,
     params?: GetArtifactParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtifact>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}

@@ -13,7 +13,7 @@
 export type MgmtTargetFilterQueryAutoAssignActionType = typeof MgmtTargetFilterQueryAutoAssignActionType[keyof typeof MgmtTargetFilterQueryAutoAssignActionType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MgmtTargetFilterQueryAutoAssignActionType = {
   soft: 'soft',
   forced: 'forced',

@@ -7,16 +7,21 @@
  * OpenAPI spec version: v1
  */
 import {
+  useInfiniteQuery,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
@@ -55,6 +60,12 @@ export const getActions = (
 
 
 
+export const getGetActionsInfiniteQueryKey = (params?: GetActionsParams,) => {
+    return [
+    'infinite', `/rest/v1/actions`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetActionsQueryKey = (params?: GetActionsParams,) => {
     return [
     `/rest/v1/actions`, ...(params ? [params]: [])
@@ -62,6 +73,73 @@ export const getGetActionsQueryKey = (params?: GetActionsParams,) => {
     }
 
     
+export const getGetActionsInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getActions>>, GetActionsParams['offset']>, TError = ExceptionInfo>(params?: GetActionsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActions>>, TError, TData, QueryKey, GetActionsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetActionsInfiniteQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getActions>>, QueryKey, GetActionsParams['offset']> = ({ signal, pageParam }) => getActions({...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActions>>, TError, TData, QueryKey, GetActionsParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetActionsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getActions>>>
+export type GetActionsInfiniteQueryError = ExceptionInfo
+
+
+export function useGetActionsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getActions>>, GetActionsParams['offset']>, TError = ExceptionInfo>(
+ params: undefined |  GetActionsParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActions>>, TError, TData, QueryKey, GetActionsParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getActions>>,
+          TError,
+          Awaited<ReturnType<typeof getActions>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetActionsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getActions>>, GetActionsParams['offset']>, TError = ExceptionInfo>(
+ params?: GetActionsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActions>>, TError, TData, QueryKey, GetActionsParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getActions>>,
+          TError,
+          Awaited<ReturnType<typeof getActions>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetActionsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getActions>>, GetActionsParams['offset']>, TError = ExceptionInfo>(
+ params?: GetActionsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActions>>, TError, TData, QueryKey, GetActionsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return all actions
+ */
+
+export function useGetActionsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getActions>>, GetActionsParams['offset']>, TError = ExceptionInfo>(
+ params?: GetActionsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getActions>>, TError, TData, QueryKey, GetActionsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetActionsInfiniteQueryOptions(params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetActionsQueryOptions = <TData = Awaited<ReturnType<typeof getActions>>, TError = ExceptionInfo>(params?: GetActionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActions>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -148,6 +226,12 @@ export const getAction1 = (
 
 
 
+export const getGetAction1InfiniteQueryKey = (actionId?: number,) => {
+    return [
+    'infinite', `/rest/v1/actions/${actionId}`
+    ] as const;
+    }
+
 export const getGetAction1QueryKey = (actionId?: number,) => {
     return [
     `/rest/v1/actions/${actionId}`
@@ -155,6 +239,73 @@ export const getGetAction1QueryKey = (actionId?: number,) => {
     }
 
     
+export const getGetAction1InfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getAction1>>>, TError = ExceptionInfo>(actionId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAction1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAction1InfiniteQueryKey(actionId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAction1>>> = ({ signal }) => getAction1(actionId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(actionId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAction1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAction1InfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getAction1>>>
+export type GetAction1InfiniteQueryError = ExceptionInfo
+
+
+export function useGetAction1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAction1>>>, TError = ExceptionInfo>(
+ actionId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAction1>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAction1>>,
+          TError,
+          Awaited<ReturnType<typeof getAction1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAction1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAction1>>>, TError = ExceptionInfo>(
+ actionId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAction1>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAction1>>,
+          TError,
+          Awaited<ReturnType<typeof getAction1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAction1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAction1>>>, TError = ExceptionInfo>(
+ actionId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAction1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return action by id
+ */
+
+export function useGetAction1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof getAction1>>>, TError = ExceptionInfo>(
+ actionId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAction1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAction1InfiniteQueryOptions(actionId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetAction1QueryOptions = <TData = Awaited<ReturnType<typeof getAction1>>, TError = ExceptionInfo>(actionId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAction1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 

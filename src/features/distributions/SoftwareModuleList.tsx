@@ -46,22 +46,11 @@ const SoftwareModuleList: React.FC = () => {
             sorter: true,
             width: 200,
             render: (text, record) => (
-                <Flex align="center" gap={8}>
-                    <EditableCell
-                        value={text || ''}
-                        onSave={(val) => model.handleInlineUpdate(record.id, 'name', val)}
-                        editable={isAdmin}
-                    />
-                    <Tooltip title={t('actions.viewDetails')}>
-                        <Button
-                            type="text"
-                            size="small"
-                            icon={<EyeOutlined />}
-                            style={{ fontSize: 'var(--ant-font-size-sm)', padding: 0, height: 'auto' }}
-                            onClick={() => navigate(`/distributions/modules/${record.id}`)}
-                        />
-                    </Tooltip>
-                </Flex>
+                <EditableCell
+                    value={text || ''}
+                    onSave={(val) => model.handleInlineUpdate(record.id, 'name', val)}
+                    editable={isAdmin}
+                />
             ),
         },
         {
@@ -111,9 +100,11 @@ const SoftwareModuleList: React.FC = () => {
             dataIndex: 'lastModifiedAt',
             key: 'lastModifiedAt',
             sorter: true,
-            width: 130,
+            width: 160,
             render: (val: number) => (
-                <Text style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>{val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}</Text>
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>
+                    {val ? dayjs(val).format('YYYY-MM-DD HH:mm') : '-'}
+                </Text>
             ),
         },
         {
@@ -148,6 +139,25 @@ const SoftwareModuleList: React.FC = () => {
         },
     ];
 
+    // Filter columns based on visibility
+    const displayColumns = useMemo(() => {
+        if (!model.visibleColumns || model.visibleColumns.length === 0) return columns;
+        return columns.filter(col =>
+            col.key === 'actions' || model.visibleColumns.includes(col.key as string)
+        );
+    }, [columns, model.visibleColumns]);
+
+    // Column options for FilterBuilder
+    const columnOptions = useMemo(() => [
+        { key: 'id', label: t('common:table.id'), defaultVisible: false },
+        { key: 'name', label: t('list.columns.name'), defaultVisible: true },
+        { key: 'version', label: t('list.columns.version'), defaultVisible: true },
+        { key: 'typeName', label: t('list.columns.type'), defaultVisible: true },
+        { key: 'vendor', label: t('list.columns.vendor'), defaultVisible: true },
+        { key: 'description', label: t('list.columns.description'), defaultVisible: true },
+        { key: 'lastModifiedAt', label: t('list.columns.lastModified'), defaultVisible: true },
+    ], [t]);
+
     return (
         <StandardListLayout
             title={t('moduleList.title')}
@@ -162,27 +172,24 @@ const SoftwareModuleList: React.FC = () => {
                     canAdd={isAdmin}
                     addLabel={t('actions.createModule')}
                     loading={model.isLoading || model.isFetching}
+                    // Integrated Column Customization
+                    columns={columnOptions}
+                    visibleColumns={model.visibleColumns}
+                    onVisibilityChange={model.setVisibleColumns}
                 />
             }
         >
             <DataView
-                loading={model.isLoading || model.isFetching}
+                loading={model.isLoading}
                 error={model.error as Error}
-                isEmpty={model.data?.content?.length === 0}
+                isEmpty={model.data.length === 0}
                 emptyText={t('moduleList.empty')}
             >
                 <EnhancedTable<MgmtSoftwareModule>
-                    columns={columns}
-                    dataSource={model.data?.content || []}
+                    columns={displayColumns}
+                    dataSource={model.data}
                     rowKey="id"
-                    pagination={{
-                        current: model.pagination.current,
-                        pageSize: model.pagination.pageSize,
-                        total: model.data?.total || 0,
-                        showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50', '100'],
-                        position: ['topRight'],
-                    }}
+                    pagination={false}
                     loading={model.isLoading || model.isFetching}
                     onChange={model.handleTableChange}
                     selectedRowKeys={model.selectedModuleIds}
@@ -190,6 +197,9 @@ const SoftwareModuleList: React.FC = () => {
                     selectionActions={selectionActions}
                     selectionLabel={t('common:filter.selected')}
                     scroll={{ x: 1000 }}
+                    onFetchNextPage={model.fetchNextPage}
+                    hasNextPage={model.hasNextPage}
+                    isFetchingNextPage={model.isFetchingNextPage}
                 />
             </DataView>
             <CreateModuleWizard

@@ -7,16 +7,21 @@
  * OpenAPI spec version: v1
  */
 import {
+  useInfiniteQuery,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
@@ -47,6 +52,12 @@ export const validateBasicAuth = (
 
 
 
+export const getValidateBasicAuthInfiniteQueryKey = () => {
+    return [
+    'infinite', `/rest/v1/userinfo`
+    ] as const;
+    }
+
 export const getValidateBasicAuthQueryKey = () => {
     return [
     `/rest/v1/userinfo`
@@ -54,6 +65,70 @@ export const getValidateBasicAuthQueryKey = () => {
     }
 
     
+export const getValidateBasicAuthInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof validateBasicAuth>>>, TError = unknown>( options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof validateBasicAuth>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getValidateBasicAuthInfiniteQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof validateBasicAuth>>> = ({ signal }) => validateBasicAuth(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof validateBasicAuth>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ValidateBasicAuthInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof validateBasicAuth>>>
+export type ValidateBasicAuthInfiniteQueryError = unknown
+
+
+export function useValidateBasicAuthInfinite<TData = InfiniteData<Awaited<ReturnType<typeof validateBasicAuth>>>, TError = unknown>(
+  options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof validateBasicAuth>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof validateBasicAuth>>,
+          TError,
+          Awaited<ReturnType<typeof validateBasicAuth>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useValidateBasicAuthInfinite<TData = InfiniteData<Awaited<ReturnType<typeof validateBasicAuth>>>, TError = unknown>(
+  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof validateBasicAuth>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof validateBasicAuth>>,
+          TError,
+          Awaited<ReturnType<typeof validateBasicAuth>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useValidateBasicAuthInfinite<TData = InfiniteData<Awaited<ReturnType<typeof validateBasicAuth>>>, TError = unknown>(
+  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof validateBasicAuth>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useValidateBasicAuthInfinite<TData = InfiniteData<Awaited<ReturnType<typeof validateBasicAuth>>>, TError = unknown>(
+  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof validateBasicAuth>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getValidateBasicAuthInfiniteQueryOptions(options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getValidateBasicAuthQueryOptions = <TData = Awaited<ReturnType<typeof validateBasicAuth>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof validateBasicAuth>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 

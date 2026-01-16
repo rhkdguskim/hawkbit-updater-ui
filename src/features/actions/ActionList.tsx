@@ -4,24 +4,22 @@ import {
     EyeOutlined,
     StopOutlined,
     ThunderboltOutlined,
-    CheckCircleOutlined,
-    ClockCircleOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useGetActions } from '@/api/generated/actions/actions';
+import { useGetActionsInfinite } from '@/api/generated/actions/actions';
 import { useCancelAction, useGetTargets } from '@/api/generated/targets/targets';
-import type { MgmtAction } from '@/api/generated/model';
+import type { MgmtAction, PagedListMgmtAction } from '@/api/generated/model';
 import { useTranslation } from 'react-i18next';
-import { keepPreviousData } from '@tanstack/react-query';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useServerTable } from '@/hooks/useServerTable';
-import { StatusTag, StatusQuickFilters, type StatusFilterOption } from '@/components/common';
+import { StatusTag } from '@/components/common';
 import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction, type FilterValue, type FilterField } from '@/components/patterns';
 import type { ColumnsType } from 'antd/es/table';
 import { buildQueryFromFilterValues } from '@/utils/fiql';
 import { getActionDisplayStatus, isActionInProgress, isActionCanceled } from '@/utils/statusUtils';
+import { useListFilterStore } from '@/stores/useListFilterStore';
 
 dayjs.extend(relativeTime);
 
@@ -41,8 +39,26 @@ const ActionList: React.FC = () => {
     const [selectedActionIds, setSelectedActionIds] = useState<React.Key[]>([]);
     const [selectedActions, setSelectedActions] = useState<MgmtAction[]>([]);
     const [selectedTargetIdsMap, setSelectedTargetIdsMap] = useState<Record<number, string>>({});
-    const [filters, setFilters] = useState<FilterValue[]>([]);
-    const [quickFilter, setQuickFilter] = useState('all');
+
+    // List Filter Store Integration
+    const {
+        actions: actionsPersistentState,
+        setActions: setActionsPersistentState
+    } = useListFilterStore();
+
+    const {
+        filters,
+        quickFilter,
+        visibleColumns
+    } = actionsPersistentState;
+
+    const setFilters = useCallback((newFilters: FilterValue[]) => {
+        setActionsPersistentState({ filters: newFilters });
+    }, [setActionsPersistentState]);
+
+    const setVisibleColumns = useCallback((columns: string[]) => {
+        setActionsPersistentState({ visibleColumns: columns });
+    }, [setActionsPersistentState]);
 
     // Filter fields
     const filterFields: FilterField[] = useMemo(() => [
@@ -74,21 +90,34 @@ const ActionList: React.FC = () => {
     const buildFinalQuery = useCallback(() => buildQueryFromFilterValues(filters), [filters]);
 
     const query = buildFinalQuery();
-    const { data, isLoading, isFetching, error, refetch } = useGetActions(
+    const {
+        data: infiniteData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isFetching,
+        error,
+        refetch
+    } = useGetActionsInfinite(
         {
-            offset,
             limit: pagination.pageSize,
             q: query || undefined,
         },
         {
             query: {
-                placeholderData: keepPreviousData,
+                getNextPageParam: (lastPage: PagedListMgmtAction, allPages: PagedListMgmtAction[]) => {
+                    const total = lastPage.total || 0;
+                    const currentOffset = allPages.length * (pagination.pageSize || 20);
+                    return currentOffset < total ? currentOffset : undefined;
+                },
+                initialPageParam: 0,
                 refetchOnWindowFocus: true,
                 staleTime: 5000,
-                refetchInterval: (query) => {
+                refetchInterval: (queryResult) => {
                     // Poll faster if there are active actions in the current view
-                    const hasActive = query.state.data?.content?.some(action =>
-                        isActionInProgress(action.status)
+                    const hasActive = queryResult.state.data?.pages.some((page: PagedListMgmtAction) =>
+                        page.content?.some((action: MgmtAction) => isActionInProgress(action.status))
                     );
                     return hasActive ? 5000 : 20000;
                 }
@@ -96,7 +125,9 @@ const ActionList: React.FC = () => {
         }
     );
 
-
+    const actionsContent = useMemo(() => {
+        return infiniteData?.pages.flatMap((page: PagedListMgmtAction) => page.content || []) || [];
+    }, [infiniteData]);
 
     const getTypeLabel = useCallback((type?: string) => {
         if (!type) return '-';
@@ -116,12 +147,12 @@ const ActionList: React.FC = () => {
 
     const targetIds = useMemo(() => {
         const ids = new Set<string>();
-        data?.content?.forEach(action => {
+        actionsContent.forEach(action => {
             const targetId = getTargetId(action);
             if (targetId) ids.add(targetId);
         });
         return Array.from(ids);
-    }, [data?.content, getTargetId]);
+    }, [actionsContent, getTargetId]);
 
     const targetQuery = useMemo(() => {
         if (targetIds.length === 0) return undefined;
@@ -199,37 +230,11 @@ const ActionList: React.FC = () => {
         }
     }, [selectedActions, selectedTargetIdsMap, cancelMutation, t, refetch]);
 
-    // Quick filter options - only use valid API statuses (pending, finished)
-    const quickFilterOptions: StatusFilterOption[] = useMemo(() => [
-        { key: 'pending', label: t('common:status.pending'), icon: <ClockCircleOutlined />, color: 'warning' },
-        { key: 'finished', label: t('common:status.finished'), icon: <CheckCircleOutlined />, color: 'success' },
-    ], [t]);
-
-    // Handle quick filter change
-    const handleQuickFilterChange = useCallback((filter: string) => {
-        setQuickFilter(filter);
-        if (filter === 'all') {
-            setFilters([]);
-        } else {
-            setFilters([{
-                id: `quick-${filter}`,
-                field: 'status',
-                fieldLabel: t('columns.status'),
-                operator: 'equals',
-                operatorLabel: '=',
-                value: filter,
-                displayValue: t(`common:status.${filter}`),
-            }]);
-        }
-        resetPagination();
-    }, [t, resetPagination]);
-
     // Handle filter change
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
         setFilters(newFilters);
-        setQuickFilter('all'); // Reset quick filter when manual filter applied
         resetPagination();
-    }, [resetPagination]);
+    }, [resetPagination, setFilters]);
 
     const cancelableSelectionCount = useMemo(
         () => selectedActions.filter(action => isActionInProgress(action.status)).length,
@@ -255,7 +260,7 @@ const ActionList: React.FC = () => {
         },
     ], [t, handleBulkCancel, cancelableSelectionCount]);
 
-    const columns: ColumnsType<MgmtAction> = [
+    const columns: ColumnsType<MgmtAction> = useMemo(() => [
         {
             title: t('columns.target', { defaultValue: 'Target' }),
             key: 'target',
@@ -380,7 +385,24 @@ const ActionList: React.FC = () => {
                 </Space>
             ),
         },
-    ];
+    ], [t, getTargetId, targetMap, navigate, getTypeLabel, getDistributionInfo, cancelMutation, refetch]);
+
+    // Filter columns based on visibility
+    const displayColumns = useMemo(() => {
+        if (!visibleColumns || visibleColumns.length === 0) return columns;
+        return columns.filter(col =>
+            col.key === 'actions' || visibleColumns.includes(col.key as string)
+        );
+    }, [columns, visibleColumns]);
+
+    // Column options for FilterBuilder
+    const columnOptions = useMemo(() => [
+        { key: 'target', label: t('columns.target'), defaultVisible: true },
+        { key: 'status', label: t('columns.status'), defaultVisible: true },
+        { key: 'type', label: t('columns.type'), defaultVisible: true },
+        { key: 'distributionSet', label: t('columns.distributionSet'), defaultVisible: true },
+        { key: 'createdAt', label: t('columns.createdAt'), defaultVisible: true },
+    ], [t]);
 
     const handleSelectionChange = useCallback((keys: React.Key[], selectedRows: MgmtAction[]) => {
         setSelectedActionIds(keys);
@@ -404,28 +426,24 @@ const ActionList: React.FC = () => {
                     onFiltersChange={handleFiltersChange}
                     onRefresh={refetch}
                     loading={isLoading || isFetching}
-                    extra={
-                        <StatusQuickFilters
-                            t={t}
-                            options={quickFilterOptions}
-                            activeFilter={quickFilter}
-                            onFilterChange={handleQuickFilterChange}
-                        />
-                    }
+                    // Integrated Column Customization
+                    columns={columnOptions}
+                    visibleColumns={visibleColumns}
+                    onVisibilityChange={setVisibleColumns}
                 />
             }
         >
             <DataView
                 loading={isLoading}
                 error={error as Error}
-                isEmpty={data?.content?.length === 0}
+                isEmpty={actionsContent.length === 0}
                 emptyText={t('common:messages.noData')}
             >
                 <EnhancedTable<MgmtAction>
-                    dataSource={data?.content || []}
-                    columns={columns}
+                    dataSource={actionsContent}
+                    columns={displayColumns}
                     rowKey="id"
-                    loading={isLoading}
+                    loading={isLoading || isFetching}
                     selectedRowKeys={selectedActionIds}
                     onSelectionChange={handleSelectionChange}
                     selectionActions={selectionActions}
@@ -434,17 +452,12 @@ const ActionList: React.FC = () => {
                         onClick: () => navigate(`/actions/${record.id}`),
                         style: { cursor: 'pointer' },
                     })}
-                    pagination={{
-                        current: pagination.current,
-                        pageSize: pagination.pageSize,
-                        total: data?.total || 0,
-                        showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50', '100'],
-                        showTotal: (total, range) => t('pagination.range', { start: range[0], end: range[1], total }),
-                        position: ['topRight'],
-                    }}
+                    pagination={false}
                     onChange={handleTableChange}
                     scroll={{ x: 800 }}
+                    onFetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    isFetchingNextPage={isFetchingNextPage}
                 />
             </DataView>
         </StandardListLayout>

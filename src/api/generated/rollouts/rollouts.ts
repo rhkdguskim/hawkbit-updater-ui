@@ -7,18 +7,23 @@
  * OpenAPI spec version: v1
  */
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -94,6 +99,12 @@ export const getRollout = (
 
 
 
+export const getGetRolloutInfiniteQueryKey = (rolloutId?: number,) => {
+    return [
+    'infinite', `/rest/v1/rollouts/${rolloutId}`
+    ] as const;
+    }
+
 export const getGetRolloutQueryKey = (rolloutId?: number,) => {
     return [
     `/rest/v1/rollouts/${rolloutId}`
@@ -101,6 +112,73 @@ export const getGetRolloutQueryKey = (rolloutId?: number,) => {
     }
 
     
+export const getGetRolloutInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getRollout>>>, TError = ExceptionInfo>(rolloutId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollout>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRolloutInfiniteQueryKey(rolloutId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRollout>>> = ({ signal }) => getRollout(rolloutId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(rolloutId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollout>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRolloutInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getRollout>>>
+export type GetRolloutInfiniteQueryError = ExceptionInfo
+
+
+export function useGetRolloutInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRollout>>>, TError = ExceptionInfo>(
+ rolloutId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollout>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRollout>>,
+          TError,
+          Awaited<ReturnType<typeof getRollout>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRollout>>>, TError = ExceptionInfo>(
+ rolloutId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollout>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRollout>>,
+          TError,
+          Awaited<ReturnType<typeof getRollout>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRollout>>>, TError = ExceptionInfo>(
+ rolloutId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollout>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return single Rollout
+ */
+
+export function useGetRolloutInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRollout>>>, TError = ExceptionInfo>(
+ rolloutId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollout>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetRolloutInfiniteQueryOptions(rolloutId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetRolloutQueryOptions = <TData = Awaited<ReturnType<typeof getRollout>>, TError = ExceptionInfo>(rolloutId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRollout>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -315,6 +393,12 @@ export const getRollouts = (
 
 
 
+export const getGetRolloutsInfiniteQueryKey = (params?: GetRolloutsParams,) => {
+    return [
+    'infinite', `/rest/v1/rollouts`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetRolloutsQueryKey = (params?: GetRolloutsParams,) => {
     return [
     `/rest/v1/rollouts`, ...(params ? [params]: [])
@@ -322,6 +406,73 @@ export const getGetRolloutsQueryKey = (params?: GetRolloutsParams,) => {
     }
 
     
+export const getGetRolloutsInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getRollouts>>, GetRolloutsParams['offset']>, TError = ExceptionInfo>(params?: GetRolloutsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollouts>>, TError, TData, QueryKey, GetRolloutsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRolloutsInfiniteQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRollouts>>, QueryKey, GetRolloutsParams['offset']> = ({ signal, pageParam }) => getRollouts({...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollouts>>, TError, TData, QueryKey, GetRolloutsParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRolloutsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getRollouts>>>
+export type GetRolloutsInfiniteQueryError = ExceptionInfo
+
+
+export function useGetRolloutsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRollouts>>, GetRolloutsParams['offset']>, TError = ExceptionInfo>(
+ params: undefined |  GetRolloutsParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollouts>>, TError, TData, QueryKey, GetRolloutsParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRollouts>>,
+          TError,
+          Awaited<ReturnType<typeof getRollouts>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRollouts>>, GetRolloutsParams['offset']>, TError = ExceptionInfo>(
+ params?: GetRolloutsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollouts>>, TError, TData, QueryKey, GetRolloutsParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRollouts>>,
+          TError,
+          Awaited<ReturnType<typeof getRollouts>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRollouts>>, GetRolloutsParams['offset']>, TError = ExceptionInfo>(
+ params?: GetRolloutsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollouts>>, TError, TData, QueryKey, GetRolloutsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return all Rollouts
+ */
+
+export function useGetRolloutsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRollouts>>, GetRolloutsParams['offset']>, TError = ExceptionInfo>(
+ params?: GetRolloutsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRollouts>>, TError, TData, QueryKey, GetRolloutsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetRolloutsInfiniteQueryOptions(params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetRolloutsQueryOptions = <TData = Awaited<ReturnType<typeof getRollouts>>, TError = ExceptionInfo>(params?: GetRolloutsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRollouts>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
@@ -920,6 +1071,13 @@ export const getRolloutGroups = (
 
 
 
+export const getGetRolloutGroupsInfiniteQueryKey = (rolloutId?: number,
+    params?: GetRolloutGroupsParams,) => {
+    return [
+    'infinite', `/rest/v1/rollouts/${rolloutId}/deploygroups`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetRolloutGroupsQueryKey = (rolloutId?: number,
     params?: GetRolloutGroupsParams,) => {
     return [
@@ -928,6 +1086,78 @@ export const getGetRolloutGroupsQueryKey = (rolloutId?: number,
     }
 
     
+export const getGetRolloutGroupsInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroups>>, GetRolloutGroupsParams['offset']>, TError = ExceptionInfo>(rolloutId: number,
+    params?: GetRolloutGroupsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroups>>, TError, TData, QueryKey, GetRolloutGroupsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRolloutGroupsInfiniteQueryKey(rolloutId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRolloutGroups>>, QueryKey, GetRolloutGroupsParams['offset']> = ({ signal, pageParam }) => getRolloutGroups(rolloutId,{...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(rolloutId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroups>>, TError, TData, QueryKey, GetRolloutGroupsParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRolloutGroupsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getRolloutGroups>>>
+export type GetRolloutGroupsInfiniteQueryError = ExceptionInfo
+
+
+export function useGetRolloutGroupsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroups>>, GetRolloutGroupsParams['offset']>, TError = ExceptionInfo>(
+ rolloutId: number,
+    params: undefined |  GetRolloutGroupsParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroups>>, TError, TData, QueryKey, GetRolloutGroupsParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRolloutGroups>>,
+          TError,
+          Awaited<ReturnType<typeof getRolloutGroups>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutGroupsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroups>>, GetRolloutGroupsParams['offset']>, TError = ExceptionInfo>(
+ rolloutId: number,
+    params?: GetRolloutGroupsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroups>>, TError, TData, QueryKey, GetRolloutGroupsParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRolloutGroups>>,
+          TError,
+          Awaited<ReturnType<typeof getRolloutGroups>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutGroupsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroups>>, GetRolloutGroupsParams['offset']>, TError = ExceptionInfo>(
+ rolloutId: number,
+    params?: GetRolloutGroupsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroups>>, TError, TData, QueryKey, GetRolloutGroupsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return all rollout groups referred to a Rollout
+ */
+
+export function useGetRolloutGroupsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroups>>, GetRolloutGroupsParams['offset']>, TError = ExceptionInfo>(
+ rolloutId: number,
+    params?: GetRolloutGroupsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroups>>, TError, TData, QueryKey, GetRolloutGroupsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetRolloutGroupsInfiniteQueryOptions(rolloutId,params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetRolloutGroupsQueryOptions = <TData = Awaited<ReturnType<typeof getRolloutGroups>>, TError = ExceptionInfo>(rolloutId: number,
     params?: GetRolloutGroupsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolloutGroups>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
@@ -1020,6 +1250,13 @@ export const getRolloutGroup = (
 
 
 
+export const getGetRolloutGroupInfiniteQueryKey = (rolloutId?: number,
+    groupId?: number,) => {
+    return [
+    'infinite', `/rest/v1/rollouts/${rolloutId}/deploygroups/${groupId}`
+    ] as const;
+    }
+
 export const getGetRolloutGroupQueryKey = (rolloutId?: number,
     groupId?: number,) => {
     return [
@@ -1028,6 +1265,78 @@ export const getGetRolloutGroupQueryKey = (rolloutId?: number,
     }
 
     
+export const getGetRolloutGroupInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroup>>>, TError = ExceptionInfo>(rolloutId: number,
+    groupId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroup>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRolloutGroupInfiniteQueryKey(rolloutId,groupId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRolloutGroup>>> = ({ signal }) => getRolloutGroup(rolloutId,groupId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(rolloutId && groupId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroup>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRolloutGroupInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getRolloutGroup>>>
+export type GetRolloutGroupInfiniteQueryError = ExceptionInfo
+
+
+export function useGetRolloutGroupInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroup>>>, TError = ExceptionInfo>(
+ rolloutId: number,
+    groupId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroup>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRolloutGroup>>,
+          TError,
+          Awaited<ReturnType<typeof getRolloutGroup>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutGroupInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroup>>>, TError = ExceptionInfo>(
+ rolloutId: number,
+    groupId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroup>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRolloutGroup>>,
+          TError,
+          Awaited<ReturnType<typeof getRolloutGroup>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutGroupInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroup>>>, TError = ExceptionInfo>(
+ rolloutId: number,
+    groupId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroup>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return single rollout group
+ */
+
+export function useGetRolloutGroupInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroup>>>, TError = ExceptionInfo>(
+ rolloutId: number,
+    groupId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroup>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetRolloutGroupInfiniteQueryOptions(rolloutId,groupId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetRolloutGroupQueryOptions = <TData = Awaited<ReturnType<typeof getRolloutGroup>>, TError = ExceptionInfo>(rolloutId: number,
     groupId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolloutGroup>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
@@ -1122,6 +1431,14 @@ export const getRolloutGroupTargets = (
 
 
 
+export const getGetRolloutGroupTargetsInfiniteQueryKey = (rolloutId?: number,
+    groupId?: number,
+    params?: GetRolloutGroupTargetsParams,) => {
+    return [
+    'infinite', `/rest/v1/rollouts/${rolloutId}/deploygroups/${groupId}/targets`, ...(params ? [params]: [])
+    ] as const;
+    }
+
 export const getGetRolloutGroupTargetsQueryKey = (rolloutId?: number,
     groupId?: number,
     params?: GetRolloutGroupTargetsParams,) => {
@@ -1131,6 +1448,83 @@ export const getGetRolloutGroupTargetsQueryKey = (rolloutId?: number,
     }
 
     
+export const getGetRolloutGroupTargetsInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroupTargets>>, GetRolloutGroupTargetsParams['offset']>, TError = ExceptionInfo>(rolloutId: number,
+    groupId: number,
+    params?: GetRolloutGroupTargetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroupTargets>>, TError, TData, QueryKey, GetRolloutGroupTargetsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRolloutGroupTargetsInfiniteQueryKey(rolloutId,groupId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRolloutGroupTargets>>, QueryKey, GetRolloutGroupTargetsParams['offset']> = ({ signal, pageParam }) => getRolloutGroupTargets(rolloutId,groupId,{...params, 'offset': pageParam || params?.['offset']}, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(rolloutId && groupId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroupTargets>>, TError, TData, QueryKey, GetRolloutGroupTargetsParams['offset']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRolloutGroupTargetsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getRolloutGroupTargets>>>
+export type GetRolloutGroupTargetsInfiniteQueryError = ExceptionInfo
+
+
+export function useGetRolloutGroupTargetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroupTargets>>, GetRolloutGroupTargetsParams['offset']>, TError = ExceptionInfo>(
+ rolloutId: number,
+    groupId: number,
+    params: undefined |  GetRolloutGroupTargetsParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroupTargets>>, TError, TData, QueryKey, GetRolloutGroupTargetsParams['offset']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRolloutGroupTargets>>,
+          TError,
+          Awaited<ReturnType<typeof getRolloutGroupTargets>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutGroupTargetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroupTargets>>, GetRolloutGroupTargetsParams['offset']>, TError = ExceptionInfo>(
+ rolloutId: number,
+    groupId: number,
+    params?: GetRolloutGroupTargetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroupTargets>>, TError, TData, QueryKey, GetRolloutGroupTargetsParams['offset']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRolloutGroupTargets>>,
+          TError,
+          Awaited<ReturnType<typeof getRolloutGroupTargets>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolloutGroupTargetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroupTargets>>, GetRolloutGroupTargetsParams['offset']>, TError = ExceptionInfo>(
+ rolloutId: number,
+    groupId: number,
+    params?: GetRolloutGroupTargetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroupTargets>>, TError, TData, QueryKey, GetRolloutGroupTargetsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Return all targets related to a specific rollout group
+ */
+
+export function useGetRolloutGroupTargetsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getRolloutGroupTargets>>, GetRolloutGroupTargetsParams['offset']>, TError = ExceptionInfo>(
+ rolloutId: number,
+    groupId: number,
+    params?: GetRolloutGroupTargetsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getRolloutGroupTargets>>, TError, TData, QueryKey, GetRolloutGroupTargetsParams['offset']>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetRolloutGroupTargetsInfiniteQueryOptions(rolloutId,groupId,params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getGetRolloutGroupTargetsQueryOptions = <TData = Awaited<ReturnType<typeof getRolloutGroupTargets>>, TError = ExceptionInfo>(rolloutId: number,
     groupId: number,
     params?: GetRolloutGroupTargetsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolloutGroupTargets>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}

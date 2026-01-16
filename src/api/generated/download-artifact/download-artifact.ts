@@ -7,16 +7,21 @@
  * OpenAPI spec version: v1
  */
 import {
+  useInfiniteQuery,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
@@ -48,6 +53,13 @@ export const downloadArtifact1 = (
 
 
 
+export const getDownloadArtifact1InfiniteQueryKey = (softwareModuleId?: number,
+    artifactId?: number,) => {
+    return [
+    'infinite', `/rest/v1/softwaremodules/${softwareModuleId}/artifacts/${artifactId}/download`
+    ] as const;
+    }
+
 export const getDownloadArtifact1QueryKey = (softwareModuleId?: number,
     artifactId?: number,) => {
     return [
@@ -56,6 +68,75 @@ export const getDownloadArtifact1QueryKey = (softwareModuleId?: number,
     }
 
     
+export const getDownloadArtifact1InfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof downloadArtifact1>>>, TError = unknown>(softwareModuleId: number,
+    artifactId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof downloadArtifact1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadArtifact1InfiniteQueryKey(softwareModuleId,artifactId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadArtifact1>>> = ({ signal }) => downloadArtifact1(softwareModuleId,artifactId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(softwareModuleId && artifactId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof downloadArtifact1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DownloadArtifact1InfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof downloadArtifact1>>>
+export type DownloadArtifact1InfiniteQueryError = unknown
+
+
+export function useDownloadArtifact1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof downloadArtifact1>>>, TError = unknown>(
+ softwareModuleId: number,
+    artifactId: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof downloadArtifact1>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadArtifact1>>,
+          TError,
+          Awaited<ReturnType<typeof downloadArtifact1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadArtifact1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof downloadArtifact1>>>, TError = unknown>(
+ softwareModuleId: number,
+    artifactId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof downloadArtifact1>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadArtifact1>>,
+          TError,
+          Awaited<ReturnType<typeof downloadArtifact1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadArtifact1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof downloadArtifact1>>>, TError = unknown>(
+ softwareModuleId: number,
+    artifactId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof downloadArtifact1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDownloadArtifact1Infinite<TData = InfiniteData<Awaited<ReturnType<typeof downloadArtifact1>>>, TError = unknown>(
+ softwareModuleId: number,
+    artifactId: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof downloadArtifact1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDownloadArtifact1InfiniteQueryOptions(softwareModuleId,artifactId,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const getDownloadArtifact1QueryOptions = <TData = Awaited<ReturnType<typeof downloadArtifact1>>, TError = unknown>(softwareModuleId: number,
     artifactId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadArtifact1>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
