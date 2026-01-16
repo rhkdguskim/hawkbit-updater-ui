@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -12,6 +12,7 @@ import type { MgmtDistributionSet, MgmtSoftwareModule, MgmtRolloutResponseBody, 
 
 import { isTargetOnline, isActionErrored, isActive } from '@/entities';
 import { COLORS } from '@/components/shared/OverviewStyles';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 dayjs.extend(relativeTime);
 
@@ -24,14 +25,19 @@ type CompletenessDatum = {
 
 export const useDashboardMetrics = () => {
     const { t } = useTranslation(['dashboard', 'common', 'distributions']);
+    const isVisible = usePageVisibility();
     const now = dayjs();
     const last24h = now.subtract(24, 'hour');
 
-    // Queries with differentiated polling intervals
+    // OPTIMIZED: Reduced limits and increased polling intervals for better performance
+    // Visibility-aware polling: stops when tab is not visible
     const { data: targetsData, isLoading: targetsLoading, refetch: refetchTargets, dataUpdatedAt } = useGetTargets(
-        { limit: 1000 },
+        { limit: 200 }, // Reduced from 1000 - sufficient for dashboard metrics
         {
-            query: { staleTime: 0, refetchInterval: 3000 },
+            query: {
+                staleTime: 10000, // 10s cache before refetch
+                refetchInterval: isVisible ? 15000 : false, // 15s polling, paused when hidden
+            },
             request: { skipGlobalError: true }
         }
     );
@@ -39,10 +45,11 @@ export const useDashboardMetrics = () => {
         { limit: 100 },
         {
             query: {
-                staleTime: 0,
+                staleTime: 5000, // 5s cache
                 refetchInterval: (query) => {
+                    if (!isVisible) return false; // Stop polling when tab hidden
                     const hasActive = query.state.data?.content?.some(a => isActive(a));
-                    return hasActive ? 1000 : 10000;
+                    return hasActive ? 3000 : 30000; // 3s when active, 30s when idle
                 }
             },
             request: { skipGlobalError: true }
@@ -52,12 +59,13 @@ export const useDashboardMetrics = () => {
         { limit: 100 },
         {
             query: {
-                staleTime: 0,
+                staleTime: 5000, // 5s cache
                 refetchInterval: (query) => {
+                    if (!isVisible) return false; // Stop polling when tab hidden
                     const hasActive = query.state.data?.content?.some(r =>
                         ['running', 'starting', 'creating', 'paused', 'waiting_for_approval', 'scheduled', 'ready'].includes(r.status?.toLowerCase() || '')
                     );
-                    return hasActive ? 1000 : 10000;
+                    return hasActive ? 3000 : 30000; // 3s when active, 30s when idle
                 }
             },
             request: { skipGlobalError: true }

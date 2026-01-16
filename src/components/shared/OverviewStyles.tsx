@@ -19,64 +19,64 @@ export const shimmer = keyframes`
     100% { background-position: 200% 0; }
 `;
 
-// Color Theme Definitions - Industrial Clean
-// Color Theme Definitions - Industrial Clean
+// Color Theme Definitions - Semiconductor + AI Style
+// Color Theme Definitions - Semiconductor + AI Style
 export const OVERVIEW_THEMES = {
     targets: {
-        gradient: 'linear-gradient(135deg, var(--ant-color-success) 0%, var(--ant-color-success-active) 100%)',
-        accentLight: 'rgba(16, 185, 129, 0.1)',
-        accentBorder: 'rgba(16, 185, 129, 0.3)',
-        iconBg: 'var(--ant-color-success)',
-        color: 'var(--ant-color-success)',
+        gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+        accentLight: 'rgba(34, 197, 94, 0.1)',
+        accentBorder: 'rgba(34, 197, 94, 0.25)',
+        iconBg: '#22c55e',
+        color: '#22c55e',
     },
     distributions: {
-        gradient: 'linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)',
-        accentLight: 'rgba(6, 182, 212, 0.1)', // Cyan tint
-        accentBorder: 'rgba(6, 182, 212, 0.3)',
+        gradient: 'linear-gradient(135deg, #00ffd5 0%, #0891b2 100%)',
+        accentLight: 'rgba(0, 255, 213, 0.1)',
+        accentBorder: 'rgba(0, 255, 213, 0.25)',
         iconBg: 'var(--ant-color-primary)',
         color: 'var(--ant-color-primary)',
     },
     actions: {
-        gradient: 'linear-gradient(135deg, var(--ant-color-info) 0%, var(--ant-color-info-active) 100%)',
-        accentLight: 'rgba(59, 130, 246, 0.1)',
-        accentBorder: 'rgba(59, 130, 246, 0.3)',
-        iconBg: 'var(--ant-color-info)',
-        color: 'var(--ant-color-info)',
+        gradient: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+        accentLight: 'rgba(168, 85, 247, 0.1)',
+        accentBorder: 'rgba(168, 85, 247, 0.25)',
+        iconBg: '#a855f7',
+        color: '#a855f7',
     },
     rollouts: {
-        gradient: 'linear-gradient(135deg, var(--ant-color-warning) 0%, var(--ant-color-warning-active) 100%)',
-        accentLight: 'rgba(245, 158, 11, 0.1)',
-        accentBorder: 'rgba(245, 158, 11, 0.3)',
-        iconBg: 'var(--ant-color-warning)',
-        color: 'var(--ant-color-warning)',
+        gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+        accentLight: 'rgba(249, 115, 22, 0.1)',
+        accentBorder: 'rgba(249, 115, 22, 0.25)',
+        iconBg: '#f97316',
+        color: '#f97316',
     },
     connectivity: {
-        gradient: 'linear-gradient(135deg, var(--ant-color-success) 0%, var(--ant-color-success-active) 100%)',
-        accentLight: 'rgba(16, 185, 129, 0.1)',
-        accentBorder: 'rgba(16, 185, 129, 0.3)',
-        iconBg: 'var(--ant-color-success)',
-        color: 'var(--ant-color-success)',
+        gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+        accentLight: 'rgba(34, 197, 94, 0.1)',
+        accentBorder: 'rgba(34, 197, 94, 0.25)',
+        iconBg: '#22c55e',
+        color: '#22c55e',
     },
     deployment: {
-        gradient: 'linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)',
-        accentLight: 'rgba(6, 182, 212, 0.1)',
-        accentBorder: 'rgba(6, 182, 212, 0.3)',
+        gradient: 'linear-gradient(135deg, #00ffd5 0%, #0891b2 100%)',
+        accentLight: 'rgba(0, 255, 213, 0.1)',
+        accentBorder: 'rgba(0, 255, 213, 0.25)',
         iconBg: 'var(--ant-color-primary)',
         color: 'var(--ant-color-primary)',
     },
     fragmentation: {
         gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
         accentLight: 'rgba(236, 72, 153, 0.1)',
-        accentBorder: 'rgba(236, 72, 153, 0.3)',
+        accentBorder: 'rgba(236, 72, 153, 0.25)',
         iconBg: '#ec4899',
         color: '#ec4899',
     },
     activity: {
-        gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
-        accentLight: 'rgba(6, 182, 212, 0.1)',
-        accentBorder: 'rgba(6, 182, 212, 0.3)',
-        iconBg: '#06b6d4',
-        color: '#06b6d4',
+        gradient: 'linear-gradient(135deg, #00ffd5 0%, #06b6d4 100%)',
+        accentLight: 'rgba(0, 255, 213, 0.1)',
+        accentBorder: 'rgba(0, 255, 213, 0.25)',
+        iconBg: '#00ffd5',
+        color: '#00ffd5',
     },
 };
 
@@ -432,31 +432,32 @@ export const ProgressBar = styled.div<{ $progress: number; $color?: string }>`
 
 export const COLORS = {
     // Update Status Colors
-    inSync: 'var(--ant-color-success)',
-    pending: 'var(--ant-color-info)',
-    error: 'var(--ant-color-error)',
-    unknown: 'var(--ant-color-text-quaternary)',
+    inSync: '#22c55e',
+    pending: '#a855f7',
+    error: '#ef4444',
+    unknown: '#64748b',
     // Connectivity Colors
-    online: 'var(--ant-color-success)',
-    offline: 'var(--ant-color-warning)',
+    online: '#22c55e',
+    offline: '#eab308',
     // General
-    success: 'var(--ant-color-success)',
-    running: 'var(--ant-color-info)',
-    finished: 'var(--ant-color-success)',
-    canceled: 'var(--ant-color-text-quaternary)',
+    success: '#22c55e',
+    running: '#a855f7',
+    finished: '#22c55e',
+    canceled: '#64748b',
     // Theme
-    targets: 'var(--ant-color-success)',
-    distributions: 'var(--ant-color-primary)',
-    actions: 'var(--ant-color-info)',
-    rollouts: 'var(--ant-color-warning)',
+    targets: '#22c55e',
+    distributions: '#00ffd5',
+    actions: '#a855f7',
+    rollouts: '#f97316',
+    // AI Chart Palette - Neon & Vibrant
     chartPalette: [
-        '#06b6d4', // Cyan (Primary)
-        '#10b981', // Emerald
-        '#f59e0b', // Amber
-        '#ef4444', // Red
-        '#3b82f6', // Blue
-        '#8b5cf6', // Violet
-        '#d946ef', // Fuchsia
+        '#00ffd5', // Neon Cyan (Primary)
+        '#22c55e', // Emerald
+        '#a855f7', // Violet
+        '#f97316', // Orange
+        '#eab308', // Yellow
+        '#ec4899', // Pink
+        '#06b6d4', // Cyan
         '#6366f1', // Indigo
     ],
 };

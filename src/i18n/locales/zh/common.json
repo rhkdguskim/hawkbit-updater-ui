@@ -5,10 +5,35 @@
     "nav": {
         "home": "首页",
         "dashboard": "仪表板",
-        "overview": "概览"
+        "overview": "概览",
+        "targets": "目标",
+        "targetList": "目标",
+        "viewList": "查看列表",
+        "targetTypes": "类型管理",
+        "bulkAssign": "批量分配",
+        "distributions": "分发",
+        "distributionSets": "分发集",
+        "softwareModules": "软件模块",
+        "dsTypes": "分发集类型管理",
+        "actions": "操作",
+        "rollouts": "发布",
+        "rolloutManagement": "发布管理",
+        "rolloutOverview": "概览",
+        "system": "系统",
+        "configuration": "配置",
+        "typeManagement": "类型管理",
+        "deployment": "部署",
+        "list": "列表",
+        "types": "类型",
+        "tags": "标签",
+        "tagsAndTypes": "标签和类型",
+        "typesAndTags": "类型和标签",
+        "targetTags": "目标标签",
+        "dsTags": "分发集标签",
+        "smTypes": "软件模块类型"
     },
     "search": {
-        "placeholderGlobal": "搜索目标、发布、分发集...",
+        "placeholderGlobal": "搜索目标、发布、分发集、标签、类型...",
         "startTyping": "输入以搜索...",
         "noResults": "未找到结果",
         "targets": "搜索目标...",
@@ -16,8 +41,9 @@
         "distributions": "搜索分发...",
         "actions": "搜索操作...",
         "enterQuery": "输入搜索词",
-        "description": "跨目标、发布和分发集搜索",
+        "description": "跨目标、发布、分发集、标签和类型搜索",
         "resultsFor": "搜索结果：",
+        "closeHint": "使用 {{key}} 关闭",
         "tabs": {
             "all": "所有结果"
         }

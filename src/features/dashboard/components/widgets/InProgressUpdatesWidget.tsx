@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 import { ListCard, IconBadge } from '../DashboardStyles';
 import { useCancelAction, useGetActionStatusList } from '@/api/generated/targets/targets';
-import { useGetAction1 } from '@/api/generated/actions/actions';
+// useGetAction1 removed - no longer needed after N+1 optimization
 import { useQueryClient } from '@tanstack/react-query';
 import type { MgmtTarget, MgmtAction, MgmtActionStatus } from '@/api/generated/model';
 import { Popover, List } from 'antd';
@@ -132,35 +132,38 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
     const { t } = useTranslation(['dashboard', 'common', 'actions']);
     const { language } = useLanguageStore();
     const queryClient = useQueryClient();
+    const [isHovered, setIsHovered] = useState(false);
 
-    // Polling for THE action to get latest detail status
-    const { data: actionData } = useGetAction1(item.action.id!, {
-        query: {
-            enabled: !!item.action.id,
-            refetchInterval: 2000,
-            staleTime: 0
-        }
-    });
+    // OPTIMIZED: Removed individual action polling (N+1 pattern)
+    // Parent component (useDashboardMetrics) already provides real-time action data
+    const currentAction = item.action;
 
-    const currentAction = actionData || item.action;
-
-    // Polling for action stats history - MUST be before any conditional returns
-    const { data: statusHistoryData } = useGetActionStatusList(
+    // OPTIMIZED: Status history only fetched on hover with 30s cache
+    // This dramatically reduces API calls since most items are never hovered
+    const { data: statusHistoryData, refetch: refetchHistory } = useGetActionStatusList(
         item.target.controllerId!,
         item.action.id!,
         {},
         {
             query: {
-                enabled: !!item.target.controllerId && !!item.action.id,
-                refetchInterval: 5000,
-                staleTime: 0
+                enabled: false, // Lazy fetch - triggered on hover
+                staleTime: 30000, // 30s cache - don't refetch if recently fetched
+                gcTime: 60000, // Keep in cache for 1 minute
             }
         }
     );
 
-    const statusHistory = statusHistoryData?.content || [];
+    // Fetch history on hover (lazy loading)
+    const handleMouseEnter = useCallback(() => {
+        setIsHovered(true);
+        refetchHistory();
+    }, [refetchHistory]);
 
-    // We check both the current action status AND the latest history entry
+    const handleMouseLeave = useCallback(() => {
+        setIsHovered(false);
+    }, []);
+
+    const statusHistory = statusHistoryData?.content || [];
 
     // Sort history to find the latest event by timestamp (descending)
     const sortedHistory = [...statusHistory].sort((a, b) => {
@@ -168,7 +171,6 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
         const tB = b.timestamp || b.reportedAt || 0;
         return dayjs(tB).valueOf() - dayjs(tA).valueOf();
     });
-    // to ensure consistency with the parent widget's count.
 
     const getDelayText = (startTime?: number): string => {
         if (!startTime || !currentTime) return t('inProgress.justNow');
@@ -271,6 +273,8 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
             <ActivityItem
                 onClick={() => handleItemClick(item)}
                 onKeyDown={handleKeyDown}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
                 role="button"
                 tabIndex={0}
                 aria-label={item.target.name || item.target.controllerId || ''}

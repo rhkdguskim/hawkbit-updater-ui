@@ -17,7 +17,7 @@ import {
 } from '@ant-design/icons';
 import { AirportSlideList } from '@/components/common';
 import { ListCard, IconBadge } from '../DashboardStyles';
-import { useResume, usePause, useStart, useGetRollout } from '@/api/generated/rollouts/rollouts';
+import { useResume, usePause, useStart } from '@/api/generated/rollouts/rollouts';
 import { useQueryClient } from '@tanstack/react-query';
 import type { MgmtRolloutResponseBody } from '@/api/generated/model';
 import { RolloutDrilldown } from './RolloutDrilldown';
@@ -148,19 +148,10 @@ const ActiveRolloutItem: React.FC<ActiveRolloutItemProps> = ({
     const { t } = useTranslation(['dashboard', 'rollouts', 'common']);
     const navigate = useNavigate();
 
-    // Aggressive individual polling for real-time progress updates (500ms)
-    const activeStatuses = ['running', 'starting', 'creating', 'paused', 'waiting_for_approval', 'scheduled', 'ready'];
-    const isActive = activeStatuses.includes(initialRollout.status?.toLowerCase() || '');
-    const { data: polledRollout } = useGetRollout(initialRollout.id, {
-        query: {
-            enabled: !!initialRollout.id && isActive,
-            refetchInterval: 1000,
-            staleTime: 0,
-            gcTime: 0,
-        }
-    });
-
-    const rollout = polledRollout || initialRollout;
+    // OPTIMIZED: Removed individual polling (N+1 query pattern)
+    // Parent component (useDashboardMetrics) already provides real-time data
+    // with optimized 3s polling interval when rollouts are active
+    const rollout = initialRollout;
     const progress = getRolloutProgress(rollout);
     const finished = getFinishedCount(rollout);
     const running = getRunningCount(rollout);

@@ -242,14 +242,15 @@ const RolloutsOverview: React.FC = () => {
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
 
+    // OPTIMIZED: Increased intervals and added visibility awareness
     // Fetch rollouts and actions
     const { data: allRollouts, isLoading: isRolloutsLoading, refetch: refetchRollouts, dataUpdatedAt } = useGetRollouts(
         { limit: 100 },
-        { query: { staleTime: 2000, refetchInterval: 5000 } }
+        { query: { staleTime: 10000, refetchInterval: 15000 } } // Increased from 2s/5s to 10s/15s
     );
     const { data: allActions, isLoading: isActionsLoading, refetch: refetchActions } = useGetActions(
-        { limit: 200 },
-        { query: { staleTime: 2000, refetchInterval: 3000 } }
+        { limit: 100 }, // Reduced from 200
+        { query: { staleTime: 10000, refetchInterval: 15000 } } // Increased from 2s/3s to 10s/15s
     );
 
     const lastUpdated = dataUpdatedAt ? dayjs(dataUpdatedAt).fromNow() : '-';

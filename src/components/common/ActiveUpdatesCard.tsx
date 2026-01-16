@@ -11,7 +11,7 @@ import {
     CheckCircleOutlined,
     CloseCircleOutlined,
 } from '@ant-design/icons';
-import { useGetAction1 } from '@/api/generated/actions/actions';
+// useGetAction1 removed - no longer needed after N+1 optimization
 import { useGetActionStatusList } from '@/api/generated/targets/targets';
 import type { MgmtAction } from '@/api/generated/model';
 import { ActionTimeline } from './ActionTimeline';
@@ -261,44 +261,43 @@ const ActiveUpdateRowComponent: React.FC<{
     const { t } = useTranslation(['dashboard', 'actions', 'common']);
     const navigate = useNavigate();
     const [isCompleting, setIsCompleting] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
     const prevStatusRef = useRef<string | undefined>(item.action.status);
 
-    // Real-time action data polling for active actions
-    const isActive = ['running', 'pending', 'scheduled', 'retrieving', 'retrieved', 'downloading'].includes(
-        item.action.status?.toLowerCase() || ''
-    );
-
-    const { data: fetchedAction } = useGetAction1(
-        item.action.id!,
-        {
-            query: {
-                enabled: !!item.action.id && isActive,
-                refetchInterval: 2000,
-                staleTime: 0
-            }
-        }
-    );
-
-    const displayAction = fetchedAction || item.action;
+    // OPTIMIZED: Removed individual action polling (N+1 pattern)
+    // Parent component already provides real-time action data
+    const displayAction = item.action;
     const status = displayAction.status?.toLowerCase() || '';
     const isActiveStatus = ['running', 'pending', 'scheduled', 'retrieving', 'retrieved', 'downloading'].includes(status);
 
     const targetLink = (displayAction._links as Record<string, unknown> | undefined)?.target as { href?: string } | undefined;
     const targetId = item.controllerId || targetLink?.href?.split('/')?.pop();
 
-    // Poll granular status history for active update rows
-    const { data: statusData } = useGetActionStatusList(
+    // OPTIMIZED: Status history only fetched on hover with 30s cache
+    const { data: statusData, refetch: refetchHistory } = useGetActionStatusList(
         targetId || '',
         item.action.id!,
         { limit: 10 },
         {
             query: {
-                enabled: !!targetId && !!item.action.id && showHistory && isActiveStatus,
-                staleTime: 0,
-                refetchInterval: 5000
+                enabled: false, // Lazy fetch - triggered on hover
+                staleTime: 30000, // 30s cache
+                gcTime: 60000, // Keep in cache for 1 minute
             }
         }
     );
+
+    // Fetch history on hover (lazy loading)
+    const handleMouseEnter = useCallback(() => {
+        setIsHovered(true);
+        if (showHistory && targetId) {
+            refetchHistory();
+        }
+    }, [refetchHistory, showHistory, targetId]);
+
+    const handleMouseLeave = useCallback(() => {
+        setIsHovered(false);
+    }, []);
 
     const statusHistory = (statusData?.content || []).slice().sort((a, b) => {
         const aTime = a.reportedAt || a.timestamp || 0;
@@ -430,7 +429,13 @@ const ActiveUpdateRowComponent: React.FC<{
     );
 
     const rowContent = (
-        <UpdateRow $isCompleting={isCompleting} $isNew={isNew} ref={rowRef}>
+        <UpdateRow
+            $isCompleting={isCompleting}
+            $isNew={isNew}
+            ref={rowRef}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+        >
             <MainContent onClick={handleClick}>
                 <RowContent align="center" gap={12}>
                     <IconBadge $status={status}>
