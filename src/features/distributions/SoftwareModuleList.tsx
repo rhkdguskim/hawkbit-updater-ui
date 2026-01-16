@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { Tag, Tooltip, Space, Button, Typography, Flex } from 'antd';
+import { Tag, Tooltip, Space, Button, Typography } from 'antd';
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
-import { EditableCell, Highlighter } from '@/components/common';
+import { EditableCell, Highlighter, ListSummary } from '@/components/common';
 import type { MgmtSoftwareModule } from '@/api/generated/model';
 import CreateModuleWizard from './components/CreateModuleWizard';
 import dayjs from 'dayjs';
@@ -71,7 +71,11 @@ const SoftwareModuleList: React.FC = () => {
             dataIndex: 'typeName',
             key: 'typeName',
             width: 120,
-            render: (text) => <Tag color="blue">{text || t('common:notSelected')}</Tag>,
+            render: (text) => (
+                <Tag color="blue">
+                    <Highlighter text={text || t('common:notSelected')} search={model.globalSearch} />
+                </Tag>
+            ),
         },
         {
             title: t('list.columns.vendor'),
@@ -165,6 +169,16 @@ const SoftwareModuleList: React.FC = () => {
         { key: 'lastModifiedAt', label: t('list.columns.lastModified'), defaultVisible: true },
     ], [t]);
 
+    const summary = useMemo(() => (
+        <ListSummary
+            loaded={model.data.length}
+            total={model.totalCount}
+            filtersCount={model.filters.length}
+            updatedAt={model.dataUpdatedAt}
+            isFetching={model.isFetching}
+        />
+    ), [model.data.length, model.totalCount, model.filters.length, model.dataUpdatedAt, model.isFetching]);
+
     return (
         <StandardListLayout
             title={t('moduleList.title')}
@@ -179,8 +193,10 @@ const SoftwareModuleList: React.FC = () => {
                     canAdd={isAdmin}
                     addLabel={t('actions.createModule')}
                     loading={model.isLoading || model.isFetching}
+                    extra={summary}
                     searchValue={model.globalSearch}
                     onSearchChange={model.setGlobalSearch}
+                    searchPlaceholder={t('list.searchPlaceholder', { field: t('modules.title') })}
                     // Integrated Column Customization
                     columns={columnOptions}
                     visibleColumns={model.visibleColumns}

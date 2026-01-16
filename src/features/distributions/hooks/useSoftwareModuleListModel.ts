@@ -7,12 +7,12 @@ import {
     useGetSoftwareModulesInfinite,
     useDeleteSoftwareModule,
     useUpdateSoftwareModule,
-    getGetSoftwareModulesQueryKey,
+    getGetSoftwareModulesInfiniteQueryKey,
 } from '@/api/generated/software-modules/software-modules';
 import type { MgmtSoftwareModule, PagedListMgmtSoftwareModule, ExceptionInfo } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useServerTable } from '@/hooks/useServerTable';
-import { buildQueryFromFilterValues } from '@/utils/fiql';
+import { buildQueryFromFilterValues, buildWildcardSearch } from '@/utils/fiql';
 import type { FilterValue, FilterField } from '@/components/patterns';
 import { useListFilterStore } from '@/stores/useListFilterStore';
 
@@ -69,12 +69,12 @@ export const useSoftwareModuleListModel = () => {
      * Build RSQL query from filters.
      */
     const buildFinalQuery = useCallback(() => {
-        const fiql = buildQueryFromFilterValues(filters.filter(f => f.field !== 'typeName'));
+        const fiql = buildQueryFromFilterValues(filters);
 
         if (debouncedGlobalSearch) {
             const searchFields = ['name', 'version', 'description', 'vendor'];
             const searchQuery = searchFields
-                .map(field => `${field}==*${debouncedGlobalSearch}*`)
+                .map(field => buildWildcardSearch(field, debouncedGlobalSearch))
                 .join(',');
 
             return fiql ? `(${fiql});(${searchQuery})` : `(${searchQuery})`;
@@ -82,12 +82,6 @@ export const useSoftwareModuleListModel = () => {
 
         return fiql;
     }, [filters, debouncedGlobalSearch]);
-
-    // Get typeName filter value for client-side filtering
-    const typeNameFilter = useMemo(() => {
-        const filter = filters.find(f => f.field === 'typeName');
-        return filter?.value as string | undefined;
-    }, [filters]);
 
     const {
         data: infiniteData,
@@ -98,6 +92,7 @@ export const useSoftwareModuleListModel = () => {
         isFetching,
         error,
         refetch,
+        dataUpdatedAt,
     } = useGetSoftwareModulesInfinite(
         {
             limit: pagination.pageSize,
@@ -114,6 +109,7 @@ export const useSoftwareModuleListModel = () => {
                 initialPageParam: 0,
                 refetchOnWindowFocus: false,
                 refetchOnReconnect: false,
+                staleTime: 30000,
             },
         }
     );
@@ -122,12 +118,8 @@ export const useSoftwareModuleListModel = () => {
      * Flatten pages and apply client-side typeName filter (if active).
      */
     const dataContent = useMemo(() => {
-        const allItems = infiniteData?.pages.flatMap((page: PagedListMgmtSoftwareModule) => page.content || []) || [];
-
-        if (!typeNameFilter) return allItems;
-
-        return allItems.filter(sm => sm.typeName === typeNameFilter);
-    }, [infiniteData, typeNameFilter]);
+        return infiniteData?.pages.flatMap((page: PagedListMgmtSoftwareModule) => page.content || []) || [];
+    }, [infiniteData]);
 
     const totalCount = useMemo(() => {
         return infiniteData?.pages[0]?.total || 0;
@@ -137,8 +129,7 @@ export const useSoftwareModuleListModel = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('messages.deleteModuleSuccess'));
-                queryClient.invalidateQueries({ queryKey: getGetSoftwareModulesQueryKey() });
-                refetch();
+                queryClient.invalidateQueries({ queryKey: getGetSoftwareModulesInfiniteQueryKey() });
             },
             onError: (err: ExceptionInfo) => {
                 message.error((err as Error).message || t('messages.deleteModuleError'));
@@ -186,8 +177,7 @@ export const useSoftwareModuleListModel = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('messages.updateSuccess'));
-                queryClient.invalidateQueries({ queryKey: getGetSoftwareModulesQueryKey() });
-                refetch();
+                queryClient.invalidateQueries({ queryKey: getGetSoftwareModulesInfiniteQueryKey() });
             },
             onError: (err: ExceptionInfo) => {
                 message.error((err as Error).message || t('common:messages.error'));
@@ -235,6 +225,7 @@ export const useSoftwareModuleListModel = () => {
         isFetching,
         error,
         refetch,
+        dataUpdatedAt,
 
         // Modal States
         isCreateModalVisible,

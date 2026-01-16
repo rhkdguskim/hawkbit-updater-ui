@@ -6,6 +6,7 @@ import {
     useDeleteDistributionSetTag,
     useCreateDistributionSetTags,
     useUpdateDistributionSetTag,
+    getGetDistributionSetTagsInfiniteQueryKey,
 } from '@/api/generated/distribution-set-tags/distribution-set-tags';
 import type { MgmtTag, PagedListMgmtTag } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -17,6 +18,8 @@ import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createTagNameColumn, createDateColumn } from '@/utils/columnFactory';
 import { useListFilterStore } from '@/stores/useListFilterStore';
 import { useServerTable } from '@/hooks/useServerTable';
+import { ListSummary } from '@/components/common';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface DistributionSetTagListProps {
     standalone?: boolean;
@@ -26,6 +29,7 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
     const { t } = useTranslation(['distributions', 'common']);
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
+    const queryClient = useQueryClient();
 
     // List Filter Store Integration
     const {
@@ -60,7 +64,8 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
         isFetchingNextPage,
         isLoading,
         isFetching,
-        refetch
+        refetch,
+        dataUpdatedAt,
     } = useGetDistributionSetTagsInfinite({
         limit: pagination.pageSize,
         sort: sort || undefined,
@@ -72,12 +77,16 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
                 return currentOffset < total ? currentOffset : undefined;
             },
             initialPageParam: 0,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+            staleTime: 30000,
         }
     });
 
     const tagsContent = useMemo(() => {
         return infiniteData?.pages.flatMap((page: PagedListMgmtTag) => page.content || []) || [];
     }, [infiniteData]);
+    const totalCount = useMemo(() => infiniteData?.pages[0]?.total || 0, [infiniteData]);
 
     // Filter fields
     const filterFields: FilterField[] = useMemo(() => [
@@ -94,7 +103,7 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
         mutation: {
             onSuccess: () => {
                 message.success(t('tagManagement.deleteSuccess'));
-                refetch();
+                queryClient.invalidateQueries({ queryKey: getGetDistributionSetTagsInfiniteQueryKey() });
             },
             onError: (error) => {
                 message.error((error as Error).message || t('tagManagement.deleteError'));
@@ -128,7 +137,7 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
             onSuccess: () => {
                 message.success(t('tagManagement.createSuccess'));
                 handleDialogClose();
-                refetch();
+                queryClient.invalidateQueries({ queryKey: getGetDistributionSetTagsInfiniteQueryKey() });
             },
             onError: (error) => {
                 message.error((error as Error).message || t('tagManagement.createError'));
@@ -141,7 +150,7 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
             onSuccess: () => {
                 message.success(t('tagManagement.updateSuccess'));
                 handleDialogClose();
-                refetch();
+                queryClient.invalidateQueries({ queryKey: getGetDistributionSetTagsInfiniteQueryKey() });
             },
             onError: (error) => {
                 message.error((error as Error).message || t('tagManagement.updateError'));
@@ -214,26 +223,40 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
         { key: 'lastModifiedAt', label: t('common:table.lastModified'), defaultVisible: true },
     ], [t]);
 
+    const summary = useMemo(() => (
+        <ListSummary
+            loaded={tagsContent.length}
+            total={totalCount}
+            filtersCount={filters.length}
+            updatedAt={dataUpdatedAt}
+            isFetching={isFetching}
+        />
+    ), [tagsContent.length, totalCount, filters.length, dataUpdatedAt, isFetching]);
+
+    const searchBar = (
+        <FilterBuilder
+            fields={filterFields}
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onRefresh={() => refetch()}
+            onAdd={isAdmin ? () => {
+                setEditingTag(null);
+                setDialogOpen(true);
+            } : undefined}
+            canAdd={isAdmin}
+            addLabel={t('tagManagement.addTag')}
+            loading={isLoading || isFetching}
+            extra={summary}
+            columns={columnOptions}
+            visibleColumns={visibleColumns}
+            onVisibilityChange={setVisibleColumns}
+            searchPlaceholder={t('list.searchPlaceholder', { defaultValue: t('common:actions.search') })}
+        />
+    );
+
     const listContent = (
         <>
-            <div style={{ marginBottom: 16 }}>
-                <FilterBuilder
-                    fields={filterFields}
-                    filters={filters}
-                    onFiltersChange={handleFiltersChange}
-                    onRefresh={() => refetch()}
-                    onAdd={isAdmin ? () => {
-                        setEditingTag(null);
-                        setDialogOpen(true);
-                    } : undefined}
-                    canAdd={isAdmin}
-                    addLabel={t('tagManagement.addTag')}
-                    loading={isLoading || isFetching}
-                    columns={columnOptions}
-                    visibleColumns={visibleColumns}
-                    onVisibilityChange={setVisibleColumns}
-                />
-            </div>
+            {!standalone && <div style={{ marginBottom: 16 }}>{searchBar}</div>}
             <DataView
                 loading={isLoading}
                 error={null}
@@ -288,6 +311,7 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
         <StandardListLayout
             title={t('tagManagement.title')}
             description={t('tagManagement.description', { defaultValue: 'Manage distribution set tags' })}
+            searchBar={searchBar}
         >
             {listContent}
         </StandardListLayout>

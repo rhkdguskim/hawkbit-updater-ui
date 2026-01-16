@@ -1,6 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
 import { Tag, message, Modal } from 'antd';
-import type { TableProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
     useGetDistributionSetTypesInfinite,
@@ -16,6 +15,7 @@ import DistributionSetTypeDialog from './DistributionSetTypeDialog';
 import { createActionsColumn, createIdColumn, createDescriptionColumn, createColorColumn, createDateColumn, createColoredNameColumn } from '@/utils/columnFactory';
 import { useListFilterStore } from '@/stores/useListFilterStore';
 import { useServerTable } from '@/hooks/useServerTable';
+import { ListSummary } from '@/components/common';
 
 interface DistributionSetTypeListProps {
     standalone?: boolean;
@@ -59,7 +59,8 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
         isFetchingNextPage,
         isLoading,
         isFetching,
-        refetch
+        refetch,
+        dataUpdatedAt,
     } = useGetDistributionSetTypesInfinite(
         {
             limit: pagination.pageSize,
@@ -75,6 +76,7 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
                 initialPageParam: 0,
                 refetchOnWindowFocus: false,
                 refetchOnReconnect: false,
+                staleTime: 30000,
             },
         }
     );
@@ -82,6 +84,7 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
     const typesContent = useMemo(() => {
         return infiniteData?.pages.flatMap((page: PagedListMgmtDistributionSetType) => page.content || []) || [];
     }, [infiniteData]);
+    const totalCount = useMemo(() => infiniteData?.pages[0]?.total || 0, [infiniteData]);
 
     // Filter fields
     const filterFields: FilterField[] = useMemo(() => [
@@ -197,24 +200,40 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
         { key: 'lastModifiedAt', label: t('common:table.lastModified'), defaultVisible: true },
     ], [t]);
 
+    const summary = useMemo(() => (
+        <ListSummary
+            loaded={typesContent.length}
+            total={totalCount}
+            filtersCount={filters.length}
+            updatedAt={dataUpdatedAt}
+            isFetching={isFetching}
+        />
+    ), [typesContent.length, totalCount, filters.length, dataUpdatedAt, isFetching]);
+
+    const searchBar = (
+        <FilterBuilder
+            fields={filterFields}
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onRefresh={() => refetch()}
+            onAdd={isAdmin ? () => {
+                setEditingType(null);
+                setDialogOpen(true);
+            } : undefined}
+            canAdd={isAdmin}
+            addLabel={t('typeManagement.addType')}
+            loading={isLoading || isFetching}
+            extra={summary}
+            columns={columnOptions}
+            visibleColumns={visibleColumns}
+            onVisibilityChange={setVisibleColumns}
+            searchPlaceholder={t('list.searchPlaceholder', { defaultValue: t('common:actions.search') })}
+        />
+    );
+
     const listContent = (
         <>
-            <FilterBuilder
-                fields={filterFields}
-                filters={filters}
-                onFiltersChange={handleFiltersChange}
-                onRefresh={() => refetch()}
-                onAdd={isAdmin ? () => {
-                    setEditingType(null);
-                    setDialogOpen(true);
-                } : undefined}
-                canAdd={isAdmin}
-                addLabel={t('typeManagement.addType')}
-                loading={isLoading || isFetching}
-                columns={columnOptions}
-                visibleColumns={visibleColumns}
-                onVisibilityChange={setVisibleColumns}
-            />
+            {!standalone && <div style={{ marginBottom: 16 }}>{searchBar}</div>}
             <DataView
                 loading={isLoading}
                 error={null}
@@ -252,6 +271,7 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
         <StandardListLayout
             title={t('typeManagement.dsTypeTitle')}
             description={t('typeManagement.dsTypeDescription', { defaultValue: 'Manage distribution set types' })}
+            searchBar={searchBar}
         >
             {listContent}
         </StandardListLayout>

@@ -41,7 +41,7 @@ export const DashboardSurface = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: clamp(12px, 1.4vw, 16px);
+    gap: clamp(8px, 1vw, 12px);
     min-height: 100%;
     flex: 1;
     isolation: isolate;
@@ -72,11 +72,26 @@ export const DashboardSurface = styled.div`
         box-shadow: var(--shadow-md);
         border-color: var(--ant-color-primary);
     }
+
+    .dashboard-clickable {
+        cursor: pointer;
+        transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+    }
+
+    .dashboard-clickable:focus-visible {
+        outline: 2px solid var(--ant-color-primary);
+        outline-offset: 2px;
+    }
+
+    .dashboard-clickable[data-disabled='true'] {
+        cursor: default;
+        opacity: 0.7;
+    }
  `;
 
 export const DashboardScrollContent = styled(BaseScrollContent)`
-    gap: clamp(12px, 1.4vw, 16px);
-    padding: var(--ant-padding-sm, 12px);
+    gap: clamp(8px, 1vw, 12px);
+    padding: 8px;
 `;
 
 // Dashboard Specific Layouts

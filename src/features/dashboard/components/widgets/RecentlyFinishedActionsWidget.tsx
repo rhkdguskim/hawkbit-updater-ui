@@ -171,9 +171,24 @@ const FinishedActionItem: React.FC<FinishedActionItemProps> = ({ item }) => {
         }
     };
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handleClick();
+        }
+    };
+
     return (
         <Popover content={historyContent} trigger="hover" placement="left">
-            <ActionCard $status={cardStatus} onClick={handleClick}>
+            <ActionCard
+                $status={cardStatus}
+                onClick={handleClick}
+                onKeyDown={handleKeyDown}
+                role="button"
+                tabIndex={0}
+                aria-label={item.target.name || item.target.controllerId || ''}
+                className="dashboard-clickable"
+            >
                 <TargetInfo align="center" gap={12}>
                     <AimOutlined style={{
                         fontSize: 16,

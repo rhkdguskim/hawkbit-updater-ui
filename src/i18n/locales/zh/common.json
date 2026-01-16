@@ -5,31 +5,22 @@
     "nav": {
         "home": "首页",
         "dashboard": "仪表板",
-        "targets": "目标",
-        "targetList": "目标列表",
-        "viewList": "列表视图",
-        "targetTags": "标签管理",
-        "targetTypes": "类型管理",
-        "bulkAssign": "批量分配",
-        "distributions": "分发",
-        "distributionSets": "分发集",
-        "softwareModules": "软件模块",
-        "dsTypes": "分发集类型管理",
-        "smTypes": "模块类型管理",
-        "actions": "操作",
-        "rollouts": "发布",
-        "rolloutManagement": "发布管理",
-        "rolloutOverview": "概览",
-        "system": "系统",
-        "configuration": "配置",
-        "typeManagement": "类型管理",
-        "deployment": "部署",
-        "list": "列表",
-        "types": "类型",
-        "tags": "标签",
-        "tagsAndTypes": "标签与类型",
-        "typesAndTags": "类型与标签",
         "overview": "概览"
+    },
+    "search": {
+        "placeholderGlobal": "搜索目标、发布、分发集...",
+        "startTyping": "输入以搜索...",
+        "noResults": "未找到结果",
+        "targets": "搜索目标...",
+        "rollouts": "搜索发布...",
+        "distributions": "搜索分发...",
+        "actions": "搜索操作...",
+        "enterQuery": "输入搜索词",
+        "description": "跨目标、发布和分发集搜索",
+        "resultsFor": "搜索结果：",
+        "tabs": {
+            "all": "所有结果"
+        }
     },
     "status": {
         "online": "在线",
@@ -111,7 +102,8 @@
         "settings": "设置",
         "more": "更多",
         "filter": "筛选",
-        "clear": "清除"
+        "clear": "清除",
+        "results": "结果"
     },
     "messages": {
         "success": "操作成功完成。",

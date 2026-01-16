@@ -1,6 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
 import { Tag, message, Modal } from 'antd';
-import type { TableProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
     useGetTypesInfinite,
@@ -17,6 +16,7 @@ import { createActionsColumn, createIdColumn, createDescriptionColumn, createCol
 import { SmallText } from '@/components/shared/Typography';
 import { useListFilterStore } from '@/stores/useListFilterStore';
 import { useServerTable } from '@/hooks/useServerTable';
+import { ListSummary } from '@/components/common';
 
 interface SoftwareModuleTypeListProps {
     standalone?: boolean;
@@ -60,7 +60,8 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
         isFetchingNextPage,
         isLoading,
         isFetching,
-        refetch
+        refetch,
+        dataUpdatedAt,
     } = useGetTypesInfinite(
         {
             limit: pagination.pageSize,
@@ -76,6 +77,7 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
                 initialPageParam: 0,
                 refetchOnWindowFocus: false,
                 refetchOnReconnect: false,
+                staleTime: 30000,
             },
         }
     );
@@ -83,6 +85,7 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
     const typesContent = useMemo(() => {
         return infiniteData?.pages.flatMap((page: PagedListMgmtSoftwareModuleType) => page.content || []) || [];
     }, [infiniteData]);
+    const totalCount = useMemo(() => infiniteData?.pages[0]?.total || 0, [infiniteData]);
 
     // Filter fields
     const filterFields: FilterField[] = useMemo(() => [
@@ -207,24 +210,40 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
         { key: 'lastModifiedAt', label: t('common:table.lastModified'), defaultVisible: true },
     ], [t]);
 
+    const summary = useMemo(() => (
+        <ListSummary
+            loaded={typesContent.length}
+            total={totalCount}
+            filtersCount={filters.length}
+            updatedAt={dataUpdatedAt}
+            isFetching={isFetching}
+        />
+    ), [typesContent.length, totalCount, filters.length, dataUpdatedAt, isFetching]);
+
+    const searchBar = (
+        <FilterBuilder
+            fields={filterFields}
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onRefresh={() => refetch()}
+            onAdd={isAdmin ? () => {
+                setEditingType(null);
+                setDialogOpen(true);
+            } : undefined}
+            canAdd={isAdmin}
+            addLabel={t('typeManagement.addType')}
+            loading={isLoading || isFetching}
+            extra={summary}
+            columns={columnOptions}
+            visibleColumns={visibleColumns}
+            onVisibilityChange={setVisibleColumns}
+            searchPlaceholder={t('list.searchPlaceholder', { defaultValue: t('common:actions.search') })}
+        />
+    );
+
     const listContent = (
         <>
-            <FilterBuilder
-                fields={filterFields}
-                filters={filters}
-                onFiltersChange={handleFiltersChange}
-                onRefresh={() => refetch()}
-                onAdd={isAdmin ? () => {
-                    setEditingType(null);
-                    setDialogOpen(true);
-                } : undefined}
-                canAdd={isAdmin}
-                addLabel={t('typeManagement.addType')}
-                loading={isLoading || isFetching}
-                columns={columnOptions}
-                visibleColumns={visibleColumns}
-                onVisibilityChange={setVisibleColumns}
-            />
+            {!standalone && <div style={{ marginBottom: 16 }}>{searchBar}</div>}
             <DataView
                 loading={isLoading}
                 error={null}
@@ -262,6 +281,7 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
         <StandardListLayout
             title={t('typeManagement.smTypeTitle')}
             description={t('typeManagement.smTypeDescription', { defaultValue: 'Manage software module types' })}
+            searchBar={searchBar}
         >
             {listContent}
         </StandardListLayout>

@@ -31,6 +31,22 @@
         "typesAndTags": "유형 & 태그",
         "overview": "개요"
     },
+    "search": {
+        "placeholderGlobal": "타겟, 롤아웃, 배포 세트 검색...",
+        "startTyping": "검색어를 입력하세요...",
+        "noResults": "검색 결과가 없습니다",
+        "targets": "타겟 검색...",
+        "rollouts": "롤아웃 검색...",
+        "distributions": "배포 관리 검색...",
+        "actions": "액션 검색...",
+        "enterQuery": "검색어를 입력하세요",
+        "description": "타겟, 롤아웃, 배포 세트 전체 검색",
+        "resultsFor": "검색 결과:",
+        "closeHint": "{{key}} 키를 눌러 닫기",
+        "tabs": {
+            "all": "전체 결과"
+        }
+    },
     "status": {
         "online": "온라인",
         "offline": "오프라인",
@@ -113,7 +129,8 @@
         "settings": "설정",
         "more": "더 보기",
         "filter": "필터",
-        "clear": "초기화"
+        "clear": "초기화",
+        "results": "결과"
     },
     "messages": {
         "success": "성공적으로 처리되었습니다.",
@@ -131,7 +148,15 @@
         "created": "생성됨",
         "updated": "수정됨",
         "networkError": "네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
-        "sessionExpired": "세션이 만료되었습니다. 다시 로그인해주세요."
+        "sessionExpired": "세션이 만료되었습니다. 다시 로그인해주세요.",
+        "noMoreData": "더 이상 데이터가 없습니다."
+    },
+    "list": {
+        "summary": {
+            "loaded": "불러옴 {{loaded}} / {{total}}",
+            "filters": "필터 {{count}}개",
+            "updated": "업데이트 {{time}}"
+        }
     },
     "apiErrors": {
         "ENTITY_NOT_FOUND": "요청하신 항목을 찾을 수 없습니다.",

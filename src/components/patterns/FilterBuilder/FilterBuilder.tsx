@@ -90,6 +90,7 @@ export interface FilterBuilderProps {
     searchValue?: string;
     onSearchChange?: (value: string) => void;
     searchPlaceholder?: string;
+    hideSearchInput?: boolean;
 
     // Selection integration
     selection?: SelectionInfo;
@@ -115,6 +116,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     searchValue,
     onSearchChange,
     searchPlaceholder,
+    hideSearchInput = false,
 }) => {
     const { t } = useTranslation('common');
     const { t: tActions } = useTranslation('common'); // Or just use t since it's already common
@@ -214,19 +216,25 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                         />
                     )}
 
-                    <Input
-                        placeholder={searchPlaceholder || t('actions.search')}
-                        prefix={<SearchOutlined style={{ color: 'var(--ant-color-text-description)' }} />}
-                        size="small"
-                        allowClear
-                        value={searchValue}
-                        onChange={(e) => onSearchChange?.(e.target.value)}
-                        style={{ width: 220, borderRadius: 6 }}
-                    />
+
+                    {!hideSearchInput && (
+                        <Input
+                            placeholder={searchPlaceholder || t('actions.search')}
+                            prefix={<SearchOutlined style={{ color: 'var(--ant-color-text-description)' }} />}
+                            size="small"
+                            allowClear
+                            value={searchValue}
+                            onChange={(e) => onSearchChange?.(e.target.value)}
+                            style={{ width: 220, borderRadius: 6 }}
+                        />
+                    )}
+
+                    {!hideSearchInput && filters.length > 0 && (
+                        <Divider type="vertical" style={{ height: 20 }} />
+                    )}
 
                     {filters.length > 0 && (
                         <>
-                            <Divider type="vertical" style={{ height: 20 }} />
                             <ChipsContainer>
                                 {filters.map((filter) => (
                                     <FilterChip

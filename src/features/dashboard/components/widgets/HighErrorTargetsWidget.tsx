@@ -39,6 +39,16 @@ export const HighErrorTargetsWidget: React.FC<HighErrorTargetsWidgetProps> = ({ 
                         <List.Item
                             style={{ padding: '8px 4px', cursor: 'pointer' }}
                             onClick={() => navigate(`/targets/${item.id}`)}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault();
+                                    navigate(`/targets/${item.id}`);
+                                }
+                            }}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={item.name}
+                            className="dashboard-clickable"
                             extra={
                                 <Flex align="center" gap={8}>
                                     <Tag color="error" style={{ margin: 0, borderRadius: 10, fontFamily: 'var(--font-mono)' }}>

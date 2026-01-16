@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TagOutlined, AppstoreOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
-import { Space, message } from 'antd';
+import { message } from 'antd';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import {
     DeleteTargetModal,
@@ -17,6 +17,7 @@ import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction } from '@/co
 import { useTargetListModel } from './hooks/useTargetListModel';
 import { getTargetColumns } from './config/targetListConfig';
 import type { MgmtTarget } from '@/api/generated/model';
+import { ListSummary } from '@/components/common';
 
 
 const TargetList: React.FC = () => {
@@ -93,6 +94,16 @@ const TargetList: React.FC = () => {
         searchTerm: model.globalSearch,
     }), [t, isAdmin, model.availableTypes, model.availableTags, model.visibleColumns, handleViewDetail, model.globalSearch, model.handleDeleteClick]);
 
+    const summary = useMemo(() => (
+        <ListSummary
+            loaded={model.targetsData.length}
+            total={model.totalTargets}
+            filtersCount={model.filters.length}
+            updatedAt={model.targetsUpdatedAt}
+            isFetching={model.targetsFetching}
+        />
+    ), [model.targetsData.length, model.totalTargets, model.filters.length, model.targetsUpdatedAt, model.targetsFetching]);
+
     return (
         <StandardListLayout
             title={t('list.title')}
@@ -106,8 +117,10 @@ const TargetList: React.FC = () => {
                     onAdd={isAdmin ? model.handleAddTarget : undefined}
                     addLabel={t('actions.addTarget')}
                     loading={model.targetsLoading || model.targetsFetching}
+                    extra={summary}
                     searchValue={model.globalSearch}
                     onSearchChange={model.setGlobalSearch}
+                    searchPlaceholder={t('list.searchPlaceholder', { defaultValue: t('common:actions.search') })}
                     columns={model.columnOptions}
                     visibleColumns={model.visibleColumns}
                     onVisibilityChange={model.setVisibleColumns}
@@ -254,4 +267,3 @@ const TargetList: React.FC = () => {
 };
 
 export default TargetList;
-

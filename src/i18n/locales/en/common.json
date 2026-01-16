@@ -29,7 +29,25 @@
         "tags": "Tags",
         "tagsAndTypes": "Tags & Types",
         "typesAndTags": "Types & Tags",
-        "overview": "Overview"
+        "filter": "Filter",
+        "clear": "Clear",
+        "results": "results"
+    },
+    "search": {
+        "placeholderGlobal": "Search targets, rollouts, distributions...",
+        "startTyping": "Type to search...",
+        "noResults": "No results found",
+        "targets": "Search targets...",
+        "rollouts": "Search rollouts...",
+        "distributions": "Search distributions...",
+        "actions": "Search actions...",
+        "enterQuery": "Enter a search term",
+        "description": "Search across Targets, Rollouts, and Distributions",
+        "resultsFor": "Search results for",
+        "closeHint": "Use {{key}} to close",
+        "tabs": {
+            "all": "All Results"
+        }
     },
     "status": {
         "online": "Online",
@@ -130,6 +148,13 @@
         "updated": "Updated",
         "networkError": "Network error, please try again later",
         "sessionExpired": "Session expired, please login again"
+    },
+    "list": {
+        "summary": {
+            "loaded": "Loaded {{loaded}} of {{total}}",
+            "filters": "{{count}} filters",
+            "updated": "Updated {{time}}"
+        }
     },
     "apiErrors": {
         "ENTITY_NOT_FOUND": "The requested item was not found.",

@@ -9,7 +9,7 @@ import {
     useCreateTargets,
     useUpdateTarget,
     usePostAssignedDistributionSet,
-    getGetTargetsQueryKey,
+    getGetTargetsInfiniteQueryKey,
 } from '@/api/generated/targets/targets';
 import type { GetTargetsParams } from '@/api/generated/model';
 import { axiosInstance } from '@/api/axios-instance';
@@ -19,7 +19,7 @@ import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useListFilterStore } from '@/stores/useListFilterStore';
 import { useServerTable } from '@/hooks/useServerTable';
-import { buildQueryFromFilterValues } from '@/utils/fiql';
+import { buildQueryFromFilterValues, buildWildcardSearch } from '@/utils/fiql';
 import { COLUMN_CONFIG } from '../config/targetListConfig';
 import type { MgmtTarget, MgmtTag, MgmtTargetType, MgmtDistributionSetAssignment, MgmtDistributionSetAssignments, MgmtDistributionSetAssignmentType, PagedListMgmtTarget, ExceptionInfo } from '@/api/generated/model';
 import type { FilterValue, FilterField } from '@/components/patterns';
@@ -148,7 +148,7 @@ export const useTargetListModel = () => {
         if (debouncedGlobalSearch) {
             const searchFields = ['name', 'controllerId', 'ipAddress', 'description'];
             const searchQuery = searchFields
-                .map(field => `${field}==*${debouncedGlobalSearch}*`)
+                .map(field => buildWildcardSearch(field, debouncedGlobalSearch))
                 .join(',');
 
             return fiql ? `(${fiql});(${searchQuery})` : `(${searchQuery})`;
@@ -193,6 +193,7 @@ export const useTargetListModel = () => {
         isFetching: targetsFetching,
         error: targetsError,
         refetch: refetchTargets,
+        dataUpdatedAt: targetsUpdatedAt,
     } = useGetTargetsInfinite(
         {
             // Initial offset is handled by initialPageParam
@@ -203,14 +204,21 @@ export const useTargetListModel = () => {
         {
             query: {
                 getNextPageParam: (lastPage: PagedListMgmtTarget, allPages: PagedListMgmtTarget[]) => {
+                    const pageSize = pagination.pageSize || 20;
+                    if ((lastPage.content?.length || 0) < pageSize) return undefined;
+
                     const total = lastPage.total || 0;
-                    const currentOffset = allPages.length * (pagination.pageSize || 20);
+                    const currentOffset = allPages.length * pageSize;
                     return currentOffset < total ? currentOffset : undefined;
                 },
                 initialPageParam: 0,
-                refetchOnWindowFocus: true,
-                staleTime: 5000,
-                refetchInterval: 20000,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+                staleTime: 30000,
+                refetchInterval: () => {
+                    if (typeof document === 'undefined') return 30000;
+                    return document.visibilityState === 'visible' ? 30000 : false;
+                },
             }
         }
     );
@@ -283,8 +291,7 @@ export const useTargetListModel = () => {
                 message.success(t('messages.deleteSuccess'));
                 setDeleteModalOpen(false);
                 setTargetToDelete(null);
-                queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
-                refetchTargets();
+                queryClient.invalidateQueries({ queryKey: getGetTargetsInfiniteQueryKey() });
             },
             onError: (error: Error) => {
                 const errMsg = error.message || t('messages.deleteFailed');
@@ -300,8 +307,7 @@ export const useTargetListModel = () => {
                 message.success(t('messages.createSuccess'));
                 setFormModalOpen(false);
                 setEditingTarget(null);
-                queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
-                refetchTargets();
+                queryClient.invalidateQueries({ queryKey: getGetTargetsInfiniteQueryKey() });
             },
             onError: (error: Error) => {
                 const errMsg = error.message || t('messages.createFailed');
@@ -315,8 +321,7 @@ export const useTargetListModel = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('messages.updateSuccess', { defaultValue: 'Target updated' }));
-                queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
-                refetchTargets();
+                queryClient.invalidateQueries({ queryKey: getGetTargetsInfiniteQueryKey() });
             },
             onError: (error: Error) => {
                 message.error(error.message || t('messages.updateFailed', { defaultValue: 'Failed to update target' }));
@@ -330,8 +335,7 @@ export const useTargetListModel = () => {
                 message.success(t('messages.assignSuccess'));
                 setAssignModalOpen(false);
                 setTargetToAssign(null);
-                queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
-                refetchTargets();
+                queryClient.invalidateQueries({ queryKey: getGetTargetsInfiniteQueryKey() });
             },
             onError: (error: Error) => {
                 message.error(error.message || t('messages.error', { ns: 'common' }));
@@ -429,6 +433,7 @@ export const useTargetListModel = () => {
         targetsLoading,
         targetsFetching,
         targetsError,
+        targetsUpdatedAt,
         availableTags,
         availableTypes,
         dsData,

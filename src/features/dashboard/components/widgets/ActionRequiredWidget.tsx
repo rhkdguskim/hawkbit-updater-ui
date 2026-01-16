@@ -66,6 +66,12 @@ export const ActionRequiredWidget: React.FC<ActionRequiredWidgetProps> = ({
 }) => {
     const { t } = useTranslation(['dashboard', 'common']);
     const totalCount = delayedActionsCount + pendingApprovalsCount;
+    const handleRowKeyDown = (type: 'DELAYED' | 'APPROVAL_PENDING') => (event: React.KeyboardEvent) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onActionClick?.(type);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -112,7 +118,14 @@ export const ActionRequiredWidget: React.FC<ActionRequiredWidgetProps> = ({
                         }] : [])
                     ]}
                     renderItem={item => (
-                        <ItemRow onClick={() => onActionClick?.(item.type)}>
+                        <ItemRow
+                            onClick={() => onActionClick?.(item.type)}
+                            onKeyDown={handleRowKeyDown(item.type)}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={item.label}
+                            className="dashboard-clickable"
+                        >
                             <List.Item.Meta
                                 avatar={
                                     <div style={{

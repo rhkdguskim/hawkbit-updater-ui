@@ -237,11 +237,24 @@ export const RolloutDrilldown: React.FC<RolloutDrilldownProps> = ({ rolloutId, i
                 const errorCount = getErrorCount(group);
                 const isClickable = group.status === 'running' || group.status === 'finished' || group.status === 'error';
 
+                const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+                    if (!isClickable) return;
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        handleGroupClick(group);
+                    }
+                };
+
                 return (
                     <GroupItem
                         key={group.id}
                         $clickable={isClickable}
                         onClick={() => isClickable && handleGroupClick(group)}
+                        onKeyDown={handleKeyDown}
+                        role={isClickable ? 'button' : undefined}
+                        tabIndex={isClickable ? 0 : -1}
+                        aria-disabled={!isClickable}
+                        className={isClickable ? 'dashboard-clickable' : undefined}
                     >
                         <GroupIcon $status={group.status}>
                             {getStatusIcon(group.status)}

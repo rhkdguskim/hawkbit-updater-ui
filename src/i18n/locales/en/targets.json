@@ -12,7 +12,12 @@
         "selectTags": "Select tags",
         "searchPlaceholder": "Enter search term",
         "filterByTag": "Filter by Tag",
-        "savedFilters": "Saved Filters"
+        "savedFilters": "Saved Filters",
+        "summary": {
+            "loaded": "Loaded {{loaded}} of {{total}}",
+            "filters": "{{count}} filters",
+            "updated": "Updated {{time}}"
+        }
     },
     "quickFilters": "Quick Filters",
     "manageFilters": "Manage",

@@ -242,6 +242,19 @@
         "enter": "Enter Focus Mode",
         "exit": "Exit Focus Mode"
     },
+    "sections": {
+        "decision": "Decision Support",
+        "operations": "Active Operations",
+        "analytics": "Performance Analytics",
+        "trends": "Trend & History"
+    },
+    "quick": {
+        "totalDevices": "Total Devices",
+        "online": "Online",
+        "activeActions": "Active Actions",
+        "pendingApprovals": "Pending Approvals",
+        "activeRollouts": "Active Rollouts"
+    },
     "ticker": {
         "title": "Live Feed",
         "empty": "No high-priority events in the last 24h",

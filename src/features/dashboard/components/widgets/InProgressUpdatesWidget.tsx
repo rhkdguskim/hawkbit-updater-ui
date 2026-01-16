@@ -81,7 +81,8 @@ const ActionButtons = styled.div`
 
 const ListBody = styled.div<{ $hasMany?: boolean }>`
     flex: 1;
-    min-height: 500px;
+    min-height: 0;
+    max-height: 100%;
     overflow-y: auto;
     display: grid;
     /* Use 2 columns if many items and space permits */
@@ -252,6 +253,13 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
         </div>
     );
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handleItemClick(item);
+        }
+    };
+
     return (
         <Popover
             content={historyContent}
@@ -260,7 +268,14 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
             mouseEnterDelay={0.3}
             overlayStyle={{ padding: 0 }}
         >
-            <ActivityItem onClick={() => handleItemClick(item)}>
+            <ActivityItem
+                onClick={() => handleItemClick(item)}
+                onKeyDown={handleKeyDown}
+                role="button"
+                tabIndex={0}
+                aria-label={item.target.name || item.target.controllerId || ''}
+                className="dashboard-clickable"
+            >
                 <Flex justify="space-between" align="flex-start">
                     <Flex align="center" gap={8}>
                         <div

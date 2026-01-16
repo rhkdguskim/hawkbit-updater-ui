@@ -65,7 +65,7 @@ const ActivityItem = styled.div`
 
 const ListBody = styled.div`
     flex: 1;
-    max-height: 400px;
+    min-height: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -172,8 +172,26 @@ const ActiveRolloutItem: React.FC<ActiveRolloutItemProps> = ({
         return t(`common:status.${status.toLowerCase()}`, { defaultValue: status.toUpperCase() });
     };
 
+    const handleOpen = () => {
+        navigate(`/rollouts/${rollout.id}`);
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handleOpen();
+        }
+    };
+
     return (
-        <ActivityItem onClick={() => navigate(`/rollouts/${rollout.id}`)}>
+        <ActivityItem
+            onClick={handleOpen}
+            onKeyDown={handleKeyDown}
+            role="button"
+            tabIndex={0}
+            aria-label={rollout.name || t('dashboard:activeRollouts.details')}
+            className="dashboard-clickable"
+        >
             {/* Header Row */}
             <Flex justify="space-between" align="center">
                 <Flex align="center" gap={8} style={{ flex: 1, minWidth: 0 }}>

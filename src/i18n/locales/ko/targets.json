@@ -12,7 +12,12 @@
         "selectTags": "태그 선택",
         "searchPlaceholder": "검색어를 입력하세요",
         "filterByTag": "태그로 필터링",
-        "savedFilters": "저장된 필터"
+        "savedFilters": "저장된 필터",
+        "summary": {
+            "loaded": "불러옴 {{loaded}} / {{total}}",
+            "filters": "필터 {{count}}개",
+            "updated": "업데이트 {{time}}"
+        }
     },
     "quickFilters": "빠른 필터",
     "manageFilters": "관리",

@@ -17,6 +17,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher, ThemeSwitcher } from '@/components/common';
+import { AppSearchBar } from './AppSearchBar';
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -289,6 +290,10 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
                     disabledOverflow
                 />
             </HeaderLeft>
+
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <AppSearchBar />
+            </div>
 
             <HeaderRight>
 

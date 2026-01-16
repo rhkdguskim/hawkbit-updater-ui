@@ -19,5 +19,6 @@ export { StatusQuickFilters } from './StatusQuickFilters';
 export type { StatusFilterOption } from './StatusQuickFilters';
 export { PresetColorPicker } from './PresetColorPicker';
 export type { PresetColorPickerProps } from './PresetColorPicker';
+export { ListSummary } from './ListSummary';
 
 export { default as RouteLoader } from './RouteLoader';

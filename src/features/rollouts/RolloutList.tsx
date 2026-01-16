@@ -12,7 +12,7 @@ import { useServerTable } from '@/hooks/useServerTable';
 import dayjs from 'dayjs';
 import { buildQueryFromFilterValues } from '@/utils/fiql';
 import RolloutCreateModal from './RolloutCreateModal';
-import { StatusTag } from '@/components/common';
+import { StatusTag, ListSummary, Highlighter } from '@/components/common';
 import type { ColumnsType } from 'antd/es/table';
 import { useListFilterStore } from '@/stores/useListFilterStore';
 
@@ -51,6 +51,9 @@ const RolloutList: React.FC = () => {
         sort,
         handleTableChange,
         resetPagination,
+        globalSearch,
+        setGlobalSearch,
+        debouncedGlobalSearch,
     } = useServerTable<MgmtRolloutResponseBody>({ syncToUrl: true });
 
     // Pause/Resume mutations
@@ -109,7 +112,20 @@ const RolloutList: React.FC = () => {
 
 
     // Build RSQL query from filters
-    const buildFinalQuery = useCallback(() => buildQueryFromFilterValues(filters), [filters]);
+    const buildFinalQuery = useCallback(() => {
+        const fiql = buildQueryFromFilterValues(filters);
+
+        if (debouncedGlobalSearch) {
+            const searchFields = ['name', 'description'];
+            const searchQuery = searchFields
+                .map(field => `${field}==*${debouncedGlobalSearch}*`)
+                .join(',');
+
+            return fiql ? `(${fiql});(${searchQuery})` : `(${searchQuery})`;
+        }
+
+        return fiql;
+    }, [filters, debouncedGlobalSearch]);
 
     const query = buildFinalQuery();
     const {
@@ -120,7 +136,8 @@ const RolloutList: React.FC = () => {
         isLoading,
         isFetching,
         error,
-        refetch
+        refetch,
+        dataUpdatedAt,
     } = useGetRolloutsInfinite(
         {
             limit: pagination.pageSize,
@@ -144,6 +161,7 @@ const RolloutList: React.FC = () => {
     const rolloutsContent = useMemo(() => {
         return infiniteData?.pages.flatMap((page: PagedListMgmtRolloutResponseBody) => page.content || []) || [];
     }, [infiniteData]);
+    const totalCount = useMemo(() => infiniteData?.pages[0]?.total || 0, [infiniteData]);
 
     // Handle filter change
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
@@ -166,7 +184,9 @@ const RolloutList: React.FC = () => {
             width: 200,
             sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
             render: (value: string) => (
-                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>{value}</Text>
+                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>
+                    <Highlighter text={value} search={globalSearch} />
+                </Text>
             ),
         },
         {
@@ -276,6 +296,16 @@ const RolloutList: React.FC = () => {
         { key: 'progress', label: t('columns.progress'), defaultVisible: true },
     ], [t]);
 
+    const summary = useMemo(() => (
+        <ListSummary
+            loaded={rolloutsContent.length}
+            total={totalCount}
+            filtersCount={filters.length}
+            updatedAt={dataUpdatedAt}
+            isFetching={isFetching}
+        />
+    ), [rolloutsContent.length, totalCount, filters.length, dataUpdatedAt, isFetching]);
+
     return (
         <StandardListLayout
             title={t('list.title')}
@@ -290,6 +320,10 @@ const RolloutList: React.FC = () => {
                     canAdd={isAdmin}
                     addLabel={t('createRollout')}
                     loading={isFetching}
+                    extra={summary}
+                    searchValue={globalSearch}
+                    onSearchChange={setGlobalSearch}
+                    searchPlaceholder={t('search.placeholder', { defaultValue: t('common:actions.search') })}
                     // Integrated Column Customization
                     columns={columnOptions}
                     visibleColumns={visibleColumns}

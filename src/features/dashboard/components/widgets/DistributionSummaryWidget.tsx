@@ -144,7 +144,20 @@ export const DistributionSummaryWidget: React.FC<DistributionSummaryWidgetProps>
                     <div style={{ flex: 1, overflowY: 'auto', maxHeight: 150 }}>
                         {recentSets.length > 0 ? (
                             recentSets.map(set => (
-                                <ListItem key={set.id} onClick={() => navigate(`/distributions/${set.id}`)}>
+                                <ListItem
+                                    key={set.id}
+                                    onClick={() => navigate(`/distributions/${set.id}`)}
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter' || event.key === ' ') {
+                                            event.preventDefault();
+                                            navigate(`/distributions/${set.id}`);
+                                        }
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label={set.name || String(set.id)}
+                                    className="dashboard-clickable"
+                                >
                                     <Flex vertical gap={2}>
                                         <Text strong style={{ fontSize: 12 }} ellipsis>{set.name}</Text>
                                         <Flex justify="space-between" align="center">
@@ -167,4 +180,3 @@ export const DistributionSummaryWidget: React.FC<DistributionSummaryWidgetProps>
         </OverviewCard>
     );
 };
-

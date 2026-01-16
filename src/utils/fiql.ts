@@ -75,13 +75,10 @@ export const buildCondition = (condition: FiqlCondition): string => {
 export const buildWildcardSearch = (field: string, value: string): string => {
     if (!value.trim()) return '';
     const trimmed = value.trim();
-    // Wildcards are NOT escaped in the value content usually, 
-    // but the surrounding quotes must handle the string.
-    // However, for RSQL, * is special.
-    // If we want literal *, we escape it? HawkBit usually treats * as wildcard.
-    // We'll wrap in quotes if it contains other specials, but keep * unescaped inside?
-    // Actually, safest is to just return as-is if simple, but here we assume user WANTS wildcard.
-    return `${field}==*${trimmed}*`;
+    // Wrap with wildcards
+    const fullValue = `*${trimmed}*`;
+    // Use escapeValue to handle special characters and quoting
+    return `${field}==${escapeValue(fullValue)}`;
 };
 
 /**

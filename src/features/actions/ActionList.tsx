@@ -14,10 +14,10 @@ import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useServerTable } from '@/hooks/useServerTable';
-import { StatusTag } from '@/components/common';
+import { StatusTag, ListSummary, Highlighter } from '@/components/common';
 import { DataView, EnhancedTable, FilterBuilder, type ToolbarAction, type FilterValue, type FilterField } from '@/components/patterns';
 import type { ColumnsType } from 'antd/es/table';
-import { buildQueryFromFilterValues } from '@/utils/fiql';
+import { buildQueryFromFilterValues, buildWildcardSearch } from '@/utils/fiql';
 import { getActionDisplayStatus, isActionInProgress, isActionCanceled } from '@/utils/statusUtils';
 import { useListFilterStore } from '@/stores/useListFilterStore';
 
@@ -35,6 +35,9 @@ const ActionList: React.FC = () => {
         sort,
         handleTableChange,
         resetPagination,
+        globalSearch,
+        setGlobalSearch,
+        debouncedGlobalSearch,
     } = useServerTable<MgmtAction>({ syncToUrl: true });
 
     const [selectedActionIds, setSelectedActionIds] = useState<React.Key[]>([]);
@@ -88,7 +91,23 @@ const ActionList: React.FC = () => {
     ], [t]);
 
     // Build RSQL query from filters
-    const buildFinalQuery = useCallback(() => buildQueryFromFilterValues(filters), [filters]);
+    const buildFinalQuery = useCallback(() => {
+        const fiql = buildQueryFromFilterValues(filters);
+
+        if (debouncedGlobalSearch) {
+            // Search in status, type, and if possible target controllerId (though nested search support varies)
+            // We search type and status as starting point.
+            // Note: Searching Enums via text might be limited, but useful.
+            const searchFields = ['status', 'type'];
+            const searchQuery = searchFields
+                .map(field => buildWildcardSearch(field, debouncedGlobalSearch))
+                .join(',');
+
+            return fiql ? `(${fiql});(${searchQuery})` : `(${searchQuery})`;
+        }
+
+        return fiql;
+    }, [filters, debouncedGlobalSearch]);
 
     const query = buildFinalQuery();
     const {
@@ -99,7 +118,8 @@ const ActionList: React.FC = () => {
         isLoading,
         isFetching,
         error,
-        refetch
+        refetch,
+        dataUpdatedAt,
     } = useGetActionsInfinite(
         {
             limit: pagination.pageSize,
@@ -114,9 +134,13 @@ const ActionList: React.FC = () => {
                     return currentOffset < total ? currentOffset : undefined;
                 },
                 initialPageParam: 0,
-                refetchOnWindowFocus: true,
-                staleTime: 5000,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+                staleTime: 10000,
                 refetchInterval: (queryResult) => {
+                    if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+                        return false;
+                    }
                     // Poll faster if there are active actions in the current view
                     const hasActive = queryResult.state.data?.pages.some((page: PagedListMgmtAction) =>
                         page.content?.some((action: MgmtAction) => isActionInProgress(action.status))
@@ -130,6 +154,7 @@ const ActionList: React.FC = () => {
     const actionsContent = useMemo(() => {
         return infiniteData?.pages.flatMap((page: PagedListMgmtAction) => page.content || []) || [];
     }, [infiniteData]);
+    const totalCount = useMemo(() => infiniteData?.pages[0]?.total || 0, [infiniteData]);
 
     const getTypeLabel = useCallback((type?: string) => {
         if (!type) return '-';
@@ -280,11 +305,11 @@ const ActionList: React.FC = () => {
                     >
                         <Space size={4} align="baseline">
                             <Text strong style={{ fontSize: '13px', lineHeight: '20px' }}>
-                                {targetName}
+                                <Highlighter text={targetName} search={globalSearch} />
                             </Text>
                             {targetIp ? (
                                 <Text type="secondary" style={{ fontSize: '11px', fontWeight: 400 }}>
-                                    {targetIp}
+                                    <Highlighter text={targetIp} search={globalSearch} />
                                 </Text>
                             ) : null}
                         </Space>
@@ -309,7 +334,7 @@ const ActionList: React.FC = () => {
             width: 90,
             render: (type: string) => (
                 <Tag color={type === 'forced' ? 'red' : 'blue'} style={{ borderRadius: 8 }}>
-                    {getTypeLabel(type)}
+                    <Highlighter text={getTypeLabel(type)} search={globalSearch} />
                 </Tag>
             ),
         },
@@ -325,7 +350,9 @@ const ActionList: React.FC = () => {
                         onClick={(e) => { e.stopPropagation(); navigate(`/distributions/sets/${ds.id}`); }}
                         style={{ cursor: 'pointer' }}
                     >
-                        <Text ellipsis style={{ maxWidth: 160, fontSize: 'var(--ant-font-size-sm)' }}>{ds.name}</Text>
+                        <Text ellipsis style={{ maxWidth: 160, fontSize: 'var(--ant-font-size-sm)' }}>
+                            <Highlighter text={ds.name} search={globalSearch} />
+                        </Text>
                     </a>
                 );
             },
@@ -387,7 +414,7 @@ const ActionList: React.FC = () => {
                 </Space>
             ),
         },
-    ], [t, getTargetId, targetMap, navigate, getTypeLabel, getDistributionInfo, cancelMutation, refetch]);
+    ], [t, getTargetId, targetMap, navigate, getTypeLabel, getDistributionInfo, cancelMutation, refetch, globalSearch]);
 
     // Filter columns based on visibility
     const displayColumns = useMemo(() => {
@@ -405,6 +432,16 @@ const ActionList: React.FC = () => {
         { key: 'distributionSet', label: t('columns.distributionSet'), defaultVisible: true },
         { key: 'createdAt', label: t('columns.createdAt'), defaultVisible: true },
     ], [t]);
+
+    const summary = useMemo(() => (
+        <ListSummary
+            loaded={actionsContent.length}
+            total={totalCount}
+            filtersCount={filters.length}
+            updatedAt={dataUpdatedAt}
+            isFetching={isFetching}
+        />
+    ), [actionsContent.length, totalCount, filters.length, dataUpdatedAt, isFetching]);
 
     const handleSelectionChange = useCallback((keys: React.Key[], selectedRows: MgmtAction[]) => {
         setSelectedActionIds(keys);
@@ -428,6 +465,10 @@ const ActionList: React.FC = () => {
                     onFiltersChange={handleFiltersChange}
                     onRefresh={refetch}
                     loading={isLoading || isFetching}
+                    extra={summary}
+                    searchValue={globalSearch}
+                    onSearchChange={setGlobalSearch}
+                    searchPlaceholder={t('filter.searchPlaceholder', { defaultValue: t('common:actions.search') })}
                     // Integrated Column Customization
                     columns={columnOptions}
                     visibleColumns={visibleColumns}

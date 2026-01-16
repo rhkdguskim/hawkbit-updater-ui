@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Table, Spin, Divider } from 'antd';
+import { Table, Spin, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import type { TableProps } from 'antd';
 import styled from 'styled-components';
@@ -185,6 +185,7 @@ export function EnhancedTable<T extends object>({
     const { t } = useTranslation('common');
     const containerRef = useRef<HTMLDivElement>(null);
     const [scrollY, setScrollY] = useState<number | undefined>(undefined);
+    const endMessageCooldownRef = useRef(false);
 
     const isLoading = typeof loading === 'object' ? loading.spinning : loading;
 
@@ -201,13 +202,27 @@ export function EnhancedTable<T extends object>({
 
             // Trigger fetch when 50px from bottom
             if (scrollBottom < 50) {
-                onFetchNextPage();
+                if (onFetchNextPage && hasNextPage && !isFetchingNextPage) {
+                    onFetchNextPage();
+                } else if (!hasNextPage && !isFetchingNextPage && (tableProps.dataSource?.length ?? 0) > 0) {
+                    // Show "End of List" message as a toast notification
+                    if (!endMessageCooldownRef.current) {
+                        message.info(t('messages.noMoreData', 'End of List'));
+                        endMessageCooldownRef.current = true;
+                        // specific debounce time to prevent spamming
+                        setTimeout(() => {
+                            endMessageCooldownRef.current = false;
+                        }, 2000);
+                    }
+                }
             }
         };
 
         tableBody.addEventListener('scroll', handleScroll);
-        return () => tableBody.removeEventListener('scroll', handleScroll);
-    }, [onFetchNextPage, hasNextPage, isFetchingNextPage]);
+        return () => {
+            tableBody.removeEventListener('scroll', handleScroll);
+        };
+    }, [onFetchNextPage, hasNextPage, isFetchingNextPage, tableProps.dataSource?.length]);
 
     useEffect(() => {
         const calculateScrollHeight = () => {
@@ -219,9 +234,11 @@ export function EnhancedTable<T extends object>({
                 // Pagination: ~48px (including margins)
                 const paginationHeight = tableProps.pagination !== false ? 48 : 0;
                 const headerHeight = 35;
+                const showFooter = isFetchingNextPage;
+                const footerHeight = showFooter ? 55 : 0;
 
                 // Subtract heights of other elements to find available space for table body
-                const calculatedHeight = containerHeight - paginationHeight - headerHeight - 8;
+                const calculatedHeight = containerHeight - paginationHeight - headerHeight - footerHeight - 8;
                 setScrollY(calculatedHeight > 100 ? calculatedHeight : undefined);
             }
         };
@@ -241,7 +258,7 @@ export function EnhancedTable<T extends object>({
         return () => {
             observer.disconnect();
         };
-    }, [selectedRowKeys.length, tableProps.pagination, tableProps.dataSource?.length]);
+    }, [selectedRowKeys.length, tableProps.pagination, tableProps.dataSource?.length, hasNextPage, isFetchingNextPage]);
 
     useEffect(() => {
         // Handle selection clear if needed, but usually handled by parent now
@@ -308,12 +325,10 @@ export function EnhancedTable<T extends object>({
                     sticky
                     onChange={handleTableChange}
                     footer={
-                        !hasNextPage && (tableProps.dataSource?.length ?? 0) > 0
+                        isFetchingNextPage
                             ? () => (
-                                <div style={{ padding: '0 16px' }}>
-                                    <Divider plain style={{ margin: '16px 0', color: 'var(--ant-color-text-quaternary)', fontSize: '12px' }}>
-                                        {t('list.noMoreData', 'End of List')}
-                                    </Divider>
+                                <div style={{ textAlign: 'center', padding: '12px' }}>
+                                    <Spin size="small" />
                                 </div>
                             )
                             : undefined

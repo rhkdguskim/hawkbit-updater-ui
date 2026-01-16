@@ -7,11 +7,11 @@ import {
     useDeleteTargetTag,
     useCreateTargetTags,
     useUpdateTargetTag,
-    getGetTargetTagsQueryKey,
+    getGetTargetTagsInfiniteQueryKey,
 } from '@/api/generated/target-tags/target-tags';
 import type { MgmtTag, PagedListMgmtTag } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { TagFormModal } from '@/components/common';
+import { TagFormModal, ListSummary } from '@/components/common';
 import type { TagFormValues } from '@/components/common';
 import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterValue } from '@/components/patterns';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
@@ -69,7 +69,8 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
         isFetchingNextPage,
         isLoading,
         isFetching,
-        refetch
+        refetch,
+        dataUpdatedAt,
     } = useGetTargetTagsInfinite({
         limit: pagination.pageSize,
         sort: sort || undefined,
@@ -81,12 +82,16 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
                 return currentOffset < total ? currentOffset : undefined;
             },
             initialPageParam: 0,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+            staleTime: 30000,
         }
     });
 
     const tagsContent = useMemo(() => {
         return infiniteData?.pages.flatMap((page: PagedListMgmtTag) => page.content || []) || [];
     }, [infiniteData]);
+    const totalCount = useMemo(() => infiniteData?.pages[0]?.total || 0, [infiniteData]);
 
     // Filter fields
     const filterFields: FilterField[] = useMemo(() => [
@@ -103,7 +108,7 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
         mutation: {
             onSuccess: () => {
                 message.success(t('tagManagement.deleteSuccess'));
-                queryClient.invalidateQueries({ queryKey: getGetTargetTagsQueryKey() });
+                queryClient.invalidateQueries({ queryKey: getGetTargetTagsInfiniteQueryKey() });
             },
             onError: (error) => {
                 message.error((error as Error).message || t('common:error'));
@@ -116,7 +121,7 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
             onSuccess: () => {
                 message.success(t('tagManagement.createSuccess'));
                 setDialogOpen(false);
-                queryClient.invalidateQueries({ queryKey: getGetTargetTagsQueryKey() });
+                queryClient.invalidateQueries({ queryKey: getGetTargetTagsInfiniteQueryKey() });
             },
             onError: (error) => {
                 message.error((error as Error).message || t('common:error'));
@@ -130,7 +135,7 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
                 message.success(t('tagManagement.updateSuccess'));
                 setDialogOpen(false);
                 setEditingTag(null);
-                queryClient.invalidateQueries({ queryKey: getGetTargetTagsQueryKey() });
+                queryClient.invalidateQueries({ queryKey: getGetTargetTagsInfiniteQueryKey() });
             },
             onError: (error) => {
                 message.error((error as Error).message || t('common:error'));
@@ -206,26 +211,40 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
         { key: 'colour', label: t('common:table.color'), defaultVisible: true },
     ], [t]);
 
+    const summary = useMemo(() => (
+        <ListSummary
+            loaded={tagsContent.length}
+            total={totalCount}
+            filtersCount={filters.length}
+            updatedAt={dataUpdatedAt}
+            isFetching={isFetching}
+        />
+    ), [tagsContent.length, totalCount, filters.length, dataUpdatedAt, isFetching]);
+
+    const searchBar = (
+        <FilterBuilder
+            fields={filterFields}
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onRefresh={() => refetch()}
+            onAdd={() => {
+                setEditingTag(null);
+                setDialogOpen(true);
+            }}
+            canAdd={isAdmin}
+            addLabel={t('tagManagement.add')}
+            loading={isLoading || isFetching}
+            extra={summary}
+            columns={columnOptions}
+            visibleColumns={visibleColumns}
+            onVisibilityChange={setVisibleColumns}
+            searchPlaceholder={t('list.searchPlaceholder', { defaultValue: t('common:actions.search') })}
+        />
+    );
+
     const listContent = (
         <>
-            <div style={{ marginBottom: 16 }}>
-                <FilterBuilder
-                    fields={filterFields}
-                    filters={filters}
-                    onFiltersChange={handleFiltersChange}
-                    onRefresh={() => refetch()}
-                    onAdd={() => {
-                        setEditingTag(null);
-                        setDialogOpen(true);
-                    }}
-                    canAdd={isAdmin}
-                    addLabel={t('tagManagement.add')}
-                    loading={isLoading || isFetching}
-                    columns={columnOptions}
-                    visibleColumns={visibleColumns}
-                    onVisibilityChange={setVisibleColumns}
-                />
-            </div>
+            {!standalone && <div style={{ marginBottom: 16 }}>{searchBar}</div>}
             <DataView
                 loading={isLoading}
                 error={null}
@@ -272,17 +291,14 @@ const TargetTagList: React.FC<TargetTagListProps> = ({ standalone = true }) => {
     );
 
     if (!standalone) {
-        return (
-            <div style={{ marginTop: 16 }}>
-                {listContent}
-            </div>
-        );
+        return listContent;
     }
 
     return (
         <StandardListLayout
             title={t('tagManagement.title')}
             description={t('tagManagement.description', { defaultValue: 'Manage target tags for categorization' })}
+            searchBar={searchBar}
         >
             {listContent}
         </StandardListLayout>

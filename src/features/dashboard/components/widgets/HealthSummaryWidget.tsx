@@ -237,11 +237,25 @@ export const HealthSummaryWidget: React.FC<HealthSummaryWidgetProps> = ({
         );
     }
 
+    const isClickable = healthData.status !== 'SAFE' && !!onAnalysisClick;
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (!isClickable) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onAnalysisClick?.();
+        }
+    };
+
     return (
         <Container
             $status={healthData.status}
-            onClick={healthData.status !== 'SAFE' ? onAnalysisClick : undefined}
-            style={{ cursor: healthData.status !== 'SAFE' ? 'pointer' : 'default' }}
+            onClick={isClickable ? onAnalysisClick : undefined}
+            onKeyDown={handleKeyDown}
+            role={isClickable ? 'button' : undefined}
+            tabIndex={isClickable ? 0 : -1}
+            aria-disabled={!isClickable}
+            className={isClickable ? 'dashboard-clickable' : undefined}
         >
             <Flex justify="space-between" align="center">
                 <StatusBadge $status={healthData.status}>

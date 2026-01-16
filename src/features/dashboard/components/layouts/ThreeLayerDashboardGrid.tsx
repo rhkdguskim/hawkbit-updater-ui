@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { PageLayout } from '@/components/patterns';
 import { DashboardScrollContent, DashboardSurface, fadeInUp } from '../DashboardStyles';
+import { useTranslation } from 'react-i18next';
 
 const HeaderRow = styled.div`
     flex-shrink: 0;
@@ -14,9 +15,9 @@ const DecisionLayer = styled.section`
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: clamp(12px, 1vw, 16px);
-    min-height: 110px;
+    min-height: 96px;
     flex-shrink: 0;
-    padding-bottom: var(--ant-margin, 16px);
+    padding-bottom: 8px;
 
     @media (max-width: 1400px) {
         grid-template-columns: repeat(2, 1fr);
@@ -30,9 +31,9 @@ const ControlLayer = styled.section`
     display: grid;
     grid-template-columns: 1.8fr 1fr 1fr;
     gap: clamp(12px, 1vw, 16px);
-    min-height: 420px;
+    min-height: 360px;
     flex-shrink: 0;
-    padding-bottom: var(--ant-margin, 16px);
+    padding-bottom: 8px;
 
     @media (max-width: 1600px) {
         grid-template-columns: 1.2fr 1fr 1fr;
@@ -48,7 +49,7 @@ const StatsLayer = styled.section`
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: clamp(12px, 1vw, 16px);
     flex-shrink: 0;
-    padding-bottom: var(--ant-margin, 16px);
+    padding-bottom: 8px;
 
     @media (max-width: 1400px) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -65,9 +66,9 @@ const MonitoringLayer = styled.section`
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: clamp(12px, 1vw, 16px);
-    min-height: 200px;
+    min-height: 180px;
     flex-shrink: 1;
-    padding-top: var(--ant-margin, 8px);
+    padding-top: 6px;
 
     @media (max-width: 992px) {
         grid-template-columns: 1fr;
@@ -82,7 +83,7 @@ const SectionLabel = styled.div`
     letter-spacing: 0.05em;
     color: var(--ant-color-text-secondary);
     opacity: 0.8;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -153,8 +154,9 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
     actionActivity,
     showLayerLabels = false,
 }) => {
+    const { t } = useTranslation('dashboard');
     return (
-        <PageLayout fullWidth={true}>
+        <PageLayout fullWidth={true} padding="8px 12px 10px" gap="8px">
             <DashboardSurface>
                 <HeaderRow>
                     {header}
@@ -162,7 +164,7 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
                 <DashboardScrollContent>
                     {/* TOP: Overview & Metrics Layer */}
                     <SectionWrapper>
-                        {showLayerLabels && <SectionLabel>Decision Support</SectionLabel>}
+                        {showLayerLabels && <SectionLabel>{t('sections.decision', 'Decision Support')}</SectionLabel>}
                         <DecisionLayer>
                             {healthSummary}
                             {actionRequired}
@@ -173,7 +175,7 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
 
                     {/* MIDDLE: Control & Activity Layer */}
                     <SectionWrapper>
-                        {showLayerLabels && <SectionLabel>Active Operations</SectionLabel>}
+                        {showLayerLabels && <SectionLabel>{t('sections.operations', 'Active Operations')}</SectionLabel>}
                         <ControlLayer>
                             {activeRollouts}
                             {inProgressUpdates}
@@ -184,7 +186,7 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
                     {/* NEW: Performance Stats Layer */}
                     {statsRow && (
                         <SectionWrapper>
-                            {showLayerLabels && <SectionLabel>Performance Analytics</SectionLabel>}
+                            {showLayerLabels && <SectionLabel>{t('sections.analytics', 'Performance Analytics')}</SectionLabel>}
                             <StatsLayer>
                                 {statsRow}
                             </StatsLayer>
@@ -193,7 +195,7 @@ export const ThreeLayerDashboardGrid: React.FC<ThreeLayerDashboardGridProps> = (
 
                     {/* BOTTOM: Monitoring & History Layer */}
                     <SectionWrapper>
-                        {showLayerLabels && <SectionLabel>Trend & History Analysis</SectionLabel>}
+                        {showLayerLabels && <SectionLabel>{t('sections.trends', 'Trend & History')}</SectionLabel>}
                         <MonitoringLayer>
                             {statusTrend}
                             {actionActivity}

@@ -43,6 +43,8 @@ export interface PageLayoutProps {
   children: React.ReactNode;
   fullWidth?: boolean;
   fullHeight?: boolean;
+  padding?: string;
+  gap?: string;
 }
 
 /**
@@ -55,13 +57,15 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
   children,
   fullWidth = false,
   fullHeight = false,
+  padding,
+  gap,
 }) => {
   const { token } = useToken();
 
   return (
     <StyledLayout
-      $padding={`${token.marginLG}px ${token.padding}px ${token.marginLG}px`}
-      $gap={`${token.marginXS}px`}
+      $padding={padding ?? `${token.marginLG}px ${token.padding}px ${token.marginLG}px`}
+      $gap={gap ?? `${token.marginXS}px`}
       $fullWidth={fullWidth}
       $fullHeight={fullHeight}
     >
