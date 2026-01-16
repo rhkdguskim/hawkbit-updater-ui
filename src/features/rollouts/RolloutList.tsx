@@ -48,6 +48,7 @@ const RolloutList: React.FC = () => {
 
     const {
         pagination,
+        sort,
         handleTableChange,
         resetPagination,
     } = useServerTable<MgmtRolloutResponseBody>({ syncToUrl: true });
@@ -123,6 +124,7 @@ const RolloutList: React.FC = () => {
     } = useGetRolloutsInfinite(
         {
             limit: pagination.pageSize,
+            sort: sort || undefined,
             q: query || undefined,
         },
         {

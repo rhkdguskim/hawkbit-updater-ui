@@ -3,7 +3,7 @@ import { Modal, Select, Tag, Space, message, Typography, Button, Divider } from 
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAssignTarget, useGetTargetTags, getGetTargetTagsQueryKey, useCreateTargetTags } from '@/api/generated/target-tags/target-tags';
+import { useAssignTargets, useGetTargetTags, getGetTargetTagsQueryKey, useCreateTargetTags } from '@/api/generated/target-tags/target-tags';
 import { getGetTargetsQueryKey, getGetTagsQueryKey } from '@/api/generated/targets/targets';
 import type { MgmtTag } from '@/api/generated/model';
 import { TagFormModal, type TagFormValues } from '@/components/common';
@@ -29,7 +29,7 @@ const BulkAssignTagsModal: React.FC<BulkAssignTagsModalProps> = ({
 
     const { data: tagsData, isLoading: tagsLoading } = useGetTargetTags({ limit: 100 });
 
-    const assignTagMutation = useAssignTarget();
+    const assignTargetsMutation = useAssignTargets();
 
     const createTagMutation = useCreateTargetTags({
         mutation: {
@@ -56,20 +56,16 @@ const BulkAssignTagsModal: React.FC<BulkAssignTagsModalProps> = ({
 
         setAssigning(true);
         try {
-            for (const controllerId of targetIds) {
-                for (const tagId of selectedTagIds) {
-                    await assignTagMutation.mutateAsync({
-                        targetTagId: tagId,
-                        controllerId,
-                    });
-                }
+            // Bulk assign all targets to each selected tag
+            for (const tagId of selectedTagIds) {
+                await assignTargetsMutation.mutateAsync({
+                    targetTagId: tagId,
+                    data: targetIds,
+                });
             }
             message.success(t('bulkAssign.tagAssignSuccess', { count: targetIds.length }));
             setSelectedTagIds([]);
             queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
-            targetIds.forEach((controllerId) => {
-                queryClient.invalidateQueries({ queryKey: getGetTagsQueryKey(controllerId) });
-            });
             onSuccess();
         } catch (error) {
             message.error((error as Error).message || t('common:messages.error'));

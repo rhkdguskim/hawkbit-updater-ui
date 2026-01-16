@@ -32,6 +32,7 @@ const ActionList: React.FC = () => {
     const {
         pagination,
         offset,
+        sort,
         handleTableChange,
         resetPagination,
     } = useServerTable<MgmtAction>({ syncToUrl: true });
@@ -102,6 +103,7 @@ const ActionList: React.FC = () => {
     } = useGetActionsInfinite(
         {
             limit: pagination.pageSize,
+            sort: sort || undefined,
             q: query || undefined,
         },
         {
@@ -430,6 +432,12 @@ const ActionList: React.FC = () => {
                     columns={columnOptions}
                     visibleColumns={visibleColumns}
                     onVisibilityChange={setVisibleColumns}
+                    selection={{
+                        count: selectedActionIds.length,
+                        actions: selectionActions,
+                        onClear: () => setSelectedActionIds([]),
+                        label: t('common:filter.selected')
+                    }}
                 />
             }
         >
@@ -446,8 +454,6 @@ const ActionList: React.FC = () => {
                     loading={isLoading || isFetching}
                     selectedRowKeys={selectedActionIds}
                     onSelectionChange={handleSelectionChange}
-                    selectionActions={selectionActions}
-                    selectionLabel={t('common:filter.selected')}
                     onRow={(record) => ({
                         onClick: () => navigate(`/actions/${record.id}`),
                         style: { cursor: 'pointer' },

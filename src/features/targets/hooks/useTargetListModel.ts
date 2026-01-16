@@ -11,6 +11,7 @@ import {
     usePostAssignedDistributionSet,
     getGetTargetsQueryKey,
 } from '@/api/generated/targets/targets';
+import { axiosInstance } from '@/api/axios-instance';
 import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
 import { useGetTargetTags } from '@/api/generated/target-tags/target-tags';
 import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
@@ -35,7 +36,10 @@ export const useTargetListModel = () => {
     // Pagination/Sort Hook
     const {
         pagination,
-        // sort,
+        sort,
+        globalSearch,
+        setGlobalSearch,
+        debouncedGlobalSearch,
         handleTableChange: serverTableChange,
         resetPagination,
         setPagination,
@@ -58,6 +62,8 @@ export const useTargetListModel = () => {
     } = targetPersistentState;
 
     const [selectedTargetIds, setSelectedTargetIds] = useState<React.Key[]>([]);
+    const [isAllMatchingSelected, setIsAllMatchingSelected] = useState(false);
+    const [isFetchingAllIds, setIsFetchingAllIds] = useState(false);
 
     // Modal Open States
     const [bulkTagsModalOpen, setBulkTagsModalOpen] = useState(false);
@@ -130,14 +136,25 @@ export const useTargetListModel = () => {
     ], [t, availableTypes, availableTags]);
 
     const buildFinalQuery = useCallback((targetFilters: FilterValue[] = filters): string => {
-        return buildQueryFromFilterValues(targetFilters, {
+        const fiql = buildQueryFromFilterValues(targetFilters, {
             fieldMap: {
-                targetType: 'targetType.name', // Requires sub-attribute [key, name]
+                targetType: 'targetType.name',
                 tag: 'tag',
             },
             rawFields: ['query'],
         });
-    }, [filters]);
+
+        if (debouncedGlobalSearch) {
+            const searchFields = ['name', 'controllerId', 'ipAddress', 'description'];
+            const searchQuery = searchFields
+                .map(field => `${field}==*${debouncedGlobalSearch}*`)
+                .join(',');
+
+            return fiql ? `(${fiql});(${searchQuery})` : `(${searchQuery})`;
+        }
+
+        return fiql;
+    }, [filters, debouncedGlobalSearch]);
 
     // Setters for persistent state
     const setFilters = useCallback((newFilters: FilterValue[]) => {
@@ -150,10 +167,11 @@ export const useTargetListModel = () => {
 
     const handleFiltersChange = useCallback((newFilters: FilterValue[]) => {
         setFilters(newFilters);
+        setSelectedTargetIds([]);
+        setIsAllMatchingSelected(false);
         setTargetPersistentState({ quickFilter: 'all' });
         resetPagination();
-    }, [setFilters, setTargetPersistentState, resetPagination]);
-
+    }, [setFilters, setTargetPersistentState, resetPagination, setSelectedTargetIds, setIsAllMatchingSelected]);
 
     // Main Data Query
     const {
@@ -168,6 +186,7 @@ export const useTargetListModel = () => {
     } = useGetTargetsInfinite(
         {
             limit: pagination.pageSize,
+            sort: sort || undefined,
             q: buildFinalQuery() || undefined,
         },
         {
@@ -180,7 +199,7 @@ export const useTargetListModel = () => {
                 initialPageParam: 0,
                 refetchOnWindowFocus: true,
                 staleTime: 5000,
-                refetchInterval: 20000, // Background poll every 20s
+                refetchInterval: 20000,
             }
         }
     );
@@ -192,6 +211,36 @@ export const useTargetListModel = () => {
     const totalTargets = useMemo(() => {
         return infiniteData?.pages[0]?.total || 0;
     }, [infiniteData]);
+
+    const handleSelectAllMatching = useCallback(async () => {
+        setIsFetchingAllIds(true);
+        try {
+            const response = await axiosInstance<PagedListMgmtTarget>({
+                url: `/rest/v1/targets`,
+                method: 'GET',
+                params: {
+                    limit: 1000,
+                    q: buildFinalQuery() || undefined,
+                },
+            });
+            const allIds = response.content?.map((target: MgmtTarget) => target.controllerId) || [];
+            setSelectedTargetIds(allIds);
+            setIsAllMatchingSelected(true);
+        } catch (error) {
+            message.error(t('common:messages.error'));
+        } finally {
+            setIsFetchingAllIds(false);
+        }
+    }, [buildFinalQuery, t]);
+
+    const handleSelectionChange = useCallback((keys: React.Key[]) => {
+        setSelectedTargetIds(keys);
+        if (keys.length === 0) {
+            setIsAllMatchingSelected(false);
+        } else if (keys.length < totalTargets) {
+            setIsAllMatchingSelected(false);
+        }
+    }, [totalTargets]);
 
     const { data: dsData, isLoading: dsLoading } = useGetDistributionSets(
         {
@@ -430,6 +479,12 @@ export const useTargetListModel = () => {
         setSelectedTargetIds,
         setPagination,
         setVisibleColumns,
+        globalSearch,
+        setGlobalSearch,
+        isAllMatchingSelected,
+        isFetchingAllIds,
+        handleSelectAllMatching,
+        handleSelectionChange,
 
         // Column options for FilterBuilder
         columnOptions: useMemo(() => COLUMN_CONFIG.filter(c => c.key !== 'actions').map(c => ({

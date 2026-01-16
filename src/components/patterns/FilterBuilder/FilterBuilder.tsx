@@ -1,12 +1,15 @@
 import React, { useState, useCallback } from 'react';
-import { Button, Popover, Divider } from 'antd';
-import { PlusOutlined, ClearOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Button, Popover, Divider, Space } from 'antd';
+import { PlusOutlined, ClearOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { FilterChip } from './FilterChip';
 import { FilterCondition, type FilterField, type FilterConditionValue } from './FilterCondition';
 import { SavedFilterDropdown } from './SavedFilterDropdown';
 import { ColumnCustomizer, type ColumnOption } from './ColumnCustomizer';
+import { CloseOutlined } from '@ant-design/icons';
+import { Input } from 'antd';
+import { type ToolbarAction } from '../EnhancedTable/SelectionToolbar';
 
 const Container = styled.div`
     display: flex;
@@ -58,6 +61,13 @@ export interface FilterValue {
     displayValue: string;
 }
 
+export interface SelectionInfo {
+    count: number;
+    actions: ToolbarAction[];
+    onClear: () => void;
+    label?: string;
+}
+
 export interface FilterBuilderProps {
     fields: FilterField[];
     filters: FilterValue[];
@@ -72,10 +82,17 @@ export interface FilterBuilderProps {
     onManageSavedFilters?: () => void;
     buildQuery?: (filters: FilterValue[]) => string;
 
-    // Column Customization integration
     columns?: ColumnOption[];
     visibleColumns?: string[];
     onVisibilityChange?: (columns: string[]) => void;
+
+    // Global Search
+    searchValue?: string;
+    onSearchChange?: (value: string) => void;
+    searchPlaceholder?: string;
+
+    // Selection integration
+    selection?: SelectionInfo;
 }
 
 export const FilterBuilder: React.FC<FilterBuilderProps> = ({
@@ -94,6 +111,10 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     columns,
     visibleColumns,
     onVisibilityChange,
+    selection,
+    searchValue,
+    onSearchChange,
+    searchPlaceholder,
 }) => {
     const { t } = useTranslation('common');
     const [conditionOpen, setConditionOpen] = useState(false);
@@ -192,6 +213,16 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                         />
                     )}
 
+                    <Input
+                        placeholder={searchPlaceholder || t('actions.search')}
+                        prefix={<SearchOutlined style={{ color: 'var(--ant-color-text-description)' }} />}
+                        size="small"
+                        allowClear
+                        value={searchValue}
+                        onChange={(e) => onSearchChange?.(e.target.value)}
+                        style={{ width: 220, borderRadius: 6 }}
+                    />
+
                     {filters.length > 0 && (
                         <>
                             <Divider type="vertical" style={{ height: 20 }} />
@@ -249,7 +280,50 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                     )}
                 </ActionsSection>
             </HeaderRow>
-
+            {selection && selection.count > 0 && (
+                <>
+                    <Divider style={{ margin: '8px 0' }} />
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '4px 8px',
+                        background: 'var(--ant-color-primary-bg, #e6f4ff)',
+                        borderRadius: '6px',
+                        border: '1px solid var(--ant-color-primary-border, #91caff)',
+                        animation: 'fadeIn 0.2s ease-out'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <span style={{ fontWeight: 600, color: 'var(--ant-color-primary, #1677ff)', fontSize: 13 }}>
+                                {selection.count} {selection.label || t('filter.selected')}
+                            </span>
+                            <Divider type="vertical" />
+                            <Space size="small">
+                                {selection.actions.map(action => (
+                                    <Button
+                                        key={action.key}
+                                        size="small"
+                                        type={action.danger ? 'primary' : 'default'}
+                                        danger={action.danger}
+                                        icon={action.icon}
+                                        onClick={action.onClick}
+                                        disabled={action.disabled}
+                                        style={{ fontSize: 12 }}
+                                    >
+                                        {action.label}
+                                    </Button>
+                                ))}
+                            </Space>
+                        </div>
+                        <Button
+                            type="text"
+                            size="small"
+                            icon={<CloseOutlined />}
+                            onClick={selection.onClear}
+                        />
+                    </div>
+                </>
+            )}
         </Container>
     );
 };

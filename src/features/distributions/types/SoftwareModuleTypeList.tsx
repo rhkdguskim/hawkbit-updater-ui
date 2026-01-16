@@ -3,11 +3,11 @@ import { Tag, message, Modal } from 'antd';
 import type { TableProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
-    useGetTypes,
+    useGetTypesInfinite,
     useDeleteSoftwareModuleType,
     useUpdateSoftwareModuleType,
 } from '@/api/generated/software-module-types/software-module-types';
-import type { MgmtSoftwareModuleType } from '@/api/generated/model';
+import type { MgmtSoftwareModuleType, PagedListMgmtSoftwareModuleType, ExceptionInfo } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterValue } from '@/components/patterns';
@@ -45,7 +45,7 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
 
     const {
         pagination,
-        offset,
+        sort,
         handleTableChange,
         resetPagination,
     } = useServerTable<MgmtSoftwareModuleType>({ syncToUrl: standalone });
@@ -53,10 +53,36 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [editingType, setEditingType] = React.useState<MgmtSoftwareModuleType | null>(null);
 
-    const { data, isLoading, isFetching, refetch } = useGetTypes({
-        offset,
-        limit: pagination.pageSize,
-    });
+    const {
+        data: infiniteData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isFetching,
+        refetch
+    } = useGetTypesInfinite(
+        {
+            limit: pagination.pageSize,
+            sort: sort || undefined,
+        },
+        {
+            query: {
+                getNextPageParam: (lastPage: PagedListMgmtSoftwareModuleType, allPages: PagedListMgmtSoftwareModuleType[]) => {
+                    const total = lastPage.total || 0;
+                    const currentOffset = allPages.length * (pagination.pageSize || 20);
+                    return currentOffset < total ? currentOffset : undefined;
+                },
+                initialPageParam: 0,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+            },
+        }
+    );
+
+    const typesContent = useMemo(() => {
+        return infiniteData?.pages.flatMap((page: PagedListMgmtSoftwareModuleType) => page.content || []) || [];
+    }, [infiniteData]);
 
     // Filter fields
     const filterFields: FilterField[] = useMemo(() => [
@@ -76,7 +102,7 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
                 message.success(t('typeManagement.deleteSuccess'));
                 refetch();
             },
-            onError: (error) => {
+            onError: (error: ExceptionInfo) => {
                 message.error((error as Error).message || t('typeManagement.deleteError'));
             },
         },
@@ -88,7 +114,7 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
                 message.success(t('typeManagement.updateSuccess'));
                 refetch();
             },
-            onError: (error) => {
+            onError: (error: ExceptionInfo) => {
                 message.error((error as Error).message || t('typeManagement.updateError'));
             },
         },
@@ -128,6 +154,7 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
             dataIndex: 'key',
             key: 'key',
             width: 150,
+            sorter: true,
             render: (text: string) => <Tag style={{ fontSize: 'var(--ant-font-size-sm)', margin: 0 }}>{text}</Tag>,
         },
         createDescriptionColumn<MgmtSoftwareModuleType>({ t }),
@@ -136,6 +163,7 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
             dataIndex: 'maxAssignments',
             key: 'maxAssignments',
             width: 100,
+            sorter: true,
             render: (val: number) => <SmallText>{val ?? 1}</SmallText>,
         },
         createColorColumn<MgmtSoftwareModuleType>({
@@ -200,23 +228,20 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
             <DataView
                 loading={isLoading}
                 error={null}
-                isEmpty={data?.content?.length === 0}
+                isEmpty={!isLoading && typesContent.length === 0}
                 emptyText={t('common:messages.noData')}
             >
                 <EnhancedTable<MgmtSoftwareModuleType>
                     columns={displayColumns}
-                    dataSource={data?.content || []}
+                    dataSource={typesContent}
                     rowKey="id"
-                    pagination={{
-                        ...pagination,
-                        total: data?.total || 0,
-                        showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50'],
-                        position: ['topRight'],
-                    }}
-                    loading={isLoading}
+                    pagination={false}
+                    loading={isLoading || isFetching}
                     onChange={handleTableChange}
                     scroll={{ x: 900 }}
+                    onFetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    isFetchingNextPage={isFetchingNextPage}
                 />
             </DataView>
 

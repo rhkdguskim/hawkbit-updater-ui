@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Tag, Tooltip, Space, Button, Typography, Flex } from 'antd';
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
-import { EditableCell } from '@/components/common';
+import { EditableCell, Highlighter } from '@/components/common';
 import type { MgmtSoftwareModule } from '@/api/generated/model';
 import CreateModuleWizard from './components/CreateModuleWizard';
 import dayjs from 'dayjs';
@@ -31,7 +31,7 @@ const SoftwareModuleList: React.FC = () => {
         return actions;
     }, [t, isAdmin, model]);
 
-    const columns: ColumnsType<MgmtSoftwareModule> = [
+    const columns: ColumnsType<MgmtSoftwareModule> = useMemo(() => [
         {
             title: t('common:table.id'),
             dataIndex: 'id',
@@ -46,11 +46,17 @@ const SoftwareModuleList: React.FC = () => {
             sorter: true,
             width: 200,
             render: (text, record) => (
-                <EditableCell
-                    value={text || ''}
-                    onSave={(val) => model.handleInlineUpdate(record.id, 'name', val)}
-                    editable={isAdmin}
-                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <Highlighter text={text} search={model.globalSearch} />
+                    {isAdmin && (
+                        <EditableCell
+                            value={text || ''}
+                            onSave={(val) => model.handleInlineUpdate(record.id, 'name', val)}
+                            editable={isAdmin}
+                            style={{ marginLeft: 'auto' }}
+                        />
+                    )}
+                </div>
             ),
         },
         {
@@ -59,7 +65,11 @@ const SoftwareModuleList: React.FC = () => {
             key: 'version',
             sorter: true,
             width: 80,
-            render: (text) => <Tag color="blue">{text}</Tag>,
+            render: (text) => (
+                <Tag color="blue">
+                    <Highlighter text={text} search={model.globalSearch} />
+                </Tag>
+            ),
         },
         {
             title: t('list.columns.type'),
@@ -74,11 +84,17 @@ const SoftwareModuleList: React.FC = () => {
             key: 'vendor',
             width: 120,
             render: (text, record) => (
-                <EditableCell
-                    value={text || ''}
-                    onSave={(val) => model.handleInlineUpdate(record.id, 'vendor', val)}
-                    editable={isAdmin}
-                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <Highlighter text={text} search={model.globalSearch} />
+                    {isAdmin && (
+                        <EditableCell
+                            value={text || ''}
+                            onSave={(val) => model.handleInlineUpdate(record.id, 'vendor', val)}
+                            editable={isAdmin}
+                            style={{ marginLeft: 'auto' }}
+                        />
+                    )}
+                </div>
             ),
         },
         {
@@ -87,12 +103,18 @@ const SoftwareModuleList: React.FC = () => {
             key: 'description',
             ellipsis: true,
             render: (text, record) => (
-                <EditableCell
-                    value={text || ''}
-                    onSave={(val) => model.handleInlineUpdate(record.id, 'description', val)}
-                    editable={isAdmin}
-                    secondary
-                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <Highlighter text={text} search={model.globalSearch} />
+                    {isAdmin && (
+                        <EditableCell
+                            value={text || ''}
+                            onSave={(val) => model.handleInlineUpdate(record.id, 'description', val)}
+                            editable={isAdmin}
+                            secondary
+                            style={{ marginLeft: 'auto' }}
+                        />
+                    )}
+                </div>
             ),
         },
         {
@@ -137,7 +159,7 @@ const SoftwareModuleList: React.FC = () => {
                 </Space>
             ),
         },
-    ];
+    ], [t, isAdmin, model.globalSearch, model.handleInlineUpdate, navigate]);
 
     // Filter columns based on visibility
     const displayColumns = useMemo(() => {
@@ -172,10 +194,19 @@ const SoftwareModuleList: React.FC = () => {
                     canAdd={isAdmin}
                     addLabel={t('actions.createModule')}
                     loading={model.isLoading || model.isFetching}
+                    searchValue={model.globalSearch}
+                    onSearchChange={model.setGlobalSearch}
+                    searchPlaceholder={t('list.searchDescription', { defaultValue: 'Search modules...' })}
                     // Integrated Column Customization
                     columns={columnOptions}
                     visibleColumns={model.visibleColumns}
                     onVisibilityChange={model.setVisibleColumns}
+                    selection={{
+                        count: model.selectedModuleIds.length,
+                        actions: selectionActions,
+                        onClear: () => model.setSelectedModuleIds([]),
+                        label: t('common:filter.selected')
+                    }}
                 />
             }
         >
@@ -194,8 +225,6 @@ const SoftwareModuleList: React.FC = () => {
                     onChange={model.handleTableChange}
                     selectedRowKeys={model.selectedModuleIds}
                     onSelectionChange={(keys) => model.setSelectedModuleIds(keys)}
-                    selectionActions={selectionActions}
-                    selectionLabel={t('common:filter.selected')}
                     scroll={{ x: 1000 }}
                     onFetchNextPage={model.fetchNextPage}
                     hasNextPage={model.hasNextPage}

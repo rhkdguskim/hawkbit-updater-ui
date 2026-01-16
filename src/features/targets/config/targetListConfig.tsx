@@ -19,6 +19,7 @@ import type { MgmtTarget, MgmtTargetType } from '@/api/generated/model';
 import dayjs from 'dayjs';
 import { isTargetOnline } from '@/entities';
 import { TargetTagsCell, TargetTypeCell, InstalledModulesCell, StatusIndicator } from '../components';
+import { Highlighter } from '@/components/common/Highlighter';
 
 const { Text } = Typography;
 
@@ -85,6 +86,7 @@ export interface GetColumnsOptions {
     onView: (target: MgmtTarget) => void;
     onDelete: (target: MgmtTarget) => void;
     onCopySecurityToken?: (token: string) => void;
+    searchTerm?: string;
 }
 
 export const getTargetColumns = ({
@@ -96,6 +98,7 @@ export const getTargetColumns = ({
     onView,
     onDelete,
     onCopySecurityToken,
+    searchTerm,
 }: GetColumnsOptions): ColumnsType<MgmtTarget> => {
     const allColumns: ColumnsType<MgmtTarget> = [
         {
@@ -107,7 +110,7 @@ export const getTargetColumns = ({
             render: (_: string, record) => (
                 <Tooltip title={record.description || undefined}>
                     <Text strong ellipsis style={{ maxWidth: 200, fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
-                        {record.name || record.controllerId}
+                        <Highlighter text={record.name || record.controllerId} search={searchTerm} />
                     </Text>
                 </Tooltip>
             ),
@@ -118,7 +121,9 @@ export const getTargetColumns = ({
             key: 'ipAddress',
             width: 130,
             render: (ipAddress: string | undefined) => (
-                <Text style={{ fontSize: 12, fontFamily: 'var(--font-mono)' }}>{ipAddress || '-'}</Text>
+                <Text style={{ fontSize: 12, fontFamily: 'var(--font-mono)' }}>
+                    <Highlighter text={ipAddress} search={searchTerm} />
+                </Text>
             ),
         },
         {

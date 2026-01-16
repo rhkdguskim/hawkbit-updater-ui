@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import type { TableProps } from 'antd';
 import type { SorterResult, TablePaginationConfig, FilterValue } from 'antd/es/table/interface';
 import { useSearchParams } from 'react-router-dom';
+import { useDebounce } from './useDebounce';
 
 interface UseServerTableProps {
     defaultPageSize?: number;
@@ -16,7 +17,7 @@ interface PaginationState {
 }
 
 export function useServerTable<T>({
-    defaultPageSize = 10,
+    defaultPageSize = 25,
     syncToUrl = false,
     allowedSortFields,
 }: UseServerTableProps = {}) {
@@ -56,6 +57,16 @@ export function useServerTable<T>({
         return '';
     });
 
+    const [globalSearch, setGlobalSearch] = useState<string>(() => {
+        if (syncToUrl) {
+            return searchParams.get('search') || '';
+        }
+        return '';
+    });
+
+    // Debounce global search to optimize API calls
+    const debouncedGlobalSearch = useDebounce(globalSearch, 500);
+
     // Sync state to URL
     useEffect(() => {
         if (!syncToUrl) return;
@@ -74,8 +85,11 @@ export function useServerTable<T>({
         if (searchQuery) newParams.set('q', searchQuery);
         else newParams.delete('q');
 
+        if (globalSearch) newParams.set('search', globalSearch);
+        else newParams.delete('search');
+
         setSearchParams(newParams, { replace: true });
-    }, [pagination, sort, searchQuery, syncToUrl]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [pagination, sort, searchQuery, globalSearch, syncToUrl, searchParams, setSearchParams, defaultPageSize]);
 
     const offset = (pagination.current - 1) * pagination.pageSize;
 
@@ -126,6 +140,9 @@ export function useServerTable<T>({
         sort,
         searchQuery,
         setSearchQuery,
+        globalSearch,
+        setGlobalSearch,
+        debouncedGlobalSearch,
         handleTableChange,
         handleSearch,
         resetPagination,

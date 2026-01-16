@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Table } from 'antd';
+import { Table, Spin } from 'antd';
 import type { TableProps } from 'antd';
 import styled from 'styled-components';
-import { SelectionToolbar, type ToolbarAction } from './SelectionToolbar';
+import type { ToolbarAction } from './SelectionToolbar';
 
 const TableContainer = styled.div`
     flex: 1;
@@ -148,8 +148,6 @@ export interface EnhancedTableProps<T> extends Omit<TableProps<T>, 'rowSelection
     selectedRowKeys?: React.Key[];
     /** Callback when selection changes */
     onSelectionChange?: (keys: React.Key[], rows: T[]) => void;
-    /** Custom selection label */
-    selectionLabel?: string;
     /** Row key field */
     rowKeyField?: string;
     /** Infinite scroll: Callback to fetch next page */
@@ -158,17 +156,28 @@ export interface EnhancedTableProps<T> extends Omit<TableProps<T>, 'rowSelection
     hasNextPage?: boolean;
     /** Infinite scroll: Whether the next page is currently being fetched */
     isFetchingNextPage?: boolean;
+    /** Callback when column filters/sorters change */
+    onTableChange?: TableProps<T>['onChange'];
+    /** Total items matching current filter (for "Select all matching" feature) */
+    totalItems?: number;
+    /** Callback to select all items matching current filter */
+    onSelectAllMatching?: () => void;
+    /** Whether all items matching filter are selected */
+    isAllMatchingSelected?: boolean;
 }
 
 export function EnhancedTable<T extends object>({
     selectionActions = [],
     selectedRowKeys = [],
     onSelectionChange,
-    selectionLabel,
     rowKeyField = 'id',
     onFetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    onTableChange,
+    totalItems,
+    onSelectAllMatching,
+    isAllMatchingSelected,
     ...tableProps
 }: EnhancedTableProps<T>) {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -203,12 +212,11 @@ export function EnhancedTable<T extends object>({
                 // SelectionToolbar: ~44px
                 // Table Header: ~35px (small size)
                 // Pagination: ~48px (including margins)
-                const toolbarHeight = selectedRowKeys.length > 0 ? 44 : 0;
                 const paginationHeight = tableProps.pagination !== false ? 48 : 0;
                 const headerHeight = 35;
 
                 // Subtract heights of other elements to find available space for table body
-                const calculatedHeight = containerHeight - toolbarHeight - paginationHeight - headerHeight - 8;
+                const calculatedHeight = containerHeight - paginationHeight - headerHeight - 8;
                 setScrollY(calculatedHeight > 100 ? calculatedHeight : undefined);
             }
         };
@@ -230,9 +238,9 @@ export function EnhancedTable<T extends object>({
         };
     }, [selectedRowKeys.length, tableProps.pagination, tableProps.dataSource?.length]);
 
-    const handleClearSelection = () => {
-        onSelectionChange?.([], []);
-    };
+    useEffect(() => {
+        // Handle selection clear if needed, but usually handled by parent now
+    }, [selectedRowKeys.length]);
 
     const rowSelection: TableProps<T>['rowSelection'] = onSelectionChange
         ? {
@@ -249,35 +257,53 @@ export function EnhancedTable<T extends object>({
         ...tableProps.scroll,
     };
 
+    const handleTableChange: TableProps<T>['onChange'] = (pagination, filters, sorter, extra) => {
+        onTableChange?.(pagination, filters, sorter, extra);
+        tableProps.onChange?.(pagination, filters, sorter, extra);
+    };
+
     return (
         <TableContainer ref={containerRef}>
-            <SelectionToolbar
-                selectedCount={selectedRowKeys.length}
-                actions={selectionActions}
-                onClearSelection={handleClearSelection}
-                selectionLabel={selectionLabel}
-            />
-            <Table<T>
-                {...tableProps}
-                rowSelection={rowSelection}
-                rowKey={(tableProps.rowKey as string) || rowKeyField}
-                size="small"
-                scroll={scroll}
-                sticky
-                summary={
-                    isFetchingNextPage ? () => (
-                        <Table.Summary fixed="bottom">
-                            <Table.Summary.Row>
-                                <Table.Summary.Cell index={0} colSpan={tableProps.columns?.length || 10}>
-                                    <div style={{ textAlign: 'center', padding: '12px', color: 'var(--ant-color-text-secondary)' }}>
-                                        Loading more...
-                                    </div>
-                                </Table.Summary.Cell>
-                            </Table.Summary.Row>
-                        </Table.Summary>
-                    ) : undefined
-                }
-            />
+            <Spin spinning={isFetchingNextPage} tip="Loading more..." size="large">
+                {selectedRowKeys.length > 0 && totalItems !== undefined && totalItems > selectedRowKeys.length && !isAllMatchingSelected && onSelectAllMatching && (
+                    <div style={{
+                        padding: '8px 16px',
+                        background: 'var(--ant-color-primary-bg)',
+                        borderBottom: '1px solid var(--ant-color-primary-border)',
+                        textAlign: 'center',
+                        fontSize: '13px',
+                        animation: 'fadeIn 0.2s ease-out'
+                    }}>
+                        All <strong>{selectedRowKeys.length}</strong> items on this page are selected.{' '}
+                        <a onClick={(e) => { e.preventDefault(); onSelectAllMatching(); }} style={{ fontWeight: 600, textDecoration: 'underline' }}>
+                            Select all {totalItems} items matching this filter
+                        </a>
+                    </div>
+                )}
+                {isAllMatchingSelected && (
+                    <div style={{
+                        padding: '8px 16px',
+                        background: 'var(--ant-color-info-bg)',
+                        borderBottom: '1px solid var(--ant-color-info-border)',
+                        textAlign: 'center',
+                        fontSize: '13px',
+                    }}>
+                        All <strong>{totalItems}</strong> items matching this filter are selected.{' '}
+                        <a onClick={(e) => { e.preventDefault(); onSelectionChange?.([], []); }} style={{ fontWeight: 600 }}>
+                            Clear selection
+                        </a>
+                    </div>
+                )}
+                <Table<T>
+                    {...tableProps}
+                    rowSelection={rowSelection}
+                    rowKey={(tableProps.rowKey as string) || rowKeyField}
+                    size="small"
+                    scroll={scroll}
+                    sticky
+                    onChange={handleTableChange}
+                />
+            </Spin>
         </TableContainer>
     );
 }

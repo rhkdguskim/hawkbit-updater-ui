@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ColumnsType } from 'antd/es/table';
 import {
-    useGetTargetTypes,
+    useGetTargetTypesInfinite,
     useDeleteTargetType,
     useCreateTargetTypes,
     useUpdateTargetType,
@@ -14,7 +14,7 @@ import {
     getGetTargetTypesQueryKey,
     getGetCompatibleDistributionSetsQueryKey,
 } from '@/api/generated/target-types/target-types';
-import type { MgmtTargetType, MgmtTargetTypeRequestBodyPost, MgmtTargetTypeRequestBodyPut } from '@/api/generated/model';
+import type { MgmtTargetType, MgmtTargetTypeRequestBodyPost, MgmtTargetTypeRequestBodyPut, PagedListMgmtTargetType, ExceptionInfo } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterValue } from '@/components/patterns';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
@@ -52,7 +52,7 @@ const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) =>
 
     const {
         pagination,
-        offset,
+        sort,
         handleTableChange,
         resetPagination,
     } = useServerTable<MgmtTargetType>({ syncToUrl: standalone });
@@ -60,10 +60,36 @@ const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) =>
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [editingType, setEditingType] = React.useState<MgmtTargetType | null>(null);
 
-    const { data, isLoading, isFetching, refetch } = useGetTargetTypes({
-        offset,
-        limit: pagination.pageSize,
-    });
+    const {
+        data: infiniteData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isFetching,
+        refetch
+    } = useGetTargetTypesInfinite(
+        {
+            limit: pagination.pageSize,
+            sort: sort || undefined,
+        },
+        {
+            query: {
+                getNextPageParam: (lastPage: PagedListMgmtTargetType, allPages: PagedListMgmtTargetType[]) => {
+                    const total = lastPage.total || 0;
+                    const currentOffset = allPages.length * (pagination.pageSize || 20);
+                    return currentOffset < total ? currentOffset : undefined;
+                },
+                initialPageParam: 0,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+            },
+        }
+    );
+
+    const typesContent = useMemo(() => {
+        return infiniteData?.pages.flatMap((page: PagedListMgmtTargetType) => page.content || []) || [];
+    }, [infiniteData]);
 
     // Filter fields
     const filterFields: FilterField[] = useMemo(() => [
@@ -132,7 +158,7 @@ const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) =>
 
             message.success(t('typeManagement.createSuccess'));
             setDialogOpen(false);
-            queryClient.invalidateQueries({ queryKey: getGetTargetTypesQueryKey() });
+            refetch();
         } catch {
             // Error handled in mutation
         }
@@ -173,7 +199,7 @@ const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) =>
             message.success(t('typeManagement.updateSuccess'));
             setDialogOpen(false);
             setEditingType(null);
-            queryClient.invalidateQueries({ queryKey: getGetTargetTypesQueryKey() });
+            refetch();
             queryClient.invalidateQueries({ queryKey: getGetCompatibleDistributionSetsQueryKey(editingType.id) });
         } catch {
             // Error handled in mutation
@@ -274,23 +300,20 @@ const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) =>
             <DataView
                 loading={isLoading}
                 error={null}
-                isEmpty={data?.content?.length === 0}
+                isEmpty={!isLoading && typesContent.length === 0}
                 emptyText={t('common:messages.noData')}
             >
                 <EnhancedTable<MgmtTargetType>
                     columns={displayColumns}
-                    dataSource={data?.content || []}
+                    dataSource={typesContent}
                     rowKey="id"
-                    loading={isLoading}
-                    pagination={{
-                        ...pagination,
-                        total: data?.total || 0,
-                        showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50'],
-                        position: ['topRight'],
-                    }}
+                    pagination={false}
+                    loading={isLoading || isFetching}
                     onChange={handleTableChange}
                     scroll={{ x: 800 }}
+                    onFetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    isFetchingNextPage={isFetchingNextPage}
                 />
             </DataView>
 

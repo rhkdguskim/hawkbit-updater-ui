@@ -2,12 +2,12 @@ import React, { useMemo, useCallback } from 'react';
 import { message, Modal } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
-    useGetDistributionSetTags,
+    useGetDistributionSetTagsInfinite,
     useDeleteDistributionSetTag,
     useCreateDistributionSetTags,
     useUpdateDistributionSetTag,
 } from '@/api/generated/distribution-set-tags/distribution-set-tags';
-import type { MgmtTag } from '@/api/generated/model';
+import type { MgmtTag, PagedListMgmtTag } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import { TagFormModal } from '@/components/common';
@@ -45,7 +45,7 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
 
     const {
         pagination,
-        offset,
+        sort,
         handleTableChange,
         resetPagination,
     } = useServerTable<MgmtTag>({ syncToUrl: standalone });
@@ -53,10 +53,31 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [editingTag, setEditingTag] = React.useState<MgmtTag | null>(null);
 
-    const { data, isLoading, isFetching, refetch } = useGetDistributionSetTags({
-        offset,
+    const {
+        data: infiniteData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isFetching,
+        refetch
+    } = useGetDistributionSetTagsInfinite({
         limit: pagination.pageSize,
+        sort: sort || undefined,
+    }, {
+        query: {
+            getNextPageParam: (lastPage: PagedListMgmtTag, allPages: PagedListMgmtTag[]) => {
+                const total = lastPage.total || 0;
+                const currentOffset = allPages.length * (pagination.pageSize || 20);
+                return currentOffset < total ? currentOffset : undefined;
+            },
+            initialPageParam: 0,
+        }
     });
+
+    const tagsContent = useMemo(() => {
+        return infiniteData?.pages.flatMap((page: PagedListMgmtTag) => page.content || []) || [];
+    }, [infiniteData]);
 
     // Filter fields
     const filterFields: FilterField[] = useMemo(() => [
@@ -216,23 +237,20 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
             <DataView
                 loading={isLoading}
                 error={null}
-                isEmpty={data?.content?.length === 0}
+                isEmpty={tagsContent.length === 0}
                 emptyText={t('common:messages.noData')}
             >
                 <EnhancedTable<MgmtTag>
                     columns={displayColumns}
-                    dataSource={data?.content || []}
+                    dataSource={tagsContent}
                     rowKey="id"
-                    pagination={{
-                        ...pagination,
-                        total: data?.total || 0,
-                        showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50'],
-                        position: ['topRight'],
-                    }}
-                    loading={isLoading}
+                    pagination={false}
+                    loading={isLoading || isFetching}
                     onChange={handleTableChange}
                     scroll={{ x: 700 }}
+                    onFetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    isFetchingNextPage={isFetchingNextPage}
                 />
             </DataView>
 

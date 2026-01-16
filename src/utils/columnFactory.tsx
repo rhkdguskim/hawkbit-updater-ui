@@ -161,6 +161,7 @@ export function createStatusColumn<T>(options: {
         dataIndex,
         key: 'status',
         width,
+        sorter: true,
         render: (status: string) => <StatusTag status={status} showIcon={showIcon} />,
     };
 }
@@ -242,6 +243,7 @@ export function createTypeColumn<T>(options: {
         dataIndex,
         key: 'type',
         width,
+        sorter: true,
         render: (text: string, record: T) => {
             const resolvedColor = typeof color === 'function' ? color(record) : color;
             return (

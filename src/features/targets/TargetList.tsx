@@ -89,7 +89,8 @@ const TargetList: React.FC = () => {
             navigator.clipboard.writeText(token);
             message.success(t('common:actions.copied', { defaultValue: 'Copied!' }));
         },
-    }), [t, isAdmin, model.availableTypes, model.visibleColumns, handleViewDetail, model]);
+        searchTerm: model.globalSearch,
+    }), [t, isAdmin, model.availableTypes, model.visibleColumns, handleViewDetail, model.globalSearch, model]);
 
     return (
         <StandardListLayout
@@ -100,16 +101,22 @@ const TargetList: React.FC = () => {
                     fields={model.filterFields}
                     filters={model.filters}
                     onFiltersChange={model.handleFiltersChange}
-                    onRefresh={() => model.refetchTargets()}
-                    onAdd={model.handleAddTarget}
-                    canAdd={isAdmin}
-                    addLabel={t('actions.addTarget')}
+                    onRefresh={model.refetchTargets}
+                    onAdd={isAdmin ? model.handleAddTarget : undefined}
+                    addLabel={t('actions.add')}
                     loading={model.targetsLoading || model.targetsFetching}
-                    buildQuery={model.buildFinalQuery}
-                    // Integrated Column Customization
+                    searchValue={model.globalSearch}
+                    onSearchChange={model.setGlobalSearch}
+                    searchPlaceholder={t('list.searchPlaceholder', { defaultValue: 'Search targets...' })}
                     columns={model.columnOptions}
                     visibleColumns={model.visibleColumns}
                     onVisibilityChange={model.setVisibleColumns}
+                    selection={{
+                        count: model.selectedTargetIds.length,
+                        actions: selectionActions,
+                        onClear: () => model.setSelectedTargetIds([]),
+                        label: t('filter.selected', { ns: 'common' })
+                    }}
                 />
             }
         >
@@ -123,14 +130,12 @@ const TargetList: React.FC = () => {
                     columns={columns}
                     dataSource={model.targetsData}
                     rowKey="controllerId"
-                    loading={model.targetsLoading || model.targetsFetching}
+                    loading={model.targetsLoading || model.targetsFetching || model.isFetchingAllIds}
                     selectedRowKeys={model.selectedTargetIds}
-                    onSelectionChange={(keys) => model.setSelectedTargetIds(keys)}
-                    selectionActions={selectionActions}
-                    selectionLabel={t('filter.selected', { ns: 'common' })}
+                    onSelectionChange={model.handleSelectionChange}
                     pagination={false}
                     onChange={model.handleTableChange}
-                    scroll={{ x: 1340 }}
+                    scroll={{ x: 1200 }}
                     locale={{ emptyText: t('noTargets') }}
                     onRow={(record) => ({
                         onDoubleClick: () => handleViewDetail(record),
@@ -138,6 +143,9 @@ const TargetList: React.FC = () => {
                     onFetchNextPage={model.fetchNextPage}
                     hasNextPage={model.hasNextPage}
                     isFetchingNextPage={model.isFetchingNextPage}
+                    totalItems={model.totalTargets}
+                    onSelectAllMatching={model.handleSelectAllMatching}
+                    isAllMatchingSelected={model.isAllMatchingSelected}
                 />
             </DataView>
 

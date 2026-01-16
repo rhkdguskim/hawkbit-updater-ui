@@ -3,11 +3,11 @@ import { Tag, message, Modal } from 'antd';
 import type { TableProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
-    useGetDistributionSetTypes,
+    useGetDistributionSetTypesInfinite,
     useDeleteDistributionSetType,
     useUpdateDistributionSetType,
 } from '@/api/generated/distribution-set-types/distribution-set-types';
-import type { MgmtDistributionSetType } from '@/api/generated/model';
+import type { MgmtDistributionSetType, PagedListMgmtDistributionSetType, ExceptionInfo } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import { EnhancedTable, FilterBuilder, DataView, type FilterField, type FilterValue } from '@/components/patterns';
@@ -44,7 +44,7 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
 
     const {
         pagination,
-        offset,
+        sort,
         handleTableChange,
         resetPagination,
     } = useServerTable<MgmtDistributionSetType>({ syncToUrl: standalone });
@@ -52,13 +52,36 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [editingType, setEditingType] = React.useState<MgmtDistributionSetType | null>(null);
 
-    const { data, isLoading, isFetching, refetch } = useGetDistributionSetTypes({
-        offset,
-        limit: pagination.pageSize,
-        // HawkBit doesn't support RSQL for types/tags in some endpoints, 
-        // but let's check if name filtering is possible. 
-        // Typically name/description/key are filterable.
-    });
+    const {
+        data: infiniteData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isFetching,
+        refetch
+    } = useGetDistributionSetTypesInfinite(
+        {
+            limit: pagination.pageSize,
+            sort: sort || undefined,
+        },
+        {
+            query: {
+                getNextPageParam: (lastPage: PagedListMgmtDistributionSetType, allPages: PagedListMgmtDistributionSetType[]) => {
+                    const total = lastPage.total || 0;
+                    const currentOffset = allPages.length * (pagination.pageSize || 20);
+                    return currentOffset < total ? currentOffset : undefined;
+                },
+                initialPageParam: 0,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+            },
+        }
+    );
+
+    const typesContent = useMemo(() => {
+        return infiniteData?.pages.flatMap((page: PagedListMgmtDistributionSetType) => page.content || []) || [];
+    }, [infiniteData]);
 
     // Filter fields
     const filterFields: FilterField[] = useMemo(() => [
@@ -78,7 +101,7 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
                 message.success(t('typeManagement.deleteSuccess'));
                 refetch();
             },
-            onError: (error) => {
+            onError: (error: ExceptionInfo) => {
                 message.error((error as Error).message || t('typeManagement.deleteError'));
             },
         },
@@ -90,7 +113,7 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
                 message.success(t('typeManagement.updateSuccess'));
                 refetch();
             },
-            onError: (error) => {
+            onError: (error: ExceptionInfo) => {
                 message.error((error as Error).message || t('typeManagement.updateError'));
             },
         },
@@ -130,6 +153,7 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
             dataIndex: 'key',
             key: 'key',
             width: 150,
+            sorter: true,
             render: (text: string) => <Tag style={{ fontSize: 'var(--ant-font-size-sm)', margin: 0 }}>{text}</Tag>,
         },
         createDescriptionColumn<MgmtDistributionSetType>({ t }),
@@ -194,23 +218,20 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
             <DataView
                 loading={isLoading}
                 error={null}
-                isEmpty={data?.content?.length === 0}
+                isEmpty={!isLoading && typesContent.length === 0}
                 emptyText={t('common:messages.noData')}
             >
                 <EnhancedTable<MgmtDistributionSetType>
                     columns={displayColumns}
-                    dataSource={data?.content || []}
+                    dataSource={typesContent}
                     rowKey="id"
-                    pagination={{
-                        ...pagination,
-                        total: data?.total || 0,
-                        showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50'],
-                        position: ['topRight'],
-                    }}
-                    loading={isLoading}
+                    pagination={false}
+                    loading={isLoading || isFetching}
                     onChange={handleTableChange}
                     scroll={{ x: 800 }}
+                    onFetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    isFetchingNextPage={isFetchingNextPage}
                 />
             </DataView>
 

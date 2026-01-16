@@ -3,6 +3,11 @@ import { ConfigProvider } from 'antd';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { lightTheme, darkTheme } from '@/theme';
 
+import { useLanguageStore } from '@/stores/useLanguageStore';
+import ko_KR from 'antd/es/locale/ko_KR';
+import en_US from 'antd/es/locale/en_US';
+import zh_CN from 'antd/es/locale/zh_CN';
+
 interface ThemeProviderProps {
     children: React.ReactNode;
 }
@@ -10,6 +15,18 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     const mode = useThemeStore(state => state.mode);
     const systemTheme = useThemeStore(state => state.systemTheme);
+    const language = useLanguageStore(state => state.language);
+
+    // Determine AntD locale
+    const locale = useMemo(() => {
+        switch (language) {
+            case 'ko': return ko_KR;
+            case 'zh': return zh_CN;
+            case 'en':
+            default:
+                return en_US;
+        }
+    }, [language]);
 
     // Determine the actual theme to apply
     const resolvedTheme = useMemo(() => {
@@ -35,7 +52,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     const currentTheme = resolvedTheme === 'dark' ? darkTheme : lightTheme;
 
     return (
-        <ConfigProvider theme={{ ...currentTheme, cssVar: { key: 'ant' } }}>
+        <ConfigProvider
+            theme={{ ...currentTheme, cssVar: { key: 'ant' } }}
+            locale={locale}
+        >
             {children}
         </ConfigProvider>
     );

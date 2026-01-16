@@ -26,9 +26,12 @@ export const useSoftwareModuleListModel = () => {
     const {
         pagination,
         sort,
+        globalSearch,
+        setGlobalSearch,
+        debouncedGlobalSearch,
         handleTableChange,
         resetPagination,
-    } = useServerTable<MgmtSoftwareModule>({ syncToUrl: true });
+    } = useServerTable<MgmtSoftwareModule>({ syncToUrl: true, defaultPageSize: 25 });
 
     const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
     const [selectedModuleIds, setSelectedModuleIds] = useState<React.Key[]>([]);
@@ -66,9 +69,19 @@ export const useSoftwareModuleListModel = () => {
      * Build RSQL query from filters.
      */
     const buildFinalQuery = useCallback(() => {
-        const serverFilters = filters.filter(f => f.field !== 'typeName');
-        return buildQueryFromFilterValues(serverFilters);
-    }, [filters]);
+        const fiql = buildQueryFromFilterValues(filters.filter(f => f.field !== 'typeName'));
+
+        if (debouncedGlobalSearch) {
+            const searchFields = ['name', 'version', 'description', 'vendor'];
+            const searchQuery = searchFields
+                .map(field => `${field}==*${debouncedGlobalSearch}*`)
+                .join(',');
+
+            return fiql ? `(${fiql});(${searchQuery})` : `(${searchQuery})`;
+        }
+
+        return fiql;
+    }, [filters, debouncedGlobalSearch]);
 
     // Get typeName filter value for client-side filtering
     const typeNameFilter = useMemo(() => {
@@ -231,5 +244,7 @@ export const useSoftwareModuleListModel = () => {
         handleDelete,
         handleBulkDelete,
         handleInlineUpdate,
+        globalSearch,
+        setGlobalSearch,
     };
 };

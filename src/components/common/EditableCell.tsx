@@ -89,6 +89,8 @@ export interface EditableCellProps {
     mono?: boolean;
     /** Custom render for display mode */
     renderDisplay?: (value: string) => React.ReactNode;
+    /** Custom style for wrapper */
+    style?: React.CSSProperties;
 }
 
 export const EditableCell: React.FC<EditableCellProps> = ({
@@ -101,6 +103,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     maxLength,
     mono = false,
     renderDisplay,
+    style,
 }) => {
     const { t } = useTranslation('common');
     const [editing, setEditing] = useState(false);
@@ -190,7 +193,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
 
     return (
-        <CellWrapper onClick={handleStartEdit}>
+        <CellWrapper onClick={handleStartEdit} style={style}>
             {renderDisplay ? (
                 renderDisplay(value)
             ) : (
