@@ -46,17 +46,12 @@ const SoftwareModuleList: React.FC = () => {
             sorter: true,
             width: 200,
             render: (text, record) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <Highlighter text={text} search={model.globalSearch} />
-                    {isAdmin && (
-                        <EditableCell
-                            value={text || ''}
-                            onSave={(val) => model.handleInlineUpdate(record.id, 'name', val)}
-                            editable={isAdmin}
-                            style={{ marginLeft: 'auto' }}
-                        />
-                    )}
-                </div>
+                <EditableCell
+                    value={text || ''}
+                    onSave={(val) => model.handleInlineUpdate(record.id, 'name', val)}
+                    editable={isAdmin}
+                    renderDisplay={(val) => <Highlighter text={val} search={model.globalSearch} />}
+                />
             ),
         },
         {
@@ -84,17 +79,12 @@ const SoftwareModuleList: React.FC = () => {
             key: 'vendor',
             width: 120,
             render: (text, record) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <Highlighter text={text} search={model.globalSearch} />
-                    {isAdmin && (
-                        <EditableCell
-                            value={text || ''}
-                            onSave={(val) => model.handleInlineUpdate(record.id, 'vendor', val)}
-                            editable={isAdmin}
-                            style={{ marginLeft: 'auto' }}
-                        />
-                    )}
-                </div>
+                <EditableCell
+                    value={text || ''}
+                    onSave={(val) => model.handleInlineUpdate(record.id, 'vendor', val)}
+                    editable={isAdmin}
+                    renderDisplay={(val) => <Highlighter text={val} search={model.globalSearch} />}
+                />
             ),
         },
         {
@@ -103,18 +93,13 @@ const SoftwareModuleList: React.FC = () => {
             key: 'description',
             ellipsis: true,
             render: (text, record) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <Highlighter text={text} search={model.globalSearch} />
-                    {isAdmin && (
-                        <EditableCell
-                            value={text || ''}
-                            onSave={(val) => model.handleInlineUpdate(record.id, 'description', val)}
-                            editable={isAdmin}
-                            secondary
-                            style={{ marginLeft: 'auto' }}
-                        />
-                    )}
-                </div>
+                <EditableCell
+                    value={text || ''}
+                    onSave={(val) => model.handleInlineUpdate(record.id, 'description', val)}
+                    editable={isAdmin}
+                    secondary
+                    renderDisplay={(val) => <Highlighter text={val} search={model.globalSearch} />}
+                />
             ),
         },
         {
@@ -196,7 +181,6 @@ const SoftwareModuleList: React.FC = () => {
                     loading={model.isLoading || model.isFetching}
                     searchValue={model.globalSearch}
                     onSearchChange={model.setGlobalSearch}
-                    searchPlaceholder={t('list.searchDescription', { defaultValue: 'Search modules...' })}
                     // Integrated Column Customization
                     columns={columnOptions}
                     visibleColumns={model.visibleColumns}

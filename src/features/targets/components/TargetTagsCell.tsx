@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Tag, Space, Spin, Typography, Popover, Select, Button, message, Divider } from 'antd';
+import React, { useState, useMemo } from 'react';
+import { Tag, Space, Spin, Typography, Popover, Select, Button, message, Divider, Tooltip } from 'antd';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useGetTags, getGetTagsQueryKey } from '@/api/generated/targets/targets';
 import { useGetTargetTags, useAssignTarget, useUnassignTarget, useCreateTargetTags, getGetTargetTagsQueryKey } from '@/api/generated/target-tags/target-tags';
@@ -9,29 +9,44 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { TagFormModal } from '@/components/common';
 import type { TagFormValues } from '@/components/common';
 import type { MgmtTag } from '@/api/generated/model';
+import { useInView } from '@/hooks/useInView';
 
 const { Text } = Typography;
 
 interface TargetTagsCellProps {
     controllerId: string;
+    availableTags?: MgmtTag[];
 }
 
-export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) => {
+export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId, availableTags }) => {
     const { t } = useTranslation(['targets', 'common']);
     const queryClient = useQueryClient();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
+    const { ref, inView } = useInView();
 
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [createModalOpen, setCreateModalOpen] = useState(false);
 
+    // 1. Tags for this specific target
+    // Only fetch if in view to prevent N+1 storm
     const { data: currentTags, isLoading } = useGetTags(controllerId, {
         query: {
-            staleTime: 0,
-            refetchOnMount: 'always',
+            staleTime: 1000 * 60 * 5, // 5 minutes
+            gcTime: 1000 * 60 * 10, // 10 minutes
+            enabled: inView,
         },
     });
-    const { data: allTagsData, isLoading: allTagsLoading, refetch: refetchAllTags } = useGetTargetTags({ limit: 100 });
+
+    // 2. All available tags (for the dropdown)
+    // Use passed availableTags if provided to avoid fetching 100 tags 50 times.
+    const { data: fetchedTagsData, isLoading: allTagsLoading, refetch: refetchAllTags } = useGetTargetTags(
+        { limit: 100 },
+        { query: { enabled: !availableTags && popoverOpen } } // Delay fetch until popover opens or if not provided
+    );
+
+    const allTags = useMemo(() => availableTags || (fetchedTagsData?.content as MgmtTag[]) || [], [availableTags, fetchedTagsData]);
+    const isTagsLoading = !availableTags && allTagsLoading;
 
     const assignTagMutation = useAssignTarget();
     const unassignTagMutation = useUnassignTarget();
@@ -41,7 +56,9 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
             onSuccess: async (data) => {
                 message.success(t('tagManagement.createSuccess'));
                 setCreateModalOpen(false);
-                await refetchAllTags();
+                if (!availableTags) await refetchAllTags();
+                await queryClient.invalidateQueries({ queryKey: getGetTargetTagsQueryKey() }); // Always invalidate global tags
+
                 // Auto-select the newly created tag
                 const newTag = data?.[0];
                 if (newTag?.id) {
@@ -70,7 +87,6 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
             queryClient.invalidateQueries({ queryKey: getGetTagsQueryKey(controllerId) });
         } catch (error) {
             message.error((error as Error).message || t('common:error'));
-            // Revert selection if needed (handled by refetch)
         }
     };
 
@@ -85,7 +101,12 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
         }
     };
 
-    const popoverContent = (
+    const tagOptions = useMemo(() => allTags.map(tag => ({
+        value: tag.id,
+        label: <Tag color={tag.colour || 'default'}>{tag.name}</Tag>,
+    })), [allTags]);
+
+    const popoverContent = useMemo(() => (
         <div style={{ width: 280 }}>
             <Select
                 mode="multiple"
@@ -94,12 +115,9 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
                 value={(currentTags || []).map(tag => tag.id!)}
                 onSelect={handleSelect}
                 onDeselect={handleDeselect}
-                loading={allTagsLoading || assignTagMutation.isPending || unassignTagMutation.isPending}
+                loading={isTagsLoading || assignTagMutation.isPending || unassignTagMutation.isPending}
                 allowClear={false}
-                options={(allTagsData?.content as MgmtTag[] || []).map(tag => ({
-                    value: tag.id,
-                    label: <Tag color={tag.colour || 'default'}>{tag.name}</Tag>,
-                }))}
+                options={tagOptions}
                 dropdownRender={(menu) => (
                     <>
                         {menu}
@@ -116,20 +134,44 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
                 )}
             />
         </div>
-    );
+    ), [allTags, currentTags, isTagsLoading, assignTagMutation.isPending, unassignTagMutation.isPending, t, handleSelect, handleDeselect, tagOptions]);
+
+    // Placeholder for intersection observer
+    if (!inView) {
+        return <div ref={ref} style={{ minHeight: 24, minWidth: 50 }} />;
+    }
 
     if (isLoading) {
-        return <Spin size="small" />;
+        return (
+            <div ref={ref} style={{ minHeight: 24, display: 'flex', alignItems: 'center' }}>
+                <Spin size="small" />
+            </div>
+        );
     }
 
     return (
-        <>
+        <div ref={ref}>
             <Space size={[0, 4]} wrap style={{ maxWidth: '100%' }}>
-                {(currentTags || []).map((tag) => (
+                {(currentTags || []).slice(0, 3).map((tag) => (
                     <Tag key={tag.id} color={tag.colour || 'default'}>
                         {tag.name}
                     </Tag>
                 ))}
+                {(currentTags || []).length > 3 && (
+                    <Tooltip
+                        title={
+                            <Space direction="vertical" size={2}>
+                                {(currentTags || []).slice(3).map((tag) => (
+                                    <Tag key={tag.id} color={tag.colour || 'default'} style={{ margin: 0 }}>
+                                        {tag.name}
+                                    </Tag>
+                                ))}
+                            </Space>
+                        }
+                    >
+                        <Tag>+{(currentTags || []).length - 3}</Tag>
+                    </Tooltip>
+                )}
                 {isAdmin && (
                     <Popover
                         content={popoverContent}
@@ -171,6 +213,6 @@ export const TargetTagsCell: React.FC<TargetTagsCellProps> = ({ controllerId }) 
                     colourLabel: t('tagManagement.colour'),
                 }}
             />
-        </>
+        </div>
     );
 };

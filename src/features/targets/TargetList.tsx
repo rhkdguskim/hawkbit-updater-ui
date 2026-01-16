@@ -82,6 +82,7 @@ const TargetList: React.FC = () => {
         t,
         isAdmin,
         availableTypes: model.availableTypes,
+        availableTags: model.availableTags,  // Assuming model exposes this
         visibleColumns: model.visibleColumns,
         onView: handleViewDetail,
         onDelete: (target) => model.handleDeleteClick(target),
@@ -90,7 +91,7 @@ const TargetList: React.FC = () => {
             message.success(t('common:actions.copied', { defaultValue: 'Copied!' }));
         },
         searchTerm: model.globalSearch,
-    }), [t, isAdmin, model.availableTypes, model.visibleColumns, handleViewDetail, model.globalSearch, model]);
+    }), [t, isAdmin, model.availableTypes, model.availableTags, model.visibleColumns, handleViewDetail, model.globalSearch, model.handleDeleteClick]);
 
     return (
         <StandardListLayout
@@ -103,11 +104,10 @@ const TargetList: React.FC = () => {
                     onFiltersChange={model.handleFiltersChange}
                     onRefresh={model.refetchTargets}
                     onAdd={isAdmin ? model.handleAddTarget : undefined}
-                    addLabel={t('actions.add')}
+                    addLabel={t('actions.addTarget')}
                     loading={model.targetsLoading || model.targetsFetching}
                     searchValue={model.globalSearch}
                     onSearchChange={model.setGlobalSearch}
-                    searchPlaceholder={t('list.searchPlaceholder', { defaultValue: 'Search targets...' })}
                     columns={model.columnOptions}
                     visibleColumns={model.visibleColumns}
                     onVisibilityChange={model.setVisibleColumns}

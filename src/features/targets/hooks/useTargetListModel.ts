@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { message, type TableProps } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import {
     usePostAssignedDistributionSet,
     getGetTargetsQueryKey,
 } from '@/api/generated/targets/targets';
+import type { GetTargetsParams } from '@/api/generated/model';
 import { axiosInstance } from '@/api/axios-instance';
 import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
 import { useGetTargetTags } from '@/api/generated/target-tags/target-tags';
@@ -173,7 +174,16 @@ export const useTargetListModel = () => {
         resetPagination();
     }, [setFilters, setTargetPersistentState, resetPagination, setSelectedTargetIds, setIsAllMatchingSelected]);
 
+    // Reset query cache on unmount to prevent UI stutter on re-entry
+    useEffect(() => {
+        return () => {
+            // Removes all infinite queries for targets effectively resetting the list state
+            queryClient.removeQueries({ queryKey: ['infinite', '/rest/v1/targets'] });
+        };
+    }, [queryClient]);
+
     // Main Data Query
+    // Main Data Query (Infinite Scroll)
     const {
         data: infiniteData,
         fetchNextPage,
@@ -185,6 +195,7 @@ export const useTargetListModel = () => {
         refetch: refetchTargets,
     } = useGetTargetsInfinite(
         {
+            // Initial offset is handled by initialPageParam
             limit: pagination.pageSize,
             sort: sort || undefined,
             q: buildFinalQuery() || undefined,

@@ -20,3 +20,4 @@ export type { StatusFilterOption } from './StatusQuickFilters';
 export { PresetColorPicker } from './PresetColorPicker';
 export type { PresetColorPickerProps } from './PresetColorPicker';
 
+export { default as RouteLoader } from './RouteLoader';

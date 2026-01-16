@@ -106,8 +106,14 @@ const BulkAssignTagsModal: React.FC<BulkAssignTagsModalProps> = ({
                         value={selectedTagIds}
                         onChange={setSelectedTagIds}
                         loading={tagsLoading}
+                        showSearch
+                        filterOption={(input, option) => {
+                            if (!option?.searchText) return false;
+                            return (option.searchText as string).toLowerCase().includes(input.toLowerCase());
+                        }}
                         options={(tagsData?.content as MgmtTag[] || []).map((tag) => ({
                             value: tag.id,
+                            searchText: tag.name,
                             label: (
                                 <Space>
                                     <Tag color={tag.colour || 'default'}>{tag.name}</Tag>

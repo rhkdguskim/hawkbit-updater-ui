@@ -144,8 +144,14 @@ const BulkAssignTypeModal: React.FC<BulkAssignTypeModalProps> = ({
                         loading={typesLoading}
                         value={selectedTypeId}
                         onChange={(val) => setSelectedTypeId(val as number)}
+                        showSearch
+                        filterOption={(input, option) => {
+                            if (!option?.searchText) return false;
+                            return (option.searchText as string).toLowerCase().includes(input.toLowerCase());
+                        }}
                         options={(typesData?.content as MgmtTargetType[] || []).map((type) => ({
                             value: type.id,
+                            searchText: type.name,
                             label: (
                                 <Space>
                                     {type.colour && (

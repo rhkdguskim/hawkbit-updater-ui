@@ -117,6 +117,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     searchPlaceholder,
 }) => {
     const { t } = useTranslation('common');
+    const { t: tActions } = useTranslation('common'); // Or just use t since it's already common
     const [conditionOpen, setConditionOpen] = useState(false);
 
     const operatorLabels: Record<string, string> = React.useMemo(() => ({

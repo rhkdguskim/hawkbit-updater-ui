@@ -7,11 +7,13 @@ import type { TextAreaRef } from 'antd/es/input/TextArea';
 
 const { Text } = Typography;
 
-const CellWrapper = styled.div`
+const CellWrapper = styled.div<{ $secondary?: boolean }>`
     display: flex;
     align-items: center;
     gap: 4px;
     min-height: 24px;
+    font-size: var(--ant-font-size-sm);
+    color: ${props => props.$secondary ? 'var(--ant-color-text-secondary)' : 'var(--ant-color-text)'};
 
     .edit-icon {
         opacity: 0;
@@ -193,7 +195,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
 
     return (
-        <CellWrapper onClick={handleStartEdit} style={style}>
+        <CellWrapper onClick={handleStartEdit} style={style} $secondary={secondary}>
             {renderDisplay ? (
                 renderDisplay(value)
             ) : (

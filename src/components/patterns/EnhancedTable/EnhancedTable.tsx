@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Table, Spin } from 'antd';
+import { Table, Spin, Divider } from 'antd';
+import { useTranslation } from 'react-i18next';
 import type { TableProps } from 'antd';
 import styled from 'styled-components';
 import type { ToolbarAction } from './SelectionToolbar';
@@ -178,10 +179,14 @@ export function EnhancedTable<T extends object>({
     totalItems,
     onSelectAllMatching,
     isAllMatchingSelected,
+    loading,
     ...tableProps
 }: EnhancedTableProps<T>) {
+    const { t } = useTranslation('common');
     const containerRef = useRef<HTMLDivElement>(null);
     const [scrollY, setScrollY] = useState<number | undefined>(undefined);
+
+    const isLoading = typeof loading === 'object' ? loading.spinning : loading;
 
     // Handle infinite scroll
     useEffect(() => {
@@ -264,7 +269,7 @@ export function EnhancedTable<T extends object>({
 
     return (
         <TableContainer ref={containerRef}>
-            <Spin spinning={isFetchingNextPage} tip="Loading more..." size="large">
+            <Spin spinning={!!isLoading} size="large" wrapperClassName="h-full flex flex-col">
                 {selectedRowKeys.length > 0 && totalItems !== undefined && totalItems > selectedRowKeys.length && !isAllMatchingSelected && onSelectAllMatching && (
                     <div style={{
                         padding: '8px 16px',
@@ -302,6 +307,17 @@ export function EnhancedTable<T extends object>({
                     scroll={scroll}
                     sticky
                     onChange={handleTableChange}
+                    footer={
+                        !hasNextPage && (tableProps.dataSource?.length ?? 0) > 0
+                            ? () => (
+                                <div style={{ padding: '0 16px' }}>
+                                    <Divider plain style={{ margin: '16px 0', color: 'var(--ant-color-text-quaternary)', fontSize: '12px' }}>
+                                        {t('list.noMoreData', 'End of List')}
+                                    </Divider>
+                                </div>
+                            )
+                            : undefined
+                    }
                 />
             </Spin>
         </TableContainer>

@@ -15,7 +15,7 @@ import {
     CopyOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import type { MgmtTarget, MgmtTargetType } from '@/api/generated/model';
+import type { MgmtTarget, MgmtTargetType, MgmtTag } from '@/api/generated/model';
 import dayjs from 'dayjs';
 import { isTargetOnline } from '@/entities';
 import { TargetTagsCell, TargetTypeCell, InstalledModulesCell, StatusIndicator } from '../components';
@@ -81,6 +81,7 @@ export interface GetColumnsOptions {
     t: (key: string, options?: Record<string, unknown>) => string;
     isAdmin: boolean;
     availableTypes: MgmtTargetType[];
+    availableTags?: MgmtTag[];
     visibleColumns?: string[];
     alwaysShowActions?: boolean;
     onView: (target: MgmtTarget) => void;
@@ -93,6 +94,7 @@ export const getTargetColumns = ({
     t,
     isAdmin,
     availableTypes,
+    availableTags,
     visibleColumns,
     alwaysShowActions = false,
     onView,
@@ -147,7 +149,12 @@ export const getTargetColumns = ({
             title: t('table.tags'),
             key: 'tags',
             width: 180,
-            render: (_, record) => <TargetTagsCell controllerId={record.controllerId!} />,
+            render: (_, record) => (
+                <TargetTagsCell
+                    controllerId={record.controllerId!}
+                    availableTags={availableTags}
+                />
+            ),
         },
         {
             title: t('table.status'),

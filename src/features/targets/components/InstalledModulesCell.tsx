@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Space, Spin, Typography } from 'antd';
 import { useGetAssignedSoftwareModules } from '@/api/generated/distribution-sets/distribution-sets';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { useInView } from '@/hooks/useInView';
 
 const { Text } = Typography;
 
@@ -32,13 +33,15 @@ export const InstalledModulesCell: React.FC<InstalledModulesCellProps> = ({ dist
     // Validate distributionSetId - must be a valid positive number
     const isValidId = typeof distributionSetId === 'number' && !isNaN(distributionSetId) && distributionSetId > 0;
 
+    const { ref, inView } = useInView();
+
     const { data: modules, isLoading } = useGetAssignedSoftwareModules(
         isValidId ? distributionSetId : 0, // Use 0 as fallback (query will be disabled anyway)
         undefined,
         {
             query: {
-                staleTime: 60000, // 1 minute
-                enabled: isValidId, // Only fetch when ID is valid
+                staleTime: 1000 * 60 * 5, // 5 minutes
+                enabled: isValidId && inView, // Only fetch when ID is valid AND in view
             }
         }
     );
@@ -48,8 +51,16 @@ export const InstalledModulesCell: React.FC<InstalledModulesCellProps> = ({ dist
         return <Text type="secondary" style={{ fontSize: 11 }}>-</Text>;
     }
 
+    if (!inView) {
+        return <div ref={ref} style={{ minHeight: 22 }} />;
+    }
+
     if (isLoading) {
-        return <Spin size="small" />;
+        return (
+            <div ref={ref} style={{ minHeight: 22 }}>
+                <Spin size="small" />
+            </div>
+        );
     }
 
     if (!modules?.content || modules.content.length === 0) {
@@ -57,19 +68,21 @@ export const InstalledModulesCell: React.FC<InstalledModulesCellProps> = ({ dist
     }
 
     return (
-        <Space size={[0, 0]} wrap style={{ maxWidth: '100%' }}>
-            {modules.content.map((module) => (
-                <Link key={module.id} to={`/distributions/modules/${module.id}`}>
-                    <ModuleTag>
-                        <Text strong style={{ fontSize: 11, marginRight: 4 }}>
-                            {module.typeName}:
-                        </Text>
-                        <Text style={{ fontSize: 11, fontFamily: 'var(--font-mono)' }}>
-                            {module.name} ({module.version})
-                        </Text>
-                    </ModuleTag>
-                </Link>
-            ))}
-        </Space>
+        <div ref={ref}>
+            <Space size={[0, 0]} wrap style={{ maxWidth: '100%' }}>
+                {modules.content.map((module) => (
+                    <Link key={module.id} to={`/distributions/modules/${module.id}`}>
+                        <ModuleTag>
+                            <Text strong style={{ fontSize: 11, marginRight: 4 }}>
+                                {module.typeName}:
+                            </Text>
+                            <Text style={{ fontSize: 11, fontFamily: 'var(--font-mono)' }}>
+                                {module.name} ({module.version})
+                            </Text>
+                        </ModuleTag>
+                    </Link>
+                ))}
+            </Space>
+        </div>
     );
 };
