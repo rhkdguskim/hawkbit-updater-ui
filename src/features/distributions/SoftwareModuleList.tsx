@@ -12,7 +12,11 @@ import { useSoftwareModuleListModel } from './hooks/useSoftwareModuleListModel';
 
 const { Text } = Typography;
 
-const SoftwareModuleList: React.FC = () => {
+interface SoftwareModuleListProps {
+    standalone?: boolean;
+}
+
+const SoftwareModuleList: React.FC<SoftwareModuleListProps> = ({ standalone = true }) => {
     const model = useSoftwareModuleListModel();
     const { t, isAdmin, navigate } = model;
 
@@ -181,6 +185,7 @@ const SoftwareModuleList: React.FC = () => {
 
     return (
         <StandardListLayout
+            standalone={standalone}
             title={t('moduleList.title')}
             description={t('moduleList.description')}
             searchBar={

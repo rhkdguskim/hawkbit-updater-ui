@@ -5,9 +5,9 @@ const { Text } = Typography;
 
 export const WidgetContainer = styled.div`
     background: var(--ant-color-bg-container);
-    border-radius: var(--ant-border-radius-lg);
+    border-radius: 12px;
     padding: 16px;
-    border: 1px solid var(--ant-color-border-secondary);
+    border: 1px solid var(--ant-color-border);
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -18,38 +18,38 @@ export const WidgetContainer = styled.div`
 
 export const HeaderRow = styled(Flex)`
     border-bottom: 1px solid var(--ant-color-border-secondary);
-    padding-bottom: 8px;
+    padding-bottom: 10px;
     flex-shrink: 0;
 `;
 
 export const IconBadge = styled.div<{ $status?: 'normal' | 'warning' | 'critical'; $color?: string }>`
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
     background: ${({ $status, $color }) => {
-        if ($color) return $color.replace(')', '-bg)'); // heuristic if using var
-        if ($status === 'critical') return 'var(--ant-color-error-bg)';
-        if ($status === 'warning') return 'var(--ant-color-warning-bg)';
-        if ($status === 'normal') return 'var(--ant-color-success-bg)';
-        return 'var(--ant-color-info-bg)';
+        if ($color) return `${$color}15`; // 15 = hex opacity ~8%
+        if ($status === 'critical') return 'rgba(239, 68, 68, 0.1)';
+        if ($status === 'warning') return 'rgba(245, 158, 11, 0.1)';
+        if ($status === 'normal') return 'rgba(16, 185, 129, 0.1)';
+        return 'rgba(59, 130, 246, 0.1)';
     }};
     color: ${({ $status, $color }) => {
         if ($color) return $color;
         if ($status === 'critical') return 'var(--ant-color-error)';
         if ($status === 'warning') return 'var(--ant-color-warning)';
         if ($status === 'normal') return 'var(--ant-color-success)';
-        return 'var(--ant-color-info)';
+        return 'var(--ant-color-primary)';
     }};
 `;
 
 export const MetricCard = styled.div`
     background: var(--ant-color-fill-quaternary);
-    border-radius: var(--ant-border-radius);
-    padding: 8px 12px;
+    border-radius: 8px;
+    padding: 10px 14px;
     flex: 1;
 `;
 
@@ -61,8 +61,8 @@ export const MetricLabel = styled(Text)`
 `;
 
 export const MetricValue = styled.div<{ $status?: 'normal' | 'warning' | 'critical' }>`
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     color: ${({ $status }) =>
         $status === 'critical' ? 'var(--ant-color-error)' :
             $status === 'warning' ? 'var(--ant-color-warning)' :
@@ -81,23 +81,22 @@ export const ThresholdText = styled(Text)`
 `;
 
 const pulse = keyframes`
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-    100% { transform: scale(1); opacity: 1; }
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
 `;
 
 export const BottleneckBanner = styled.div<{ $status: 'warning' | 'critical' }>`
-    background: ${({ $status }) => $status === 'critical' ? 'var(--ant-color-error-bg)' : 'var(--ant-color-warning-bg)'};
-    border-radius: var(--ant-border-radius);
-    padding: 8px 10px;
-    border: 1px solid ${({ $status }) => $status === 'critical' ? 'var(--ant-color-error-border)' : 'var(--ant-color-warning-border)'};
+    background: ${({ $status }) => $status === 'critical' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)'};
+    border-radius: 8px;
+    padding: 10px 12px;
+    border: 1px solid ${({ $status }) => $status === 'critical' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)'};
     display: flex;
     flex-direction: column;
     gap: 4px;
     margin-top: 4px;
 
     ${({ $status }) => $status === 'critical' && css`
-        animation: ${pulse} 2s infinite ease-in-out;
+        animation: ${pulse} 3s infinite ease-in-out;
     `}
 `;
 
@@ -120,14 +119,13 @@ export const ChartWrapper = styled.div`
     min-height: 160px;
     position: relative;
     
-    /* Ensure ResponsiveContainer has dimensions to work with */
     & > .recharts-responsive-container {
         min-height: 100%;
     }
 `;
 
 export const LegendContainer = styled(Flex)`
-    padding-top: 4px;
+    padding-top: 8px;
     border-top: 1px solid var(--ant-color-border-secondary);
 `;
 
@@ -137,8 +135,8 @@ export const LegendItem = styled(Flex)`
 `;
 
 export const LegendDot = styled.div<{ $color: string }>`
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
     background: ${props => props.$color};
 `;

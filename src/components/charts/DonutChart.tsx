@@ -57,7 +57,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
                         textAnchor="middle"
                         dominantBaseline="middle"
                         fill="var(--ant-color-text)"
-                        style={{ fontSize: 18, fontWeight: 700 }}
+                        style={{ fontSize: 'var(--ant-font-size-xl)', fontWeight: 700 }}
                     >
                         {centerLabel}
                     </text>

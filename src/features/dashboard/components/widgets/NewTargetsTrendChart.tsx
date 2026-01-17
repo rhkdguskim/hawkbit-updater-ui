@@ -24,8 +24,8 @@ export const NewTargetsTrendChart: React.FC<NewTargetsTrendChartProps> = ({ isLo
                         <UserAddOutlined />
                     </IconBadge>
                     <Flex vertical gap={0}>
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('chart.newTargetsTrend', 'New Targets Trend')}</span>
-                        <Text type="secondary" style={{ fontSize: 11 }}>{t('chart.last24h', 'Last 24h')}</Text>
+                        <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('chart.newTargetsTrend', 'New Targets Trend')}</span>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('chart.last24h', 'Last 24h')}</Text>
                     </Flex>
                 </Flex>
             }
@@ -47,12 +47,12 @@ export const NewTargetsTrendChart: React.FC<NewTargetsTrendChartProps> = ({ isLo
                             dataKey="time"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fontSize: 10, fill: 'var(--ant-color-text-description)' }}
+                            tick={{ fontSize: 'var(--ant-font-size-sm)', fill: 'var(--ant-color-text-description)' }}
                         />
                         <YAxis
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fontSize: 10, fill: 'var(--ant-color-text-description)' }}
+                            tick={{ fontSize: 'var(--ant-font-size-sm)', fill: 'var(--ant-color-text-description)' }}
                         />
                         <Tooltip
                             contentStyle={{

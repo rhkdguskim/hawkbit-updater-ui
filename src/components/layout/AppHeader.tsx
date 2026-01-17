@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, theme, Avatar, Typography, Dropdown, Divider, Badge, Menu, type MenuProps } from 'antd';
-import { UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, SettingOutlined, EditOutlined } from '@ant-design/icons';
 import {
     MdDashboard,
     MdDevices,
@@ -18,6 +18,8 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher, ThemeSwitcher } from '@/components/common';
 import { AppSearchBar } from './AppSearchBar';
+import { useThemeStore } from '@/stores/useThemeStore';
+import { UISettingsModal } from '@/components/modals';
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -84,6 +86,13 @@ const LogoContainer = styled.div`
     background: var(--ant-color-primary-bg);
     color: var(--ant-color-primary);
     border: 1px solid var(--ant-color-primary-border);
+  }
+
+  .custom-logo {
+    height: 32px;
+    width: auto;
+    max-width: 150px;
+    object-fit: contain;
   }
 `;
 
@@ -181,6 +190,8 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
     const location = useLocation();
     const { user, role, logout } = useAuthStore();
     const navigate = useNavigate();
+    const { customLogo } = useThemeStore();
+    const [uiSettingsOpen, setUiSettingsOpen] = React.useState(false);
 
     const handleLogout = () => {
         logout();
@@ -214,41 +225,13 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
             key: 'distributions-menu',
             label: t('nav.distributions'),
             icon: <MdInventory />,
-            onTitleClick: () => navigate('/distributions/sets'),
-            children: [
-                {
-                    key: '/distributions/sets',
-                    icon: <MdLayers />,
-                    label: t('nav.distributionSets'),
-                    onClick: () => navigate('/distributions/sets'),
-                },
-                {
-                    key: '/distributions/modules',
-                    icon: <MdWidgets />,
-                    label: t('nav.softwareModules'),
-                    onClick: () => navigate('/distributions/modules'),
-                },
-            ],
+            onClick: () => navigate('/distributions/sets'),
         },
         {
             key: 'rollouts-menu',
             icon: <MdAssignment />,
             label: t('nav.rolloutManagement'),
-            onTitleClick: () => navigate('/rollouts/list'),
-            children: [
-                {
-                    key: '/rollouts/list',
-                    icon: <MdRocketLaunch />,
-                    label: t('nav.rollouts'),
-                    onClick: () => navigate('/rollouts/list'),
-                },
-                {
-                    key: '/actions',
-                    icon: <MdPlayArrow />,
-                    label: t('nav.actions'),
-                    onClick: () => navigate('/actions'),
-                },
-            ]
+            onClick: () => navigate('/rollouts/list'),
         },
     ];
 
@@ -265,6 +248,13 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
             onClick: () => navigate('/system/types'),
         }, { type: 'divider' as const }] : []),
         {
+            key: 'ui-settings',
+            label: t('settings.customizeUI'),
+            icon: <EditOutlined />,
+            onClick: () => setUiSettingsOpen(true),
+        },
+        { type: 'divider' as const },
+        {
             key: 'logout',
             label: t('settings.logout'),
             icon: <LogoutOutlined />,
@@ -277,10 +267,14 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
         <StyledHeader $bg={colorBgContainer}>
             <HeaderLeft>
                 <LogoContainer onClick={() => navigate('/')}>
-                    <div className="logo-icon">
-                        <MdRocketLaunch />
-                    </div>
-                    <span className="logo-text">{import.meta.env.VITE_LOGIN_TITLE || 'Updater UI'}</span>
+                    {customLogo ? (
+                        <img src={customLogo} alt="Logo" className="custom-logo" />
+                    ) : (
+                        <div className="logo-icon">
+                            <MdRocketLaunch />
+                        </div>
+                    )}
+                    <span className="logo-text">{t('common:app.title', { defaultValue: import.meta.env.VITE_LOGIN_TITLE || 'Updater UI' })}</span>
                 </LogoContainer>
 
                 <StyledMenu
@@ -316,6 +310,7 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
                     </UserSection>
                 </Dropdown>
             </HeaderRight>
+            <UISettingsModal open={uiSettingsOpen} onClose={() => setUiSettingsOpen(false)} />
         </StyledHeader>
     );
 };

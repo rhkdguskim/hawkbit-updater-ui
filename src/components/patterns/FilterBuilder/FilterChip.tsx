@@ -37,7 +37,7 @@ const RemoveButton = styled(Button)`
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--ant-color-error, #ff4d4f);
+        color: var(--ant-color-error, var(--ant-color-error));
         border: none;
         background: transparent;
         

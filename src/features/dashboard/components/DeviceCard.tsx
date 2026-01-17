@@ -100,8 +100,8 @@ const OnlineIndicator = styled.div<{ $isOnline: boolean; $typeColor?: string }>`
             return `linear-gradient(135deg, ${props.$typeColor} 0%, ${props.$typeColor}cc 100%)`;
         }
         return props.$isOnline
-            ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-            : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+            ? 'linear-gradient(135deg, var(--ant-color-success) 0%, #059669 100%)'
+            : 'linear-gradient(135deg, var(--ant-color-warning) 0%, #d97706 100%)';
     }};
     color: white;
     box-shadow: 0 2px 6px ${props => {
@@ -180,10 +180,10 @@ interface DeviceCardProps {
 
 const getStatusIcon = (status?: string) => {
     const s = status?.toLowerCase();
-    if (s === 'in_sync') return <CheckCircleFilled style={{ fontSize: 10 }} />;
-    if (s === 'pending') return <SyncOutlined spin style={{ fontSize: 10 }} />;
-    if (s === 'error') return <CloseCircleFilled style={{ fontSize: 10 }} />;
-    return <ClockCircleFilled style={{ fontSize: 10 }} />;
+    if (s === 'in_sync') return <CheckCircleFilled style={{ fontSize: 'var(--ant-font-size-sm)' }} />;
+    if (s === 'pending') return <SyncOutlined spin style={{ fontSize: 'var(--ant-font-size-sm)' }} />;
+    if (s === 'error') return <CloseCircleFilled style={{ fontSize: 'var(--ant-font-size-sm)' }} />;
+    return <ClockCircleFilled style={{ fontSize: 'var(--ant-font-size-sm)' }} />;
 };
 
 const getStatusLabel = (status?: string, t?: TFunction) => {
@@ -240,7 +240,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ target, recentAction, targetTyp
                                     color={targetTypeColor}
                                     style={{
                                         margin: 0,
-                                        fontSize: 10,
+                                        fontSize: 'var(--ant-font-size-sm)',
                                         padding: '0 4px',
                                         lineHeight: '16px',
                                         borderRadius: 4

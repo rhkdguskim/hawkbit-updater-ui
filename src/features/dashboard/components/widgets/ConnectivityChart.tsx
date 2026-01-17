@@ -34,8 +34,8 @@ export const ConnectivityChart: React.FC<ConnectivityChartProps> = ({ isLoading,
                         <ApiOutlined />
                     </IconBadge>
                     <Flex vertical gap={0}>
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('chart.connectivityStatus')}</span>
-                        <Text type="secondary" style={{ fontSize: 11 }}>{t('overview.percentOnline', { percent: onlinePercent })}</Text>
+                        <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('chart.connectivityStatus')}</span>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('overview.percentOnline', { percent: onlinePercent })}</Text>
                     </Flex>
                 </Flex>
             }
@@ -83,9 +83,9 @@ export const ConnectivityChart: React.FC<ConnectivityChartProps> = ({ isLoading,
                                         background: entry.color,
                                         flexShrink: 0
                                     }} />
-                                    <Text style={{ fontSize: 11, whiteSpace: 'nowrap' }}>{entry.name}</Text>
+                                    <Text style={{ fontSize: 'var(--ant-font-size-sm)', whiteSpace: 'nowrap' }}>{entry.name}</Text>
                                 </Flex>
-                                <Text strong style={{ fontSize: 12, color: entry.color }}>{entry.value}</Text>
+                                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', color: entry.color }}>{entry.value}</Text>
                             </ChartLegendItem>
                         ))}
                     </Flex>

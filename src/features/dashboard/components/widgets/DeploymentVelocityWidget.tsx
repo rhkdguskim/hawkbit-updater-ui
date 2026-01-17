@@ -48,8 +48,8 @@ export const DeploymentVelocityWidget: React.FC<DeploymentVelocityWidgetProps> =
                             <ThunderboltOutlined />
                         </IconBadge>
                         <Flex vertical gap={0}>
-                            <span style={{ fontSize: 14, fontWeight: 600 }}>{t('velocity.title')}</span>
-                            <Text type="secondary" style={{ fontSize: 11 }}>{t('velocity.trend')}</Text>
+                            <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('velocity.title')}</span>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('velocity.trend')}</Text>
                         </Flex>
                     </Flex>
                     {getStatusTag(currentVelocity)}
@@ -63,7 +63,7 @@ export const DeploymentVelocityWidget: React.FC<DeploymentVelocityWidgetProps> =
                 <Flex vertical style={{ height: '100%', width: '100%' }}>
                     <Flex align="baseline" gap={4} style={{ marginBottom: 16 }}>
                         <span style={{ fontSize: 24, fontWeight: 700 }}>{currentVelocity}</span>
-                        <Text type="secondary" style={{ fontSize: 12 }}>{t('velocity.unit')}</Text>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('velocity.unit')}</Text>
                     </Flex>
                     <div style={{ flex: 1, minHeight: 0 }}>
                         <ResponsiveContainer width="100%" height="100%">
@@ -79,12 +79,12 @@ export const DeploymentVelocityWidget: React.FC<DeploymentVelocityWidgetProps> =
                                     dataKey="time"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fontSize: 10, fill: 'var(--ant-color-text-description)' }}
+                                    tick={{ fontSize: 'var(--ant-font-size-sm)', fill: 'var(--ant-color-text-description)' }}
                                 />
                                 <YAxis
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fontSize: 10, fill: 'var(--ant-color-text-description)' }}
+                                    tick={{ fontSize: 'var(--ant-font-size-sm)', fill: 'var(--ant-color-text-description)' }}
                                 />
                                 <Tooltip
                                     contentStyle={{

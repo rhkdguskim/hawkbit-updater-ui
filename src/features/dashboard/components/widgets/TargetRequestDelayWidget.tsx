@@ -75,8 +75,8 @@ export const TargetRequestDelayWidget: React.FC<TargetRequestDelayWidgetProps> =
                         <FieldTimeOutlined />
                     </IconBadge>
                     <Flex vertical gap={0}>
-                        <span style={{ fontSize: 13, fontWeight: 600 }}>{t('delayWidget.title', 'Target Request Delay')}</span>
-                        <Text type="secondary" style={{ fontSize: 10 }}>{t('delayWidget.subtitle', 'Time since last poll')}</Text>
+                        <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('delayWidget.title', 'Target Request Delay')}</span>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('delayWidget.subtitle', 'Time since last poll')}</Text>
                     </Flex>
                 </Flex>
             }
@@ -87,7 +87,7 @@ export const TargetRequestDelayWidget: React.FC<TargetRequestDelayWidgetProps> =
             ) : (
                 <Flex vertical gap={12} style={{ flex: 1 }}>
                     <Flex vertical gap={2} align="center" style={{ padding: '8px 0', background: 'var(--ant-color-fill-quaternary)', borderRadius: 10 }}>
-                        <Text type="secondary" style={{ fontSize: 11 }}>{t('delayWidget.average', 'Average Delay')}</Text>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('delayWidget.average', 'Average Delay')}</Text>
                         <Text strong style={{ fontSize: 20, color: avgColor, fontFamily: 'var(--font-mono)' }}>
                             {formatDuration(averageDelay)}
                         </Text>
@@ -95,7 +95,7 @@ export const TargetRequestDelayWidget: React.FC<TargetRequestDelayWidgetProps> =
 
                     <Flex vertical gap={6} style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
                         <Flex justify="space-between" align="center">
-                            <Text strong style={{ fontSize: 11 }}>{t('delayWidget.longestDelays', 'Longest Delays')}</Text>
+                            <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('delayWidget.longestDelays', 'Longest Delays')}</Text>
                             <Text type="secondary" style={{ fontSize: 9 }}>Top 5</Text>
                         </Flex>
 
@@ -121,13 +121,13 @@ export const TargetRequestDelayWidget: React.FC<TargetRequestDelayWidgetProps> =
                                                             background: delayColor,
                                                             flexShrink: 0
                                                         }} />
-                                                        <Text strong ellipsis style={{ fontSize: 12, flex: 1, fontFamily: 'var(--font-mono)' }}>
+                                                        <Text strong ellipsis style={{ fontSize: 'var(--ant-font-size-sm)', flex: 1, fontFamily: 'var(--font-mono)' }}>
                                                             {item.name}
                                                         </Text>
                                                     </Flex>
                                                     <Flex align="center" gap={8}>
                                                         <Text style={{
-                                                            fontSize: 11,
+                                                            fontSize: 'var(--ant-font-size-sm)',
                                                             fontWeight: 600,
                                                             color: delayColor,
                                                             fontFamily: 'var(--font-mono)'
@@ -145,7 +145,7 @@ export const TargetRequestDelayWidget: React.FC<TargetRequestDelayWidgetProps> =
                                 />
                             ) : (
                                 <Flex justify="center" align="center" style={{ height: '100%' }}>
-                                    <Text type="secondary" style={{ fontSize: 11 }}>{t('common:messages.noData')}</Text>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('common:messages.noData')}</Text>
                                 </Flex>
                             )}
                         </div>

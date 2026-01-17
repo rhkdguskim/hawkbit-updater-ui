@@ -82,31 +82,31 @@ export const FilterPreview: React.FC<FilterPreviewProps> = ({
 
     const severityConfig = useMemo(() => ({
         high: {
-            icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f', fontSize: 24 }} />,
+            icon: <ExclamationCircleOutlined style={{ color: 'var(--ant-color-error)', fontSize: 24 }} />,
             title: t('filterPreview.highWarning', { defaultValue: 'Large Scale Operation' }),
             description: t('filterPreview.highWarningDesc', {
                 count: totalCount,
                 defaultValue: `This filter affects ${totalCount.toLocaleString()} targets. Please review carefully.`
             }),
-            color: '#ff4d4f',
+            color: 'var(--ant-color-error)',
         },
         medium: {
-            icon: <WarningOutlined style={{ color: '#faad14', fontSize: 24 }} />,
+            icon: <WarningOutlined style={{ color: 'var(--ant-color-warning)', fontSize: 24 }} />,
             title: t('filterPreview.mediumWarning', { defaultValue: 'Moderate Scale' }),
             description: t('filterPreview.mediumWarningDesc', {
                 count: totalCount,
                 defaultValue: `This filter affects ${totalCount.toLocaleString()} targets.`
             }),
-            color: '#faad14',
+            color: 'var(--ant-color-warning)',
         },
         low: {
-            icon: <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 24 }} />,
+            icon: <CheckCircleOutlined style={{ color: 'var(--ant-color-success)', fontSize: 24 }} />,
             title: t('filterPreview.safeOperation', { defaultValue: 'Safe Operation' }),
             description: t('filterPreview.safeOperationDesc', {
                 count: totalCount,
                 defaultValue: `This filter affects ${totalCount.toLocaleString()} targets.`
             }),
-            color: '#52c41a',
+            color: 'var(--ant-color-success)',
         },
     }), [totalCount, t]);
 
@@ -130,7 +130,7 @@ export const FilterPreview: React.FC<FilterPreviewProps> = ({
                                 <Text strong style={{ color: config.color }}>
                                     {config.title}
                                 </Text>
-                                <Text type="secondary" style={{ display: 'block', fontSize: 12, marginTop: 4 }}>
+                                <Text type="secondary" style={{ display: 'block', fontSize: 'var(--ant-font-size-sm)', marginTop: 4 }}>
                                     {config.description}
                                 </Text>
                             </div>
@@ -153,7 +153,7 @@ export const FilterPreview: React.FC<FilterPreviewProps> = ({
 
                     {query && (
                         <div style={{ marginBottom: 12 }}>
-                            <Text type="secondary" style={{ fontSize: 12 }}>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                 {t('filterPreview.query', { defaultValue: 'Query:' })}
                             </Text>
                             <Text
@@ -161,7 +161,7 @@ export const FilterPreview: React.FC<FilterPreviewProps> = ({
                                 style={{
                                     display: 'block',
                                     marginTop: 4,
-                                    fontSize: 11,
+                                    fontSize: 'var(--ant-font-size-sm)',
                                     wordBreak: 'break-all',
                                 }}
                             >

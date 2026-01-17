@@ -1,5 +1,9 @@
 {
     "title": "目标管理",
+    "feature": {
+        "title": "目标管理",
+        "subtitle": "管理设备和更新"
+    },
     "list": {
         "title": "目标列表",
         "description": "搜索、筛选并管理物联网目标及其部署状态",

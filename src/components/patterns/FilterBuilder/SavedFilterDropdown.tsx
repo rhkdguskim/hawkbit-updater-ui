@@ -106,7 +106,7 @@ export const SavedFilterDropdown: React.FC<SavedFilterDropdownProps> = ({
             )}
 
             <FooterSection>
-                <Text type="secondary" style={{ fontSize: 12 }}>
+                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                     {t('savedFilters.totalCount', { count: totalCount, defaultValue: `${totalCount} saved filters` })}
                 </Text>
                 {onManageClick && (
@@ -146,7 +146,7 @@ export const SavedFilterDropdown: React.FC<SavedFilterDropdownProps> = ({
                         background: 'var(--ant-color-primary)',
                         color: '#fff',
                         borderRadius: '50%',
-                        fontSize: 11,
+                        fontSize: 'var(--ant-font-size-sm)',
                         padding: '0 6px',
                         minWidth: 18,
                         display: 'inline-block',

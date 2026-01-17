@@ -133,7 +133,7 @@ const FinishedActionItem: React.FC<FinishedActionItemProps> = ({ item }) => {
 
     const historyContent = (
         <div style={{ maxWidth: 320, padding: '4px 8px' }}>
-            <Text strong style={{ fontSize: 13, marginBottom: 8, display: 'block', borderBottom: '1px solid var(--ant-color-border-secondary)', paddingBottom: 4 }}>
+            <Text strong style={{ fontSize: 'var(--ant-font-size)', marginBottom: 8, display: 'block', borderBottom: '1px solid var(--ant-color-border-secondary)', paddingBottom: 4 }}>
                 {t('actions:history.title', 'Action History')}
             </Text>
             <div style={{ maxHeight: 200, overflowY: 'auto' }}>
@@ -145,15 +145,15 @@ const FinishedActionItem: React.FC<FinishedActionItemProps> = ({ item }) => {
                         <List.Item style={{ padding: '6px 0', borderBottom: '1px dashed var(--ant-color-border-secondary)' }}>
                             <Flex vertical gap={2} style={{ width: '100%' }}>
                                 <Flex justify="space-between" align="center">
-                                    <Tag color="blue" style={{ fontSize: 10, margin: 0 }}>
+                                    <Tag color="blue" style={{ fontSize: 'var(--ant-font-size-sm)', margin: 0 }}>
                                         {getStatusLabel(s.type, t)}
                                     </Tag>
-                                    <Text type="secondary" style={{ fontSize: 10 }}>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                         {s.reportedAt ? dayjs(s.reportedAt).format('HH:mm:ss') : '-'}
                                     </Text>
                                 </Flex>
                                 {s.messages?.[0] && (
-                                    <Text type="secondary" style={{ fontSize: 10 }} ellipsis>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }} ellipsis>
                                         {translateStatusMessage(s.messages[0], t)}
                                     </Text>
                                 )}
@@ -198,29 +198,29 @@ const FinishedActionItem: React.FC<FinishedActionItemProps> = ({ item }) => {
                     }} />
                     <Flex vertical gap={2} style={{ minWidth: 0, flex: 1 }}>
                         <Flex align="center" gap={8}>
-                            <Text strong style={{ fontSize: 13 }} ellipsis>
+                            <Text strong style={{ fontSize: 'var(--ant-font-size)' }} ellipsis>
                                 {item.target.name || item.target.controllerId || '-'}
                             </Text>
                             {item.target.ipAddress && (
-                                <Text type="secondary" style={{ fontSize: 10 }}>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                     ({item.target.ipAddress})
                                 </Text>
                             )}
-                            <Tag color={getStatusColor()} icon={getStatusIcon()} style={{ margin: 0, fontSize: 10 }}>
+                            <Tag color={getStatusColor()} icon={getStatusIcon()} style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)' }}>
                                 {t(`common:status.${status}`, status)}
                             </Tag>
                         </Flex>
                         <Flex align="center" gap={8}>
                             {currentAction.rolloutName && (
                                 <Space size={4}>
-                                    <RocketOutlined style={{ fontSize: 10, color: 'var(--ant-color-text-tertiary)' }} />
-                                    <Text type="secondary" style={{ fontSize: 11 }} ellipsis>
+                                    <RocketOutlined style={{ fontSize: 'var(--ant-font-size-sm)', color: 'var(--ant-color-text-tertiary)' }} />
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }} ellipsis>
                                         {currentAction.rolloutName}
                                     </Text>
                                 </Space>
                             )}
                             {statusHistory[0]?.messages?.[0] && (
-                                <Text type="secondary" style={{ fontSize: 10 }} ellipsis>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }} ellipsis>
                                     {translateStatusMessage(statusHistory[0].messages[0], t)}
                                 </Text>
                             )}
@@ -228,11 +228,11 @@ const FinishedActionItem: React.FC<FinishedActionItemProps> = ({ item }) => {
                     </Flex>
                 </TargetInfo>
                 <TimeInfo vertical align="flex-end" gap={2}>
-                    <Text style={{ fontSize: 12 }}>
-                        <ClockCircleOutlined style={{ marginRight: 4, fontSize: 10 }} />
+                    <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>
+                        <ClockCircleOutlined style={{ marginRight: 4, fontSize: 'var(--ant-font-size-sm)' }} />
                         {dayjs(currentAction.lastModifiedAt).fromNow()}
                     </Text>
-                    <Text type="secondary" style={{ fontSize: 10 }}>
+                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                         {dayjs(currentAction.lastModifiedAt).format('HH:mm:ss')}
                     </Text>
                 </TimeInfo>
@@ -268,7 +268,7 @@ export const RecentlyFinishedActionsWidget: React.FC<RecentlyFinishedActionsWidg
                         <Title level={5} style={{ margin: 0 }}>
                             {t('actionActivity.recentlyCompleted', 'Recently Completed')}
                         </Title>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {displayedItems.length > 0
                                 ? t('recentActions.subtitle', '{{count}} completed', { count: displayedItems.length })
                                 : t('recentActions.empty', 'No recent completions')

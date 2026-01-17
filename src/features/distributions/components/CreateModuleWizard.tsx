@@ -464,7 +464,7 @@ const CreateModuleWizard: React.FC<CreateModuleWizardProps> = ({
                                         <span>{item.value}</span>
                                         {item.targetVisible && (
                                             <Tooltip title={t('metadataTab.targetVisible')}>
-                                                <InfoCircleOutlined style={{ color: '#52c41a' }} />
+                                                <InfoCircleOutlined style={{ color: 'var(--ant-color-success)' }} />
                                             </Tooltip>
                                         )}
                                     </Space>

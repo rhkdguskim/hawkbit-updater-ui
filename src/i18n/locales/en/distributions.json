@@ -1,5 +1,9 @@
 {
     "pageTitle": "Distributions Management",
+    "feature": {
+        "title": "Distributions Management",
+        "subtitle": "Manage software and updates"
+    },
     "sets": {
         "title": "Distribution Sets"
     },

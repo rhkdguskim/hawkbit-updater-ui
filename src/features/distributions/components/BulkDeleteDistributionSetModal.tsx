@@ -86,7 +86,7 @@ const BulkDeleteDistributionSetModal: React.FC<BulkDeleteDistributionSetModalPro
         <Modal
             title={
                 <span>
-                    <ExclamationCircleOutlined style={{ color: '#faad14', marginRight: 8 }} />
+                    <ExclamationCircleOutlined style={{ color: 'var(--ant-color-warning)', marginRight: 8 }} />
                     {t('bulkDelete.title', { defaultValue: 'Bulk Delete Distribution Sets' })}
                 </span>
             }

@@ -92,7 +92,7 @@ export const ActionRequiredWidget: React.FC<ActionRequiredWidgetProps> = ({
                         <Title level={5} style={{ margin: 0 }}>
                             {t('actionRequired.title', 'Action Required')}
                         </Title>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {t('actionRequired.subtitle', 'Items needing immediate attention')}
                         </Text>
                     </Flex>

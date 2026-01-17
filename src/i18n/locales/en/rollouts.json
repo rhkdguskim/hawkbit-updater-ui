@@ -1,4 +1,8 @@
 {
+    "feature": {
+        "title": "Rollout Management",
+        "subtitle": "Manage software updates and deployments"
+    },
     "templates": {
         "title": "Rollout Templates",
         "createNew": "Create New Template",

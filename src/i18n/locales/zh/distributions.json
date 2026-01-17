@@ -1,5 +1,9 @@
 {
     "pageTitle": "分发管理",
+    "feature": {
+        "title": "分发管理",
+        "subtitle": "管理软件和更新"
+    },
     "sets": {
         "title": "分发集"
     },

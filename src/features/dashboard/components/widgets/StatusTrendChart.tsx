@@ -179,7 +179,7 @@ export const StatusTrendChart: React.FC<StatusTrendChartProps> = ({
                         <Title level={5} style={{ margin: 0 }}>
                             {t('statusTrend.title', 'Status Trend (24h)')}
                         </Title>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {t('statusTrend.subtitle', 'Hourly action status aggregation')}
                         </Text>
                     </Flex>
@@ -218,13 +218,13 @@ export const StatusTrendChart: React.FC<StatusTrendChartProps> = ({
                                 dataKey="hour"
                                 axisLine={false}
                                 tickLine={false}
-                                tick={{ fontSize: 10, fill: 'var(--ant-color-text-description)' }}
+                                tick={{ fontSize: 'var(--ant-font-size-sm)', fill: 'var(--ant-color-text-description)' }}
                                 interval="preserveStartEnd"
                             />
                             <YAxis
                                 axisLine={false}
                                 tickLine={false}
-                                tick={{ fontSize: 10, fill: 'var(--ant-color-text-description)' }}
+                                tick={{ fontSize: 'var(--ant-font-size-sm)', fill: 'var(--ant-color-text-description)' }}
                             />
                             <RechartsTooltip
                                 contentStyle={{
@@ -278,7 +278,7 @@ export const StatusTrendChart: React.FC<StatusTrendChartProps> = ({
                                             value: event.type === 'start' ? '▶' : '⏸',
                                             position: 'top',
                                             fill: event.type === 'start' ? COLORS.success : COLORS.running,
-                                            fontSize: 14,
+                                            fontSize: 'var(--ant-font-size)',
                                         }}
                                     />
                                 );

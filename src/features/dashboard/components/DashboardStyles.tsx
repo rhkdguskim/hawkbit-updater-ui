@@ -41,26 +41,24 @@ export const DashboardSurface = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 1vw, 12px);
+    gap: 16px;
     min-height: 100%;
     flex: 1;
     isolation: isolate;
 
-    /* Global Card Overrides for Dashboard Density */
+    /* 카드 스타일 통일 */
     .ant-card {
         border: 1px solid var(--ant-color-border);
         box-shadow: var(--shadow-sm);
-        /* Ensure precise corners */
-        border-radius: var(--ant-border-radius-lg, 12px);
+        border-radius: 12px;
         display: flex;
         flex-direction: column;
         min-height: 0;
     }
 
     .ant-card:hover {
-        transform: translateY(-2px);
+        transform: translateY(-1px);
         box-shadow: var(--shadow-md);
-        border-color: var(--ant-color-primary-border);
     }
 
     .ant-card-body {
@@ -71,19 +69,18 @@ export const DashboardSurface = styled.div`
     [data-theme='dark'] & .ant-card,
     .dark-mode & .ant-card {
         background-color: var(--ant-color-bg-container);
-        border-color: var(--ant-color-border-secondary);
-        box-shadow: var(--shadow-sm);
+        border-color: rgba(255, 255, 255, 0.06);
     }
 
     [data-theme='dark'] & .ant-card:hover,
     .dark-mode & .ant-card:hover {
         box-shadow: var(--shadow-md);
-        border-color: var(--ant-color-primary);
+        border-color: rgba(255, 255, 255, 0.1);
     }
 
     .dashboard-clickable {
         cursor: pointer;
-        transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+        transition: all 0.15s ease;
     }
 
     .dashboard-clickable:focus-visible {
@@ -93,22 +90,25 @@ export const DashboardSurface = styled.div`
 
     .dashboard-clickable[data-disabled='true'] {
         cursor: default;
-        opacity: 0.7;
+        opacity: 0.6;
     }
- `;
+
+    .dashboard-clickable:active {
+        transform: scale(0.99);
+    }
+`;
 
 export const DashboardScrollContent = styled(BaseScrollContent)`
-    gap: 16px;
-    padding: 4px 8px 16px;
+    gap: 20px;
+    padding: 4px 8px 20px;
 `;
 
 // Dashboard Specific Layouts
 export const IntegratedKPIGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    /* Fixed height rows for uniformity */
     grid-template-rows: repeat(1, minmax(100px, 1fr)); 
-    gap: var(--ant-margin-sm, 12px);
+    gap: 16px;
     width: 100%;
     align-content: stretch;
 `;
@@ -116,7 +116,7 @@ export const IntegratedKPIGrid = styled.div`
 export const IntegratedKPIColumn = styled.div`
     display: flex;
     flex-direction: column;
-    gap: var(--ant-margin-sm, 12px);
+    gap: 16px;
     min-width: 0;
     flex: 1;
 `;
@@ -124,17 +124,17 @@ export const IntegratedKPIColumn = styled.div`
 export const IntegratedTopRow = styled.div`
     display: grid;
     grid-template-columns: 1fr 2fr;
-    gap: var(--ant-margin, 16px);
+    gap: 20px;
     flex: 0 0 auto;
     align-items: stretch;
-    min-height: 480px; /* Reduced specific height */
+    min-height: 480px;
 `;
 
 export const IntegratedChartsGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(180px, 1fr)); /* 2 substantial rows */
-    gap: var(--ant-margin-sm, 12px);
+    grid-template-rows: repeat(2, minmax(180px, 1fr));
+    gap: 16px;
     flex: 1;
     min-width: 0;
     width: 100%;
@@ -151,7 +151,7 @@ export const IntegratedChartsGrid = styled.div`
 export const IntegratedBottomRow = styled.div`
     display: grid;
     grid-template-columns: 1fr 2fr;
-    gap: var(--ant-margin, 16px);
+    gap: 20px;
     flex: 0 0 auto;
     min-height: 260px;
 
@@ -164,7 +164,7 @@ export const IntegratedBottomRow = styled.div`
 
 export const ChartsContainer = styled.div`
     display: flex;
-    gap: var(--ant-margin, 16px);
+    gap: 20px;
     flex: 1;
     min-width: 0;
 `;

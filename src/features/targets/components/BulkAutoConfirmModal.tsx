@@ -179,7 +179,7 @@ export const BulkAutoConfirmModal: React.FC<BulkAutoConfirmModalProps> = ({
                                 <Space direction="vertical">
                                     <Badge status="success" text={`${results.success.length} succeeded`} />
                                     <Badge status="error" text={`${results.failed.length} failed`} />
-                                    <Text type="secondary" style={{ fontSize: 12 }}>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                         {t('bulkAutoConfirm.failedTargets', { defaultValue: 'Failed targets:' })}
                                         {' '}{results.failed.slice(0, 3).join(', ')}
                                         {results.failed.length > 3 && '...'}

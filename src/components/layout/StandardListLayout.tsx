@@ -1,5 +1,14 @@
-import { PageLayout, PageHeader, FullHeightSectionCard } from '@/components/patterns';
+import { PageLayout, PageHeader, FullHeightSectionCard, SectionCard } from '@/components/patterns';
 import styled from 'styled-components';
+
+const FilterWrapper = styled(SectionCard)`
+    margin-bottom: 8px;
+    flex: none;
+    
+    .ant-card-body {
+        padding: 12px 16px;
+    }
+`;
 
 const TableWrapper = styled.div`
     flex: 1;
@@ -61,7 +70,11 @@ export const StandardListLayout: React.FC<StandardListLayoutProps> = ({
 }) => {
     const content = (
         <>
-            {searchBar}
+            {searchBar && (
+                <FilterWrapper>
+                    {searchBar}
+                </FilterWrapper>
+            )}
             {bulkActionBar}
 
             <FullHeightSectionCard style={{ padding: noCardPadding ? 0 : undefined }}>

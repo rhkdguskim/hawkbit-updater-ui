@@ -91,13 +91,13 @@ const SearchHeader = styled.div`
 `;
 
 const SearchInput = styled(Input)`
-    font-size: 18px;
+    font-size: var(--ant-font-size-xl);
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     
     .ant-input {
-        font-size: 18px;
+        font-size: var(--ant-font-size-xl);
         background: transparent;
     }
     
@@ -140,7 +140,7 @@ const CategoryTitle = styled.div`
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -155,7 +155,7 @@ const CategoryIcon = styled.div<{ $color?: string }>`
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: var(--ant-font-size-sm);
     color: ${props => props.$color ? 'white' : 'var(--ant-color-primary)'};
 `;
 
@@ -192,7 +192,7 @@ const IconWrapper = styled.div<{ $bgColor?: string; $iconColor?: string }>`
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: var(--ant-font-size-xl);
     margin-right: 14px;
     flex-shrink: 0;
 `;
@@ -207,7 +207,7 @@ const ResultInfo = styled.div`
 
 const ResultTitle = styled(Text)`
     font-weight: 600;
-    font-size: 14px;
+    font-size: var(--ant-font-size-sm);
     color: var(--ant-color-text);
     display: block;
     overflow: hidden;
@@ -216,7 +216,7 @@ const ResultTitle = styled(Text)`
 `;
 
 const ResultSubtitle = styled(Text)`
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     color: var(--ant-color-text-description);
     display: block;
     overflow: hidden;
@@ -270,7 +270,7 @@ const FooterBar = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     color: var(--ant-color-text-description);
 `;
 
@@ -281,7 +281,7 @@ const ShortcutBadge = styled.span`
     border-radius: 4px;
     background: var(--ant-color-bg-container);
     border: 1px solid var(--ant-color-border-secondary);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 500;
     margin-left: 4px;
 `;
@@ -294,7 +294,7 @@ const LoadingWrapper = styled.div`
 `;
 
 const ViewAllButton = styled(Button)`
-    font-size: 12px;
+    font-size: var(--ant-font-size-sm);
     height: 28px;
     padding: 0 12px;
     border-radius: 6px;
@@ -317,14 +317,14 @@ const TabBadge = styled(Badge)`
 
 // Category color configurations
 const CATEGORY_COLORS = {
-    targets: { bg: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', icon: '#3b82f6' },
+    targets: { bg: 'linear-gradient(135deg, var(--ant-color-primary) 0%, #1d4ed8 100%)', icon: 'var(--ant-color-primary)' },
     rollouts: { bg: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)', icon: '#f97316' },
     distSets: { bg: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)', icon: '#22c55e' },
     modules: { bg: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)', icon: '#a855f7' },
     targetTags: { bg: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)', icon: '#ec4899' },
     dsTags: { bg: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)', icon: '#14b8a6' },
     targetTypes: { bg: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', icon: '#6366f1' },
-    dsTypes: { bg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', icon: '#f59e0b' },
+    dsTypes: { bg: 'linear-gradient(135deg, var(--ant-color-warning) 0%, #d97706 100%)', icon: 'var(--ant-color-warning)' },
     smTypes: { bg: 'linear-gradient(135deg, #84cc16 0%, #65a30d 100%)', icon: '#84cc16' },
 };
 
@@ -583,7 +583,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
                             <Title level={5} style={{ marginBottom: 8, color: 'var(--ant-color-text-secondary)' }}>
                                 {t('search.startTyping', { defaultValue: 'Type to search...' })}
                             </Title>
-                            <Text type="secondary" style={{ fontSize: 13 }}>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                 {t('search.description', { defaultValue: 'Search across Targets, Rollouts, Distributions, Tags and Types' })}
                             </Text>
                         </EmptyState>
@@ -762,7 +762,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
         >
             <SearchHeader>
                 <SearchInput
-                    prefix={<SearchOutlined style={{ fontSize: 22, color: 'var(--ant-color-primary)', marginRight: 12 }} />}
+                    prefix={<SearchOutlined style={{ fontSize: 'var(--ant-font-size-xl)', color: 'var(--ant-color-primary)', marginRight: 12 }} />}
                     placeholder={t('search.placeholderGlobal', { defaultValue: 'Search targets, rollouts, distributions, tags, types...' })}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}

@@ -23,7 +23,7 @@ const EmergencyButton = styled(Button)`
     transition: all 0.1s;
     
     &:hover:not(:disabled) {
-        background: #ef4444;
+        background: var(--ant-color-error);
         transform: translateY(2px);
         box-shadow: 0 2px 0 #991b1b;
     }
@@ -224,7 +224,7 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
             {hasRunningRollouts && (
                 <Badge
                     count={runningRollouts.length}
-                    style={{ marginLeft: 8, backgroundColor: '#fff', color: '#ff4d4f', fontWeight: 'bold' }}
+                    style={{ marginLeft: 8, backgroundColor: '#fff', color: 'var(--ant-color-error)', fontWeight: 'bold' }}
                 />
             )}
         </EmergencyButton>
@@ -302,7 +302,7 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                                             <RolloutInfo>
                                                 <Text strong>{rollout.name}</Text>
                                                 <br />
-                                                <Text type="secondary" style={{ fontSize: 12, fontFamily: 'var(--font-mono)' }}>
+                                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
                                                     {t('emergencyStop.totalTargets', { count: rollout.totalTargets })}
                                                 </Text>
                                             </RolloutInfo>
@@ -334,7 +334,7 @@ export const EmergencyStopButton: React.FC<EmergencyStopButtonProps> = ({
                                     <RolloutInfo>
                                         <Text strong>{result.name}</Text>
                                         {result.error && (
-                                            <Text type="danger" style={{ display: 'block', fontSize: 12 }}>
+                                            <Text type="danger" style={{ display: 'block', fontSize: 'var(--ant-font-size-sm)' }}>
                                                 {result.error}
                                             </Text>
                                         )}

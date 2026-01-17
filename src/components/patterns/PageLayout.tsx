@@ -33,6 +33,12 @@ const StyledLayout = styled.div<{ $padding: string; $gap: string; $fullWidth?: b
   gap: ${props => props.$gap};
   background: transparent;
   isolation: isolate;
+  animation: fadeIn 0.4s var(--transition-gentle) forwards;
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   
   ${props => props.$fullHeight ? css`
     height: 100%;
@@ -79,22 +85,44 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
  * Consistent card styling for all pages
  */
 export const SectionCard = styled(Card)`
-    border-radius: var(--ant-border-radius-lg, 12px);
+    border-radius: 12px;
     width: 100%;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    background: var(--bg-container);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gradient-primary);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    &:hover::before {
+        opacity: 1;
+    }
     
     .ant-card-head {
-        padding: var(--ant-padding, 16px) var(--ant-padding-lg, 24px);
-        min-height: auto;
-        border-bottom: 1px solid var(--ant-color-split);
+        padding: 16px 24px;
+        min-height: 48px;
+        border-bottom: 1px solid var(--border-color);
     }
     
     .ant-card-head-title {
-        font-size: var(--ant-font-size-lg, 16px);
+        font-size: var(--ant-font-size-lg);
         font-weight: 600;
+        letter-spacing: -0.015em;
     }
     
     .ant-card-body {
-        padding: var(--ant-padding-lg, 24px);
+        padding: 24px;
     }
 `;
 

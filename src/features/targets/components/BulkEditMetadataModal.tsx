@@ -214,7 +214,7 @@ const BulkEditMetadataModal: React.FC<BulkEditMetadataModalProps> = ({
                                             <Title level={5} style={{ margin: 0 }}>
                                                 <TagsOutlined /> {t('bulkEdit.mergeMode')}
                                             </Title>
-                                            <Text type="secondary" style={{ fontSize: 12 }}>
+                                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                                 {t('bulkEdit.mergeModeDesc')}
                                             </Text>
                                         </div>
@@ -227,7 +227,7 @@ const BulkEditMetadataModal: React.FC<BulkEditMetadataModalProps> = ({
                                             <Title level={5} style={{ margin: 0 }}>
                                                 <SwapOutlined /> {t('bulkEdit.replaceMode')}
                                             </Title>
-                                            <Text type="secondary" style={{ fontSize: 12 }}>
+                                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                                 {t('bulkEdit.replaceModeDesc')}
                                             </Text>
                                         </div>
@@ -272,7 +272,7 @@ const BulkEditMetadataModal: React.FC<BulkEditMetadataModalProps> = ({
                                                 <Space>
                                                     <Tag color={tag.colour || 'default'}>{tag.name}</Tag>
                                                     {tag.description && (
-                                                        <Text type="secondary" style={{ fontSize: 12 }}>
+                                                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                                             {tag.description}
                                                         </Text>
                                                     )}
@@ -361,13 +361,13 @@ const BulkEditMetadataModal: React.FC<BulkEditMetadataModalProps> = ({
                                                     <List.Item>
                                                         <Space>
                                                             {item.success ? (
-                                                                <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                                                                <CheckCircleOutlined style={{ color: 'var(--ant-color-success)' }} />
                                                             ) : (
-                                                                <CloseCircleOutlined style={{ color: '#ff4d4f' }} />
+                                                                <CloseCircleOutlined style={{ color: 'var(--ant-color-error)' }} />
                                                             )}
                                                             <Text>{item.targetId}</Text>
                                                             {item.error && (
-                                                                <Text type="danger" style={{ fontSize: 12 }}>
+                                                                <Text type="danger" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                                                     ({item.error})
                                                                 </Text>
                                                             )}

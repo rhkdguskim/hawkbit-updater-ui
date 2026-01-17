@@ -10,8 +10,8 @@ export interface PresetColorPickerProps extends Omit<ColorPickerProps, 'presets'
 
 const RECOMMENDED_COLORS = [
     '#1677ff', // Blue (Primary)
-    '#52c41a', // Green (Success)
-    '#faad14', // Gold (Warning)
+    'var(--ant-color-success)', // Green (Success)
+    'var(--ant-color-warning)', // Gold (Warning)
     '#f5222d', // Red (Error)
     '#722ed1', // Purple
     '#eb2f96', // Magenta

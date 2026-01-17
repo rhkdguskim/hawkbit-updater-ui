@@ -54,7 +54,7 @@ export const HighErrorTargetsWidget: React.FC<HighErrorTargetsWidgetProps> = ({ 
                                     <Tag color="error" style={{ margin: 0, borderRadius: 10, fontFamily: 'var(--font-mono)' }}>
                                         {item.count} {t('common:status.failed', 'Failures')}
                                     </Tag>
-                                    <ArrowRightOutlined style={{ fontSize: 12, opacity: 0.3 }} />
+                                    <ArrowRightOutlined style={{ fontSize: 'var(--ant-font-size-sm)', opacity: 0.3 }} />
                                 </Flex>
                             }
                         >
@@ -65,7 +65,7 @@ export const HighErrorTargetsWidget: React.FC<HighErrorTargetsWidgetProps> = ({ 
                                     </Tooltip>
                                 }
                                 description={
-                                    <Text type="secondary" style={{ fontSize: 11, fontFamily: 'var(--font-mono)' }}>{item.id}</Text>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>{item.id}</Text>
                                 }
                             />
                         </List.Item>

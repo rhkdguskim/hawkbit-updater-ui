@@ -1,10 +1,21 @@
 {
     "pageTitle": "배포 관리",
+    "feature": {
+        "title": "배포 관리",
+        "subtitle": "소프트웨어 및 업데이트 관리"
+    },
     "sets": {
         "title": "배포 세트"
     },
     "modules": {
         "title": "소프트웨어 모듈"
+    },
+    "menu": {
+        "distributionSets": "배포 세트",
+        "softwareModules": "소프트웨어 모듈",
+        "tags": "태그",
+        "setTypes": "배포 세트 유형",
+        "moduleTypes": "모듈 유형"
     },
     "overview": {
         "title": "배포 관리",

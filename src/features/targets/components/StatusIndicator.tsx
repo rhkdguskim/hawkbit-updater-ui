@@ -77,7 +77,7 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
     return (
         <StatusWrapper size={8}>
             <StatusDot $status={status} />
-            <Text style={{ fontSize: 12, fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>{label}</Text>
+            <Text style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>{label}</Text>
         </StatusWrapper>
     );
 };
@@ -124,7 +124,7 @@ export const UpdateStatusIndicator: React.FC<UpdateStatusIndicatorProps> = ({
     return (
         <StatusWrapper size={8}>
             <StatusDot $status={getStatus()} style={updateStatus === 'error' ? { backgroundColor: 'var(--ant-color-error)', boxShadow: 'none' } : {}} />
-            <Text style={{ fontSize: 12, fontFamily: 'var(--font-mono)' }}>{getLabel()}</Text>
+            <Text style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>{getLabel()}</Text>
         </StatusWrapper>
     );
 };

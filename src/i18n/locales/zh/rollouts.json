@@ -1,4 +1,8 @@
 {
+    "feature": {
+        "title": "Rollout 管理",
+        "subtitle": "管理软件更新和部署"
+    },
     "templates": {
         "title": "Rollout 模板",
         "createNew": "创建新模板",

@@ -118,7 +118,7 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
             dataIndex: 'id',
             key: 'id',
             width: 80,
-            render: (id: number) => <Text strong style={{ fontSize: 12 }}>#{id}</Text>,
+            render: (id: number) => <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>#{id}</Text>,
         },
         {
             title: t('table.status'),
@@ -132,7 +132,7 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
             dataIndex: 'type',
             key: 'type',
             width: 100,
-            render: (type: string) => <Tag style={{ fontSize: 12 }}>{getTypeLabel(type)}</Tag>,
+            render: (type: string) => <Tag style={{ fontSize: 'var(--ant-font-size-sm)' }}>{getTypeLabel(type)}</Tag>,
         },
         {
             title: t('table.forceType'),
@@ -147,7 +147,7 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
             key: 'createdAt',
             width: 130,
             render: (value: number) => (
-                <Text style={{ fontSize: 12 }}>
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                     {value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'}
                 </Text>
             ),
@@ -158,7 +158,7 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
             key: 'lastModifiedAt',
             width: 130,
             render: (value: number) => (
-                <Text style={{ fontSize: 12 }}>
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                     {value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'}
                 </Text>
             ),

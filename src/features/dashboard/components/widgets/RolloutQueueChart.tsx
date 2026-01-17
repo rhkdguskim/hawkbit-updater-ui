@@ -37,8 +37,8 @@ export const RolloutQueueChart: React.FC<RolloutQueueChartProps> = ({
                         <HourglassOutlined />
                     </IconBadge>
                     <Flex vertical gap={0}>
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('chart.rolloutQueue', 'Rollout Queue')}</span>
-                        <Text type="secondary" style={{ fontSize: 11 }}>{t('chart.totalRollouts', { count: total })}</Text>
+                        <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('chart.rolloutQueue', 'Rollout Queue')}</span>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('chart.totalRollouts', { count: total })}</Text>
                     </Flex>
                 </Flex>
             }
@@ -69,9 +69,9 @@ export const RolloutQueueChart: React.FC<RolloutQueueChartProps> = ({
                             <ChartLegendItem key={entry.name} style={{ padding: '6px 10px' }}>
                                 <Flex align="center" gap={6}>
                                     <div style={{ width: 10, height: 10, borderRadius: 3, background: entry.color, flexShrink: 0 }} />
-                                    <Text style={{ fontSize: 11, whiteSpace: 'nowrap' }}>{entry.name}</Text>
+                                    <Text style={{ fontSize: 'var(--ant-font-size-sm)', whiteSpace: 'nowrap' }}>{entry.name}</Text>
                                 </Flex>
-                                <Text strong style={{ fontSize: 12, color: entry.color }}>{entry.value}</Text>
+                                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', color: entry.color }}>{entry.value}</Text>
                             </ChartLegendItem>
                         ))}
                     </Flex>

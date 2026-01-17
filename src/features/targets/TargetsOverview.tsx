@@ -115,7 +115,11 @@ const FullWidthBottomRow = styled(BottomRow)`
     display: block;
 `;
 
-const TargetsOverview: React.FC = () => {
+interface TargetsOverviewProps {
+    standalone?: boolean;
+}
+
+const TargetsOverview: React.FC<TargetsOverviewProps> = ({ standalone = true }) => {
     const { t } = useTranslation('targets');
     const navigate = useNavigate();
 
@@ -249,6 +253,234 @@ const TargetsOverview: React.FC = () => {
         </LegendStack>
     );
 
+    const content = (
+        <OverviewScrollContent>
+            {/* Top Row: KPI Cards + 3 Pie Charts */}
+            <TopRow>
+                <KPIGridContainer>
+                    <OverviewStatsCard
+                        $accentColor="linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)"
+                        $delay={1}
+                        onClick={() => navigate('/targets/list')}
+                    >
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)">
+                                    <AppstoreOutlined />
+                                </IconBadge>
+                                <BigNumber $color="var(--ant-color-primary)">{totalDevices}</BigNumber>
+                                <StatCaption type="secondary">
+                                    {t('overview.totalDevices', 'Total Devices')}
+                                </StatCaption>
+                            </Flex>
+                        )}
+                    </OverviewStatsCard>
+                    <OverviewStatsCard
+                        $accentColor="linear-gradient(135deg, var(--ant-color-success) 0%, var(--ant-color-success-active) 100%)"
+                        $delay={2}
+                        onClick={() => navigate('/targets/list')}
+                    >
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-success) 0%, var(--ant-color-success-active) 100%)">
+                                    <CheckCircleOutlined />
+                                </IconBadge>
+                                <BigNumber $color={COLORS.inSync}>{inSyncCount}</BigNumber>
+                                <StatCaption type="secondary">
+                                    {t('status.inSync', 'In Sync')}
+                                </StatCaption>
+                            </Flex>
+                        )}
+                    </OverviewStatsCard>
+                    <OverviewStatsCard
+                        $accentColor="linear-gradient(135deg, var(--ant-color-info) 0%, var(--ant-color-info-active) 100%)"
+                        $delay={3}
+                        $pulse={pendingCount > 0}
+                        onClick={() => navigate('/targets/list')}
+                    >
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-info) 0%, var(--ant-color-info-active) 100%)">
+                                    <ClockCircleOutlined />
+                                </IconBadge>
+                                <BigNumber $color={COLORS.pending}>{pendingCount}</BigNumber>
+                                <StatCaption type="secondary">
+                                    {t('status.pending', 'Pending')}
+                                </StatCaption>
+                            </Flex>
+                        )}
+                    </OverviewStatsCard>
+                    <OverviewStatsCard
+                        $accentColor="linear-gradient(135deg, var(--ant-color-error) 0%, var(--ant-color-error-active) 100%)"
+                        $delay={4}
+                        $pulse={errorCount > 0}
+                        onClick={() => navigate('/targets/list')}
+                    >
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-error) 0%, var(--ant-color-error-active) 100%)">
+                                    <ExclamationCircleOutlined />
+                                </IconBadge>
+                                <BigNumber $color={errorCount > 0 ? COLORS.error : 'var(--ant-color-text-tertiary)'}>{errorCount}</BigNumber>
+                                <StatCaption type="secondary">
+                                    {t('status.error', 'Error')}
+                                </StatCaption>
+                            </Flex>
+                        )}
+                    </OverviewStatsCard>
+                </KPIGridContainer>
+
+                <ChartsContainer>
+                    <OverviewChartCard
+                        $theme="targets"
+                        title={
+                            <Flex align="center" gap={10}>
+                                <IconBadge $theme="targets">
+                                    <ApiOutlined />
+                                </IconBadge>
+                                <Flex vertical gap={0}>
+                                    <ChartTitle>{t('overview.connectivityStatus')}</ChartTitle>
+                                    <ChartSubtitle type="secondary">{t('overview.percentOnline', { percent: onlinePercent })}</ChartSubtitle>
+                                </Flex>
+                            </Flex>
+                        }
+                        $delay={5}
+                    >
+                        {isLoading ? (
+                            <ChartSkeleton active size={60} shape="circle" />
+                        ) : connectivityPieData.length > 0 ? (
+                            <FlexFill vertical>
+                                <ResponsiveContainer width="100%" height={100}>
+                                    <PieChart>
+                                        <Pie data={connectivityPieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
+                                            {connectivityPieData.map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={entry.color}
+                                                    style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                {renderCustomLegend(connectivityPieData)}
+                            </FlexFill>
+                        ) : (
+                            <CenteredFlex justify="center" align="center">
+                                <Text type="secondary">{t('common:messages.noData')}</Text>
+                            </CenteredFlex>
+                        )}
+                    </OverviewChartCard>
+
+                    <OverviewChartCard
+                        $theme="targets"
+                        title={
+                            <Flex align="center" gap={10}>
+                                <IconBadge $color="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)">
+                                    <TagsOutlined />
+                                </IconBadge>
+                                <Flex vertical gap={0}>
+                                    <ChartTitle>{t('overview.targetTypeDistribution')}</ChartTitle>
+                                    <ChartSubtitle type="secondary">{t('overview.typesCount', { count: targetTypePieData.length })}</ChartSubtitle>
+                                </Flex>
+                            </Flex>
+                        }
+                        $delay={6}
+                    >
+                        {isLoading ? (
+                            <ChartSkeleton active size={60} shape="circle" />
+                        ) : targetTypePieData.length > 0 ? (
+                            <FlexFill vertical>
+                                <ResponsiveContainer width="100%" height={100}>
+                                    <PieChart>
+                                        <Pie data={targetTypePieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
+                                            {targetTypePieData.map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={entry.color}
+                                                    style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                {renderCustomLegend(targetTypePieData)}
+                            </FlexFill>
+                        ) : (
+                            <CenteredFlex justify="center" align="center">
+                                <Text type="secondary">{t('common:messages.noData')}</Text>
+                            </CenteredFlex>
+                        )}
+                    </OverviewChartCard>
+
+                    <OverviewChartCard
+                        $theme="targets"
+                        title={
+                            <Flex align="center" gap={10}>
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-primary) 0%, #2563eb 100%)">
+                                    <SyncOutlined />
+                                </IconBadge>
+                                <Flex vertical gap={0}>
+                                    <ChartTitle>{t('overview.updateStatusDistribution')}</ChartTitle>
+                                    <ChartSubtitle type="secondary">{t('overview.devicesCount', { count: targets.length })}</ChartSubtitle>
+                                </Flex>
+                            </Flex>
+                        }
+                        $delay={6}
+                    >
+                        {isLoading ? (
+                            <ChartSkeleton active size={60} shape="circle" />
+                        ) : updateStatusPieData.length > 0 ? (
+                            <FlexFill vertical>
+                                <ResponsiveContainer width="100%" height={100}>
+                                    <PieChart>
+                                        <Pie data={updateStatusPieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
+                                            {updateStatusPieData.map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={entry.color}
+                                                    style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                {renderCustomLegend(updateStatusPieData)}
+                            </FlexFill>
+                        ) : (
+                            <CenteredFlex justify="center" align="center">
+                                <Text type="secondary">{t('common:messages.noData')}</Text>
+                            </CenteredFlex>
+                        )}
+                    </OverviewChartCard>
+                </ChartsContainer>
+            </TopRow>
+
+            {/* Bottom Row: Device Grid (Full Width) */}
+            <FullWidthBottomRow>
+                <DeviceCardGrid
+                    targets={gridTargets}
+                    actions={actions}
+                    loading={isLoading}
+                    title={t('overview.deviceGrid', 'Device Status Grid')}
+                    delay={7}
+                    cols={gridCols}
+                    rows={gridRows}
+                    gap={8}
+                    rowHeight={90}
+                    targetTypeColorMap={targetTypeColorMap}
+                />
+            </FullWidthBottomRow>
+        </OverviewScrollContent>
+    );
+
+    if (!standalone) {
+        return content;
+    }
+
     return (
         <PageLayout>
             <PageHeader
@@ -279,228 +511,7 @@ const TargetsOverview: React.FC = () => {
                     </Flex>
                 }
             />
-
-            <OverviewScrollContent>
-                {/* Top Row: KPI Cards + 3 Pie Charts */}
-                <TopRow>
-                    <KPIGridContainer>
-                        <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)"
-                            $delay={1}
-                            onClick={() => navigate('/targets/list')}
-                        >
-                            {isLoading ? <Skeleton.Avatar active size={40} /> : (
-                                <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)">
-                                        <AppstoreOutlined />
-                                    </IconBadge>
-                                    <BigNumber $color="var(--ant-color-primary)">{totalDevices}</BigNumber>
-                                    <StatCaption type="secondary">
-                                        {t('overview.totalDevices', 'Total Devices')}
-                                    </StatCaption>
-                                </Flex>
-                            )}
-                        </OverviewStatsCard>
-                        <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, var(--ant-color-success) 0%, var(--ant-color-success-active) 100%)"
-                            $delay={2}
-                            onClick={() => navigate('/targets/list')}
-                        >
-                            {isLoading ? <Skeleton.Avatar active size={40} /> : (
-                                <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, var(--ant-color-success) 0%, var(--ant-color-success-active) 100%)">
-                                        <CheckCircleOutlined />
-                                    </IconBadge>
-                                    <BigNumber $color={COLORS.inSync}>{inSyncCount}</BigNumber>
-                                    <StatCaption type="secondary">
-                                        {t('status.inSync', 'In Sync')}
-                                    </StatCaption>
-                                </Flex>
-                            )}
-                        </OverviewStatsCard>
-                        <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, var(--ant-color-info) 0%, var(--ant-color-info-active) 100%)"
-                            $delay={3}
-                            $pulse={pendingCount > 0}
-                            onClick={() => navigate('/targets/list')}
-                        >
-                            {isLoading ? <Skeleton.Avatar active size={40} /> : (
-                                <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, var(--ant-color-info) 0%, var(--ant-color-info-active) 100%)">
-                                        <ClockCircleOutlined />
-                                    </IconBadge>
-                                    <BigNumber $color={COLORS.pending}>{pendingCount}</BigNumber>
-                                    <StatCaption type="secondary">
-                                        {t('status.pending', 'Pending')}
-                                    </StatCaption>
-                                </Flex>
-                            )}
-                        </OverviewStatsCard>
-                        <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, var(--ant-color-error) 0%, var(--ant-color-error-active) 100%)"
-                            $delay={4}
-                            $pulse={errorCount > 0}
-                            onClick={() => navigate('/targets/list')}
-                        >
-                            {isLoading ? <Skeleton.Avatar active size={40} /> : (
-                                <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, var(--ant-color-error) 0%, var(--ant-color-error-active) 100%)">
-                                        <ExclamationCircleOutlined />
-                                    </IconBadge>
-                                    <BigNumber $color={errorCount > 0 ? COLORS.error : 'var(--ant-color-text-tertiary)'}>{errorCount}</BigNumber>
-                                    <StatCaption type="secondary">
-                                        {t('status.error', 'Error')}
-                                    </StatCaption>
-                                </Flex>
-                            )}
-                        </OverviewStatsCard>
-                    </KPIGridContainer>
-
-                    <ChartsContainer>
-                        <OverviewChartCard
-                            $theme="targets"
-                            title={
-                                <Flex align="center" gap={10}>
-                                    <IconBadge $theme="targets">
-                                        <ApiOutlined />
-                                    </IconBadge>
-                                    <Flex vertical gap={0}>
-                                        <ChartTitle>{t('overview.connectivityStatus')}</ChartTitle>
-                                        <ChartSubtitle type="secondary">{t('overview.percentOnline', { percent: onlinePercent })}</ChartSubtitle>
-                                    </Flex>
-                                </Flex>
-                            }
-                            $delay={5}
-                        >
-                            {isLoading ? (
-                                <ChartSkeleton active size={60} shape="circle" />
-                            ) : connectivityPieData.length > 0 ? (
-                                <FlexFill vertical>
-                                    <ResponsiveContainer width="100%" height={100}>
-                                        <PieChart>
-                                            <Pie data={connectivityPieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
-                                                {connectivityPieData.map((entry, index) => (
-                                                    <Cell
-                                                        key={`cell-${index}`}
-                                                        fill={entry.color}
-                                                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                                                    />
-                                                ))}
-                                            </Pie>
-                                            <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                    {renderCustomLegend(connectivityPieData)}
-                                </FlexFill>
-                            ) : (
-                                <CenteredFlex justify="center" align="center">
-                                    <Text type="secondary">{t('common:messages.noData')}</Text>
-                                </CenteredFlex>
-                            )}
-                        </OverviewChartCard>
-
-                        <OverviewChartCard
-                            $theme="targets"
-                            title={
-                                <Flex align="center" gap={10}>
-                                    <IconBadge $color="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)">
-                                        <TagsOutlined />
-                                    </IconBadge>
-                                    <Flex vertical gap={0}>
-                                        <ChartTitle>{t('overview.targetTypeDistribution')}</ChartTitle>
-                                        <ChartSubtitle type="secondary">{t('overview.typesCount', { count: targetTypePieData.length })}</ChartSubtitle>
-                                    </Flex>
-                                </Flex>
-                            }
-                            $delay={6}
-                        >
-                            {isLoading ? (
-                                <ChartSkeleton active size={60} shape="circle" />
-                            ) : targetTypePieData.length > 0 ? (
-                                <FlexFill vertical>
-                                    <ResponsiveContainer width="100%" height={100}>
-                                        <PieChart>
-                                            <Pie data={targetTypePieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
-                                                {targetTypePieData.map((entry, index) => (
-                                                    <Cell
-                                                        key={`cell-${index}`}
-                                                        fill={entry.color}
-                                                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                                                    />
-                                                ))}
-                                            </Pie>
-                                            <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                    {renderCustomLegend(targetTypePieData)}
-                                </FlexFill>
-                            ) : (
-                                <CenteredFlex justify="center" align="center">
-                                    <Text type="secondary">{t('common:messages.noData')}</Text>
-                                </CenteredFlex>
-                            )}
-                        </OverviewChartCard>
-
-                        <OverviewChartCard
-                            $theme="targets"
-                            title={
-                                <Flex align="center" gap={10}>
-                                    <IconBadge $color="linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)">
-                                        <SyncOutlined />
-                                    </IconBadge>
-                                    <Flex vertical gap={0}>
-                                        <ChartTitle>{t('overview.updateStatusDistribution')}</ChartTitle>
-                                        <ChartSubtitle type="secondary">{t('overview.devicesCount', { count: targets.length })}</ChartSubtitle>
-                                    </Flex>
-                                </Flex>
-                            }
-                            $delay={6}
-                        >
-                            {isLoading ? (
-                                <ChartSkeleton active size={60} shape="circle" />
-                            ) : updateStatusPieData.length > 0 ? (
-                                <FlexFill vertical>
-                                    <ResponsiveContainer width="100%" height={100}>
-                                        <PieChart>
-                                            <Pie data={updateStatusPieData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
-                                                {updateStatusPieData.map((entry, index) => (
-                                                    <Cell
-                                                        key={`cell-${index}`}
-                                                        fill={entry.color}
-                                                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                                                    />
-                                                ))}
-                                            </Pie>
-                                            <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                    {renderCustomLegend(updateStatusPieData)}
-                                </FlexFill>
-                            ) : (
-                                <CenteredFlex justify="center" align="center">
-                                    <Text type="secondary">{t('common:messages.noData')}</Text>
-                                </CenteredFlex>
-                            )}
-                        </OverviewChartCard>
-                    </ChartsContainer>
-                </TopRow>
-
-                {/* Bottom Row: Device Grid (Full Width) */}
-                <FullWidthBottomRow>
-                    <DeviceCardGrid
-                        targets={gridTargets}
-                        actions={actions}
-                        loading={isLoading}
-                        title={t('overview.deviceGrid', 'Device Status Grid')}
-                        delay={7}
-                        cols={gridCols}
-                        rows={gridRows}
-                        gap={8}
-                        rowHeight={90}
-                        targetTypeColorMap={targetTypeColorMap}
-                    />
-                </FullWidthBottomRow>
-            </OverviewScrollContent>
+            {content}
         </PageLayout>
     );
 };

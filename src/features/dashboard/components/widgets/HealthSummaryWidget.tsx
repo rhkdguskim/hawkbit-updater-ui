@@ -295,7 +295,7 @@ export const HealthSummaryWidget: React.FC<HealthSummaryWidgetProps> = ({
                 <ReasonsList $status={healthData.status}>
                     {healthData.reasons.map((reason, index) => (
                         <ReasonItem key={index} $status={healthData.status}>
-                            <WarningFilled style={{ fontSize: 14 }} />
+                            <WarningFilled style={{ fontSize: 'var(--ant-font-size)' }} />
                             {reason}
                         </ReasonItem>
                     ))}

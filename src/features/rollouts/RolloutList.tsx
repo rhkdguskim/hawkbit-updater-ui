@@ -18,7 +18,11 @@ import { useListFilterStore } from '@/stores/useListFilterStore';
 
 const { Text } = Typography;
 
-const RolloutList: React.FC = () => {
+interface RolloutListProps {
+    standalone?: boolean;
+}
+
+const RolloutList: React.FC<RolloutListProps> = ({ standalone = true }) => {
     const { t } = useTranslation(['rollouts', 'common']);
     const navigate = useNavigate();
     const { role } = useAuthStore();
@@ -234,7 +238,7 @@ const RolloutList: React.FC = () => {
                         percent={percent}
                         size="small"
                         status={record.status === 'stopped' ? 'exception' : undefined}
-                        strokeColor={record.status === 'stopped' ? undefined : 'var(--ant-color-primary, #3b82f6)'}
+                        strokeColor={record.status === 'stopped' ? undefined : 'var(--ant-color-primary, var(--ant-color-primary))'}
                     />
                 );
             },
@@ -308,6 +312,7 @@ const RolloutList: React.FC = () => {
 
     return (
         <StandardListLayout
+            standalone={standalone}
             title={t('list.title')}
             description={t('list.description')}
             searchBar={

@@ -197,15 +197,15 @@ const ActiveRolloutItem: React.FC<ActiveRolloutItemProps> = ({
                         flexShrink: 0
                     }}>
                         {rollout.status === 'running' ? (
-                            <SyncOutlined spin style={{ fontSize: 12, color: ROLLOUT_COLORS.running }} />
+                            <SyncOutlined spin style={{ fontSize: 'var(--ant-font-size-sm)', color: ROLLOUT_COLORS.running }} />
                         ) : rollout.status === 'paused' ? (
-                            <PauseCircleOutlined style={{ fontSize: 12, color: ROLLOUT_COLORS.paused }} />
+                            <PauseCircleOutlined style={{ fontSize: 'var(--ant-font-size-sm)', color: ROLLOUT_COLORS.paused }} />
                         ) : (
-                            <ClockCircleOutlined style={{ fontSize: 12, color: ROLLOUT_COLORS.scheduled }} />
+                            <ClockCircleOutlined style={{ fontSize: 'var(--ant-font-size-sm)', color: ROLLOUT_COLORS.scheduled }} />
                         )}
                     </div>
                     <Tooltip title={rollout.name}>
-                        <Text strong style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {rollout.name}
                         </Text>
                     </Tooltip>
@@ -218,11 +218,11 @@ const ActiveRolloutItem: React.FC<ActiveRolloutItemProps> = ({
             {/* Progress Section */}
             <ProgressSection>
                 <Flex justify="space-between" align="center">
-                    <Text type="secondary" style={{ fontSize: 10 }}>
+                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                         {t('dashboard:activeRollouts.progress')}: {progress}% ({finished}/{total})
                     </Text>
                     {rollout.totalGroups && (
-                        <Text type="secondary" style={{ fontSize: 10 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {t('dashboard:activeRollouts.groupProgress', {
                                 current: Math.min(rollout.totalGroups, Math.ceil((finished / total) * rollout.totalGroups) || 1),
                                 total: rollout.totalGroups
@@ -241,13 +241,13 @@ const ActiveRolloutItem: React.FC<ActiveRolloutItemProps> = ({
                     }
                 />
                 <StatusCounts>
-                    <StatusCount $color="#10b981">
+                    <StatusCount $color="var(--ant-color-success)">
                         <CheckCircleFilled /> {finished}
                     </StatusCount>
                     <StatusCount $color="var(--ant-color-primary)">
                         <SyncOutlined /> {running}
                     </StatusCount>
-                    <StatusCount $color="#ef4444">
+                    <StatusCount $color="var(--ant-color-error)">
                         <CloseCircleFilled /> {error}
                     </StatusCount>
                 </StatusCounts>
@@ -426,8 +426,8 @@ export const ActiveRolloutsWidget: React.FC<ActiveRolloutsWidgetProps> = ({
                             <RocketOutlined />
                         </IconBadge>
                         <Flex vertical gap={0}>
-                            <span style={{ fontSize: 14, fontWeight: 600 }}>{t('rollouts:overview.activeRollouts')}</span>
-                            <Text type="secondary" style={{ fontSize: 11 }}>{t('rollouts:overview.activeCount', { count: activeRollouts.length })}</Text>
+                            <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('rollouts:overview.activeRollouts')}</span>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('rollouts:overview.activeCount', { count: activeRollouts.length })}</Text>
                         </Flex>
                     </Flex>
                 }
@@ -471,7 +471,7 @@ export const ActiveRolloutsWidget: React.FC<ActiveRolloutsWidgetProps> = ({
                 ) : (
                     <Flex vertical justify="center" align="center" gap={12} style={{ flex: 1 }}>
                         <RocketOutlined style={{ fontSize: 32, color: 'var(--ant-color-text-quaternary)' }} />
-                        <Text type="secondary" style={{ fontSize: 12 }}>{t('rollouts:overview.noActiveRollouts')}</Text>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('rollouts:overview.noActiveRollouts')}</Text>
                         {isAdmin && onCreateClick && (
                             <Button type="primary" size="small" icon={<PlusOutlined />} onClick={onCreateClick}>
                                 {t('rollouts:overview.createRollout')}

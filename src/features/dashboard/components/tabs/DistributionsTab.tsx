@@ -30,7 +30,7 @@ import {
 import { useDashboardMetrics } from '../../hooks/useDashboardMetrics';
 
 const { Text } = Typography;
-const PIE_COLORS = ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+const PIE_COLORS = ['#6366f1', 'var(--ant-color-primary)', 'var(--ant-color-success)', 'var(--ant-color-warning)', 'var(--ant-color-error)', '#8b5cf6', '#06b6d4'];
 
 export const DistributionsTab: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
@@ -69,8 +69,8 @@ export const DistributionsTab: React.FC = () => {
     // Completeness distribution
     const completenessData = React.useMemo(() => {
         return [
-            { name: t('status.complete', 'Complete'), value: completeSetsCount, color: '#10b981' },
-            { name: t('status.incomplete', 'Incomplete'), value: incompleteSetsCount, color: '#f59e0b' },
+            { name: t('status.complete', 'Complete'), value: completeSetsCount, color: 'var(--ant-color-success)' },
+            { name: t('status.incomplete', 'Incomplete'), value: incompleteSetsCount, color: 'var(--ant-color-warning)' },
         ].filter(d => d.value > 0);
     }, [completeSetsCount, incompleteSetsCount, t]);
 
@@ -81,9 +81,9 @@ export const DistributionsTab: React.FC = () => {
                 <ChartLegendItem key={entry.name}>
                     <Flex align="center" gap={6}>
                         <div style={{ width: 10, height: 10, borderRadius: 3, background: entry.color, boxShadow: `0 1px 3px ${entry.color}40` }} />
-                        <Text style={{ fontSize: 11, color: '#475569' }}>{entry.name}</Text>
+                        <Text style={{ fontSize: 'var(--ant-font-size-sm)', color: '#475569' }}>{entry.name}</Text>
                     </Flex>
-                    <Text strong style={{ fontSize: 12, color: entry.color }}>{entry.value}</Text>
+                    <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', color: entry.color }}>{entry.value}</Text>
                 </ChartLegendItem>
             ))}
         </Flex>
@@ -105,58 +105,58 @@ export const DistributionsTab: React.FC = () => {
                                     <AppstoreOutlined />
                                 </IconBadge>
                                 <BigNumber $color={COLORS.distributions}>{setsCount}</BigNumber>
-                                <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
                                     {t('overview.distributionSets')}
                                 </Text>
                             </Flex>
                         )}
                     </OverviewStatsCard>
                     <OverviewStatsCard
-                        $accentColor="linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)"
+                        $accentColor="linear-gradient(135deg, var(--ant-color-primary) 0%, #06b6d4 100%)"
                         $delay={2}
                         onClick={() => navigate('/distributions/modules')}
                     >
                         {isLoading ? <Skeleton.Avatar active size={40} /> : (
                             <Flex vertical align="center" gap={4}>
-                                <IconBadge $color="linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)">
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-primary) 0%, #06b6d4 100%)">
                                     <CodeOutlined />
                                 </IconBadge>
-                                <BigNumber $color="#3b82f6">{softwareModulesCount}</BigNumber>
-                                <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                <BigNumber $color="var(--ant-color-primary)">{softwareModulesCount}</BigNumber>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
                                     {t('overview.softwareModules')}
                                 </Text>
                             </Flex>
                         )}
                     </OverviewStatsCard>
                     <OverviewStatsCard
-                        $accentColor="linear-gradient(135deg, #10b981 0%, #34d399 100%)"
+                        $accentColor="linear-gradient(135deg, var(--ant-color-success) 0%, #34d399 100%)"
                         $delay={3}
                         onClick={() => navigate('/distributions/sets')}
                     >
                         {isLoading ? <Skeleton.Avatar active size={40} /> : (
                             <Flex vertical align="center" gap={4}>
-                                <IconBadge $color="linear-gradient(135deg, #10b981 0%, #34d399 100%)">
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-success) 0%, #34d399 100%)">
                                     <TagsOutlined />
                                 </IconBadge>
-                                <BigNumber $color="#10b981">{completeSetsCount}</BigNumber>
-                                <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                <BigNumber $color="var(--ant-color-success)">{completeSetsCount}</BigNumber>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
                                     {t('status.complete')}
                                 </Text>
                             </Flex>
                         )}
                     </OverviewStatsCard>
                     <OverviewStatsCard
-                        $accentColor="linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)"
+                        $accentColor="linear-gradient(135deg, var(--ant-color-warning) 0%, #fbbf24 100%)"
                         $delay={4}
                         onClick={() => navigate('/distributions/sets')}
                     >
                         {isLoading ? <Skeleton.Avatar active size={40} /> : (
                             <Flex vertical align="center" gap={4}>
-                                <IconBadge $color="linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)">
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-warning) 0%, #fbbf24 100%)">
                                     <BlockOutlined />
                                 </IconBadge>
-                                <BigNumber $color="#f59e0b">{incompleteSetsCount}</BigNumber>
-                                <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                <BigNumber $color="var(--ant-color-warning)">{incompleteSetsCount}</BigNumber>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
                                     {t('status.incomplete')}
                                 </Text>
                             </Flex>
@@ -173,8 +173,8 @@ export const DistributionsTab: React.FC = () => {
                                     <BlockOutlined />
                                 </IconBadge>
                                 <Flex vertical gap={0}>
-                                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.distributionByType', 'By Type')}</span>
-                                    <Text type="secondary" style={{ fontSize: 11 }}>{setsCount} sets</Text>
+                                    <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.distributionByType', 'By Type')}</span>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{setsCount} sets</Text>
                                 </Flex>
                             </Flex>
                         }
@@ -207,12 +207,12 @@ export const DistributionsTab: React.FC = () => {
                         $theme="distributions"
                         title={
                             <Flex align="center" gap={10}>
-                                <IconBadge $color="linear-gradient(135deg, #10b981 0%, #34d399 100%)">
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-success) 0%, #34d399 100%)">
                                     <AppstoreOutlined />
                                 </IconBadge>
                                 <Flex vertical gap={0}>
-                                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.completeness', 'Completeness')}</span>
-                                    <Text type="secondary" style={{ fontSize: 11 }}>{setsCount} sets</Text>
+                                    <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.completeness', 'Completeness')}</span>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{setsCount} sets</Text>
                                 </Flex>
                             </Flex>
                         }
@@ -253,8 +253,8 @@ export const DistributionsTab: React.FC = () => {
                                 <AppstoreOutlined />
                             </IconBadge>
                             <Flex vertical gap={0}>
-                                <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.recentSets', 'Recent Distribution Sets')}</span>
-                                <Text type="secondary" style={{ fontSize: 11 }}>{recentSets.length} sets</Text>
+                                <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.recentSets', 'Recent Distribution Sets')}</span>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{recentSets.length} sets</Text>
                             </Flex>
                         </Flex>
                     }
@@ -284,16 +284,16 @@ export const DistributionsTab: React.FC = () => {
                                                 <AppstoreOutlined style={{ fontSize: 16, color: COLORS.distributions }} />
                                             </div>
                                             <Flex vertical gap={0} style={{ minWidth: 0 }}>
-                                                <Text strong style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                     {record.name}
                                                 </Text>
                                                 <Flex gap={4} align="center">
-                                                    <Tag color="blue" style={{ margin: 0, fontSize: 10, padding: '0 4px', borderRadius: 999 }}>v{record.version}</Tag>
-                                                    <Text type="secondary" style={{ fontSize: 10 }}>{record.typeName}</Text>
+                                                    <Tag color="blue" style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)', padding: '0 4px', borderRadius: 999 }}>v{record.version}</Tag>
+                                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{record.typeName}</Text>
                                                 </Flex>
                                             </Flex>
                                         </Flex>
-                                        <Tag color={record.complete ? 'green' : 'orange'} style={{ margin: 0, fontSize: 10, borderRadius: 999 }}>
+                                        <Tag color={record.complete ? 'green' : 'orange'} style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)', borderRadius: 999 }}>
                                             {record.complete ? t('status.complete') : t('status.incomplete')}
                                         </Tag>
                                     </ActivityItem>
@@ -311,12 +311,12 @@ export const DistributionsTab: React.FC = () => {
                     $theme="distributions"
                     title={
                         <Flex align="center" gap={10}>
-                            <IconBadge $color="linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)">
+                            <IconBadge $color="linear-gradient(135deg, var(--ant-color-primary) 0%, #06b6d4 100%)">
                                 <CodeOutlined />
                             </IconBadge>
                             <Flex vertical gap={0}>
-                                <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.recentModules', 'Recent Software Modules')}</span>
-                                <Text type="secondary" style={{ fontSize: 11 }}>{recentModules.length} modules</Text>
+                                <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.recentModules', 'Recent Software Modules')}</span>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{recentModules.length} modules</Text>
                             </Flex>
                         </Flex>
                     }
@@ -343,19 +343,19 @@ export const DistributionsTab: React.FC = () => {
                                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                 flexShrink: 0
                                             }}>
-                                                <CodeOutlined style={{ fontSize: 16, color: '#3b82f6' }} />
+                                                <CodeOutlined style={{ fontSize: 16, color: 'var(--ant-color-primary)' }} />
                                             </div>
                                             <Flex vertical gap={0} style={{ minWidth: 0 }}>
-                                                <Text strong style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                     {record.name}
                                                 </Text>
                                                 <Flex gap={4} align="center">
-                                                    <Tag color="cyan" style={{ margin: 0, fontSize: 10, padding: '0 4px', borderRadius: 999 }}>v{record.version}</Tag>
-                                                    <Text type="secondary" style={{ fontSize: 10 }}>{record.typeName}</Text>
+                                                    <Tag color="cyan" style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)', padding: '0 4px', borderRadius: 999 }}>v{record.version}</Tag>
+                                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{record.typeName}</Text>
                                                 </Flex>
                                             </Flex>
                                         </Flex>
-                                        <Text type="secondary" style={{ fontSize: 10 }}>
+                                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                             {record.createdAt ? dayjs(record.createdAt).format('MM-DD HH:mm') : '-'}
                                         </Text>
                                     </ActivityItem>

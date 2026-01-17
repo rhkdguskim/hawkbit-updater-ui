@@ -25,7 +25,11 @@ dayjs.extend(relativeTime);
 
 const { Text } = Typography;
 
-const ActionList: React.FC = () => {
+interface ActionListProps {
+    standalone?: boolean;
+}
+
+const ActionList: React.FC<ActionListProps> = ({ standalone = true }) => {
     const { t } = useTranslation(['actions', 'common']);
     const navigate = useNavigate();
 
@@ -304,11 +308,11 @@ const ActionList: React.FC = () => {
                         style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                     >
                         <Space size={4} align="baseline">
-                            <Text strong style={{ fontSize: '13px', lineHeight: '20px' }}>
+                            <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', lineHeight: '20px' }}>
                                 <Highlighter text={targetName} search={globalSearch} />
                             </Text>
                             {targetIp ? (
-                                <Text type="secondary" style={{ fontSize: '11px', fontWeight: 400 }}>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-xs, 11px)', fontWeight: 400 }}>
                                     <Highlighter text={targetIp} search={globalSearch} />
                                 </Text>
                             ) : null}
@@ -456,6 +460,7 @@ const ActionList: React.FC = () => {
 
     return (
         <StandardListLayout
+            standalone={standalone}
             title={t('list.title')}
             description={t('list.description')}
             searchBar={

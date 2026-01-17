@@ -15,7 +15,11 @@ import { useDistributionSetListModel } from './hooks/useDistributionSetListModel
 
 const { Text } = Typography;
 
-const DistributionSetList: React.FC = () => {
+interface DistributionSetListProps {
+    standalone?: boolean;
+}
+
+const DistributionSetList: React.FC<DistributionSetListProps> = ({ standalone = true }) => {
     const model = useDistributionSetListModel();
     const { t, isAdmin, navigate } = model;
 
@@ -195,6 +199,7 @@ const DistributionSetList: React.FC = () => {
 
     return (
         <StandardListLayout
+            standalone={standalone}
             title={t('list.title')}
             description={t('list.description')}
             searchBar={

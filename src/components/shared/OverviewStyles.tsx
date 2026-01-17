@@ -2,16 +2,15 @@
 import styled, { keyframes, css } from 'styled-components';
 import { Card, Typography } from 'antd';
 
-// Animations
+// Animations - 미니멀하고 부드럽게
 export const fadeInUp = keyframes`
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
 `;
 
 export const pulse = keyframes`
-    0% { opacity: 1; box-shadow: 0 0 0 0 rgba(var(--ant-color-primary-rgb), 0.4); }
-    70% { opacity: 1; box-shadow: 0 0 0 6px rgba(var(--ant-color-primary-rgb), 0); }
-    100% { opacity: 1; box-shadow: 0 0 0 0 rgba(var(--ant-color-primary-rgb), 0); }
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
 `;
 
 export const shimmer = keyframes`
@@ -19,69 +18,65 @@ export const shimmer = keyframes`
     100% { background-position: 200% 0; }
 `;
 
-// Color Theme Definitions - Semiconductor + AI Style
-// Color Theme Definitions - Semiconductor + AI Style
+// Color Theme Definitions - 심플하고 차분한 스타일
 export const OVERVIEW_THEMES = {
     targets: {
-        gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-        accentLight: 'rgba(34, 197, 94, 0.1)',
-        accentBorder: 'rgba(34, 197, 94, 0.25)',
-        iconBg: '#22c55e',
-        color: '#22c55e',
+        gradient: 'var(--ant-color-success)',
+        accentLight: 'rgba(16, 185, 129, 0.08)',
+        accentBorder: 'rgba(16, 185, 129, 0.15)',
+        iconBg: 'var(--ant-color-success)',
+        color: 'var(--ant-color-success)',
     },
     distributions: {
-        gradient: 'linear-gradient(135deg, #00ffd5 0%, #0891b2 100%)',
-        accentLight: 'rgba(0, 255, 213, 0.1)',
-        accentBorder: 'rgba(0, 255, 213, 0.25)',
+        gradient: 'var(--ant-color-primary)',
+        accentLight: 'rgba(59, 130, 246, 0.08)',
+        accentBorder: 'rgba(59, 130, 246, 0.15)',
         iconBg: 'var(--ant-color-primary)',
         color: 'var(--ant-color-primary)',
     },
     actions: {
-        gradient: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
-        accentLight: 'rgba(168, 85, 247, 0.1)',
-        accentBorder: 'rgba(168, 85, 247, 0.25)',
-        iconBg: '#a855f7',
-        color: '#a855f7',
+        gradient: '#8b5cf6',
+        accentLight: 'rgba(139, 92, 246, 0.08)',
+        accentBorder: 'rgba(139, 92, 246, 0.15)',
+        iconBg: '#8b5cf6',
+        color: '#8b5cf6',
     },
     rollouts: {
-        gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-        accentLight: 'rgba(249, 115, 22, 0.1)',
-        accentBorder: 'rgba(249, 115, 22, 0.25)',
-        iconBg: '#f97316',
-        color: '#f97316',
+        gradient: 'var(--ant-color-warning)',
+        accentLight: 'rgba(245, 158, 11, 0.08)',
+        accentBorder: 'rgba(245, 158, 11, 0.15)',
+        iconBg: 'var(--ant-color-warning)',
+        color: 'var(--ant-color-warning)',
     },
     connectivity: {
-        gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-        accentLight: 'rgba(34, 197, 94, 0.1)',
-        accentBorder: 'rgba(34, 197, 94, 0.25)',
-        iconBg: '#22c55e',
-        color: '#22c55e',
+        gradient: 'var(--ant-color-success)',
+        accentLight: 'rgba(16, 185, 129, 0.08)',
+        accentBorder: 'rgba(16, 185, 129, 0.15)',
+        iconBg: 'var(--ant-color-success)',
+        color: 'var(--ant-color-success)',
     },
     deployment: {
-        gradient: 'linear-gradient(135deg, #00ffd5 0%, #0891b2 100%)',
-        accentLight: 'rgba(0, 255, 213, 0.1)',
-        accentBorder: 'rgba(0, 255, 213, 0.25)',
+        gradient: 'var(--ant-color-primary)',
+        accentLight: 'rgba(59, 130, 246, 0.08)',
+        accentBorder: 'rgba(59, 130, 246, 0.15)',
         iconBg: 'var(--ant-color-primary)',
         color: 'var(--ant-color-primary)',
     },
     fragmentation: {
-        gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
-        accentLight: 'rgba(236, 72, 153, 0.1)',
-        accentBorder: 'rgba(236, 72, 153, 0.25)',
+        gradient: '#ec4899',
+        accentLight: 'rgba(236, 72, 153, 0.08)',
+        accentBorder: 'rgba(236, 72, 153, 0.15)',
         iconBg: '#ec4899',
         color: '#ec4899',
     },
     activity: {
-        gradient: 'linear-gradient(135deg, #00ffd5 0%, #06b6d4 100%)',
-        accentLight: 'rgba(0, 255, 213, 0.1)',
-        accentBorder: 'rgba(0, 255, 213, 0.25)',
-        iconBg: '#00ffd5',
-        color: '#00ffd5',
+        gradient: '#06b6d4',
+        accentLight: 'rgba(6, 182, 212, 0.08)',
+        accentBorder: 'rgba(6, 182, 212, 0.15)',
+        iconBg: '#06b6d4',
+        color: '#06b6d4',
     },
 };
-
-// ... existing components ...
-
 
 // Layout Components
 export const OverviewPageContainer = styled.div`
@@ -91,8 +86,8 @@ export const OverviewPageContainer = styled.div`
     min-height: 0;
     height: 100%;
     overflow: hidden;
-    padding: var(--ant-margin-sm, 12px);
-    animation: ${fadeInUp} 0.3s ease-out;
+    padding: 16px;
+    animation: ${fadeInUp} 0.25s ease-out;
 `;
 
 export const OverviewScrollContent = styled.div`
@@ -101,19 +96,19 @@ export const OverviewScrollContent = styled.div`
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    gap: var(--ant-margin-sm, 12px);
+    gap: 16px;
     min-height: 0;
-    padding-right: 4px; /* Space for scrollbar */
+    padding-right: 4px;
 `;
 
 export const OverviewPageHeader = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 0 var(--ant-padding-sm, 12px) 0;
+    padding: 0 0 16px 0;
     flex-shrink: 0;
     border-bottom: 1px solid var(--ant-color-border-secondary);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 `;
 
 export const HeaderContent = styled.div`
@@ -125,23 +120,22 @@ export const HeaderContent = styled.div`
 export const GradientTitle = styled(Typography.Title) <{ $theme?: keyof typeof OVERVIEW_THEMES }>`
     && {
         margin: 0;
-        /* Use solid color for industrial legibility, or very subtle gradient */
         color: var(--ant-color-text);
-        font-weight: 700;
-        letter-spacing: -0.02em;
+        font-weight: 600;
+        letter-spacing: -0.01em;
     }
 `;
 
 export const TopRow = styled.div`
     display: flex;
-    gap: var(--ant-margin-sm, 12px);
-    min-height: 200px; /* Reduced height for density */
+    gap: 16px;
+    min-height: 200px;
     flex-shrink: 0;
 `;
 
 export const BottomRow = styled.div`
     display: flex;
-    gap: var(--ant-margin-sm, 12px);
+    gap: 16px;
     min-height: 280px;
     flex: 1;
 `;
@@ -149,35 +143,32 @@ export const BottomRow = styled.div`
 export const KPIGridContainer = styled.div`
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--ant-margin-sm, 12px);
-    flex: 0 0 260px;
+    gap: 16px;
+    flex: 0 0 280px;
     height: 100%;
 `;
 
 export const ChartsContainer = styled.div`
     display: flex;
-    gap: var(--ant-margin-sm, 12px);
+    gap: 16px;
     flex: 1;
     min-width: 0;
 `;
 
-// Card Components - Defined Borders
+// Card Components - 심플하고 깔끔한 스타일
 export const OverviewStatsCard = styled(Card) <{ $accentColor?: string; $delay?: number; $pulse?: boolean }>`
-    border: 1px solid var(--ant-color-border);
-    border-radius: var(--ant-border-radius-lg, 12px);
-    background: var(--ant-color-bg-container);
-    /* backdrop-filter removal for clarity/perf */
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background: var(--bg-container);
     box-shadow: var(--shadow-sm);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--transition-normal) var(--transition-gentle);
     position: relative;
     overflow: hidden;
-    animation: ${fadeInUp} 0.3s ease-out;
+    animation: ${fadeInUp} 0.4s var(--transition-gentle) both;
     animation-delay: ${props => (props.$delay || 0) * 0.05}s;
-    animation-fill-mode: both;
     cursor: pointer;
     height: 100%;
 
-    /* Top accent line */
     &::before {
         content: '';
         position: absolute;
@@ -186,32 +177,37 @@ export const OverviewStatsCard = styled(Card) <{ $accentColor?: string; $delay?:
         width: 100%;
         height: 3px;
         background: ${props => props.$accentColor || 'var(--ant-color-primary)'};
-        opacity: 0.8;
+        opacity: 0.15;
     }
 
     &:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-xl);
         border-color: var(--ant-color-primary-border);
+        
+        &::before {
+            opacity: 1;
+        }
     }
 
     .ant-card-body {
-        padding: var(--ant-padding-sm, 12px);
+        padding: 24px 20px;
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        gap: 8px;
     }
 `;
 
 export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof typeof OVERVIEW_THEMES }>`
     border: 1px solid var(--ant-color-border);
-    border-radius: var(--ant-border-radius-lg, 12px);
+    border-radius: 12px;
     background: var(--ant-color-bg-container);
     box-shadow: var(--shadow-sm);
-    animation: ${fadeInUp} 0.3s ease-out;
-    animation-delay: ${props => (props.$delay || 0) * 0.05}s;
+    animation: ${fadeInUp} 0.25s ease-out;
+    animation-delay: ${props => (props.$delay || 0) * 0.03}s;
     animation-fill-mode: both;
     height: 100%;
     min-height: 200px;
@@ -221,32 +217,18 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
     flex-direction: column;
     position: relative;
     overflow: hidden;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
-    &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 1px; /* Top highlight only */
-        background: ${props => {
-        const theme = props.$theme ? OVERVIEW_THEMES[props.$theme] : null;
-        return theme?.color || 'transparent';
-    }};
-        opacity: 0.5;
-    }
+    transition: all 0.2s ease;
 
     &:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
         border-color: var(--ant-color-primary-border);
     }
     
     .ant-card-head {
         border-bottom: 1px solid var(--ant-color-border-secondary);
         flex-shrink: 0;
-        padding: var(--ant-padding-xs, 8px) var(--ant-padding-sm, 12px);
+        padding: 12px 16px;
         min-height: 48px; 
         background: var(--ant-color-bg-container);
     }
@@ -255,12 +237,12 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
         font-size: var(--ant-font-size);
         font-weight: 600;
         color: var(--ant-color-text);
-        padding: 4px 0;
+        padding: 0;
     }
 
     .ant-card-body {
         flex: 1;
-        padding: var(--ant-padding-xs, 8px) var(--ant-padding-sm, 12px);
+        padding: 12px 16px;
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -268,31 +250,25 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
     }
 `;
 
-export const OverviewListCard = styled(OverviewChartCard)`
-    /* Inherits */
-    `;
+export const OverviewListCard = styled(OverviewChartCard)``;
 
 export const IconBadge = styled.div<{ $theme?: keyof typeof OVERVIEW_THEMES; $color?: string }>`
-    width: 36px;
-    height: 36px;
-    border-radius: var(--ant-border-radius, 6px); /* Use theme radius or 6px */
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: ${props => {
         const theme = props.$theme ? OVERVIEW_THEMES[props.$theme] : null;
-        return theme?.accentLight || 'rgba(59, 130, 246, 0.1)';
+        return theme?.accentLight || 'rgba(59, 130, 246, 0.08)';
     }};
     color: ${props => {
         if (props.$color) return props.$color;
         const theme = props.$theme ? OVERVIEW_THEMES[props.$theme] : null;
         return theme?.color || 'var(--ant-color-primary)';
     }};
-    border: 1px solid ${props => {
-        const theme = props.$theme ? OVERVIEW_THEMES[props.$theme] : null;
-        return theme?.accentBorder || 'transparent';
-    }};
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     flex-shrink: 0;
 
     .anticon,
@@ -303,33 +279,32 @@ export const IconBadge = styled.div<{ $theme?: keyof typeof OVERVIEW_THEMES; $co
 `;
 
 export const BigNumber = styled.div<{ $color?: string }>`
-    font-family: var(--font-mono); /* Monospace numbers */
-    font-size: 2.25rem;
-    font-weight: 600;
-    line-height: 1.1;
-    margin-bottom: 4px;
-    color: ${props => props.$color || 'var(--ant-color-primary)'};
-    letter-spacing: -0.04em;
+    font-family: var(--font-mono);
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 2px;
+    color: ${props => props.$color || 'var(--ant-color-text)'};
+    letter-spacing: -0.05em;
+    transition: all 0.3s ease;
 `;
 
 export const LiveIndicator = styled.div<{ $active?: boolean; $color?: string }>`
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: var(--ant-font-size-sm);
-    color: ${props => props.$active ? (props.$color || 'var(--ant-color-success)') : 'var(--ant-color-text-quaternary)'};
-    font-weight: 600;
-    text-transform: uppercase;
     font-size: 0.7rem;
-    letter-spacing: 0.05em;
+    color: ${props => props.$active ? (props.$color || 'var(--ant-color-success)') : 'var(--ant-color-text-quaternary)'};
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     
     &::before {
         content: '';
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
         border-radius: 50%;
-        background: ${props => props.$active ? (props.$color || '#10b981') : '#94a3b8'};
-        box-shadow: ${props => props.$active ? `0 0 8px ${props.$color || '#10b981'}` : 'none'};
+        background: ${props => props.$active ? (props.$color || 'var(--ant-color-success)') : '#94a3b8'};
         ${props => props.$active && css`animation: ${pulse} 2s infinite;`}
     }
 `;
@@ -338,16 +313,17 @@ export const ChartLegendItem = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 10px;
-    background: var(--ant-color-bg-container);
-    border-radius: var(--ant-border-radius, 6px);
+    padding: 8px 12px;
+    background: var(--ant-color-fill-quaternary);
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.1s ease;
-    border: 1px solid var(--ant-color-border);
+    transition: all var(--transition-fast) var(--transition-gentle);
+    border: 1px solid transparent;
     
     &:hover {
-        background: var(--ant-color-bg-text-hover);
-        border-color: var(--ant-color-border-hover);
+        background: var(--bg-page);
+        border-color: var(--border-color);
+        transform: translateX(4px);
     }
 `;
 
@@ -355,18 +331,16 @@ export const ActivityItem = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
+    padding: 10px 14px;
     cursor: pointer;
     height: 100%;
     width: 100%;
-    background: var(--ant-color-bg-container);
-    border-radius: var(--ant-border-radius, 6px);
-    border: 1px solid var(--ant-color-border); /* Visible border */
-    transition: all 0.1s ease;
+    background: var(--ant-color-fill-quaternary);
+    border-radius: 8px;
+    transition: all 0.15s ease;
 
     &:hover {
-        background: var(--ant-color-bg-text-hover); /* Subtle gray */
-        border-color: var(--ant-color-primary); /* Highlight border */
+        background: var(--ant-color-fill-tertiary);
     }
 `;
 
@@ -374,47 +348,43 @@ export const StatusBadge = styled.div<{ $status?: string }>`
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 2px 8px;
-    border-radius: 4px; /* Capsule */
+    padding: 4px 10px;
+    border-radius: 6px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
+    letter-spacing: 0.02em;
     
     ${props => {
         const status = props.$status?.toLowerCase();
         if (status === 'online' || status === 'in_sync' || status === 'finished' || status === 'complete') return css`
-            background: rgba(var(--ant-color-success-rgb), 0.1);
+            background: rgba(16, 185, 129, 0.1);
             color: var(--ant-color-success);
-            border: 1px solid rgba(var(--ant-color-success-rgb), 0.2);
         `;
         if (status === 'running' || status === 'pending') return css`
-            background: rgba(var(--ant-color-info-rgb), 0.1);
-            color: var(--ant-color-info);
-            border: 1px solid rgba(var(--ant-color-info-rgb), 0.2);
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
         `;
         if (status === 'offline' || status === 'incomplete' || status === 'paused') return css`
-            background: rgba(var(--ant-color-warning-rgb), 0.1);
+            background: rgba(245, 158, 11, 0.1);
             color: var(--ant-color-warning);
-            border: 1px solid rgba(var(--ant-color-warning-rgb), 0.2);
         `;
         if (status === 'error' || status === 'failed') return css`
-            background: rgba(var(--ant-color-error-rgb), 0.1);
+            background: rgba(239, 68, 68, 0.1);
             color: var(--ant-color-error);
-            border: 1px solid rgba(var(--ant-color-error-rgb), 0.2);
         `;
         return css`
             background: var(--ant-color-fill-secondary);
             color: var(--ant-color-text-secondary);
-            border: 1px solid var(--ant-color-border);
         `;
     }}
 `;
 
 export const ProgressBar = styled.div<{ $progress: number; $color?: string }>`
     width: 100%;
-    height: 6px;
+    height: 4px;
     background: var(--ant-color-fill-secondary);
-    border-radius: 2px; /* Sharper */
+    border-radius: 4px;
     overflow: hidden;
     position: relative;
 
@@ -426,38 +396,39 @@ export const ProgressBar = styled.div<{ $progress: number; $color?: string }>`
         height: 100%;
         width: ${props => props.$progress}%;
         background: ${props => props.$color || 'var(--ant-color-primary)'};
-        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 4px;
+        transition: width 0.3s ease;
     }
 `;
 
 export const COLORS = {
-    // Update Status Colors
-    inSync: '#22c55e',
-    pending: '#a855f7',
-    error: '#ef4444',
-    unknown: '#64748b',
-    // Connectivity Colors
-    online: '#22c55e',
-    offline: '#eab308',
-    // General
-    success: '#22c55e',
-    running: '#a855f7',
-    finished: '#22c55e',
-    canceled: '#64748b',
-    // Theme
-    targets: '#22c55e',
-    distributions: '#00ffd5',
-    actions: '#a855f7',
-    rollouts: '#f97316',
-    // AI Chart Palette - Neon & Vibrant
+    // 상태 색상 - 차분하고 명확한
+    inSync: 'var(--ant-color-success)',
+    pending: '#6366f1',
+    error: 'var(--ant-color-error)',
+    unknown: '#71717a',
+    // 연결 상태
+    online: 'var(--ant-color-success)',
+    offline: 'var(--ant-color-warning)',
+    // 일반
+    success: 'var(--ant-color-success)',
+    running: '#6366f1',
+    finished: 'var(--ant-color-success)',
+    canceled: '#71717a',
+    // 테마
+    targets: 'var(--ant-color-success)',
+    distributions: 'var(--ant-color-primary)',
+    actions: '#8b5cf6',
+    rollouts: 'var(--ant-color-warning)',
+    // 차트 팔레트 - 차분하고 조화로운
     chartPalette: [
-        '#00ffd5', // Neon Cyan (Primary)
-        '#22c55e', // Emerald
-        '#a855f7', // Violet
-        '#f97316', // Orange
-        '#eab308', // Yellow
-        '#ec4899', // Pink
+        'var(--ant-color-primary)', // Blue
+        'var(--ant-color-success)', // Emerald
+        '#8b5cf6', // Violet
+        'var(--ant-color-warning)', // Amber
         '#06b6d4', // Cyan
+        '#ec4899', // Pink
         '#6366f1', // Indigo
+        '#14b8a6', // Teal
     ],
 };

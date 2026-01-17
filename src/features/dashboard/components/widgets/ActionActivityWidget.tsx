@@ -116,7 +116,7 @@ export const ActionActivityWidget: React.FC<ActionActivityWidgetProps> = ({
                         <Title level={5} style={{ margin: 0 }}>
                             {t('actionActivity.title', 'Action Activity')}
                         </Title>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {t('actionActivity.subtitle', 'System load and bottleneck detection')}
                         </Text>
                     </Flex>

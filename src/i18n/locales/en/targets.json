@@ -1,5 +1,9 @@
 {
     "title": "Target Management",
+    "feature": {
+        "title": "Target Management",
+        "subtitle": "Manage devices and updates"
+    },
     "list": {
         "title": "Target List",
         "description": "Search, filter, and manage IoT targets and their deployment status",

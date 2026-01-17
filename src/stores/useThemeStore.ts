@@ -9,6 +9,8 @@ interface ThemeState {
     setMode: (mode: ThemeMode) => void;
     setSystemTheme: (theme: 'light' | 'dark') => void;
     getResolvedTheme: () => 'light' | 'dark';
+    customLogo: string | null;
+    setCustomLogo: (logo: string | null) => void;
 }
 
 const getSystemTheme = (): 'light' | 'dark' => {
@@ -23,6 +25,7 @@ export const useThemeStore = create<ThemeState>()(
         (set, get) => ({
             mode: 'system',
             systemTheme: getSystemTheme(),
+            customLogo: null,
             setMode: (mode) => {
                 set({ mode });
                 const resolved = mode === 'system' ? get().systemTheme : mode;
@@ -44,6 +47,7 @@ export const useThemeStore = create<ThemeState>()(
                     }
                 }
             },
+            setCustomLogo: (logo) => set({ customLogo: logo }),
             getResolvedTheme: () => {
                 const { mode, systemTheme } = get();
                 if (mode === 'system') {

@@ -43,10 +43,10 @@ dayjs.extend(relativeTime);
 const { Text } = Typography;
 
 const ACTION_COLORS = {
-    finished: '#10b981',
-    running: '#3b82f6',
-    pending: '#f59e0b',
-    error: '#ef4444',
+    finished: 'var(--ant-color-success)',
+    running: 'var(--ant-color-primary)',
+    pending: 'var(--ant-color-warning)',
+    error: 'var(--ant-color-error)',
     canceled: '#94a3b8',
 };
 
@@ -130,9 +130,9 @@ const ActionsOverview: React.FC = () => {
                 <ChartLegendItem key={entry.name}>
                     <Flex align="center" gap={6}>
                         <div style={{ width: 10, height: 10, borderRadius: 3, background: entry.color, boxShadow: `0 1px 3px ${entry.color}40` }} />
-                        <Text style={{ fontSize: 11, color: '#475569' }}>{entry.name}</Text>
+                        <Text style={{ fontSize: 'var(--ant-font-size-sm)', color: '#475569' }}>{entry.name}</Text>
                     </Flex>
-                    <Text strong style={{ fontSize: 12, color: entry.color }}>{entry.value}</Text>
+                    <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', color: entry.color }}>{entry.value}</Text>
                 </ChartLegendItem>
             ))}
         </Flex>
@@ -144,7 +144,7 @@ const ActionsOverview: React.FC = () => {
                 title={t('overview.title', 'Action Management')}
                 description={
                     <Flex align="center" gap={12}>
-                        <Text type="secondary" style={{ fontSize: 13 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size)' }}>
                             {t('overview.subtitle', 'Deployment actions and status overview')}
                         </Text>
                         <LiveIndicator $active={runningCount > 0} $color={COLORS.actions}>
@@ -154,7 +154,7 @@ const ActionsOverview: React.FC = () => {
                 }
                 actions={
                     <Flex align="center" gap={8}>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {t('common:updated', 'Updated')}: {lastUpdated}
                         </Text>
                         <Button
@@ -181,7 +181,7 @@ const ActionsOverview: React.FC = () => {
                 <TopRow>
                     <KPIGridContainer>
                         <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)"
+                            $accentColor="linear-gradient(135deg, var(--ant-color-primary) 0%, #6366f1 100%)"
                             $delay={1}
                             onClick={() => navigate('/actions')}
                         >
@@ -190,21 +190,21 @@ const ActionsOverview: React.FC = () => {
                                     <IconBadge $theme="actions">
                                         <ThunderboltOutlined />
                                     </IconBadge>
-                                    <BigNumber $color="#3b82f6">{totalActions}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                    <BigNumber $color="var(--ant-color-primary)">{totalActions}</BigNumber>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
                                         {t('overview.totalActions', 'Total Actions')}
                                     </Text>
                                 </Flex>
                             )}
                         </OverviewStatsCard>
                         <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #10b981 0%, #34d399 100%)"
+                            $accentColor="linear-gradient(135deg, var(--ant-color-success) 0%, #34d399 100%)"
                             $delay={2}
                             onClick={() => navigate('/actions')}
                         >
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                                    <IconBadge $color="linear-gradient(135deg, var(--ant-color-success) 0%, #059669 100%)">
                                         <CheckCircleOutlined />
                                     </IconBadge>
                                     <BigNumber $color={ACTION_COLORS.finished}>
@@ -221,36 +221,36 @@ const ActionsOverview: React.FC = () => {
                             )}
                         </OverviewStatsCard>
                         <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)"
+                            $accentColor="linear-gradient(135deg, var(--ant-color-warning) 0%, #fbbf24 100%)"
                             $delay={3}
                             $pulse={runningCount > 0}
                             onClick={() => navigate('/actions')}
                         >
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)">
+                                    <IconBadge $color="linear-gradient(135deg, var(--ant-color-warning) 0%, #d97706 100%)">
                                         <PlayCircleOutlined />
                                     </IconBadge>
                                     <BigNumber $color={ACTION_COLORS.running}>{runningCount}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
                                         {t('status.running', 'Running')}
                                     </Text>
                                 </Flex>
                             )}
                         </OverviewStatsCard>
                         <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #ef4444 0%, #f87171 100%)"
+                            $accentColor="linear-gradient(135deg, var(--ant-color-error) 0%, #f87171 100%)"
                             $delay={4}
                             $pulse={errorCount > 0}
                             onClick={() => navigate('/actions')}
                         >
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, #ef4444 0%, #dc2626 100%)">
+                                    <IconBadge $color="linear-gradient(135deg, var(--ant-color-error) 0%, #dc2626 100%)">
                                         <ExclamationCircleOutlined />
                                     </IconBadge>
                                     <BigNumber $color={errorCount > 0 ? ACTION_COLORS.error : '#64748b'}>{errorCount}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
                                         {t('status.error', 'Error')}
                                     </Text>
                                 </Flex>
@@ -267,8 +267,8 @@ const ActionsOverview: React.FC = () => {
                                         <ThunderboltOutlined />
                                     </IconBadge>
                                     <Flex vertical gap={0}>
-                                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.statusDistribution', 'Status Distribution')}</span>
-                                        <Text type="secondary" style={{ fontSize: 11 }}>{totalActions} actions</Text>
+                                        <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.statusDistribution', 'Status Distribution')}</span>
+                                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{totalActions} actions</Text>
                                     </Flex>
                                 </Flex>
                             }
@@ -301,12 +301,12 @@ const ActionsOverview: React.FC = () => {
                             $theme="actions"
                             title={
                                 <Flex align="center" gap={10}>
-                                    <IconBadge $color="linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                                    <IconBadge $color="linear-gradient(135deg, var(--ant-color-success) 0%, #059669 100%)">
                                         <SyncOutlined spin={runningCount > 0} />
                                     </IconBadge>
                                     <Flex vertical gap={0}>
-                                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.activeSummary', 'Active Summary')}</span>
-                                        <Text type="secondary" style={{ fontSize: 11 }}>{runningCount + pendingCount} active</Text>
+                                        <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.activeSummary', 'Active Summary')}</span>
+                                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{runningCount + pendingCount} active</Text>
                                     </Flex>
                                 </Flex>
                             }
@@ -319,23 +319,23 @@ const ActionsOverview: React.FC = () => {
                                     <Flex align="center" justify="space-between" style={{ padding: '8px 12px', background: `${ACTION_COLORS.running}10`, borderRadius: 8 }}>
                                         <Flex align="center" gap={8}>
                                             <SyncOutlined spin style={{ color: ACTION_COLORS.running }} />
-                                            <Text style={{ fontSize: 12 }}>{t('status.running', 'Running')}</Text>
+                                            <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('status.running', 'Running')}</Text>
                                         </Flex>
-                                        <Text strong style={{ fontSize: 16, color: ACTION_COLORS.running }}>{runningCount}</Text>
+                                        <Text strong style={{ fontSize: 'var(--ant-font-size-lg)', color: ACTION_COLORS.running }}>{runningCount}</Text>
                                     </Flex>
                                     <Flex align="center" justify="space-between" style={{ padding: '8px 12px', background: `${ACTION_COLORS.pending}10`, borderRadius: 8 }}>
                                         <Flex align="center" gap={8}>
                                             <ClockCircleOutlined style={{ color: ACTION_COLORS.pending }} />
-                                            <Text style={{ fontSize: 12 }}>{t('status.pending', 'Pending')}</Text>
+                                            <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('status.pending', 'Pending')}</Text>
                                         </Flex>
-                                        <Text strong style={{ fontSize: 16, color: ACTION_COLORS.pending }}>{pendingCount}</Text>
+                                        <Text strong style={{ fontSize: 'var(--ant-font-size-lg)', color: ACTION_COLORS.pending }}>{pendingCount}</Text>
                                     </Flex>
                                     <Flex align="center" justify="space-between" style={{ padding: '8px 12px', background: `${ACTION_COLORS.finished}10`, borderRadius: 8 }}>
                                         <Flex align="center" gap={8}>
                                             <CheckCircleOutlined style={{ color: ACTION_COLORS.finished }} />
-                                            <Text style={{ fontSize: 12 }}>{t('status.finished', 'Finished')}</Text>
+                                            <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('status.finished', 'Finished')}</Text>
                                         </Flex>
-                                        <Text strong style={{ fontSize: 16, color: ACTION_COLORS.finished }}>{finishedCount}</Text>
+                                        <Text strong style={{ fontSize: 'var(--ant-font-size-lg)', color: ACTION_COLORS.finished }}>{finishedCount}</Text>
                                     </Flex>
                                 </Flex>
                             )}
@@ -349,12 +349,12 @@ const ActionsOverview: React.FC = () => {
                         $theme="actions"
                         title={
                             <Flex align="center" gap={10}>
-                                <IconBadge $color="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)">
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-warning) 0%, #d97706 100%)">
                                     <PlayCircleOutlined />
                                 </IconBadge>
                                 <Flex vertical gap={0}>
-                                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.activeActions', 'Active Actions')}</span>
-                                    <Text type="secondary" style={{ fontSize: 11 }}>{activeActions.length} active</Text>
+                                    <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.activeActions', 'Active Actions')}</span>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{activeActions.length} active</Text>
                                 </Flex>
                             </Flex>
                         }
@@ -385,8 +385,8 @@ const ActionsOverview: React.FC = () => {
                                     <HistoryOutlined />
                                 </IconBadge>
                                 <Flex vertical gap={0}>
-                                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.recentActions', 'Recent Actions (24h)')}</span>
-                                    <Text type="secondary" style={{ fontSize: 11 }}>{recentActions.length} actions</Text>
+                                    <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.recentActions', 'Recent Actions (24h)')}</span>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{recentActions.length} actions</Text>
                                 </Flex>
                             </Flex>
                         }
@@ -418,10 +418,10 @@ const ActionsOverview: React.FC = () => {
                                                     {getStatusIcon(record.status)}
                                                 </div>
                                                 <Flex vertical gap={0} style={{ minWidth: 0 }}>
-                                                    <Text strong style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                         {getTargetId(record)}
                                                     </Text>
-                                                    <Text type="secondary" style={{ fontSize: 10 }}>
+                                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                                         {record.createdAt ? dayjs(record.createdAt).fromNow() : '-'}
                                                     </Text>
                                                 </Flex>

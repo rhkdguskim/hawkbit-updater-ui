@@ -23,11 +23,11 @@ export const FragmentationChart: React.FC<FragmentationChartProps> = ({ isLoadin
     const total = stats.inSync + stats.pending + stats.unknown + stats.error + stats.registered;
 
     const data = useMemo(() => [
-        { name: t('common:status.in_sync', 'In Sync'), value: stats.inSync, color: '#10b981' },
-        { name: t('common:status.pending', 'Pending'), value: stats.pending, color: '#f59e0b' },
+        { name: t('common:status.in_sync', 'In Sync'), value: stats.inSync, color: 'var(--ant-color-success)' },
+        { name: t('common:status.pending', 'Pending'), value: stats.pending, color: 'var(--ant-color-warning)' },
         { name: t('common:status.registered', 'Registered'), value: stats.registered, color: '#6366f1' },
         { name: t('common:status.unknown', 'Unknown'), value: stats.unknown, color: '#94a3b8' },
-        { name: t('common:status.error', 'Error'), value: stats.error, color: '#ef4444' },
+        { name: t('common:status.error', 'Error'), value: stats.error, color: 'var(--ant-color-error)' },
     ].filter(d => d.value > 0), [stats, t]);
 
 
@@ -41,8 +41,8 @@ export const FragmentationChart: React.FC<FragmentationChartProps> = ({ isLoadin
                         <AppstoreOutlined />
                     </IconBadge>
                     <Flex vertical gap={0}>
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('chart.fragmentation', 'Firmware Status')}</span>
-                        <Text type="secondary" style={{ fontSize: 11 }}>{total} devices</Text>
+                        <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('chart.fragmentation', 'Firmware Status')}</span>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{total} devices</Text>
                     </Flex>
                 </Flex>
             }
@@ -90,9 +90,9 @@ export const FragmentationChart: React.FC<FragmentationChartProps> = ({ isLoadin
                                         background: entry.color,
                                         flexShrink: 0
                                     }} />
-                                    <Text style={{ fontSize: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.name}</Text>
+                                    <Text style={{ fontSize: 'var(--ant-font-size-sm)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.name}</Text>
                                 </Flex>
-                                <Text strong style={{ fontSize: 11, color: entry.color }}>{entry.value}</Text>
+                                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', color: entry.color }}>{entry.value}</Text>
                             </ChartLegendItem>
                         ))}
                     </Flex>

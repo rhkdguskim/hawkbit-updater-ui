@@ -106,12 +106,12 @@ const ApprovalPolicyCard: React.FC<{ isEditMode: boolean }> = ({ isEditMode }) =
                     </GroupIconBadge>
                     <Flex vertical gap={0}>
                         <span>{t('approvalPolicy.title', 'Approval Policies')}</span>
-                        <Text type="secondary" style={{ fontSize: 11, fontWeight: 400 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontWeight: 400 }}>
                             {rules.filter(r => r.enabled).length} {t('common:active', 'active')}
                         </Text>
                     </Flex>
                     <Tooltip title={t('approvalPolicy.desc', 'Conditional approval rules for rollouts')}>
-                        <InfoCircleOutlined style={{ color: '#94a3b8', fontSize: 14 }} />
+                        <InfoCircleOutlined style={{ color: '#94a3b8', fontSize: 'var(--ant-font-size)' }} />
                     </Tooltip>
                 </Flex>
             }
@@ -120,7 +120,7 @@ const ApprovalPolicyCard: React.FC<{ isEditMode: boolean }> = ({ isEditMode }) =
                 <ConfigItemRow key={rule.id} $delay={index}>
                     <ConfigItemLabel>
                         <Space>
-                            <span style={{ color: '#10b981' }}>{getIcon(rule.type)}</span>
+                            <span style={{ color: 'var(--ant-color-success)' }}>{getIcon(rule.type)}</span>
                             <ConfigKeyText>{t(`approvalPolicy.rules.${rule.type}.title`)}</ConfigKeyText>
                         </Space>
                         <ConfigDescText>{t(`approvalPolicy.rules.${rule.type}.desc`)}</ConfigDescText>

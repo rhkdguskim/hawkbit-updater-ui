@@ -269,7 +269,7 @@ const AssignDSModal: React.FC<AssignDSModalProps> = ({
                                     <Flex justify="space-between" align="center">
                                         <Space direction="vertical" size={0}>
                                             <Text strong>{ds.name}</Text>
-                                            <Text type="secondary" style={{ fontSize: 12 }}>
+                                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                                 {ds.description || t('common:noDescription')}
                                             </Text>
                                         </Space>
@@ -303,7 +303,7 @@ const AssignDSModal: React.FC<AssignDSModalProps> = ({
                             <Select.Option key={opt.value} value={opt.value} label={opt.label}>
                                 <Space direction="vertical" size={0}>
                                     <Text strong>{opt.label}</Text>
-                                    <Text type="secondary" style={{ fontSize: 12 }}>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                         {opt.description}
                                     </Text>
                                 </Space>
@@ -396,7 +396,7 @@ const AssignDSModal: React.FC<AssignDSModalProps> = ({
                             }}
                         >
                             <Space align="center" style={{ marginBottom: 12 }}>
-                                <Text strong style={{ fontSize: 13 }}>
+                                <Text strong style={{ fontSize: 'var(--ant-font-size)' }}>
                                     {t('assign.maintenanceWindowLabel')}
                                 </Text>
                                 <Tooltip title={t('assign.maintenanceWindowTooltip')}>

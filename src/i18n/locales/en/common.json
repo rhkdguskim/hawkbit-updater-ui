@@ -1,5 +1,8 @@
 {
     "appName": "hawkBit Updater",
+    "app": {
+        "title": "Updater UI"
+    },
     "updated": "Updated",
     "createdAt": "Created At",
     "nav": {
@@ -290,12 +293,13 @@
         "darkMode": "Dark Mode",
         "systemMode": "System Mode",
         "account": "Account",
-        "logout": "Logout"
+        "logout": "Logout",
+        "customizeUI": "Customize UI"
     },
     "languages": {
-        "en": "🇺🇸 English",
-        "ko": "🇰🇷 한국어",
-        "zh": "🇨🇳 Chinese"
+        "en": "English",
+        "ko": "한국어",
+        "zh": "中文"
     },
     "form": {
         "required": "This field is required.",
@@ -338,5 +342,26 @@
             "address": "Address"
         }
     },
-    "optional": "Optional"
+    "optional": "Optional",
+    "uiSettings": {
+        "title": "UI Customization",
+        "description": "Customize the application header logo. Changes are saved to your browser.",
+        "headerLogo": "Header Logo",
+        "defaultLogo": "Default Logo",
+        "imageSource": "Image Source",
+        "enterUrl": "Enter image URL...",
+        "uploadLocal": "Upload Local Image",
+        "storageNote": "Storage Note",
+        "storageNoteDesc": "Uploaded images are stored in your browser's Local Storage. Please use small images (SVG/PNG recommended, < 2MB) to avoid storage limits.",
+        "resetDefault": "Reset Default",
+        "save": "Save Changes",
+        "or": "- OR -",
+        "messages": {
+            "tooLarge": "Image is too large for local storage.",
+            "saved": "UI Settings saved",
+            "reset": "Reset to default",
+            "onlyImages": "You can only upload image files!",
+            "sizeLimit": "Image must be smaller than 2MB!"
+        }
+    }
 }

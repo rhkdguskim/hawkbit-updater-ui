@@ -87,7 +87,7 @@ export const ColumnCustomizer: React.FC<ColumnCustomizerProps> = ({
 
     const content = (
         <ColumnListWrapper>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                 {t('columnCustomizer.description', {
                     defaultValue: 'Select columns to display'
                 })}

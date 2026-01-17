@@ -1,5 +1,8 @@
 {
     "appName": "hawkBit 업데이터",
+    "app": {
+        "title": "업데이터 UI"
+    },
     "updated": "업데이트",
     "createdAt": "생성일",
     "nav": {
@@ -292,12 +295,13 @@
         "darkMode": "다크 모드",
         "systemMode": "시스템 설정",
         "account": "계정",
-        "logout": "로그아웃"
+        "logout": "로그아웃",
+        "customizeUI": "UI 사용자 설정"
     },
     "languages": {
-        "en": "🇺🇸 English",
-        "ko": "🇰🇷 한국어",
-        "zh": "🇨🇳 중국어"
+        "en": "English",
+        "ko": "한국어",
+        "zh": "中文"
     },
     "form": {
         "required": "필수 항목입니다.",
@@ -340,5 +344,26 @@
             "address": "주소"
         }
     },
-    "optional": "선택 사항"
+    "optional": "선택 사항",
+    "uiSettings": {
+        "title": "UI 사용자 설정",
+        "description": "헤더 로고를 원하는 이미지로 변경할 수 있습니다. 설정은 브라우저에 저장됩니다.",
+        "headerLogo": "헤더 로고",
+        "defaultLogo": "기본 로고",
+        "imageSource": "이미지 소스",
+        "enterUrl": "이미지 URL 입력...",
+        "uploadLocal": "로컬 이미지 업로드",
+        "storageNote": "저장소 알림",
+        "storageNoteDesc": "업로드된 이미지는 브라우저의 로컬 스토리지에 저장됩니다. 저장 용량 제한을 피하기 위해 작은 이미지(SVG/PNG 권장, 2MB 이하)를 사용해 주세요.",
+        "resetDefault": "기본값으로 초기화",
+        "save": "변경사항 저장",
+        "or": "- 또는 -",
+        "messages": {
+            "tooLarge": "이미지가 로컬 스토리지에 저장하기에 너무 큽니다.",
+            "saved": "UI 설정이 저장되었습니다.",
+            "reset": "기본값으로 초기화되었습니다.",
+            "onlyImages": "이미지 파일만 업로드할 수 있습니다!",
+            "sizeLimit": "이미지는 2MB보다 작아야 합니다!"
+        }
+    }
 }

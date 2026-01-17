@@ -72,11 +72,11 @@ export const TagFormModal: React.FC<TagFormModalProps> = ({
                 form.setFieldsValue({
                     name: initialData.name,
                     description: initialData.description,
-                    colour: initialData.colour || '#1890ff',
+                    colour: initialData.colour || 'var(--ant-color-primary)',
                 });
             } else {
                 form.resetFields();
-                form.setFieldsValue({ colour: '#1890ff' });
+                form.setFieldsValue({ colour: 'var(--ant-color-primary)' });
             }
         }
     }, [open, mode, initialData, form]);
@@ -87,7 +87,7 @@ export const TagFormModal: React.FC<TagFormModalProps> = ({
             // Handle ColorPicker value - it might be a Color object or string
             const colourValue = typeof values.colour === 'string'
                 ? values.colour
-                : values.colour?.toHexString?.() || '#1890ff';
+                : values.colour?.toHexString?.() || 'var(--ant-color-primary)';
 
             onSubmit({
                 name: values.name,

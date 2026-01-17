@@ -79,15 +79,15 @@ export const ActionRequiredDetailsModal: React.FC<ActionRequiredDetailsModalProp
                                 {t(`common:status.${action.status?.toLowerCase() || 'unknown'}`)}
                             </Tag>
                         </Flex>
-                        <Text type="secondary" style={{ fontSize: 11 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {action.detailStatus || '-'}
                         </Text>
                     </Flex>
                     <Flex vertical align="flex-end" gap={2}>
-                        <Text type="secondary" style={{ fontSize: 11 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             <ClockCircleOutlined /> {time ? dayjs(time).fromNow() : '-'}
                         </Text>
-                        <Text type="secondary" style={{ fontSize: 10 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {time ? dayjs(time).format('YYYY-MM-DD HH:mm') : ''}
                         </Text>
                     </Flex>
@@ -117,15 +117,15 @@ export const ActionRequiredDetailsModal: React.FC<ActionRequiredDetailsModalProp
                                 {t('common:status.waiting_for_approval')}
                             </Tag>
                         </Flex>
-                        <Text type="secondary" style={{ fontSize: 11 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {t('rollouts:list.columns.totalTargets', 'Total Targets')}: {rollout.totalTargets || 0}
                         </Text>
                     </Flex>
                     <Flex vertical align="flex-end" gap={2}>
-                        <Text type="secondary" style={{ fontSize: 11 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             <ClockCircleOutlined /> {rollout.createdAt ? dayjs(rollout.createdAt).fromNow() : '-'}
                         </Text>
-                        <Tag color="blue" bordered={false} style={{ fontSize: 10, margin: 0 }}>
+                        <Tag color="blue" bordered={false} style={{ fontSize: 'var(--ant-font-size-sm)', margin: 0 }}>
                             ID: {rollout.id}
                         </Tag>
                     </Flex>

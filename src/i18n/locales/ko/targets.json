@@ -1,5 +1,14 @@
 {
     "title": "타겟 관리",
+    "menu": {
+        "list": "타겟 목록",
+        "tags": "타겟 태그",
+        "types": "타겟 유형"
+    },
+    "feature": {
+        "title": "타겟 관리",
+        "subtitle": "디바이스 및 업데이트 관리"
+    },
     "list": {
         "title": "타겟 목록",
         "description": "IoT 타겟 검색, 필터링 및 배포 상태 관리",

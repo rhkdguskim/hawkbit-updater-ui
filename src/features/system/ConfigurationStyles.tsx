@@ -2,73 +2,73 @@
 import styled, { keyframes, css } from 'styled-components';
 import { Card, Typography } from 'antd';
 
-// Animations
+// Animations - 미니멀하게
 const fadeInUp = keyframes`
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 `;
 
 const slideIn = keyframes`
-    from { opacity: 0; transform: translateX(-10px); }
+    from { opacity: 0; transform: translateX(-6px); }
     to { opacity: 1; transform: translateX(0); }
 `;
 
 const pulse = keyframes`
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
 `;
 
 // Theme for System Configuration
 export const SYSTEM_THEME = {
-    gradient: 'linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)',
+    gradient: 'var(--ant-color-primary)',
     accentLight: 'var(--ant-color-primary-bg)',
     accentBorder: 'var(--ant-color-primary-border)',
-    iconBg: 'linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%)',
+    iconBg: 'var(--ant-color-primary)',
     color: 'var(--ant-color-primary)',
 };
 
-// Group color themes
+// Group color themes - 심플한 단색
 export const GROUP_THEMES = {
     polling: {
-        gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-        light: 'rgba(59, 130, 246, 0.08)',
-        border: 'rgba(59, 130, 246, 0.2)',
-        color: '#3b82f6',
+        gradient: 'var(--ant-color-primary)',
+        light: 'rgba(59, 130, 246, 0.06)',
+        border: 'rgba(59, 130, 246, 0.12)',
+        color: 'var(--ant-color-primary)',
     },
     auth: {
-        gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-        light: 'rgba(16, 185, 129, 0.08)',
-        border: 'rgba(16, 185, 129, 0.2)',
-        color: '#10b981',
+        gradient: 'var(--ant-color-success)',
+        light: 'rgba(16, 185, 129, 0.06)',
+        border: 'rgba(16, 185, 129, 0.12)',
+        color: 'var(--ant-color-success)',
     },
     rollout: {
-        gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-        light: 'rgba(245, 158, 11, 0.08)',
-        border: 'rgba(245, 158, 11, 0.2)',
-        color: '#f59e0b',
+        gradient: 'var(--ant-color-warning)',
+        light: 'rgba(245, 158, 11, 0.06)',
+        border: 'rgba(245, 158, 11, 0.12)',
+        color: 'var(--ant-color-warning)',
     },
     repo: {
-        gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-        light: 'rgba(139, 92, 246, 0.08)',
-        border: 'rgba(139, 92, 246, 0.2)',
+        gradient: '#8b5cf6',
+        light: 'rgba(139, 92, 246, 0.06)',
+        border: 'rgba(139, 92, 246, 0.12)',
         color: '#8b5cf6',
     },
     download: {
-        gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
-        light: 'rgba(6, 182, 212, 0.08)',
-        border: 'rgba(6, 182, 212, 0.2)',
+        gradient: '#06b6d4',
+        light: 'rgba(6, 182, 212, 0.06)',
+        border: 'rgba(6, 182, 212, 0.12)',
         color: '#06b6d4',
     },
     assignment: {
-        gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
-        light: 'rgba(236, 72, 153, 0.08)',
-        border: 'rgba(236, 72, 153, 0.2)',
+        gradient: '#ec4899',
+        light: 'rgba(236, 72, 153, 0.06)',
+        border: 'rgba(236, 72, 153, 0.12)',
         color: '#ec4899',
     },
     other: {
-        gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
-        light: 'rgba(100, 116, 139, 0.08)',
-        border: 'rgba(100, 116, 139, 0.2)',
+        gradient: '#64748b',
+        light: 'rgba(100, 116, 139, 0.06)',
+        border: 'rgba(100, 116, 139, 0.12)',
         color: '#64748b',
     },
 };
@@ -79,11 +79,11 @@ export type GroupThemeKey = keyof typeof GROUP_THEMES;
 export const ConfigPageContainer = styled.div`
     display: flex;
     flex-direction: column;
-    gap: var(--ant-margin, 16px);
+    gap: 20px;
     height: 100%;
     min-height: 0;
-    animation: ${fadeInUp} 0.5s ease-out;
-    padding: var(--ant-margin-lg, 24px);
+    animation: ${fadeInUp} 0.3s ease-out;
+    padding: 24px;
     overflow: hidden;
 `;
 
@@ -104,23 +104,14 @@ export const ConfigHeader = styled.div`
 export const HeaderContent = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 `;
 
 export const GradientTitle = styled(Typography.Title)`
     && {
         margin: 0;
-        background: ${SYSTEM_THEME.gradient};
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    [data-theme='dark'] &,
-    .dark-mode & {
-        background: linear-gradient(135deg, var(--ant-color-primary-hover) 0%, var(--ant-color-primary-bg-hover) 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
+        color: var(--ant-color-text);
+        font-weight: 600;
     }
 `;
 
@@ -129,23 +120,22 @@ export const StatusIndicator = styled.div<{ $isEdit?: boolean }>`
     align-items: center;
     gap: 8px;
     padding: 6px 14px;
-    border-radius: 20px;
+    border-radius: 8px;
     font-size: var(--ant-font-size-sm);
-    font-weight: 600;
+    font-weight: 500;
     background: ${props => props.$isEdit
-        ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%)'
-        : 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%)'
+        ? 'rgba(245, 158, 11, 0.1)'
+        : 'rgba(59, 130, 246, 0.1)'
     };
-    color: ${props => props.$isEdit ? '#d97706' : '#2563eb'};
-    border: 1px solid ${props => props.$isEdit ? 'rgba(245, 158, 11, 0.3)' : 'rgba(59, 130, 246, 0.3)'};
+    color: ${props => props.$isEdit ? '#d97706' : 'var(--ant-color-primary)'};
     
     &::before {
         content: '';
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
         border-radius: 50%;
-        background: ${props => props.$isEdit ? '#f59e0b' : '#3b82f6'};
-        ${props => props.$isEdit && css`animation: ${pulse} 1.5s ease-in-out infinite;`}
+        background: ${props => props.$isEdit ? 'var(--ant-color-warning)' : 'var(--ant-color-primary)'};
+        ${props => props.$isEdit && css`animation: ${pulse} 2s ease-in-out infinite;`}
     }
 `;
 
@@ -153,23 +143,11 @@ export const StatusIndicator = styled.div<{ $isEdit?: boolean }>`
 export const ConfigGroupsContainer = styled.div`
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: var(--ant-margin, 16px);
+    gap: 20px;
     flex: 1;
     overflow-y: auto;
-    padding-bottom: var(--ant-margin, 16px);
+    padding-bottom: 16px;
     align-content: flex-start;
-    
-    /* Custom scrollbar */
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    &::-webkit-scrollbar-thumb {
-        background: var(--ant-color-primary-bg-hover, rgba(99, 102, 241, 0.1));
-        border-radius: 10px;
-    }
     
     @media (max-width: 860px) {
         grid-template-columns: 1fr;
@@ -178,52 +156,31 @@ export const ConfigGroupsContainer = styled.div`
 
 // Group Card
 export const ConfigGroupCard = styled(Card) <{ $themeKey?: GroupThemeKey; $delay?: number }>`
-    border: none;
-    border-radius: var(--ant-border-radius-lg, 16px);
-    background: ${props => {
-        const theme = props.$themeKey ? GROUP_THEMES[props.$themeKey] : null;
-        return theme
-            ? `linear-gradient(145deg, ${theme.light} 0%, var(--ant-color-bg-container) 30%, var(--ant-color-bg-container) 100%)`
-            : 'var(--ant-color-bg-container)';
-    }};
-    backdrop-filter: blur(20px);
+    border: 1px solid var(--ant-color-border);
+    border-radius: 12px;
+    background: var(--ant-color-bg-container);
     box-shadow: var(--shadow-sm);
-    animation: ${fadeInUp} 0.5s ease-out;
-    animation-delay: ${props => (props.$delay || 0) * 0.08}s;
+    animation: ${fadeInUp} 0.3s ease-out;
+    animation-delay: ${props => (props.$delay || 0) * 0.05}s;
     animation-fill-mode: both;
     position: relative;
     overflow: visible;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
     max-height: 400px;
     
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: ${props => {
-        const theme = props.$themeKey ? GROUP_THEMES[props.$themeKey] : null;
-        return theme?.gradient || SYSTEM_THEME.gradient;
-    }};
-        border-radius: var(--ant-border-radius-lg, 16px) 0 0 var(--ant-border-radius-lg, 16px);
-    }
+    /* 왼쪽 색상 바 제거 - 심플하게 */
     
     &:hover {
-        transform: translateY(-2px);
+        transform: translateY(-1px);
         box-shadow: var(--shadow-md);
     }
     
     .ant-card-head {
-        border-bottom: 1px solid ${props => {
-        const theme = props.$themeKey ? GROUP_THEMES[props.$themeKey] : null;
-        return theme?.border || 'var(--ant-color-border-secondary)';
-    }};
+        border-bottom: 1px solid var(--ant-color-border-secondary);
         flex-shrink: 0;
-        padding: var(--ant-padding-sm, 12px) var(--ant-padding, 16px);
+        padding: 14px 16px;
         min-height: auto;
         background: transparent;
     }
@@ -236,19 +193,10 @@ export const ConfigGroupCard = styled(Card) <{ $themeKey?: GroupThemeKey; $delay
     }
     
     .ant-card-body {
-        padding: var(--ant-padding-sm, 12px) var(--ant-padding, 16px);
+        padding: 12px 16px;
         overflow-y: auto;
         flex: 1;
         min-height: 0;
-    }
-    
-    [data-theme='dark'] &,
-    .dark-mode & {
-        border: 1px solid var(--ant-color-border-secondary);
-        
-        .ant-card-head {
-            border-bottom: 1px solid var(--ant-color-border-secondary);
-        }
     }
 `;
 
@@ -262,11 +210,13 @@ export const GroupIconBadge = styled.div<{ $themeKey?: GroupThemeKey }>`
     justify-content: center;
     background: ${props => {
         const theme = props.$themeKey ? GROUP_THEMES[props.$themeKey] : null;
-        return theme?.gradient || SYSTEM_THEME.gradient;
+        return theme?.light || 'rgba(59, 130, 246, 0.1)';
     }};
-    color: white;
-    font-size: 1.25rem;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    color: ${props => {
+        const theme = props.$themeKey ? GROUP_THEMES[props.$themeKey] : null;
+        return theme?.color || 'var(--ant-color-primary)';
+    }};
+    font-size: 1.1rem;
     flex-shrink: 0;
 `;
 
@@ -275,29 +225,17 @@ export const ConfigItemRow = styled.div<{ $delay?: number }>`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
-    margin: 6px 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(248, 250, 252, 0.5) 100%);
-    border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.03);
-    transition: all 0.2s ease;
-    animation: ${slideIn} 0.3s ease-out;
-    animation-delay: ${props => (props.$delay || 0) * 0.05}s;
+    padding: 12px 14px;
+    margin: 4px 0;
+    background: var(--ant-color-fill-quaternary);
+    border-radius: 8px;
+    transition: all 0.15s ease;
+    animation: ${slideIn} 0.25s ease-out;
+    animation-delay: ${props => (props.$delay || 0) * 0.03}s;
     animation-fill-mode: both;
     
     &:hover {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.7) 100%);
-        transform: translateX(2px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    }
-    
-    .dark-mode & {
-        background: linear-gradient(135deg, rgba(51, 65, 85, 0.5) 0%, rgba(30, 41, 59, 0.4) 100%);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        
-        &:hover {
-            background: linear-gradient(135deg, rgba(51, 65, 85, 0.7) 0%, rgba(30, 41, 59, 0.6) 100%);
-        }
+        background: var(--ant-color-fill-tertiary);
     }
 `;
 
@@ -313,27 +251,18 @@ export const ConfigItemLabel = styled.div`
 export const ConfigKeyText = styled.span`
     font-family: var(--font-mono);
     font-size: var(--ant-font-size-sm);
-    color: #64748b;
-    background: rgba(100, 116, 139, 0.1);
+    color: var(--ant-color-text-secondary);
+    background: var(--ant-color-fill-secondary);
     padding: 2px 8px;
     border-radius: 4px;
     display: inline-block;
     max-width: fit-content;
-    
-    .dark-mode & {
-        color: #94a3b8;
-        background: rgba(148, 163, 184, 0.2);
-    }
 `;
 
 export const ConfigDescText = styled.span`
     font-size: var(--ant-font-size-sm);
-    color: #475569;
+    color: var(--ant-color-text-tertiary);
     line-height: 1.4;
-    
-    .dark-mode & {
-        color: #cbd5e1;
-    }
 `;
 
 // Config Item Value Section
@@ -351,40 +280,25 @@ export const BooleanTag = styled.span<{ $enabled?: boolean }>`
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 14px;
-    border-radius: 20px;
+    padding: 4px 12px;
+    border-radius: 6px;
     font-size: var(--ant-font-size-sm);
     font-weight: 500;
     background: ${props => props.$enabled
-        ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%)'
-        : 'linear-gradient(135deg, rgba(100, 116, 139, 0.15) 0%, rgba(71, 85, 105, 0.1) 100%)'
+        ? 'rgba(16, 185, 129, 0.1)'
+        : 'rgba(100, 116, 139, 0.1)'
     };
-    color: ${props => props.$enabled ? '#059669' : '#64748b'};
-    border: 1px solid ${props => props.$enabled ? 'rgba(16, 185, 129, 0.3)' : 'rgba(100, 116, 139, 0.2)'};
-    
-    .dark-mode & {
-        background: ${props => props.$enabled
-        ? 'rgba(16, 185, 129, 0.2)'
-        : 'rgba(100, 116, 139, 0.2)'
-    };
-    }
+    color: ${props => props.$enabled ? 'var(--ant-color-success)' : '#64748b'};
 `;
 
 // Value Display for non-boolean
 export const ValueDisplay = styled.span`
     font-family: var(--font-mono);
     font-size: var(--ant-font-size-sm);
-    color: #1e293b;
-    background: rgba(99, 102, 241, 0.08);
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(99, 102, 241, 0.15);
-    
-    .dark-mode & {
-        color: #e2e8f0;
-        background: rgba(139, 92, 246, 0.15);
-        border-color: rgba(139, 92, 246, 0.25);
-    }
+    color: var(--ant-color-text);
+    background: var(--ant-color-fill-secondary);
+    padding: 4px 10px;
+    border-radius: 6px;
 `;
 
 export const ArrayValueContainer = styled.div`
@@ -396,14 +310,13 @@ export const ArrayValueContainer = styled.div`
 
 export const ArrayTag = styled.span`
     font-size: 0.75rem;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: 3px 8px;
+    border-radius: 4px;
     background: rgba(99, 102, 241, 0.1);
     color: #6366f1;
-    border: 1px solid rgba(99, 102, 241, 0.2);
     
-    .dark-mode & {
-        background: rgba(139, 92, 246, 0.2);
+    [data-theme='dark'] & {
+        background: rgba(139, 92, 246, 0.15);
         color: #a5b4fc;
     }
 `;
@@ -411,7 +324,7 @@ export const ArrayTag = styled.span`
 // Empty Value
 export const EmptyValue = styled.span`
     font-size: var(--ant-font-size-sm);
-    color: #94a3b8;
+    color: var(--ant-color-text-quaternary);
     font-style: italic;
 `;
 
@@ -419,6 +332,6 @@ export const EmptyValue = styled.span`
 export const NoItemsMessage = styled.div`
     text-align: center;
     padding: 20px;
-    color: #94a3b8;
+    color: var(--ant-color-text-quaternary);
     font-size: var(--ant-font-size-sm);
 `;

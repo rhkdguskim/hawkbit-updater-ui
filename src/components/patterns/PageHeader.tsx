@@ -6,10 +6,12 @@ const { Title, Text } = Typography;
 const HeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  padding-bottom: var(--ant-margin-xs, 8px);
+  align-items: flex-end;
+  padding: 8px 4px 16px;
   flex-wrap: wrap;
-  gap: var(--ant-margin, 16px);
+  gap: 20px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 8px;
 `;
 
 const TitleSection = styled.div`
@@ -26,8 +28,13 @@ const TitleRow = styled.div`
 `;
 
 const HeaderTitle = styled(Title)`
-    margin: 0;
-    font-size: var(--ant-font-size-heading-2);
+    && {
+        margin: 0;
+        font-size: 28px !important;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--ant-color-text);
+    }
 `;
 
 const BackButton = styled(Button)`
@@ -40,7 +47,9 @@ const BackButton = styled(Button)`
 
 const SubtitleText = styled(Text)`
     && {
-        font-size: var(--ant-font-size);
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ant-color-text-secondary);
     }
 `;
 

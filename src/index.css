@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Semiconductor Equipment + AI Control Center Theme
-   반도체 설비 제어실 + AI 인터페이스 스타일
+   Modern Minimal Theme
+   깔끔하고 세련된 미니멀 스타일
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* Import Fonts */
@@ -20,39 +20,50 @@
     --info-color: var(--ant-color-info);
 
     /* Semantic Colors */
-    --bg-page: var(--ant-color-bg-layout);
-    --bg-container: var(--ant-color-bg-container);
-    --bg-elevated: var(--ant-color-bg-elevated);
-    --text-main: var(--ant-color-text);
-    --text-secondary: var(--ant-color-text-secondary);
-    --border-color: var(--ant-color-border);
+    --bg-page: var(--ant-color-bg-layout, #fafbfc);
+    --bg-container: var(--ant-color-bg-container, #ffffff);
+    --bg-elevated: var(--ant-color-bg-elevated, #ffffff);
+    --text-main: var(--ant-color-text, #1f2937);
+    --text-secondary: var(--ant-color-text-secondary, #4b5563);
+    --border-color: var(--ant-color-border, #e5e7eb);
+
+    /* Ant Design Fallbacks */
+    --ant-primary-color: #0891b2;
+    --ant-color-primary: #0891b2;
+    --ant-color-primary-rgb: 8, 145, 178;
+    --ant-color-primary-hover: #0e7490;
 
     /* Typography */
     --font-sans: 'Pretendard Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace;
 
     /* Animation */
-    --transition-fast: 0.1s;
-    --transition-normal: 0.2s;
+    --transition-fast: 0.15s;
+    --transition-normal: 0.3s;
+    --transition-gentle: cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* Light Theme Shadows - Clean & Precise */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-    --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    /* Light Theme Shadows - 정교화 */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 
-    /* Light Theme Glass Effect - Clean Room */
-    --glass-bg: rgba(255, 255, 255, 0.92);
-    --glass-border: rgba(8, 145, 178, 0.15);
-    --glass-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    /* Light Theme Glass Effect */
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 
     /* Gradient */
-    --gradient-primary: linear-gradient(135deg, var(--ant-color-primary) 0%, #0e7490 100%);
-    --gradient-sidebar: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+    --gradient-primary: linear-gradient(135deg, var(--ant-color-primary) 0%, #2563eb 100%);
+    --gradient-sidebar: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+
+    /* RGB for primary color (assuming default blue if not set) */
+    --primary-rgb: 22, 119, 255;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Light Theme Specific Styles
-   Clean Room Style (클린룸 스타일)
+   Fresh & Clean (가볍고 산뜻한)
    ───────────────────────────────────────────────────────────────────────────── */
 body {
     font-family: var(--font-sans);
@@ -62,185 +73,51 @@ body {
     color: var(--text-main);
 }
 
-/* Light mode subtle circuit pattern background */
+/* Light mode - 깨끗한 미니멀 배경 */
 body:not([data-theme='dark']) {
-    background-color: #f8fafc;
-    background-image:
-        /* Subtle cyan accent glow */
-        radial-gradient(ellipse 600px 400px at 10% 10%, rgba(8, 145, 178, 0.04), transparent 50%),
-        /* Precision grid - very subtle */
-        repeating-linear-gradient(90deg, rgba(8, 145, 178, 0.02) 0 1px, transparent 1px 80px),
-        repeating-linear-gradient(0deg, rgba(8, 145, 178, 0.02) 0 1px, transparent 1px 80px);
+    background-color: #fafbfc;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Dark Theme Specific Styles
-   AI Control Center (AI 제어실)
+   Deep Dark Industrial (딥 다크 인더스트리얼)
    ───────────────────────────────────────────────────────────────────────────── */
 [data-theme='dark'] {
-    /* AI Control Center Color Palette */
-    --ai-bg: #030712;
-    --ai-surface: #0a0f1f;
+    /* Deep Dark Color Palette */
+    --deep-bg: #0a0a0b;
+    --deep-surface: #141417;
+    --deep-elevated: #1c1c21;
 
-    /* Glow Colors */
-    --ai-cyan: #00ffd5;
-    --ai-cyan-rgb: 0, 255, 213;
-    --ai-violet: #a855f7;
-    --ai-violet-rgb: 168, 85, 247;
-    --ai-orange: #f97316;
-    --ai-orange-rgb: 249, 115, 22;
+    /* Accent Colors - 차분한 블루 계열 */
+    --accent-blue: #3b82f6;
+    --accent-blue-rgb: 59, 130, 246;
 
-    /* Grid & Node Effects */
-    --ai-grid: rgba(0, 255, 213, 0.06);
-    --ai-grid-strong: rgba(0, 255, 213, 0.12);
-    --ai-node: rgba(0, 255, 213, 0.2);
-    --ai-glow: rgba(0, 255, 213, 0.25);
+    /* Shadows - 레이어드 섀도우 (더 깊고 부드럽게) */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+    --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.7), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 12px 24px -6px rgba(0, 0, 0, 0.8), 0 8px 16px -8px rgba(0, 0, 0, 0.7);
+    --shadow-xl: 0 20px 40px -10px rgba(0, 0, 0, 0.9), 0 12px 20px -12px rgba(0, 0, 0, 0.8);
 
-    /* Dark Theme Shadows with Glow */
-    --shadow-sm: 0 0 0 1px rgba(0, 255, 213, 0.06), 0 4px 12px rgba(3, 7, 18, 0.6);
-    --shadow-md: 0 0 0 1px rgba(0, 255, 213, 0.1), 0 8px 24px rgba(3, 7, 18, 0.7);
-    --shadow-lg: 0 0 0 1px rgba(0, 255, 213, 0.12), 0 16px 40px rgba(3, 7, 18, 0.8);
+    /* Glass Effect - 강화 */
+    --glass-bg: rgba(20, 20, 23, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --gradient-sidebar: linear-gradient(180deg, #09090b 0%, #0f0f12 100%);
 
-    /* Glass Effect - Holographic */
-    --glass-bg: rgba(10, 15, 31, 0.85);
-    --glass-border: rgba(0, 255, 213, 0.2);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-
-    /* Glow Effects */
-    --shadow-glow-primary: 0 0 30px rgba(0, 255, 213, 0.4);
-    --shadow-glow-success: 0 0 24px rgba(34, 197, 94, 0.35);
-    --shadow-glow-error: 0 0 24px rgba(239, 68, 68, 0.35);
-    --shadow-glow-violet: 0 0 30px rgba(168, 85, 247, 0.35);
-
-    /* Pulse Animation Colors */
-    --ai-pulse: rgba(0, 255, 213, 0.6);
-    --ai-pulse-soft: rgba(0, 255, 213, 0.2);
-
-    --gradient-sidebar: linear-gradient(180deg, #050810 0%, #0a0f1f 100%);
+    /* Ant Design Fallbacks for Dark */
+    --ant-color-primary: #3b82f6;
+    --ant-color-primary-hover: #60a5fa;
+    --ant-color-primary-rgb: 59, 130, 246;
+    --ant-primary-color: #3b82f6;
 }
 
-/* Dark Theme Background - AI Holographic Grid */
+/* Dark Theme Background - 순수 딥 다크 */
 [data-theme='dark'] body {
-    background-color: var(--ai-bg);
-    background-image:
-        /* Primary glow spots */
-        radial-gradient(ellipse 800px 600px at 15% 10%, rgba(0, 255, 213, 0.12), transparent 50%),
-        radial-gradient(ellipse 600px 500px at 85% 20%, rgba(168, 85, 247, 0.1), transparent 55%),
-        radial-gradient(ellipse 700px 500px at 50% 90%, rgba(249, 115, 22, 0.08), transparent 50%),
-        /* Holographic grid - fine lines */
-        repeating-linear-gradient(90deg, rgba(0, 255, 213, 0.03) 0 1px, transparent 1px 60px),
-        repeating-linear-gradient(0deg, rgba(0, 255, 213, 0.03) 0 1px, transparent 1px 60px),
-        /* Major grid lines */
-        repeating-linear-gradient(90deg, rgba(0, 255, 213, 0.08) 0 1px, transparent 1px 240px),
-        repeating-linear-gradient(0deg, rgba(0, 255, 213, 0.08) 0 1px, transparent 1px 240px),
-        /* Circuit nodes */
-        radial-gradient(circle 2px, rgba(0, 255, 213, 0.15) 50%, transparent 50%);
-    background-size:
-        100% 100%,
-        100% 100%,
-        100% 100%,
-        100% 100%,
-        100% 100%,
-        100% 100%,
-        100% 100%,
-        60px 60px;
-    background-attachment: fixed;
-    position: relative;
-}
-
-/* Animated Scan Line Effect */
-[data-theme='dark'] body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background: linear-gradient(180deg,
-            transparent 0%,
-            rgba(0, 255, 213, 0.03) 45%,
-            rgba(0, 255, 213, 0.06) 50%,
-            rgba(0, 255, 213, 0.03) 55%,
-            transparent 100%);
-    background-size: 100% 200%;
-    animation: aiScanLine 8s ease-in-out infinite;
-}
-
-/* Ambient Glow Animation */
-[data-theme='dark'] body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background:
-        radial-gradient(ellipse 600px 400px at 20% 15%, rgba(0, 255, 213, 0.08), transparent 60%),
-        radial-gradient(ellipse 500px 400px at 80% 25%, rgba(168, 85, 247, 0.06), transparent 60%);
-    animation: aiAmbientGlow 12s ease-in-out infinite alternate;
+    background-color: var(--deep-bg);
 }
 
 [data-theme='dark'] #root {
     position: relative;
     z-index: 1;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   Animations
-   ───────────────────────────────────────────────────────────────────────────── */
-@keyframes aiScanLine {
-    0% {
-        background-position: 0% 0%;
-    }
-
-    50% {
-        background-position: 0% 100%;
-    }
-
-    100% {
-        background-position: 0% 0%;
-    }
-}
-
-@keyframes aiAmbientGlow {
-    0% {
-        opacity: 0.6;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 0.8;
-        transform: scale(1.02);
-    }
-
-    100% {
-        opacity: 0.6;
-        transform: scale(1);
-    }
-}
-
-@keyframes aiPulseGlow {
-    0% {
-        box-shadow: 0 0 0 0 var(--ai-pulse-soft), 0 0 20px 0 rgba(0, 255, 213, 0.15);
-    }
-
-    50% {
-        box-shadow: 0 0 0 8px rgba(0, 255, 213, 0), 0 0 40px 8px rgba(0, 255, 213, 0.3);
-    }
-
-    100% {
-        box-shadow: 0 0 0 0 var(--ai-pulse-soft), 0 0 20px 0 rgba(0, 255, 213, 0.15);
-    }
-}
-
-@keyframes aiNodePulse {
-
-    0%,
-    100% {
-        opacity: 0.4;
-    }
-
-    50% {
-        opacity: 0.8;
-    }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -274,7 +151,7 @@ pre,
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Scrollbar - Precision Style
+   Scrollbar - Minimal Style
    ───────────────────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
     width: 8px;
@@ -286,55 +163,64 @@ pre,
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.35);
-    border-radius: 0;
-    border: 2px solid transparent;
-    background-clip: content-box;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.5);
+    background: rgba(0, 0, 0, 0.25);
 }
 
 [data-theme='dark'] ::-webkit-scrollbar-thumb {
-    background: rgba(0, 255, 213, 0.2);
+    background: rgba(255, 255, 255, 0.12);
 }
 
 [data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 255, 213, 0.35);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Ant Design Component Overrides
    ───────────────────────────────────────────────────────────────────────────── */
 
-/* Cards - Industrial Precision */
+/* Cards */
 .ant-card {
-    transition: all var(--transition-normal) ease;
+    transition: all var(--transition-normal) var(--transition-gentle);
     border: 1px solid var(--border-color);
+    background: var(--bg-container);
+    border-radius: 12px !important;
+    overflow: hidden;
 }
 
 .ant-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--ant-color-primary-border);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
 }
 
 [data-theme='dark'] .ant-card {
-    background: var(--ai-surface);
-    box-shadow: var(--shadow-sm);
-    border-color: rgba(0, 255, 213, 0.1);
+    background: var(--deep-surface);
+    border-color: rgba(255, 255, 255, 0.06);
 }
 
 [data-theme='dark'] .ant-card:hover {
-    box-shadow: var(--shadow-md), 0 0 20px rgba(0, 255, 213, 0.15);
-    border-color: rgba(0, 255, 213, 0.25);
+    box-shadow: var(--shadow-xl);
+    border-color: rgba(255, 255, 255, 0.12);
 }
 
-/* Tables - Data Grid */
+/* Card Header Accent */
+.ant-card-head {
+    border-bottom: 1px solid var(--border-color) !important;
+    min-height: 48px !important;
+}
+
+[data-theme='dark'] .ant-card-head {
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Tables */
 .ant-table-wrapper {
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 8px;
 }
 
 .ant-table-thead>tr>th {
@@ -343,11 +229,21 @@ pre,
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.05em;
-    border-bottom: 2px solid var(--border-color) !important;
+    border-bottom: 1px solid var(--border-color) !important;
 }
 
 .ant-table-tbody>tr>td {
     border-bottom: 1px solid var(--border-color);
+    padding: 12px 16px !important;
+    transition: background-color var(--transition-fast) ease;
+}
+
+.ant-table-tbody>tr:hover>td {
+    background-color: rgba(var(--primary-rgb), 0.02) !important;
+}
+
+[data-theme='dark'] .ant-table-tbody>tr:hover>td {
+    background-color: rgba(255, 255, 255, 0.02) !important;
 }
 
 .ant-table-tbody>tr:last-child>td {
@@ -355,23 +251,41 @@ pre,
 }
 
 [data-theme='dark'] .ant-table-thead>tr>th {
-    color: var(--ai-cyan) !important;
-    background: rgba(0, 255, 213, 0.05) !important;
+    color: #a1a1aa !important;
+    background: #18181b !important;
 }
 
 /* Buttons */
 .ant-btn {
     font-weight: 500;
     box-shadow: none;
+    transition: all var(--transition-fast) var(--transition-gentle);
+    border-radius: 8px !important;
 }
 
-[data-theme='dark'] .ant-btn-primary {
-    box-shadow: 0 0 20px rgba(0, 255, 213, 0.4);
-    border: 1px solid rgba(0, 255, 213, 0.3);
+.ant-btn:active {
+    transform: scale(0.96);
+}
+
+.ant-btn-primary {
+    background: var(--gradient-primary);
+    background-color: var(--ant-color-primary, #0891b2) !important;
+    border: none;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2) !important;
+    text-shadow: none;
+}
+
+.ant-btn-primary:hover {
+    background: var(--gradient-primary);
+    background-color: var(--ant-color-primary-hover, #0e7490) !important;
+    box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.3) !important;
+    transform: translateY(-1px);
+    color: white !important;
 }
 
 [data-theme='dark'] .ant-btn-primary:hover {
-    box-shadow: 0 0 30px rgba(0, 255, 213, 0.55);
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4) !important;
 }
 
 /* Dashboard Clickable Elements */
@@ -385,33 +299,17 @@ pre,
     outline-offset: 2px;
 }
 
-[data-theme='dark'] .dashboard-clickable {
-    position: relative;
+[data-theme='dark'] .dashboard-clickable:hover {
+    background: rgba(255, 255, 255, 0.03);
 }
 
-[data-theme='dark'] .dashboard-clickable::after {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    border: 1px solid rgba(0, 255, 213, 0.15);
-    box-shadow: 0 0 15px rgba(0, 255, 213, 0.1);
-    opacity: 0;
-    transition: opacity var(--transition-normal) ease;
-    pointer-events: none;
-}
-
-[data-theme='dark'] .dashboard-clickable:hover::after {
-    opacity: 1;
-}
-
-/* Status Indicators - LED Style */
+/* Status Indicators */
 .status-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -425,17 +323,19 @@ pre,
     height: 6px;
     border-radius: 50%;
     background-color: var(--success-color);
-    box-shadow: 0 0 8px var(--success-color);
-    animation: aiNodePulse 2s ease-in-out infinite;
+    animation: statusPulse 2s ease-in-out infinite;
 }
 
-[data-theme='dark'] .status-badge {
-    box-shadow: 0 0 12px rgba(0, 255, 213, 0.15);
-}
+@keyframes statusPulse {
 
-[data-theme='dark'] .ant-tag {
-    box-shadow: 0 0 10px rgba(0, 255, 213, 0.1);
-    border-color: rgba(0, 255, 213, 0.2);
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
 }
 
 /* Sidebar */
@@ -445,7 +345,7 @@ pre,
 
 [data-theme='dark'] .ant-layout-sider {
     background: var(--gradient-sidebar);
-    border-right: 1px solid rgba(0, 255, 213, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* Modal & Drawer */
@@ -456,43 +356,65 @@ pre,
 }
 
 [data-theme='dark'] .ant-modal-content {
-    border-color: rgba(0, 255, 213, 0.15);
-    box-shadow: 0 0 0 1px rgba(0, 255, 213, 0.1), 0 30px 60px rgba(3, 7, 18, 0.9);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
 }
 
 /* Tooltip */
 .ant-tooltip-inner {
-    border-radius: 4px;
+    border-radius: 6px;
     font-family: var(--font-mono);
     font-size: 0.75rem;
     padding: 6px 10px;
 }
 
 [data-theme='dark'] .ant-tooltip-inner {
-    background: rgba(30, 41, 59, 0.95);
-    border: 1px solid rgba(0, 255, 213, 0.2);
-    box-shadow: 0 0 20px rgba(0, 255, 213, 0.1);
+    background: #27272a;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Skeleton Loading */
 .ant-skeleton-element {
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 [data-theme='dark'] .ant-skeleton-element .ant-skeleton-button,
 [data-theme='dark'] .ant-skeleton-element .ant-skeleton-input {
-    background: linear-gradient(90deg, rgba(0, 255, 213, 0.05) 25%, rgba(0, 255, 213, 0.1) 50%, rgba(0, 255, 213, 0.05) 75%);
+    background: linear-gradient(90deg, #1c1c21 25%, #27272a 50%, #1c1c21 75%);
     background-size: 200% 100%;
-    animation: skeletonGlow 1.5s ease-in-out infinite;
+    animation: skeletonPulse 1.5s ease-in-out infinite;
 }
 
-@keyframes skeletonGlow {
+@keyframes skeletonPulse {
     0% {
         background-position: 200% 0;
     }
 
     100% {
         background-position: -200% 0;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -511,78 +433,52 @@ pre,
     border-top: 1px solid var(--border-color);
 }
 
-/* AI Glow Effect Class */
-.ai-glow {
-    position: relative;
-}
-
-[data-theme='dark'] .ai-glow::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    background: linear-gradient(135deg, rgba(0, 255, 213, 0.3) 0%, rgba(168, 85, 247, 0.2) 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: -1;
-    filter: blur(8px);
-}
-
-[data-theme='dark'] .ai-glow:hover::before {
-    opacity: 1;
-}
-
 /* ─────────────────────────────────────────────────────────────────────────────
    Dark Mode Component Enhancements
    ───────────────────────────────────────────────────────────────────────────── */
 
-/* Tags - Neon Glow Style */
+/* Tags - Clean Style */
 [data-theme='dark'] .ant-tag {
-    background: rgba(0, 255, 213, 0.08);
-    border: 1px solid rgba(0, 255, 213, 0.2);
-    box-shadow: 0 0 10px rgba(0, 255, 213, 0.08);
-    color: var(--ai-cyan);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e4e4e7;
 }
 
 [data-theme='dark'] .ant-tag-success,
 [data-theme='dark'] .ant-tag-green {
-    background: rgba(34, 197, 94, 0.12);
-    border-color: rgba(34, 197, 94, 0.3);
-    color: #22c55e;
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.15);
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.25);
+    color: #34d399;
 }
 
 [data-theme='dark'] .ant-tag-error,
 [data-theme='dark'] .ant-tag-red {
     background: rgba(239, 68, 68, 0.12);
-    border-color: rgba(239, 68, 68, 0.3);
-    color: #ef4444;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #f87171;
 }
 
 [data-theme='dark'] .ant-tag-warning,
 [data-theme='dark'] .ant-tag-orange {
-    background: rgba(249, 115, 22, 0.12);
-    border-color: rgba(249, 115, 22, 0.3);
-    color: #f97316;
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.15);
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.25);
+    color: #fbbf24;
 }
 
 [data-theme='dark'] .ant-tag-processing,
 [data-theme='dark'] .ant-tag-blue {
-    background: rgba(168, 85, 247, 0.12);
-    border-color: rgba(168, 85, 247, 0.3);
-    color: #a855f7;
-    box-shadow: 0 0 10px rgba(168, 85, 247, 0.15);
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.25);
+    color: #60a5fa;
 }
 
-/* Descriptions - Technical Data Display */
+/* Descriptions */
 [data-theme='dark'] .ant-descriptions {
     background: transparent;
 }
 
 [data-theme='dark'] .ant-descriptions-item-label {
-    color: #67e8f9 !important;
+    color: #a1a1aa !important;
     font-weight: 500;
     text-transform: uppercase;
     font-size: 0.75rem;
@@ -590,134 +486,132 @@ pre,
 }
 
 [data-theme='dark'] .ant-descriptions-item-content {
-    color: #e2e8f0;
+    color: #e4e4e7;
     font-family: var(--font-mono);
 }
 
 [data-theme='dark'] .ant-descriptions-bordered .ant-descriptions-item-label,
 [data-theme='dark'] .ant-descriptions-bordered .ant-descriptions-item-content {
-    border-color: rgba(0, 255, 213, 0.1);
+    border-color: rgba(255, 255, 255, 0.08);
     background: transparent;
 }
 
-/* Tabs - Industrial Style */
+/* Tabs */
 [data-theme='dark'] .ant-tabs-tab {
-    color: #94a3b8 !important;
+    color: #71717a !important;
     transition: all 0.2s ease;
 }
 
 [data-theme='dark'] .ant-tabs-tab:hover {
-    color: #67e8f9 !important;
+    color: #a1a1aa !important;
 }
 
 [data-theme='dark'] .ant-tabs-tab-active .ant-tabs-tab-btn {
-    color: #00ffd5 !important;
-    text-shadow: 0 0 10px rgba(0, 255, 213, 0.4);
+    color: #60a5fa !important;
 }
 
 [data-theme='dark'] .ant-tabs-ink-bar {
-    background: #00ffd5 !important;
-    box-shadow: 0 0 10px rgba(0, 255, 213, 0.5);
+    background: #3b82f6 !important;
 }
 
-/* Breadcrumbs - Technical Path */
+/* Breadcrumbs */
 [data-theme='dark'] .ant-breadcrumb {
     font-family: var(--font-mono);
     font-size: 0.8rem;
 }
 
 [data-theme='dark'] .ant-breadcrumb-link {
-    color: #64748b !important;
+    color: #52525b !important;
 }
 
 [data-theme='dark'] .ant-breadcrumb-link:hover {
-    color: #00ffd5 !important;
+    color: #a1a1aa !important;
 }
 
 [data-theme='dark'] .ant-breadcrumb li:last-child .ant-breadcrumb-link {
-    color: #00ffd5 !important;
+    color: #e4e4e7 !important;
 }
 
 [data-theme='dark'] .ant-breadcrumb-separator {
-    color: rgba(0, 255, 213, 0.4) !important;
+    color: #52525b !important;
 }
 
-/* Page Titles & Subtitles - Better Contrast */
+/* Page Titles */
 [data-theme='dark'] .ant-typography.ant-typography-secondary {
-    color: #94a3b8 !important;
+    color: #71717a !important;
 }
 
 [data-theme='dark'] h1.ant-typography,
 [data-theme='dark'] h2.ant-typography,
 [data-theme='dark'] h3.ant-typography,
 [data-theme='dark'] h4.ant-typography {
-    color: #f1f5f9 !important;
+    color: #f4f4f5 !important;
 }
 
-/* Input & Select - AI Style */
+/* Input & Select */
 [data-theme='dark'] .ant-input,
 [data-theme='dark'] .ant-input-affix-wrapper,
 [data-theme='dark'] .ant-select-selector {
-    background: rgba(5, 8, 16, 0.8) !important;
-    border-color: rgba(0, 255, 213, 0.15) !important;
+    background: #0f0f11 !important;
+    border-color: #27272a !important;
 }
 
 [data-theme='dark'] .ant-input:hover,
 [data-theme='dark'] .ant-input-affix-wrapper:hover,
 [data-theme='dark'] .ant-select-selector:hover {
-    border-color: rgba(0, 255, 213, 0.35) !important;
+    border-color: #3f3f46 !important;
 }
 
 [data-theme='dark'] .ant-input:focus,
 [data-theme='dark'] .ant-input-affix-wrapper-focused,
 [data-theme='dark'] .ant-select-focused .ant-select-selector {
-    border-color: #00ffd5 !important;
-    box-shadow: 0 0 0 2px rgba(0, 255, 213, 0.15), 0 0 15px rgba(0, 255, 213, 0.1) !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
 }
 
-/* Progress Bars - Neon Glow */
+/* Progress Bars */
 [data-theme='dark'] .ant-progress-bg {
-    box-shadow: 0 0 10px rgba(0, 255, 213, 0.4);
+    background: #3b82f6;
 }
 
 [data-theme='dark'] .ant-progress-success-bg {
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+    background: #10b981;
 }
 
 /* Empty State */
 [data-theme='dark'] .ant-empty-description {
-    color: #64748b;
+    color: #52525b;
 }
 
 /* Divider */
 [data-theme='dark'] .ant-divider {
-    border-color: rgba(0, 255, 213, 0.1);
+    border-color: rgba(255, 255, 255, 0.06);
 }
 
-/* Alert - Neon Style */
+/* Alert */
 [data-theme='dark'] .ant-alert {
-    border: 1px solid rgba(0, 255, 213, 0.2);
-    background: rgba(0, 255, 213, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
 }
 
 [data-theme='dark'] .ant-alert-success {
-    background: rgba(34, 197, 94, 0.08);
-    border-color: rgba(34, 197, 94, 0.25);
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
 }
 
 [data-theme='dark'] .ant-alert-error {
     background: rgba(239, 68, 68, 0.08);
-    border-color: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.2);
 }
 
 [data-theme='dark'] .ant-alert-warning {
-    background: rgba(234, 179, 8, 0.08);
-    border-color: rgba(234, 179, 8, 0.25);
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.2);
 }
 
-/* Statistic - Technical Display */
+/* Statistic */
 [data-theme='dark'] .ant-statistic-title {
-    color: #67e8f9;
+    color: #71717a;
     text-transform: uppercase;
     font-size: 0.7rem;
     letter-spacing: 0.05em;
@@ -725,40 +619,38 @@ pre,
 
 [data-theme='dark'] .ant-statistic-content {
     font-family: var(--font-mono);
-    color: #00ffd5;
-    text-shadow: 0 0 20px rgba(0, 255, 213, 0.3);
+    color: #f4f4f5;
 }
 
-/* Badge - Glowing Dots */
+/* Badge */
 [data-theme='dark'] .ant-badge-status-dot {
-    box-shadow: 0 0 6px currentColor;
+    box-shadow: none;
 }
 
 /* Dropdown Menu */
 [data-theme='dark'] .ant-dropdown-menu {
-    background: rgba(10, 15, 31, 0.98);
-    border: 1px solid rgba(0, 255, 213, 0.15);
-    box-shadow: 0 0 0 1px rgba(0, 255, 213, 0.1), 0 20px 40px rgba(3, 7, 18, 0.9);
+    background: #1c1c21;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.6);
 }
 
 [data-theme='dark'] .ant-dropdown-menu-item:hover {
-    background: rgba(0, 255, 213, 0.1);
+    background: rgba(255, 255, 255, 0.06);
 }
 
-/* List Items - Enhanced Hover */
+/* List Items */
 [data-theme='dark'] .ant-list-item:hover {
-    background: rgba(0, 255, 213, 0.05);
+    background: rgba(255, 255, 255, 0.03);
 }
 
-/* Spin - Cyan Glow */
+/* Spin */
 [data-theme='dark'] .ant-spin-dot-item {
-    background-color: #00ffd5;
-    box-shadow: 0 0 10px rgba(0, 255, 213, 0.6);
+    background-color: #3b82f6;
 }
 
 /* Form Labels */
 [data-theme='dark'] .ant-form-item-label>label {
-    color: #94a3b8;
+    color: #a1a1aa;
 }
 
 [data-theme='dark'] .ant-form-item-label>label::before {
@@ -768,15 +660,15 @@ pre,
 /* Pagination */
 [data-theme='dark'] .ant-pagination-item {
     background: transparent;
-    border-color: rgba(0, 255, 213, 0.2);
+    border-color: #27272a;
 }
 
 [data-theme='dark'] .ant-pagination-item:hover,
 [data-theme='dark'] .ant-pagination-item-active {
-    background: rgba(0, 255, 213, 0.1);
-    border-color: #00ffd5;
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
 }
 
 [data-theme='dark'] .ant-pagination-item-active a {
-    color: #00ffd5;
+    color: #60a5fa;
 }

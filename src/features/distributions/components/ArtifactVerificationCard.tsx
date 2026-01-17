@@ -141,8 +141,8 @@ const ArtifactVerificationCard: React.FC<ArtifactVerificationCardProps> = ({
     };
 
     const hashes = [
-        { type: 'SHA256', value: artifact.hashes?.sha256, color: '#52c41a' },
-        { type: 'SHA1', value: artifact.hashes?.sha1, color: '#1890ff' },
+        { type: 'SHA256', value: artifact.hashes?.sha256, color: 'var(--ant-color-success)' },
+        { type: 'SHA1', value: artifact.hashes?.sha1, color: 'var(--ant-color-primary)' },
         { type: 'MD5', value: artifact.hashes?.md5, color: '#722ed1' },
     ].filter(h => h.value);
 
@@ -150,7 +150,7 @@ const ArtifactVerificationCard: React.FC<ArtifactVerificationCardProps> = ({
         <VerificationCard
             title={
                 <Space>
-                    <SafetyCertificateOutlined style={{ color: '#52c41a' }} />
+                    <SafetyCertificateOutlined style={{ color: 'var(--ant-color-success)' }} />
                     <span>{t('detail.verification.title')}</span>
                 </Space>
             }
@@ -158,7 +158,7 @@ const ArtifactVerificationCard: React.FC<ArtifactVerificationCardProps> = ({
             {/* File Information */}
             <FileInfoSection>
                 <Flex align="center" gap={16}>
-                    <FileOutlined style={{ fontSize: 32, color: '#52c41a' }} />
+                    <FileOutlined style={{ fontSize: 32, color: 'var(--ant-color-success)' }} />
                     <div style={{ flex: 1 }}>
                         <Title level={5} style={{ margin: 0 }}>
                             {artifact.providedFilename || `artifact-${artifact.id}`}
@@ -172,7 +172,7 @@ const ArtifactVerificationCard: React.FC<ArtifactVerificationCardProps> = ({
                         icon={<DownloadOutlined />}
                         onClick={handleDownload}
                         loading={isDownloading}
-                        style={{ background: '#52c41a', borderColor: '#52c41a' }}
+                        style={{ background: 'var(--ant-color-success)', borderColor: 'var(--ant-color-success)' }}
                     >
                         {t('detail.verification.download')}
                     </Button>
@@ -184,7 +184,7 @@ const ArtifactVerificationCard: React.FC<ArtifactVerificationCardProps> = ({
                             percent={downloadProgress}
                             status="active"
                             strokeColor={{
-                                '0%': '#52c41a',
+                                '0%': 'var(--ant-color-success)',
                                 '100%': '#73d13d',
                             }}
                         />
@@ -216,8 +216,8 @@ const ArtifactVerificationCard: React.FC<ArtifactVerificationCardProps> = ({
             {/* Verification Tip */}
             <div style={{ marginTop: 16, padding: 12, background: 'rgba(82, 196, 65, 0.1)', borderRadius: 8 }}>
                 <Space>
-                    <CheckCircleOutlined style={{ color: '#52c41a' }} />
-                    <Text type="secondary" style={{ fontSize: 12 }}>
+                    <CheckCircleOutlined style={{ color: 'var(--ant-color-success)' }} />
+                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                         {t('detail.verification.tip')}
                     </Text>
                 </Space>

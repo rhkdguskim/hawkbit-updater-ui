@@ -236,7 +236,11 @@ const statusColorMap: Record<string, string> = {
     canceled: 'default',
 };
 
-const RolloutsOverview: React.FC = () => {
+interface RolloutsOverviewProps {
+    standalone?: boolean;
+}
+
+const RolloutsOverview: React.FC<RolloutsOverviewProps> = ({ standalone = true }) => {
     const { t } = useTranslation(['rollouts', 'actions', 'common']);
     const navigate = useNavigate();
     const { role } = useAuthStore();
@@ -350,47 +354,49 @@ const RolloutsOverview: React.FC = () => {
 
     const totalActive = runningRollouts + runningActions;
 
-    return (
-        <PageLayout>
-            <PageHeader
-                title={t('overview.title', 'Rollout Management')}
-                description={
-                    <Flex align="center" gap={12}>
-                        <SubtitleText type="secondary">
-                            {t('overview.subtitle', 'Deployment rollout overview and monitoring')}
-                        </SubtitleText>
-                        <LiveIndicator $active={totalActive > 0} $color={COLORS.rollouts}>
-                            {totalActive > 0 ? `${totalActive} ${t('common:status.active', 'Active')}` : t('common:status.idle', 'Idle')}
-                        </LiveIndicator>
-                    </Flex>
-                }
-                actions={
-                    <Flex align="center" gap={8}>
-                        <UpdatedText type="secondary">
-                            {t('common:updated', 'Updated')}: {lastUpdated}
-                        </UpdatedText>
+    const header = (
+        <PageHeader
+            title={t('overview.title', 'Rollout Management')}
+            description={
+                <Flex align="center" gap={12}>
+                    <SubtitleText type="secondary">
+                        {t('overview.subtitle', 'Deployment rollout overview and monitoring')}
+                    </SubtitleText>
+                    <LiveIndicator $active={totalActive > 0} $color={COLORS.rollouts}>
+                        {totalActive > 0 ? `${totalActive} ${t('common:status.active', 'Active')}` : t('common:status.idle', 'Idle')}
+                    </LiveIndicator>
+                </Flex>
+            }
+            actions={
+                <Flex align="center" gap={8}>
+                    <UpdatedText type="secondary">
+                        {t('common:updated', 'Updated')}: {lastUpdated}
+                    </UpdatedText>
+                    <Button
+                        icon={<ReloadOutlined />}
+                        onClick={() => { refetchRollouts(); refetchActions(); }}
+                        loading={isLoading}
+                        size="small"
+                    >
+                        {t('common:actions.refresh', 'Refresh')}
+                    </Button>
+                    {isAdmin && (
                         <Button
-                            icon={<ReloadOutlined />}
-                            onClick={() => { refetchRollouts(); refetchActions(); }}
-                            loading={isLoading}
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsCreateModalOpen(true)}
                             size="small"
                         >
-                            {t('common:actions.refresh', 'Refresh')}
+                            {t('overview.createRollout', 'Create')}
                         </Button>
-                        {isAdmin && (
-                            <Button
-                                type="primary"
-                                icon={<PlusOutlined />}
-                                onClick={() => setIsCreateModalOpen(true)}
-                                size="small"
-                            >
-                                {t('overview.createRollout', 'Create')}
-                            </Button>
-                        )}
-                    </Flex>
-                }
-            />
+                    )}
+                </Flex>
+            }
+        />
+    );
 
+    const content = (
+        <>
             <OverviewScrollContent>
                 {/* Top Row: 2x2 KPI Grid + 2 Pie Charts */}
                 <TopRow>
@@ -461,7 +467,7 @@ const RolloutsOverview: React.FC = () => {
                         >
                             {isLoading ? <Skeleton.Avatar active size={40} /> : (
                                 <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                                    <IconBadge $color="linear-gradient(135deg, var(--ant-color-success) 0%, #059669 100%)">
                                         <CheckCircleOutlined />
                                     </IconBadge>
                                     <BigNumber $color={ACTION_COLORS.finished}>
@@ -712,6 +718,15 @@ const RolloutsOverview: React.FC = () => {
                     navigate(`/rollouts/${id}`);
                 }}
             />
+        </>
+    );
+
+    if (!standalone) return content;
+
+    return (
+        <PageLayout>
+            {header}
+            {content}
         </PageLayout>
     );
 };

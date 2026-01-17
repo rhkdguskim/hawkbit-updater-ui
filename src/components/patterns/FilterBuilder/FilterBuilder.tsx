@@ -14,12 +14,8 @@ import { type ToolbarAction } from '../EnhancedTable/SelectionToolbar';
 const Container = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 12px 16px;
-    background: var(--ant-color-bg-container, #ffffff);
-    border-radius: 8px;
-    border: 1px solid var(--ant-color-border-secondary, rgba(5, 5, 5, 0.06));
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    gap: 12px;
+    width: 100%;
 `;
 
 const HeaderRow = styled.div`
@@ -197,11 +193,13 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                     >
                         <Button
                             icon={<PlusOutlined />}
-                            size="small"
+                            size="middle"
                             type="default"
                             style={{
-                                borderColor: 'var(--ant-color-primary, #1677ff)',
-                                color: 'var(--ant-color-primary, #1677ff)',
+                                borderRadius: '8px',
+                                borderStyle: 'dashed',
+                                borderColor: 'var(--ant-color-primary)',
+                                color: 'var(--ant-color-primary)',
                                 fontWeight: 500,
                             }}
                         >
@@ -221,11 +219,16 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                         <Input
                             placeholder={searchPlaceholder || t('actions.search')}
                             prefix={<SearchOutlined style={{ color: 'var(--ant-color-text-description)' }} />}
-                            size="small"
+                            size="middle"
                             allowClear
                             value={searchValue}
                             onChange={(e) => onSearchChange?.(e.target.value)}
-                            style={{ width: 220, borderRadius: 6 }}
+                            style={{
+                                width: 320,
+                                borderRadius: 8,
+                                background: 'var(--bg-container)',
+                                border: '1px solid var(--border-color)',
+                            }}
                         />
                     )}
 
@@ -251,7 +254,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                                 size="small"
                                 icon={<ClearOutlined />}
                                 onClick={handleClearAll}
-                                style={{ fontSize: 12 }}
+                                style={{ fontSize: 'var(--ant-font-size-sm)' }}
                             >
                                 {t('filter.clear')}
                             </Button>
@@ -274,7 +277,8 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                             icon={<ReloadOutlined />}
                             onClick={onRefresh}
                             loading={loading}
-                            size="small"
+                            size="middle"
+                            style={{ borderRadius: 8 }}
                         />
                     )}
                     {onAdd && canAdd && (
@@ -282,7 +286,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                             type="primary"
                             icon={<PlusOutlined />}
                             onClick={onAdd}
-                            size="small"
+                            size="middle"
                         >
                             {addLabel || t('actions.add')}
                         </Button>
@@ -291,33 +295,43 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
             </HeaderRow>
             {selection && selection.count > 0 && (
                 <>
-                    <Divider style={{ margin: '8px 0' }} />
+                    <Divider style={{ margin: '12px 0 8px' }} />
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '4px 8px',
-                        background: 'var(--ant-color-primary-bg, #e6f4ff)',
-                        borderRadius: '6px',
-                        border: '1px solid var(--ant-color-primary-border, #91caff)',
-                        animation: 'fadeIn 0.2s ease-out'
+                        padding: '10px 16px',
+                        background: 'rgba(var(--ant-color-primary-rgb), 0.05)',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(var(--ant-color-primary-rgb), 0.2)',
+                        animation: 'fadeInUp 0.3s ease-out'
                     }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                            <span style={{ fontWeight: 600, color: 'var(--ant-color-primary, #1677ff)', fontSize: 13 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                            <span style={{
+                                fontWeight: 700,
+                                color: 'var(--ant-color-primary)',
+                                fontSize: 'var(--ant-font-size)',
+                                letterSpacing: '-0.01em'
+                            }}>
                                 {selection.count} {selection.label || t('filter.selected')}
                             </span>
-                            <Divider type="vertical" />
-                            <Space size="small">
+                            <Divider type="vertical" style={{ height: 20, borderColor: 'rgba(var(--ant-color-primary-rgb), 0.2)' }} />
+                            <Space size="middle">
                                 {selection.actions.map(action => (
                                     <Button
                                         key={action.key}
-                                        size="small"
+                                        size="middle"
                                         type={action.danger ? 'primary' : 'default'}
                                         danger={action.danger}
                                         icon={action.icon}
                                         onClick={action.onClick}
                                         disabled={action.disabled}
-                                        style={{ fontSize: 12 }}
+                                        style={{
+                                            borderRadius: '8px',
+                                            fontSize: 'var(--ant-font-size-sm)',
+                                            fontWeight: 600,
+                                            boxShadow: action.danger ? 'var(--shadow-sm)' : 'none'
+                                        }}
                                     >
                                         {action.label}
                                     </Button>
@@ -326,9 +340,10 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                         </div>
                         <Button
                             type="text"
-                            size="small"
+                            size="middle"
                             icon={<CloseOutlined />}
                             onClick={selection.onClear}
+                            style={{ color: 'var(--ant-color-text-secondary)' }}
                         />
                     </div>
                 </>

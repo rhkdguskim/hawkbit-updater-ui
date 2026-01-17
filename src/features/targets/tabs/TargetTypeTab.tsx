@@ -162,7 +162,7 @@ const TargetTypeTab: React.FC<TargetTypeTabProps> = ({
                                 <Space>
                                     <Tag color={type.colour || 'default'}>{type.name}</Tag>
                                     {type.description && (
-                                        <Text type="secondary" style={{ fontSize: 12 }}>
+                                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                             - {type.description}
                                         </Text>
                                     )}

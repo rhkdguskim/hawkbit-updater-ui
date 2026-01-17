@@ -108,6 +108,7 @@ const TargetList: React.FC = () => {
         <StandardListLayout
             title={t('list.title')}
             description={t('list.description')}
+            standalone={false}
             searchBar={
                 <FilterBuilder
                     fields={model.filterFields}

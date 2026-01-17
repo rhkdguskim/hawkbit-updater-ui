@@ -123,7 +123,7 @@ export const getTargetColumns = ({
             key: 'ipAddress',
             width: 130,
             render: (ipAddress: string | undefined) => (
-                <Text style={{ fontSize: 12, fontFamily: 'var(--font-mono)' }}>
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
                     <Highlighter text={ipAddress} search={searchTerm} />
                 </Text>
             ),
@@ -184,12 +184,12 @@ export const getTargetColumns = ({
                 return dsInfo ? (
                     <Space direction="vertical" size={0}>
                         <Link to={`/distributions/sets/${dsInfo.id}`}>
-                            <Text strong style={{ fontSize: 12 }}>{dsInfo.label}</Text>
+                            <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>{dsInfo.label}</Text>
                         </Link>
                         <InstalledModulesCell distributionSetId={Number(dsInfo.id)} />
                     </Space>
                 ) : (
-                    <Text type="secondary" style={{ fontSize: 12 }}>-</Text>
+                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>-</Text>
                 );
             },
         },
@@ -271,7 +271,7 @@ export const getTargetColumns = ({
             key: 'address',
             width: 200,
             render: (address: string | undefined) => (
-                <Text style={{ fontSize: 12 }}>{address || '-'}</Text>
+                <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{address || '-'}</Text>
             ),
         },
         {

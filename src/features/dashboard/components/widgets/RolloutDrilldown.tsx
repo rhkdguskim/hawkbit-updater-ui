@@ -210,7 +210,7 @@ export const RolloutDrilldown: React.FC<RolloutDrilldownProps> = ({ rolloutId, i
             <DrilldownContainer>
                 <Flex justify="center" align="center" style={{ padding: '24px 0' }}>
                     <Spin size="small" />
-                    <Text type="secondary" style={{ marginLeft: 8, fontSize: 12 }}>
+                    <Text type="secondary" style={{ marginLeft: 8, fontSize: 'var(--ant-font-size-sm)' }}>
                         {t('drilldown.loading')}
                     </Text>
                 </Flex>
@@ -261,14 +261,14 @@ export const RolloutDrilldown: React.FC<RolloutDrilldownProps> = ({ rolloutId, i
                         </GroupIcon>
                         <GroupContent>
                             <Flex align="center" gap={6}>
-                                <Text strong style={{ fontSize: 12 }}>
+                                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                     {t('drilldown.groupLabel', { number: index + 1 })}: {group.name}
                                 </Text>
                                 <Tag
                                     color={getStatusColor(group.status)}
                                     style={{
                                         margin: 0,
-                                        fontSize: 10,
+                                        fontSize: 'var(--ant-font-size-sm)',
                                         borderRadius: 4,
                                         padding: '0 4px',
                                         lineHeight: '16px',
@@ -290,7 +290,7 @@ export const RolloutDrilldown: React.FC<RolloutDrilldownProps> = ({ rolloutId, i
                                     }
                                     style={{ marginTop: 4 }}
                                     format={() => (
-                                        <Text style={{ fontSize: 10 }}>
+                                        <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                             {getFinishedCount(group)}/{group.totalTargets || 0}
                                         </Text>
                                     )}
@@ -312,7 +312,7 @@ export const RolloutDrilldown: React.FC<RolloutDrilldownProps> = ({ rolloutId, i
                                     </StatItem>
                                 </Tooltip>
                             )}
-                            {isClickable && <RightOutlined style={{ fontSize: 10, color: 'var(--ant-color-text-quaternary)' }} />}
+                            {isClickable && <RightOutlined style={{ fontSize: 'var(--ant-font-size-sm)', color: 'var(--ant-color-text-quaternary)' }} />}
                         </GroupStats>
                     </GroupItem>
                 );

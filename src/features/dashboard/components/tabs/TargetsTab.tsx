@@ -345,7 +345,7 @@ export const TargetsTab: React.FC = () => {
                         $theme="targets"
                         title={
                             <Flex align="center" gap={10}>
-                                <IconBadge $color="linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)">
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-primary) 0%, #2563eb 100%)">
                                     <SyncOutlined />
                                 </IconBadge>
                                 <Flex vertical gap={0}>

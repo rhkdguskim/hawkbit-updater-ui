@@ -106,11 +106,11 @@ export const DistributionSummaryWidget: React.FC<DistributionSummaryWidgetProps>
                                 background: 'rgba(59, 130, 246, 0.1)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center'
                             }}>
-                                <AppstoreOutlined style={{ fontSize: 20, color: '#3b82f6' }} />
+                                <AppstoreOutlined style={{ fontSize: 20, color: 'var(--ant-color-primary)' }} />
                             </div>
                             <Flex vertical>
                                 <MetricValue $color="var(--ant-color-text)">{distributionSetsCount.toLocaleString()}</MetricValue>
-                                <Text type="secondary" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                     {t('distributions:overview.distributionSets')}
                                 </Text>
                             </Flex>
@@ -124,11 +124,11 @@ export const DistributionSummaryWidget: React.FC<DistributionSummaryWidgetProps>
                                 background: 'rgba(16, 185, 129, 0.1)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center'
                             }}>
-                                <BuildOutlined style={{ fontSize: 20, color: '#10b981' }} />
+                                <BuildOutlined style={{ fontSize: 20, color: 'var(--ant-color-success)' }} />
                             </div>
                             <Flex vertical>
                                 <MetricValue $color="var(--ant-color-text)">{softwareModulesCount.toLocaleString()}</MetricValue>
-                                <Text type="secondary" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                     {t('distributions:overview.softwareModules')}
                                 </Text>
                             </Flex>
@@ -139,7 +139,7 @@ export const DistributionSummaryWidget: React.FC<DistributionSummaryWidgetProps>
                 <RecentListContainer>
                     <Flex align="center" gap={6} style={{ marginBottom: 4 }}>
                         <HistoryOutlined style={{ color: 'var(--ant-color-text-tertiary)' }} />
-                        <Text strong style={{ fontSize: 12 }}>{t('distributions:overview.recentSets')}</Text>
+                        <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('distributions:overview.recentSets')}</Text>
                     </Flex>
                     <div style={{ flex: 1, overflowY: 'auto', maxHeight: 150 }}>
                         {recentSets.length > 0 ? (
@@ -159,9 +159,9 @@ export const DistributionSummaryWidget: React.FC<DistributionSummaryWidgetProps>
                                     className="dashboard-clickable"
                                 >
                                     <Flex vertical gap={2}>
-                                        <Text strong style={{ fontSize: 12 }} ellipsis>{set.name}</Text>
+                                        <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }} ellipsis>{set.name}</Text>
                                         <Flex justify="space-between" align="center">
-                                            <Text type="secondary" style={{ fontSize: 10 }}>v{set.version}</Text>
+                                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>v{set.version}</Text>
                                             <Tag color={set.complete ? 'success' : 'warning'} style={{ fontSize: 9, margin: 0, height: 16, lineHeight: '14px' }}>
                                                 {set.complete ? t('distributions:status.complete') : t('distributions:status.incomplete')}
                                             </Tag>
@@ -171,7 +171,7 @@ export const DistributionSummaryWidget: React.FC<DistributionSummaryWidgetProps>
                             ))
                         ) : (
                             <Flex justify="center" align="center" style={{ height: 100 }}>
-                                <Text type="secondary" style={{ fontSize: 11 }}>{t('common:messages.noData')}</Text>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('common:messages.noData')}</Text>
                             </Flex>
                         )}
                     </div>

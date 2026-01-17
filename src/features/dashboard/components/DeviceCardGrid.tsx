@@ -132,8 +132,8 @@ const DeviceCardGrid: React.FC<DeviceCardGridProps> = ({
                         <CloudServerOutlined />
                     </IconBadge>
                     <Flex vertical gap={0}>
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>{resolvedTitle}</span>
-                        <Text type="secondary" style={{ fontSize: 11 }}>{targets.length} devices</Text>
+                        <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{resolvedTitle}</span>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{targets.length} devices</Text>
                     </Flex>
                 </Flex>
             }

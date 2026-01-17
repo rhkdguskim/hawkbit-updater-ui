@@ -339,7 +339,7 @@ export const RolloutsTab: React.FC = () => {
                     >
                         {isLoading ? <Skeleton.Avatar active size={40} /> : (
                             <Flex vertical align="center" gap={4}>
-                                <IconBadge $color="linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-success) 0%, #059669 100%)">
                                     <CheckCircleOutlined />
                                 </IconBadge>
                                 <BigNumber $color={ACTION_COLORS.finished}>

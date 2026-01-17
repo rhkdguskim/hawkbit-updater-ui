@@ -48,7 +48,7 @@ export const InstalledModulesCell: React.FC<InstalledModulesCellProps> = ({ dist
 
     // Early return for invalid ID
     if (!isValidId) {
-        return <Text type="secondary" style={{ fontSize: 11 }}>-</Text>;
+        return <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>-</Text>;
     }
 
     if (!inView) {
@@ -64,7 +64,7 @@ export const InstalledModulesCell: React.FC<InstalledModulesCellProps> = ({ dist
     }
 
     if (!modules?.content || modules.content.length === 0) {
-        return <Text type="secondary" style={{ fontSize: 11 }}>-</Text>;
+        return <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>-</Text>;
     }
 
     return (
@@ -73,10 +73,10 @@ export const InstalledModulesCell: React.FC<InstalledModulesCellProps> = ({ dist
                 {modules.content.map((module) => (
                     <Link key={module.id} to={`/distributions/modules/${module.id}`}>
                         <ModuleTag>
-                            <Text strong style={{ fontSize: 11, marginRight: 4 }}>
+                            <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', marginRight: 4 }}>
                                 {module.typeName}:
                             </Text>
-                            <Text style={{ fontSize: 11, fontFamily: 'var(--font-mono)' }}>
+                            <Text style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
                                 {module.name} ({module.version})
                             </Text>
                         </ModuleTag>

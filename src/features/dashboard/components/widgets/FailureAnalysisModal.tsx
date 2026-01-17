@@ -130,7 +130,7 @@ export const FailureAnalysisModal: React.FC<FailureAnalysisModalProps> = ({
 
                                 <TargetListContainer>
                                     <Flex vertical>
-                                        <Text type="secondary" style={{ fontSize: 11, marginBottom: 4 }}>
+                                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', marginBottom: 4 }}>
                                             <AimOutlined /> {t('common:nav.targets')}
                                         </Text>
                                         {item.actions.map((action) => {
@@ -140,8 +140,8 @@ export const FailureAnalysisModal: React.FC<FailureAnalysisModalProps> = ({
                                                     <Button
                                                         type="link"
                                                         size="small"
-                                                        icon={<AimOutlined style={{ fontSize: 10 }} />}
-                                                        style={{ padding: 0, height: 'auto', fontSize: 12, display: 'flex', alignItems: 'center' }}
+                                                        icon={<AimOutlined style={{ fontSize: 'var(--ant-font-size-sm)' }} />}
+                                                        style={{ padding: 0, height: 'auto', fontSize: 'var(--ant-font-size-sm)', display: 'flex', alignItems: 'center' }}
                                                         onClick={() => {
                                                             onClose();
                                                             navigate(`/targets/${targetId}/actions`);
@@ -150,8 +150,8 @@ export const FailureAnalysisModal: React.FC<FailureAnalysisModalProps> = ({
                                                         {targetId}
                                                     </Button>
                                                     <Flex align="center" gap={4}>
-                                                        <ClockCircleOutlined style={{ fontSize: 10, color: 'var(--ant-color-text-tertiary)' }} />
-                                                        <Text type="secondary" style={{ fontSize: 11 }}>
+                                                        <ClockCircleOutlined style={{ fontSize: 'var(--ant-font-size-sm)', color: 'var(--ant-color-text-tertiary)' }} />
+                                                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                                             {action.lastModifiedAt ? dayjs(action.lastModifiedAt).format('YYYY-MM-DD HH:mm') : '-'}
                                                         </Text>
                                                     </Flex>

@@ -27,7 +27,7 @@ const EmptyPlaceholder = styled.span`
 `;
 
 export interface ColorSwatchProps {
-    /** Hex color value (e.g., #1890ff) */
+    /** Hex color value (e.g., var(--ant-color-primary)) */
     color?: string;
     /** Whether to display the hex code */
     showHex?: boolean;

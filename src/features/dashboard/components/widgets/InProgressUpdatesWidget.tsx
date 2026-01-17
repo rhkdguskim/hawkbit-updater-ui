@@ -212,7 +212,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
 
     const historyContent = (
         <div style={{ maxWidth: 350, padding: '4px 8px' }}>
-            <Text strong style={{ fontSize: 13, marginBottom: 12, display: 'block', borderBottom: '1px solid var(--ant-color-border-secondary)', paddingBottom: 4 }}>
+            <Text strong style={{ fontSize: 'var(--ant-font-size)', marginBottom: 12, display: 'block', borderBottom: '1px solid var(--ant-color-border-secondary)', paddingBottom: 4 }}>
                 {t('actions:history.title', 'Action History')}
             </Text>
             <div style={{ maxHeight: 300, overflowY: 'auto' }}>
@@ -223,10 +223,10 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                         <List.Item style={{ padding: '8px 0', borderBottom: '1px dashed var(--ant-color-border-secondary)' }}>
                             <Flex vertical gap={4} style={{ width: '100%' }}>
                                 <Flex justify="space-between" align="center">
-                                    <Tag color="blue" style={{ fontSize: 11, margin: 0, fontWeight: 600 }}>
+                                    <Tag color="blue" style={{ fontSize: 'var(--ant-font-size-sm)', margin: 0, fontWeight: 600 }}>
                                         {getStatusLabel(status.type, t)}
                                     </Tag>
-                                    <Text type="secondary" style={{ fontSize: 10 }}>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                         {status.timestamp || status.reportedAt
                                             ? dayjs(status.timestamp || status.reportedAt).format('HH:mm:ss')
                                             : '-'}
@@ -238,7 +238,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                                         padding: '4px 8px',
                                         borderRadius: 4,
                                         marginTop: 4,
-                                        fontSize: 10,
+                                        fontSize: 'var(--ant-font-size-sm)',
                                         color: 'var(--ant-color-text-secondary)',
                                         whiteSpace: 'pre-wrap',
                                         wordBreak: 'break-all'
@@ -296,24 +296,24 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                             {['error', 'failed'].includes(currentAction.status?.toLowerCase() || '') ? (
                                 <CloseOutlined
                                     style={{
-                                        fontSize: 14,
+                                        fontSize: 'var(--ant-font-size)',
                                         color: 'var(--ant-color-error)',
                                     }}
                                 />
                             ) : (
                                 <SyncOutlined
                                     spin
-                                    style={{ fontSize: 14, color: 'var(--ant-color-primary)' }}
+                                    style={{ fontSize: 'var(--ant-font-size)', color: 'var(--ant-color-primary)' }}
                                 />
                             )}
                         </div>
                         <Flex vertical gap={0}>
                             <Flex align="center" gap={4}>
-                                <Text strong style={{ fontSize: 12 }}>
+                                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                     {item.target.name || item.target.controllerId}
                                 </Text>
                                 {item.target.ipAddress && (
-                                    <Text type="secondary" style={{ fontSize: 10 }}>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                         ({item.target.ipAddress})
                                     </Text>
                                 )}
@@ -323,7 +323,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                                     color={['error', 'failed', 'canceled'].includes(currentAction.status?.toLowerCase() || '') ? 'red' : currentAction.status?.toLowerCase() === 'canceling' ? 'orange' : 'blue'}
                                     style={{
                                         margin: 0,
-                                        fontSize: 10,
+                                        fontSize: 'var(--ant-font-size-sm)',
                                         borderRadius: 4,
                                         padding: '0 4px',
                                         marginTop: 2,
@@ -332,14 +332,14 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                                     {t(`common:status.${currentAction.status?.toLowerCase() || 'running'}`)}
                                 </Tag>
                                 {statusHistory[0] && (
-                                    <Text type="secondary" style={{ fontSize: 10, marginTop: 2 }} ellipsis={{ tooltip: true }}>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', marginTop: 2 }} ellipsis={{ tooltip: true }}>
                                         {statusHistory[0].messages?.[0] ? translateStatusMessage(statusHistory[0].messages[0], t) : getStatusLabel(statusHistory[0].type, t)}
                                     </Text>
                                 )}
                             </Space>
                         </Flex>
                     </Flex>
-                    <Flex align="center" gap={4} style={{ color: 'var(--ant-color-text-description)', fontSize: 10 }}>
+                    <Flex align="center" gap={4} style={{ color: 'var(--ant-color-text-description)', fontSize: 'var(--ant-font-size-sm)' }}>
                         <ClockCircleOutlined />
                         {delayText}
                     </Flex>
@@ -347,8 +347,8 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
 
                 {item.rolloutName && (
                     <RolloutInfo>
-                        <RocketOutlined style={{ fontSize: 10 }} />
-                        <Text type="secondary" style={{ fontSize: 11 }}>
+                        <RocketOutlined style={{ fontSize: 'var(--ant-font-size-sm)' }} />
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {t('inProgress.rolloutLabel')}: {item.rolloutName}
                         </Text>
                     </RolloutInfo>
@@ -439,8 +439,8 @@ export const InProgressUpdatesWidget: React.FC<InProgressUpdatesWidgetProps> = (
                         <SyncOutlined />
                     </IconBadge>
                     <Flex vertical gap={0}>
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('inProgress.title')}</span>
-                        <Text type="secondary" style={{ fontSize: 11 }}>
+                        <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('inProgress.title')}</span>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {t('recentActivities.inProgress', { count: sortedData.length })}
                         </Text>
                     </Flex>

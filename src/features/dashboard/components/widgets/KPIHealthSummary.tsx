@@ -30,8 +30,8 @@ export const KPIHealthSummary: React.FC<KPIHealthSummaryProps> = ({
     const renderRateRow = (label: string, value: number | null, color: string) => (
         <Flex vertical gap={6}>
             <Flex justify="space-between" align="center">
-                <Text type="secondary" style={{ fontSize: 12 }}>{label}</Text>
-                <Text strong style={{ fontSize: 13, color }}>{value !== null ? `${value.toFixed(1)}%` : '-'}</Text>
+                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{label}</Text>
+                <Text strong style={{ fontSize: 'var(--ant-font-size)', color }}>{value !== null ? `${value.toFixed(1)}%` : '-'}</Text>
             </Flex>
             <ProgressBar $progress={value ?? 0} $color={color} />
         </Flex>
@@ -47,8 +47,8 @@ export const KPIHealthSummary: React.FC<KPIHealthSummaryProps> = ({
                             <HeartOutlined />
                         </IconBadge>
                         <Flex vertical gap={0}>
-                            <span style={{ fontSize: 14, fontWeight: 600 }}>{t('snapshot.title', 'System Snapshot')}</span>
-                            <Text type="secondary" style={{ fontSize: 11 }}>{t('snapshot.subtitle', 'Key health signals')}</Text>
+                            <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('snapshot.title', 'System Snapshot')}</span>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('snapshot.subtitle', 'Key health signals')}</Text>
                         </Flex>
                     </Flex>
                     <Tag color={pendingCount > 0 ? 'warning' : 'success'}>
@@ -67,16 +67,16 @@ export const KPIHealthSummary: React.FC<KPIHealthSummaryProps> = ({
                     {renderRateRow(t('snapshot.errorRate', 'Action error rate'), errorRate, 'var(--ant-color-error)')}
                     {securityCoverage !== undefined && renderRateRow(t('snapshot.securityCoverage', 'Security coverage'), securityCoverage, 'var(--ant-color-warning)')}
                     <Flex justify="space-between" align="center" style={{ marginTop: 4 }}>
-                        <Text type="secondary" style={{ fontSize: 11 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {t('snapshot.pendingActions', 'Pending actions')}
                         </Text>
-                        <Text strong style={{ fontSize: 12 }}>{pendingCount}</Text>
+                        <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>{pendingCount}</Text>
                     </Flex>
                     <Flex justify="space-between" align="center">
-                        <Text type="secondary" style={{ fontSize: 11 }}>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                             {t('snapshot.activeRollouts', 'Active rollouts')}
                         </Text>
-                        <Text strong style={{ fontSize: 12 }}>{runningRolloutCount}</Text>
+                        <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>{runningRolloutCount}</Text>
                     </Flex>
                 </Flex>
             )}

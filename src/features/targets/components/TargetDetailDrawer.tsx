@@ -79,7 +79,7 @@ export const TargetDetailDrawer: React.FC<TargetDetailDrawerProps> = ({
                             {target?.name || target?.controllerId || t('detail.title')}
                         </Title>
                         {target?.description && (
-                            <Text type="secondary" style={{ fontSize: 12 }}>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                 {target.description}
                             </Text>
                         )}

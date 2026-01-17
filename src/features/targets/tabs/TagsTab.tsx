@@ -37,7 +37,7 @@ const TagsTab: React.FC<TagsTabProps> = ({ data, loading }) => {
                                 <Text strong>{tag.name}</Text>
                             </Space>
                             {tag.description && (
-                                <Text type="secondary" style={{ fontSize: 12 }}>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                     {tag.description}
                                 </Text>
                             )}

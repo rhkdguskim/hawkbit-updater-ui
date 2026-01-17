@@ -1,4 +1,8 @@
 {
+    "feature": {
+        "title": "롤아웃 관리",
+        "subtitle": "소프트웨어 업데이트 및 배포 관리"
+    },
     "templates": {
         "title": "롤아웃 템플릿",
         "createNew": "새 템플릿 만들기",
@@ -25,6 +29,10 @@
         "createFirst": "첫 번째 템플릿 만들기"
     },
     "pageTitle": "롤아웃",
+    "menu": {
+        "list": "롤아웃 목록",
+        "actions": "액션 이력"
+    },
     "list": {
         "title": "롤아웃 목록",
         "description": "대규모 멀티 타겟 배포 롤아웃 모니터링 및 관리"

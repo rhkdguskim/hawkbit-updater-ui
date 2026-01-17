@@ -82,7 +82,7 @@ export const ColumnCustomizer: React.FC<ColumnCustomizerProps> = ({
     const content = (
         <ColumnListWrapper>
             <div style={{ padding: '8px 12px 0' }}>
-                <Text type="secondary" style={{ fontSize: 12 }}>
+                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                     {t('columnCustomizer.description', {
                         defaultValue: 'Select columns to display'
                     })}
@@ -110,7 +110,7 @@ export const ColumnCustomizer: React.FC<ColumnCustomizerProps> = ({
                     type="text"
                     icon={<ReloadOutlined />}
                     onClick={handleReset}
-                    style={{ fontSize: 12 }}
+                    style={{ fontSize: 'var(--ant-font-size-sm)' }}
                 >
                     {t('common:actions.reset', { defaultValue: 'Reset' })}
                 </Button>

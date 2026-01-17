@@ -243,7 +243,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                                     )
                                 )}
                             </Space>
-                            <Text type="secondary" style={{ fontSize: 12 }}>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                 {autoConfirmData.active ? t('autoConfirm.enabledDesc') : t('autoConfirm.disabledDesc')}
                             </Text>
                         </Space>

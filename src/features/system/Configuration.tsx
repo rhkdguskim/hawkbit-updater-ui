@@ -352,7 +352,7 @@ const Configuration: React.FC = () => {
                             }}
                             style={{ width: 100 }}
                         />
-                        <span style={{ color: '#666', fontSize: 13 }}>{t('units.days', 'days')}</span>
+                        <span style={{ color: '#666', fontSize: 'var(--ant-font-size)' }}>{t('units.days', 'days')}</span>
                     </Space>
                 );
             }
@@ -511,12 +511,12 @@ const Configuration: React.FC = () => {
                         </GroupIconBadge>
                         <Flex vertical gap={0}>
                             <span>{t(group.titleKey)}</span>
-                            <Text type="secondary" style={{ fontSize: 11, fontWeight: 400 }}>
+                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontWeight: 400 }}>
                                 {visibleItems.length} {t('common:items', 'items')}
                             </Text>
                         </Flex>
                         <Tooltip title={t(group.descKey)}>
-                            <InfoCircleOutlined style={{ color: '#94a3b8', fontSize: 14 }} />
+                            <InfoCircleOutlined style={{ color: '#94a3b8', fontSize: 'var(--ant-font-size)' }} />
                         </Tooltip>
                     </Flex>
                 }
@@ -612,7 +612,7 @@ const Configuration: React.FC = () => {
                             </GroupIconBadge>
                             <Flex vertical gap={0}>
                                 <span>{t('groups.versionInfo', 'Version Info')}</span>
-                                <Text type="secondary" style={{ fontSize: 11, fontWeight: 400 }}>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontWeight: 400 }}>
                                     {t('groups.versionInfoDesc', 'Application version and build information')}
                                 </Text>
                             </Flex>

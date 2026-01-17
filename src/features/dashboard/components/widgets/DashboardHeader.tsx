@@ -157,7 +157,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 )}
                 subtitle={t('subtitle', 'Deployment actions and status overview')}
                 subtitleExtra={(
-                    <LiveIndicator $active={isActivePolling} $color="#10b981">
+                    <LiveIndicator $active={isActivePolling} $color="var(--ant-color-success)">
                         {isActivePolling ? t('common:status.live', 'Live') : t('common:status.idle', 'Idle')}
                     </LiveIndicator>
                 )}
@@ -182,7 +182,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                             </QuickStats>
                         )}
                         <HeaderMeta>
-                            <Text className="text-mono" type="secondary" style={{ fontSize: 12 }}>
+                            <Text className="text-mono" type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                 {t('updated', 'Updated')}: {lastUpdated}
                             </Text>
                             <Button

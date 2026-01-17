@@ -26,7 +26,7 @@ const DeleteTargetModal: React.FC<DeleteTargetModalProps> = ({
         <Modal
             title={
                 <>
-                    <ExclamationCircleOutlined style={{ color: '#faad14', marginRight: 8 }} />
+                    <ExclamationCircleOutlined style={{ color: 'var(--ant-color-warning)', marginRight: 8 }} />
                     {t('modal.deleteTitle')}
                 </>
             }

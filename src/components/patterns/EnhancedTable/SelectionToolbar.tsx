@@ -8,17 +8,21 @@ const { Text } = Typography;
 
 const ToolbarContainer = styled.div`
     position: sticky;
-    top: 0;
-    z-index: 10;
+    top: 8px;
+    z-index: 20;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 16px;
-    background: linear-gradient(135deg, var(--ant-color-primary, #1677ff) 0%, var(--ant-color-primary-hover, #4096ff) 100%);
-    border-radius: 8px;
-    margin-bottom: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    animation: slideIn 0.2s ease-out;
+    padding: 10px 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--ant-color-primary);
+    border-left: 4px solid var(--ant-color-primary);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeInUp 0.3s var(--transition-gentle);
 
     @keyframes slideIn {
         from {
@@ -36,20 +40,22 @@ const SelectionInfo = styled.div`
     display: flex;
     align-items: center;
     gap: 12px;
-    color: white;
+    color: var(--ant-color-primary);
 `;
 
 const SelectionText = styled(Text)`
     && {
-        color: var(--ant-color-text-light-solid, #fff);
+        color: var(--ant-color-primary);
         font-size: var(--ant-font-size);
+        font-weight: 600;
+        letter-spacing: -0.01em;
     }
 `;
 
 const Separator = styled(Divider)`
     && {
-        border-color: rgba(255, 255, 255, 0.3);
-        height: var(--ant-control-height-sm, 24px);
+        border-color: rgba(var(--primary-rgb), 0.2);
+        height: 20px;
     }
 `;
 
@@ -61,22 +67,28 @@ const ActionGroup = styled.div`
 
 const StyledButton = styled(Button)`
     &.ant-btn {
-        background: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
+        background: rgba(var(--primary-rgb), 0.05);
+        border: 1px solid rgba(var(--primary-rgb), 0.2);
+        color: var(--ant-color-primary);
+        font-weight: 600;
+        border-radius: 6px !important;
 
         &:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            color: white;
+            background: rgba(var(--primary-rgb), 0.1);
+            border-color: var(--ant-color-primary);
+            color: var(--ant-color-primary);
+            transform: translateY(-1px);
         }
 
         &.ant-btn-dangerous {
-            background: rgba(255, 77, 79, 0.8);
-            border-color: rgba(255, 77, 79, 0.9);
+            background: rgba(255, 77, 79, 0.1);
+            border-color: rgba(255, 77, 79, 0.3);
+            color: #ff4d4f;
 
             &:hover {
-                background: rgba(255, 77, 79, 1);
+                background: #ff4d4f;
+                color: white;
+                border-color: #ff4d4f;
             }
         }
     }
@@ -84,12 +96,13 @@ const StyledButton = styled(Button)`
 
 const CloseButton = styled(Button)`
     &.ant-btn {
-        color: white;
-        opacity: 0.8;
+        color: var(--ant-color-text-secondary);
+        opacity: 0.6;
 
         &:hover {
             opacity: 1;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(var(--primary-rgb), 0.05);
+            color: var(--ant-color-primary);
         }
     }
 `;

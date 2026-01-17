@@ -42,9 +42,13 @@ dayjs.extend(relativeTime);
 
 const { Text } = Typography;
 
-const PIE_COLORS = ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+const PIE_COLORS = ['#6366f1', 'var(--ant-color-primary)', 'var(--ant-color-success)', 'var(--ant-color-warning)', 'var(--ant-color-error)', '#8b5cf6', '#06b6d4'];
 
-const DistributionsOverview: React.FC = () => {
+interface DistributionsOverviewProps {
+    standalone?: boolean;
+}
+
+const DistributionsOverview: React.FC<DistributionsOverviewProps> = ({ standalone = true }) => {
     const { t } = useTranslation(['distributions', 'common']);
     const navigate = useNavigate();
 
@@ -139,8 +143,8 @@ const DistributionsOverview: React.FC = () => {
         const complete = setsData?.content?.filter(ds => ds.complete).length ?? 0;
         const incomplete = (setsData?.content?.length ?? 0) - complete;
         return [
-            { name: t('status.complete', 'Complete'), value: complete, color: '#10b981' },
-            { name: t('status.incomplete', 'Incomplete'), value: incomplete, color: '#f59e0b' },
+            { name: t('status.complete', 'Complete'), value: complete, color: 'var(--ant-color-success)' },
+            { name: t('status.incomplete', 'Incomplete'), value: incomplete, color: 'var(--ant-color-warning)' },
         ].filter(d => d.value > 0);
     }, [setsData, t]);
 
@@ -164,7 +168,7 @@ const DistributionsOverview: React.FC = () => {
             {data.map(entry => (
                 <ChartLegendItem key={entry.name}>
                     <Flex align="center" gap={6}>
-                        <div style={{ width: 10, height: 10, borderRadius: 3, background: entry.color, boxShadow: `0 1px 3px ${entry.color}40` }} />
+                        <div style={{ width: 10, height: 10, borderRadius: 3, background: entry.color }} />
                         <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{entry.name}</Text>
                     </Flex>
                     <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', color: entry.color, fontFamily: 'var(--font-mono)' }}>{entry.value}</Text>
@@ -173,355 +177,364 @@ const DistributionsOverview: React.FC = () => {
         </Flex>
     );
 
-    return (
-        <PageLayout>
-            <PageHeader
-                title={t('overview.title')}
-                description={
-                    <Flex align="center" gap={12}>
-                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size)' }}>
-                            {t('overview.subtitle', 'Distribution sets and software modules overview')}
-                        </Text>
-                        <LiveIndicator $active={setsCount > 0} $color={COLORS.distributions}>
-                            {setsCount > 0 ? t('common:status.active', 'Active') : t('common:status.idle', 'Idle')}
-                        </LiveIndicator>
-                    </Flex>
-                }
-                actions={
-                    <Flex align="center" gap={8}>
-                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
-                            {t('common:updated', 'Updated')}: {lastUpdated}
-                        </Text>
-                        <Button
-                            icon={<ReloadOutlined />}
-                            onClick={refetch}
-                            loading={isLoading}
-                            size="small"
-                        >
-                            {t('common:actions.refresh')}
-                        </Button>
-                    </Flex>
-                }
-            />
+    const header = (
+        <PageHeader
+            title={t('overview.title')}
+            description={
+                <Flex align="center" gap={12}>
+                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size)' }}>
+                        {t('overview.subtitle', 'Distribution sets and software modules overview')}
+                    </Text>
+                    <LiveIndicator $active={setsCount > 0} $color={COLORS.distributions}>
+                        {setsCount > 0 ? t('common:status.active', 'Active') : t('common:status.idle', 'Idle')}
+                    </LiveIndicator>
+                </Flex>
+            }
+            actions={
+                <Flex align="center" gap={8}>
+                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
+                        {t('common:updated', 'Updated')}: {lastUpdated}
+                    </Text>
+                    <Button
+                        icon={<ReloadOutlined />}
+                        onClick={refetch}
+                        loading={isLoading}
+                        size="small"
+                    >
+                        {t('common:actions.refresh')}
+                    </Button>
+                </Flex>
+            }
+        />
+    );
 
-            <OverviewScrollContent>
-                {/* Top Row: KPI Cards + 3 Pie Charts */}
-                <TopRow>
-                    <KPIGridContainer>
-                        <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
-                            $delay={1}
-                            onClick={() => navigate('/distributions/sets')}
-                        >
-                            {isLoading ? <Skeleton.Avatar active size={40} /> : (
-                                <Flex vertical align="center" gap={4}>
-                                    <IconBadge $theme="distributions">
-                                        <AppstoreOutlined />
-                                    </IconBadge>
-                                    <BigNumber $color={COLORS.distributions}>{setsCount}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
-                                        {t('overview.distributionSets')}
-                                    </Text>
-                                </Flex>
-                            )}
-                        </OverviewStatsCard>
-                        <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)"
-                            $delay={2}
-                            onClick={() => navigate('/distributions/modules')}
-                        >
-                            {isLoading ? <Skeleton.Avatar active size={40} /> : (
-                                <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)">
-                                        <CodeOutlined />
-                                    </IconBadge>
-                                    <BigNumber $color="#3b82f6">{modulesCount}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
-                                        {t('overview.softwareModules')}
-                                    </Text>
-                                </Flex>
-                            )}
-                        </OverviewStatsCard>
-                        <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #10b981 0%, #34d399 100%)"
-                            $delay={3}
-                            onClick={() => navigate('/distributions/sets')}
-                        >
-                            {isLoading ? <Skeleton.Avatar active size={40} /> : (
-                                <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, #10b981 0%, #34d399 100%)">
-                                        <TagsOutlined />
-                                    </IconBadge>
-                                    <BigNumber $color="#10b981">{tagsCount}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
-                                        {t('overview.tags')}
-                                    </Text>
-                                </Flex>
-                            )}
-                        </OverviewStatsCard>
-                        <OverviewStatsCard
-                            $accentColor="linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)"
-                            $delay={4}
-                            onClick={() => navigate('/distributions/sets')}
-                        >
-                            {isLoading ? <Skeleton.Avatar active size={40} /> : (
-                                <Flex vertical align="center" gap={4}>
-                                    <IconBadge $color="linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)">
-                                        <BlockOutlined />
-                                    </IconBadge>
-                                    <BigNumber $color="#f59e0b">{typesCount}</BigNumber>
-                                    <Text type="secondary" style={{ fontSize: 11, textAlign: 'center' }}>
-                                        {t('overview.types')}
-                                    </Text>
-                                </Flex>
-                            )}
-                        </OverviewStatsCard>
-                    </KPIGridContainer>
+    const content = (
+        <OverviewScrollContent>
+            {/* Top Row: KPI Cards + 3 Pie Charts */}
+            <TopRow>
+                <KPIGridContainer>
+                    <OverviewStatsCard
+                        $accentColor="linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
+                        $delay={1}
+                        onClick={() => navigate('/distributions/sets')}
+                    >
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $theme="distributions">
+                                    <AppstoreOutlined />
+                                </IconBadge>
+                                <BigNumber $color={COLORS.distributions}>{setsCount}</BigNumber>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
+                                    {t('overview.distributionSets')}
+                                </Text>
+                            </Flex>
+                        )}
+                    </OverviewStatsCard>
+                    <OverviewStatsCard
+                        $accentColor="linear-gradient(135deg, var(--ant-color-primary) 0%, #06b6d4 100%)"
+                        $delay={2}
+                        onClick={() => navigate('/distributions/modules')}
+                    >
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-primary) 0%, #06b6d4 100%)">
+                                    <CodeOutlined />
+                                </IconBadge>
+                                <BigNumber $color="var(--ant-color-primary)">{modulesCount}</BigNumber>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
+                                    {t('overview.softwareModules')}
+                                </Text>
+                            </Flex>
+                        )}
+                    </OverviewStatsCard>
+                    <OverviewStatsCard
+                        $accentColor="linear-gradient(135deg, var(--ant-color-success) 0%, #34d399 100%)"
+                        $delay={3}
+                        onClick={() => navigate('/distributions/sets')}
+                    >
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-success) 0%, #34d399 100%)">
+                                    <TagsOutlined />
+                                </IconBadge>
+                                <BigNumber $color="var(--ant-color-success)">{tagsCount}</BigNumber>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
+                                    {t('overview.tags')}
+                                </Text>
+                            </Flex>
+                        )}
+                    </OverviewStatsCard>
+                    <OverviewStatsCard
+                        $accentColor="linear-gradient(135deg, var(--ant-color-warning) 0%, #fbbf24 100%)"
+                        $delay={4}
+                        onClick={() => navigate('/distributions/sets')}
+                    >
+                        {isLoading ? <Skeleton.Avatar active size={40} /> : (
+                            <Flex vertical align="center" gap={4}>
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-warning) 0%, #fbbf24 100%)">
+                                    <BlockOutlined />
+                                </IconBadge>
+                                <BigNumber $color="var(--ant-color-warning)">{typesCount}</BigNumber>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', textAlign: 'center' }}>
+                                    {t('overview.types')}
+                                </Text>
+                            </Flex>
+                        )}
+                    </OverviewStatsCard>
+                </KPIGridContainer>
 
-                    <ChartsContainer>
-                        <OverviewChartCard
-                            $theme="distributions"
-                            title={
-                                <Flex align="center" gap={10}>
-                                    <IconBadge $theme="distributions">
-                                        <BlockOutlined />
-                                    </IconBadge>
-                                    <Flex vertical gap={0}>
-                                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.distributionByType', 'By Type')}</span>
-                                        <Text type="secondary" style={{ fontSize: 11 }}>{setsCount} sets</Text>
-                                    </Flex>
-                                </Flex>
-                            }
-                            $delay={5}
-                        >
-                            {isLoading ? (
-                                <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
-                            ) : typeDistribution.length > 0 ? (
-                                <Flex vertical style={{ flex: 1 }}>
-                                    <ResponsiveContainer width="100%" height={100}>
-                                        <PieChart>
-                                            <Pie data={typeDistribution} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
-                                                {typeDistribution.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
-                                                ))}
-                                            </Pie>
-                                            <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                    {renderCustomLegend(typeDistribution.slice(0, 3))}
-                                </Flex>
-                            ) : (
-                                <Flex justify="center" align="center" style={{ flex: 1 }}>
-                                    <Text type="secondary">{t('common:messages.noData')}</Text>
-                                </Flex>
-                            )}
-                        </OverviewChartCard>
-
-                        <OverviewChartCard
-                            $theme="distributions"
-                            title={
-                                <Flex align="center" gap={10}>
-                                    <IconBadge $color="linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)">
-                                        <CodeOutlined />
-                                    </IconBadge>
-                                    <Flex vertical gap={0}>
-                                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.softwareByType', 'Software by Type')}</span>
-                                        <Text type="secondary" style={{ fontSize: 11 }}>{t('overview.modulesCount', { count: modulesCount })}</Text>
-                                    </Flex>
-                                </Flex>
-                            }
-                            $delay={6}
-                        >
-                            {isLoading ? (
-                                <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
-                            ) : moduleTypeDistribution.length > 0 ? (
-                                <Flex vertical style={{ flex: 1 }}>
-                                    <ResponsiveContainer width="100%" height={100}>
-                                        <PieChart>
-                                            <Pie data={moduleTypeDistribution} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
-                                                {moduleTypeDistribution.map((entry, index) => (
-                                                    <Cell key={`module-cell-${index}`} fill={entry.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
-                                                ))}
-                                            </Pie>
-                                            <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                    {renderCustomLegend(moduleTypeDistribution.slice(0, 3))}
-                                </Flex>
-                            ) : (
-                                <Flex justify="center" align="center" style={{ flex: 1 }}>
-                                    <Text type="secondary">{t('common:messages.noData')}</Text>
-                                </Flex>
-                            )}
-                        </OverviewChartCard>
-
-                        <OverviewChartCard
-                            $theme="distributions"
-                            title={
-                                <Flex align="center" gap={10}>
-                                    <IconBadge $color="linear-gradient(135deg, #10b981 0%, #34d399 100%)">
-                                        <AppstoreOutlined />
-                                    </IconBadge>
-                                    <Flex vertical gap={0}>
-                                        <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.completeness', 'Completeness')}</span>
-                                        <Text type="secondary" style={{ fontSize: 11 }}>{setsCount} sets</Text>
-                                    </Flex>
-                                </Flex>
-                            }
-                            $delay={7}
-                        >
-                            {isLoading ? (
-                                <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
-                            ) : completenessData.length > 0 ? (
-                                <Flex vertical style={{ flex: 1 }}>
-                                    <ResponsiveContainer width="100%" height={100}>
-                                        <PieChart>
-                                            <Pie data={completenessData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
-                                                {completenessData.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
-                                                ))}
-                                            </Pie>
-                                            <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                    {renderCustomLegend(completenessData)}
-                                </Flex>
-                            ) : (
-                                <Flex justify="center" align="center" style={{ flex: 1 }}>
-                                    <Text type="secondary">{t('common:messages.noData')}</Text>
-                                </Flex>
-                            )}
-                        </OverviewChartCard>
-                    </ChartsContainer>
-                </TopRow>
-
-                {/* Bottom Row: Recent Sets + Recent Modules */}
-                <BottomRow>
-                    <OverviewListCard
+                <ChartsContainer>
+                    <OverviewChartCard
                         $theme="distributions"
                         title={
                             <Flex align="center" gap={10}>
                                 <IconBadge $theme="distributions">
-                                    <AppstoreOutlined />
+                                    <BlockOutlined />
                                 </IconBadge>
                                 <Flex vertical gap={0}>
-                                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.recentSets', 'Recent Distribution Sets')}</span>
-                                    <Text type="secondary" style={{ fontSize: 11 }}>{recentSets.length} sets</Text>
+                                    <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.distributionByType', 'By Type')}</span>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{setsCount} sets</Text>
                                 </Flex>
                             </Flex>
                         }
-                        $delay={8}
+                        $delay={5}
                     >
                         {isLoading ? (
-                            <Skeleton active paragraph={{ rows: 5 }} />
-                        ) : recentSets.length > 0 ? (
-                            <div style={{ flex: 1, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                                <AirportSlideList
-                                    items={recentSets}
-                                    itemHeight={52}
-                                    visibleCount={5}
-                                    fullHeight={true}
-                                    renderItem={(record: MgmtDistributionSet) => (
-                                        <ActivityItem
-                                            key={record.id}
-                                            onClick={() => navigate(`/distributions/sets/${record.id}`)}
-                                        >
-                                            <Flex align="center" gap={10} style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{
-                                                    width: 32, height: 32, borderRadius: 8,
-                                                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    flexShrink: 0
-                                                }}>
-                                                    <AppstoreOutlined style={{ fontSize: 16, color: COLORS.distributions }} />
-                                                </div>
-                                                <Flex vertical gap={0} style={{ minWidth: 0 }}>
-                                                    <Text strong style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                        {record.name}
-                                                    </Text>
-                                                    <Flex gap={4} align="center">
-                                                        <Tag color="blue" style={{ margin: 0, fontSize: 10, padding: '0 4px', borderRadius: 999 }}>v{record.version}</Tag>
-                                                        <Text type="secondary" style={{ fontSize: 10 }}>{record.typeName}</Text>
-                                                    </Flex>
-                                                </Flex>
-                                            </Flex>
-                                            <Tag color={record.complete ? 'green' : 'orange'} style={{ margin: 0, fontSize: 10, borderRadius: 999 }}>
-                                                {record.complete ? t('status.complete') : t('status.incomplete')}
-                                            </Tag>
-                                        </ActivityItem>
-                                    )}
-                                />
-                            </div>
+                            <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
+                        ) : typeDistribution.length > 0 ? (
+                            <Flex vertical style={{ flex: 1 }}>
+                                <ResponsiveContainer width="100%" height={100}>
+                                    <PieChart>
+                                        <Pie data={typeDistribution} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
+                                            {typeDistribution.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                {renderCustomLegend(typeDistribution.slice(0, 3))}
+                            </Flex>
                         ) : (
                             <Flex justify="center" align="center" style={{ flex: 1 }}>
                                 <Text type="secondary">{t('common:messages.noData')}</Text>
                             </Flex>
                         )}
-                    </OverviewListCard>
+                    </OverviewChartCard>
 
-                    <OverviewListCard
+                    <OverviewChartCard
                         $theme="distributions"
                         title={
                             <Flex align="center" gap={10}>
-                                <IconBadge $color="linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)">
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-primary) 0%, #06b6d4 100%)">
                                     <CodeOutlined />
                                 </IconBadge>
                                 <Flex vertical gap={0}>
-                                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('overview.recentModules', 'Recent Software Modules')}</span>
-                                    <Text type="secondary" style={{ fontSize: 11 }}>{recentModules.length} modules</Text>
+                                    <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.softwareByType', 'Software by Type')}</span>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{t('overview.modulesCount', { count: modulesCount })}</Text>
                                 </Flex>
                             </Flex>
                         }
-                        $delay={9}
+                        $delay={6}
                     >
                         {isLoading ? (
-                            <Skeleton active paragraph={{ rows: 5 }} />
-                        ) : recentModules.length > 0 ? (
-                            <div style={{ flex: 1, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                                <AirportSlideList
-                                    items={recentModules}
-                                    itemHeight={52}
-                                    visibleCount={5}
-                                    fullHeight={true}
-                                    renderItem={(record: MgmtSoftwareModule) => (
-                                        <ActivityItem
-                                            key={record.id}
-                                            onClick={() => navigate(`/distributions/modules/${record.id}`)}
-                                        >
-                                            <Flex align="center" gap={10} style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{
-                                                    width: 32, height: 32, borderRadius: 8,
-                                                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%)',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    flexShrink: 0
-                                                }}>
-                                                    <CodeOutlined style={{ fontSize: 16, color: '#3b82f6' }} />
-                                                </div>
-                                                <Flex vertical gap={0} style={{ minWidth: 0 }}>
-                                                    <Text strong style={{ fontSize: 'var(--ant-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                        {record.name}
-                                                    </Text>
-                                                    <Flex gap={4} align="center">
-                                                        <Tag color="cyan" style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)', padding: '0 4px', borderRadius: 999, fontFamily: 'var(--font-mono)' }}>v{record.version}</Tag>
-                                                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{record.typeName}</Text>
-                                                    </Flex>
-                                                </Flex>
-                                            </Flex>
-                                            <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
-                                                {record.createdAt ? dayjs(record.createdAt).format('MM-DD HH:mm') : '-'}
-                                            </Text>
-                                        </ActivityItem>
-                                    )}
-                                />
-                            </div>
+                            <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
+                        ) : moduleTypeDistribution.length > 0 ? (
+                            <Flex vertical style={{ flex: 1 }}>
+                                <ResponsiveContainer width="100%" height={100}>
+                                    <PieChart>
+                                        <Pie data={moduleTypeDistribution} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
+                                            {moduleTypeDistribution.map((entry, index) => (
+                                                <Cell key={`module-cell-${index}`} fill={entry.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                {renderCustomLegend(moduleTypeDistribution.slice(0, 3))}
+                            </Flex>
                         ) : (
                             <Flex justify="center" align="center" style={{ flex: 1 }}>
                                 <Text type="secondary">{t('common:messages.noData')}</Text>
                             </Flex>
                         )}
-                    </OverviewListCard>
-                </BottomRow>
-            </OverviewScrollContent>
+                    </OverviewChartCard>
+
+                    <OverviewChartCard
+                        $theme="distributions"
+                        title={
+                            <Flex align="center" gap={10}>
+                                <IconBadge $color="linear-gradient(135deg, var(--ant-color-success) 0%, #34d399 100%)">
+                                    <AppstoreOutlined />
+                                </IconBadge>
+                                <Flex vertical gap={0}>
+                                    <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.completeness', 'Completeness')}</span>
+                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{setsCount} sets</Text>
+                                </Flex>
+                            </Flex>
+                        }
+                        $delay={7}
+                    >
+                        {isLoading ? (
+                            <Skeleton.Avatar active size={60} shape="circle" style={{ margin: '8px auto', display: 'block' }} />
+                        ) : completenessData.length > 0 ? (
+                            <Flex vertical style={{ flex: 1 }}>
+                                <ResponsiveContainer width="100%" height={100}>
+                                    <PieChart>
+                                        <Pie data={completenessData} innerRadius={28} outerRadius={42} paddingAngle={3} dataKey="value" strokeWidth={0}>
+                                            {completenessData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                {renderCustomLegend(completenessData)}
+                            </Flex>
+                        ) : (
+                            <Flex justify="center" align="center" style={{ flex: 1 }}>
+                                <Text type="secondary">{t('common:messages.noData')}</Text>
+                            </Flex>
+                        )}
+                    </OverviewChartCard>
+                </ChartsContainer>
+            </TopRow>
+
+            {/* Bottom Row: Recent Sets + Recent Modules */}
+            <BottomRow>
+                <OverviewListCard
+                    $theme="distributions"
+                    title={
+                        <Flex align="center" gap={10}>
+                            <IconBadge $theme="distributions">
+                                <AppstoreOutlined />
+                            </IconBadge>
+                            <Flex vertical gap={0}>
+                                <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.recentSets', 'Recent Distribution Sets')}</span>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{recentSets.length} sets</Text>
+                            </Flex>
+                        </Flex>
+                    }
+                    $delay={8}
+                >
+                    {isLoading ? (
+                        <Skeleton active paragraph={{ rows: 5 }} />
+                    ) : recentSets.length > 0 ? (
+                        <div style={{ flex: 1, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                            <AirportSlideList
+                                items={recentSets}
+                                itemHeight={52}
+                                visibleCount={5}
+                                fullHeight={true}
+                                renderItem={(record: MgmtDistributionSet) => (
+                                    <ActivityItem
+                                        key={record.id}
+                                        onClick={() => navigate(`/distributions/sets/${record.id}`)}
+                                    >
+                                        <Flex align="center" gap={10} style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{
+                                                width: 32, height: 32, borderRadius: 8,
+                                                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                flexShrink: 0
+                                            }}>
+                                                <AppstoreOutlined style={{ fontSize: 16, color: COLORS.distributions }} />
+                                            </div>
+                                            <Flex vertical gap={0} style={{ minWidth: 0 }}>
+                                                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    {record.name}
+                                                </Text>
+                                                <Flex gap={4} align="center">
+                                                    <Tag color="blue" style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)', padding: '0 6px', borderRadius: 999 }}>v{record.version}</Tag>
+                                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{record.typeName}</Text>
+                                                </Flex>
+                                            </Flex>
+                                        </Flex>
+                                        <Tag color={record.complete ? 'green' : 'orange'} style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)', borderRadius: 999 }}>
+                                            {record.complete ? t('status.complete') : t('status.incomplete')}
+                                        </Tag>
+                                    </ActivityItem>
+                                )}
+                            />
+                        </div>
+                    ) : (
+                        <Flex justify="center" align="center" style={{ flex: 1 }}>
+                            <Text type="secondary">{t('common:messages.noData')}</Text>
+                        </Flex>
+                    )}
+                </OverviewListCard>
+
+                <OverviewListCard
+                    $theme="distributions"
+                    title={
+                        <Flex align="center" gap={10}>
+                            <IconBadge $color="linear-gradient(135deg, var(--ant-color-primary) 0%, #06b6d4 100%)">
+                                <CodeOutlined />
+                            </IconBadge>
+                            <Flex vertical gap={0}>
+                                <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('overview.recentModules', 'Recent Software Modules')}</span>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{recentModules.length} modules</Text>
+                            </Flex>
+                        </Flex>
+                    }
+                    $delay={9}
+                >
+                    {isLoading ? (
+                        <Skeleton active paragraph={{ rows: 5 }} />
+                    ) : recentModules.length > 0 ? (
+                        <div style={{ flex: 1, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                            <AirportSlideList
+                                items={recentModules}
+                                itemHeight={52}
+                                visibleCount={5}
+                                fullHeight={true}
+                                renderItem={(record: MgmtSoftwareModule) => (
+                                    <ActivityItem
+                                        key={record.id}
+                                        onClick={() => navigate(`/distributions/modules/${record.id}`)}
+                                    >
+                                        <Flex align="center" gap={10} style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{
+                                                width: 32, height: 32, borderRadius: 8,
+                                                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%)',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                flexShrink: 0
+                                            }}>
+                                                <CodeOutlined style={{ fontSize: 16, color: 'var(--ant-color-primary)' }} />
+                                            </div>
+                                            <Flex vertical gap={0} style={{ minWidth: 0 }}>
+                                                <Text strong style={{ fontSize: 'var(--ant-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    {record.name}
+                                                </Text>
+                                                <Flex gap={4} align="center">
+                                                    <Tag color="cyan" style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)', padding: '0 4px', borderRadius: 999, fontFamily: 'var(--font-mono)' }}>v{record.version}</Tag>
+                                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{record.typeName}</Text>
+                                                </Flex>
+                                            </Flex>
+                                        </Flex>
+                                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
+                                            {record.createdAt ? dayjs(record.createdAt).format('MM-DD HH:mm') : '-'}
+                                        </Text>
+                                    </ActivityItem>
+                                )}
+                            />
+                        </div>
+                    ) : (
+                        <Flex justify="center" align="center" style={{ flex: 1 }}>
+                            <Text type="secondary">{t('common:messages.noData')}</Text>
+                        </Flex>
+                    )}
+                </OverviewListCard>
+            </BottomRow>
+        </OverviewScrollContent>
+    );
+
+    if (!standalone) return content;
+
+    return (
+        <PageLayout>
+            {header}
+            {content}
         </PageLayout>
     );
 };
