@@ -6,44 +6,60 @@ import { MinusCircleOutlined } from '@ant-design/icons';
 const ChipContainer = styled(Tag)`
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 8px 4px 10px;
-    border-radius: 6px;
-    font-size: var(--ant-font-size-sm);
-    margin: 2px;
-    background: var(--ant-color-primary-bg, #e6f4ff);
-    border: 1px solid var(--ant-color-primary-border, #91caff);
-    color: var(--ant-color-primary, #1677ff);
+    gap: 8px;
+    padding: 6px 10px 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px;
+    background: rgba(var(--color-primary-rgb), 0.08);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+    color: var(--ant-color-primary);
+    transition: all 0.2s ease;
+    cursor: default;
+
+    &:hover {
+        background: rgba(var(--color-primary-rgb), 0.12);
+        border-color: var(--ant-color-primary);
+    }
 
     .filter-field {
-        font-weight: 500;
+        font-weight: 700;
+        opacity: 0.8;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
     .filter-operator {
-        color: var(--ant-color-text-secondary, #8c8c8c);
+        color: var(--text-tertiary);
+        font-weight: 500;
     }
 
     .filter-value {
-        font-weight: 600;
+        font-weight: 700;
+        color: var(--text-title);
     }
 `;
 
 const RemoveButton = styled(Button)`
     &.ant-btn {
         padding: 0;
-        width: 18px;
-        height: 18px;
-        min-width: 18px;
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--ant-color-error, var(--ant-color-error));
+        color: var(--text-tertiary);
         border: none;
         background: transparent;
+        transition: all 0.2s ease;
+        margin-left: 2px;
         
         &:hover {
-            color: var(--ant-color-error-hover, #ff7875);
-            background: var(--ant-color-error-bg, #fff2f0);
+            color: var(--ant-color-error);
+            background: rgba(var(--color-error-rgb), 0.1);
+            transform: scale(1.1);
         }
     }
 `;
@@ -69,7 +85,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({
             <RemoveButton
                 type="text"
                 size="small"
-                icon={<MinusCircleOutlined style={{ fontSize: 14 }} />}
+                icon={<MinusCircleOutlined style={{ fontSize: 16 }} />}
                 onClick={onRemove}
             />
         </ChipContainer>

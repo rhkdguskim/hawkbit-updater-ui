@@ -100,7 +100,7 @@ const StyledContent = styled(Content) <{ $bg: string; $radius: number }>`
 `;
 
 const StyledFooter = styled(Footer)`
-  padding: 8px 24px;
+  padding: 4px 16px;
   background: transparent;
   display: flex;
   justify-content: space-between;

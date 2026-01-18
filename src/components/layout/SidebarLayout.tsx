@@ -21,8 +21,9 @@ const LayoutContainer = styled.div<{ $gap: number }>`
 `;
 
 const SidebarCard = styled(Card)`
-    width: 250px;
+    width: 200px;
     height: fit-content;
+    flex-shrink: 0;
     
     .ant-card-body {
         padding: 0;
@@ -31,6 +32,7 @@ const SidebarCard = styled(Card)`
     .ant-menu {
         border-right: none;
         border-radius: inherit;
+        font-size: 13px;
     }
 `;
 
@@ -64,7 +66,7 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({
                 actions={actions}
             />
 
-            <LayoutContainer $gap={token.marginMD}>
+            <LayoutContainer $gap={12}>
                 <SidebarCard>
                     <Menu
                         mode="inline"

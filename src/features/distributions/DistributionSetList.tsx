@@ -64,7 +64,13 @@ const DistributionSetList: React.FC<DistributionSetListProps> = ({ standalone = 
                     value={text || ''}
                     onSave={(val) => model.handleInlineUpdate(record.id, 'name', val)}
                     editable={isAdmin}
-                    renderDisplay={(val) => <Highlighter text={val} search={model.globalSearch} />}
+                    renderDisplay={(val) => (
+                        <Tooltip title={record.description || undefined}>
+                            <Text strong ellipsis style={{ maxWidth: 180, fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
+                                <Highlighter text={val} search={model.globalSearch} />
+                            </Text>
+                        </Tooltip>
+                    )}
                 />
             ),
         },
@@ -75,8 +81,10 @@ const DistributionSetList: React.FC<DistributionSetListProps> = ({ standalone = 
             sorter: true,
             width: 100,
             render: (text) => (
-                <Tag color="blue">
-                    <Highlighter text={text} search={model.globalSearch} />
+                <Tag color="processing" style={{ borderRadius: '6px', border: 'none', background: 'rgba(59, 130, 246, 0.1)' }}>
+                    <Text strong style={{ fontSize: 'var(--ant-font-size-xs)', fontFamily: 'var(--font-mono)', color: 'var(--ant-color-primary)' }}>
+                        <Highlighter text={text} search={model.globalSearch} />
+                    </Text>
                 </Tag>
             ),
         },
@@ -86,8 +94,10 @@ const DistributionSetList: React.FC<DistributionSetListProps> = ({ standalone = 
             key: 'typeName',
             width: 120,
             render: (text) => (
-                <Tag color="blue">
-                    <Highlighter text={text || t('common:notSelected')} search={model.globalSearch} />
+                <Tag color="cyan" style={{ borderRadius: '6px', border: 'none', background: 'rgba(8, 145, 178, 0.1)' }}>
+                    <Text style={{ fontSize: 'var(--ant-font-size-xs)', fontFamily: 'var(--font-mono)', color: 'var(--ant-color-info)' }}>
+                        <Highlighter text={text || t('common:notSelected')} search={model.globalSearch} />
+                    </Text>
                 </Tag>
             ),
         },

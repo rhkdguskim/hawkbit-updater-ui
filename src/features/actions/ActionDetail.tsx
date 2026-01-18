@@ -266,6 +266,7 @@ const ActionDetail: React.FC = () => {
 
     return (
         <StandardDetailLayout
+            fullHeight={true}
             breadcrumbs={[
                 { label: t('list.title'), path: '/actions' },
                 { label: actionData ? `#${actionData.id}` : `#${actionId}` },

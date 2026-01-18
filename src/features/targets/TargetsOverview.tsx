@@ -482,7 +482,7 @@ const TargetsOverview: React.FC<TargetsOverviewProps> = ({ standalone = true }) 
     }
 
     return (
-        <PageLayout>
+        <PageLayout fullHeight={true}>
             <PageHeader
                 title={t('overview.title', 'Device Monitoring')}
                 description={

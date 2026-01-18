@@ -1,68 +1,65 @@
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Flex, Typography } from 'antd';
+import { softPulse as pulse, IconBadge as SharedIconBadge } from '../../../../components/shared/CommonStyles';
 
 const { Text } = Typography;
 
 export const WidgetContainer = styled.div`
     background: var(--ant-color-bg-container);
-    border-radius: 12px;
-    padding: 16px;
-    border: 1px solid var(--ant-color-border);
+    border-radius: var(--ant-border-radius-lg, 16px);
+    padding: 20px;
+    border: 1px solid var(--ant-color-border-secondary);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
     height: 100%;
-    min-height: 180px;
+    min-height: 200px;
     overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--ant-box-shadow-tertiary);
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--ant-box-shadow-secondary);
+        border-color: var(--ant-color-border);
+    }
 `;
 
 export const HeaderRow = styled(Flex)`
     border-bottom: 1px solid var(--ant-color-border-secondary);
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     flex-shrink: 0;
 `;
 
-export const IconBadge = styled.div<{ $status?: 'normal' | 'warning' | 'critical'; $color?: string }>`
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    background: ${({ $status, $color }) => {
-        if ($color) return `${$color}15`; // 15 = hex opacity ~8%
-        if ($status === 'critical') return 'rgba(239, 68, 68, 0.1)';
-        if ($status === 'warning') return 'rgba(245, 158, 11, 0.1)';
-        if ($status === 'normal') return 'rgba(16, 185, 129, 0.1)';
-        return 'rgba(59, 130, 246, 0.1)';
-    }};
-    color: ${({ $status, $color }) => {
-        if ($color) return $color;
-        if ($status === 'critical') return 'var(--ant-color-error)';
-        if ($status === 'warning') return 'var(--ant-color-warning)';
-        if ($status === 'normal') return 'var(--ant-color-success)';
-        return 'var(--ant-color-primary)';
-    }};
+export const IconBadge = styled(SharedIconBadge) <{ $status?: 'normal' | 'warning' | 'critical' }>`
+    ${WidgetContainer}:hover & {
+        transform: scale(1.1);
+    }
 `;
 
 export const MetricCard = styled.div`
-    background: var(--ant-color-fill-quaternary);
-    border-radius: 8px;
-    padding: 10px 14px;
+    background: var(--ant-color-bg-layout);
+    border-radius: 10px;
+    padding: 12px 16px;
     flex: 1;
+    border: 1px solid var(--ant-color-border-secondary);
 `;
 
 export const MetricLabel = styled(Text)`
     && {
-        font-size: var(--ant-font-size-sm);
+        font-size: 12px;
         color: var(--ant-color-text-secondary);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
     }
 `;
 
 export const MetricValue = styled.div<{ $status?: 'normal' | 'warning' | 'critical' }>`
-    font-size: 20px;
-    font-weight: 600;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 4px;
     color: ${({ $status }) =>
         $status === 'critical' ? 'var(--ant-color-error)' :
             $status === 'warning' ? 'var(--ant-color-warning)' :
@@ -70,39 +67,38 @@ export const MetricValue = styled.div<{ $status?: 'normal' | 'warning' | 'critic
     };
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 `;
 
 export const ThresholdText = styled(Text)`
     && {
         font-size: 11px;
         color: var(--ant-color-text-quaternary);
+        font-style: italic;
     }
 `;
 
-const pulse = keyframes`
-    0%, 100% { opacity: 0.8; }
-    50% { opacity: 1; }
-`;
+
 
 export const BottleneckBanner = styled.div<{ $status: 'warning' | 'critical' }>`
-    background: ${({ $status }) => $status === 'critical' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)'};
-    border-radius: 8px;
-    padding: 10px 12px;
-    border: 1px solid ${({ $status }) => $status === 'critical' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)'};
+    background: ${({ $status }) => $status === 'critical' ? 'rgba(var(--color-error-rgb), 0.1)' : 'rgba(var(--color-warning-rgb), 0.1)'};
+    border-radius: 10px;
+    padding: 12px 16px;
+    border: 1px solid ${({ $status }) => $status === 'critical' ? 'rgba(var(--color-error-rgb), 0.3)' : 'rgba(var(--color-warning-rgb), 0.3)'};
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin-top: 4px;
+    gap: 6px;
+    margin-top: 8px;
+    backdrop-filter: blur(4px);
 
     ${({ $status }) => $status === 'critical' && css`
-        animation: ${pulse} 3s infinite ease-in-out;
+        animation: ${pulse} 4s infinite ease-in-out;
     `}
 `;
 
 export const BottleneckHeader = styled(Flex) <{ color?: string }>`
-    font-weight: 600;
-    font-size: 13px;
+    font-weight: 700;
+    font-size: 14px;
     color: ${({ color }) => color || 'inherit'};
 `;
 
@@ -111,13 +107,15 @@ export const BottleneckDesc = styled(Text)`
         font-size: 11px;
         color: var(--ant-color-text-secondary);
         display: block;
+        line-height: 1.4;
     }
 `;
 
 export const ChartWrapper = styled.div`
     flex: 1;
-    min-height: 160px;
+    min-height: 180px;
     position: relative;
+    margin-top: 8px;
     
     & > .recharts-responsive-container {
         min-height: 100%;
@@ -125,18 +123,68 @@ export const ChartWrapper = styled.div`
 `;
 
 export const LegendContainer = styled(Flex)`
-    padding-top: 8px;
+    padding-top: 12px;
     border-top: 1px solid var(--ant-color-border-secondary);
+    justify-content: space-around;
 `;
 
 export const LegendItem = styled(Flex)`
-    font-size: 12px;
-    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    gap: 8px;
+    color: var(--ant-color-text-secondary);
 `;
 
 export const LegendDot = styled.div<{ $color: string }>`
-    width: 10px;
-    height: 10px;
-    border-radius: 3px;
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
     background: ${props => props.$color};
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+export const ActivityCard = styled.div<{ $status?: 'success' | 'error' | 'warning' | 'info' | 'default' | 'canceled' }>`
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--ant-color-fill-quaternary);
+    border: 1px solid var(--border-secondary);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+        background: var(--ant-color-fill-tertiary);
+        border-color: var(--ant-color-primary-border);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    ${({ $status }) => {
+        if ($status === 'error') return css`
+            background: rgba(var(--color-error-rgb), 0.05);
+            border-left: 4px solid var(--ant-color-error);
+            &:hover { background: rgba(var(--color-error-rgb), 0.08); }
+        `;
+        if ($status === 'warning' || $status === 'canceled') return css`
+            background: rgba(var(--color-warning-rgb), 0.05);
+            border-left: 4px solid var(--ant-color-warning);
+            &:hover { background: rgba(var(--color-warning-rgb), 0.08); }
+        `;
+        if ($status === 'success') return css`
+            background: rgba(var(--color-success-rgb), 0.05);
+            border-left: 4px solid var(--ant-color-success);
+            &:hover { background: rgba(var(--color-success-rgb), 0.08); }
+        `;
+        if ($status === 'info') return css`
+            background: rgba(var(--color-primary-rgb), 0.05);
+            border-left: 4px solid var(--ant-color-primary);
+            &:hover { background: rgba(var(--color-primary-rgb), 0.08); }
+        `;
+        return css`
+            border-left: 4px solid transparent;
+        `;
+    }}
 `;

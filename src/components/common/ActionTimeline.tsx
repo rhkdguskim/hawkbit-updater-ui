@@ -19,8 +19,8 @@ const pulse = keyframes`
 `;
 
 const glow = keyframes`
-    0%, 100% { box-shadow: 0 0 4px rgba(59, 130, 246, 0.4); }
-    50% { box-shadow: 0 0 12px rgba(59, 130, 246, 0.8); }
+    0%, 100% { box-shadow: 0 0 4px rgba(var(--color-primary-rgb), 0.4); }
+    50% { box-shadow: 0 0 12px rgba(var(--color-primary-rgb), 0.8); }
 `;
 
 const progressFlow = keyframes`
@@ -33,9 +33,10 @@ const TimelineContainer = styled.div`
     display: flex;
     align-items: center;
     gap: 0;
-    padding: 4px 8px;
-    background: rgba(0,0,0,0.02);
+    padding: 6px 12px;
+    background: var(--ant-color-fill-quaternary);
     border-radius: 20px;
+    border: 1px solid var(--border-secondary);
 `;
 
 const TimelineStep = styled.div<{
@@ -68,20 +69,20 @@ const StepNode = styled.div<{
                 return css`
                     background: var(--ant-color-success);
                     color: white;
-                    box-shadow: 0 2px 8px rgba(var(--ant-color-success-rgb), 0.4);
+                    box-shadow: 0 2px 8px rgba(var(--color-success-rgb), 0.4);
                 `;
             case 'active':
                 return css`
-                    background: var(--ant-color-info);
+                    background: var(--ant-color-primary);
                     color: white;
-                    box-shadow: 0 2px 8px rgba(var(--ant-color-info-rgb), 0.4);
+                    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.4);
                     animation: ${pulse} 1.5s ease-in-out infinite, ${glow} 2s ease-in-out infinite;
                 `;
             case 'error':
                 return css`
                     background: var(--ant-color-error);
                     color: white;
-                    box-shadow: 0 2px 8px rgba(var(--ant-color-error-rgb), 0.4);
+                    box-shadow: 0 2px 8px rgba(var(--color-error-rgb), 0.4);
                 `;
             default:
                 return css`

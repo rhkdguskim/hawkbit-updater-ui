@@ -69,13 +69,13 @@ export const DashboardSurface = styled.div`
     [data-theme='dark'] & .ant-card,
     .dark-mode & .ant-card {
         background-color: var(--ant-color-bg-container);
-        border-color: rgba(255, 255, 255, 0.06);
+        border-color: var(--glass-border);
     }
 
     [data-theme='dark'] & .ant-card:hover,
     .dark-mode & .ant-card:hover {
-        box-shadow: var(--shadow-md);
-        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--ant-color-primary-border);
     }
 
     .dashboard-clickable {

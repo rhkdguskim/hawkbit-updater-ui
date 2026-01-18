@@ -532,7 +532,7 @@ const DistributionsOverview: React.FC<DistributionsOverviewProps> = ({ standalon
     if (!standalone) return content;
 
     return (
-        <PageLayout>
+        <PageLayout fullHeight={true}>
             {header}
             {content}
         </PageLayout>

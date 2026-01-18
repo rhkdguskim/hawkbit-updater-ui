@@ -422,6 +422,7 @@ const RolloutDetail: React.FC = () => {
 
     return (
         <StandardDetailLayout
+            fullHeight={true}
             breadcrumbs={[
                 { label: t('list.title'), path: '/rollouts' },
                 { label: rolloutData?.name || rolloutId || '' },

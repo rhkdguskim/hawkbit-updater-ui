@@ -312,28 +312,34 @@ const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) =>
         />
     );
 
-    const listContent = (
+    return (
         <>
-            {!standalone && <div style={{ marginBottom: 16 }}>{searchBar}</div>}
-            <DataView
-                loading={isLoading}
-                error={null}
-                isEmpty={!isLoading && typesContent.length === 0}
-                emptyText={t('common:messages.noData')}
+            <StandardListLayout
+                title={t('typeManagement.title')}
+                description={t('typeManagement.description', { defaultValue: 'Manage target types for device categorization' })}
+                standalone={standalone}
+                searchBar={searchBar}
             >
-                <EnhancedTable<MgmtTargetType>
-                    columns={displayColumns}
-                    dataSource={typesContent}
-                    rowKey="id"
-                    pagination={false}
-                    loading={isLoading || isFetching}
-                    onChange={handleTableChange}
-                    scroll={{ x: 800 }}
-                    onFetchNextPage={fetchNextPage}
-                    hasNextPage={hasNextPage}
-                    isFetchingNextPage={isFetchingNextPage}
-                />
-            </DataView>
+                <DataView
+                    loading={isLoading}
+                    error={null}
+                    isEmpty={!isLoading && typesContent.length === 0}
+                    emptyText={t('common:messages.noData')}
+                >
+                    <EnhancedTable<MgmtTargetType>
+                        columns={displayColumns}
+                        dataSource={typesContent}
+                        rowKey="id"
+                        pagination={false}
+                        loading={isLoading || isFetching}
+                        onChange={handleTableChange}
+                        scroll={{ x: 800 }}
+                        onFetchNextPage={fetchNextPage}
+                        hasNextPage={hasNextPage}
+                        isFetchingNextPage={isFetchingNextPage}
+                    />
+                </DataView>
+            </StandardListLayout>
 
             <TargetTypeDialog
                 open={dialogOpen}
@@ -347,20 +353,6 @@ const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) =>
                 }}
             />
         </>
-    );
-
-    if (!standalone) {
-        return listContent;
-    }
-
-    return (
-        <StandardListLayout
-            title={t('typeManagement.title')}
-            description={t('typeManagement.description', { defaultValue: 'Manage target types for device categorization' })}
-            searchBar={searchBar}
-        >
-            {listContent}
-        </StandardListLayout>
     );
 };
 

@@ -256,6 +256,7 @@ const DistributionSetDetail: React.FC = () => {
 
     return (
         <StandardDetailLayout
+            fullHeight={true}
             breadcrumbs={[
                 { label: t('sets.title'), path: '/distributions/sets' },
                 { label: setData?.name || id || '' },

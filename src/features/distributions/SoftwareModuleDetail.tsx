@@ -332,6 +332,7 @@ const SoftwareModuleDetail: React.FC = () => {
 
     return (
         <StandardDetailLayout
+            fullHeight={true}
             breadcrumbs={[
                 { label: t('modules.title'), path: '/distributions/modules' },
                 { label: moduleData?.name || id || '' },

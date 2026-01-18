@@ -65,24 +65,24 @@ const ListContainer = styled.div`
     overflow-x: hidden;
 
     &::-webkit-scrollbar {
-        width: 4px;
+        width: 6px;
     }
     &::-webkit-scrollbar-track {
-        background: var(--ant-color-fill-tertiary);
+        background: transparent;
     }
     &::-webkit-scrollbar-thumb {
-        background: var(--ant-color-fill);
-        border-radius: 4px;
+        background: var(--ant-color-fill-secondary);
+        border-radius: 10px;
     }
 `;
 
 const UpdateRow = styled.div<{ $isCompleting?: boolean; $isNew?: boolean }>`
     display: flex;
     flex-direction: column;
-    padding: 12px 16px;
+    padding: 14px 16px;
     background: transparent;
-    border-bottom: 1px solid var(--ant-color-border-secondary, rgba(0, 0, 0, 0.03));
-    transition: all 0.3s ease;
+    border-bottom: 1px solid var(--border-secondary);
+    transition: all 0.3s var(--transition-gentle);
     animation: ${props => props.$isCompleting
         ? css`${fadeOutSlide} 0.5s ease-out forwards`
         : css`${fadeInSlide} 0.3s ease-out`};
@@ -90,12 +90,13 @@ const UpdateRow = styled.div<{ $isCompleting?: boolean; $isNew?: boolean }>`
     will-change: transform, opacity;
 
     &:hover {
-        background: var(--ant-color-item-hover, rgba(59, 130, 246, 0.03));
+        background: var(--ant-color-fill-quaternary);
+        padding-left: 20px;
     }
 
     ${props => props.$isNew && css`
-        background: rgba(var(--ant-color-info-rgb), 0.06);
-        box-shadow: inset 0 0 0 1px rgba(var(--ant-color-info-rgb), 0.2);
+        background: rgba(var(--color-primary-rgb), 0.08);
+        border-left: 4px solid var(--ant-color-primary);
     `}
 `;
 
@@ -107,22 +108,23 @@ const MainContent = styled.div`
 `;
 
 const IconBadge = styled.div<{ $status?: string }>`
-    width: var(--ant-control-height-lg, 40px);
-    height: var(--ant-control-height-lg, 40px);
-    border-radius: var(--ant-border-radius, 8px);
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    transition: all 0.3s ease;
     background: ${props => {
         switch (props.$status) {
             case 'finished':
-                return 'rgba(var(--ant-color-success-rgb), 0.15)';
+                return 'rgba(var(--color-success-rgb), 0.12)';
             case 'error':
             case 'canceled':
-                return 'rgba(var(--ant-color-error-rgb), 0.15)';
+                return 'rgba(var(--color-error-rgb), 0.12)';
             default:
-                return 'rgba(var(--ant-color-info-rgb), 0.15)';
+                return 'rgba(var(--color-primary-rgb), 0.12)';
         }
     }};
     color: ${props => {
@@ -133,7 +135,7 @@ const IconBadge = styled.div<{ $status?: string }>`
             case 'canceled':
                 return 'var(--ant-color-error)';
             default:
-                return 'var(--ant-color-info)';
+                return 'var(--ant-color-primary)';
         }
     }};
     font-size: 1.1rem;

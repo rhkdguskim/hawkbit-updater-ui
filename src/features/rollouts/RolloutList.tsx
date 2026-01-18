@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { Space, Button, Typography, Progress, Tooltip, message } from 'antd';
-import { EyeOutlined, EditOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { Space, Button, Typography, Progress, Tooltip, message, Modal } from 'antd';
+import { EyeOutlined, EditOutlined, PauseCircleOutlined, PlayCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useGetRolloutsInfinite, usePause, useResume } from '@/api/generated/rollouts/rollouts';
 import type { MgmtRolloutResponseBody, PagedListMgmtRolloutResponseBody } from '@/api/generated/model';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { DataView, EnhancedTable, FilterBuilder, type FilterValue, type FilterField } from '@/components/patterns';
+import { DataView, EnhancedTable, FilterBuilder, type FilterValue, type FilterField, type ToolbarAction } from '@/components/patterns';
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import { useServerTable } from '@/hooks/useServerTable';
 import dayjs from 'dayjs';
@@ -15,6 +15,7 @@ import RolloutCreateModal from './RolloutCreateModal';
 import { StatusTag, ListSummary, Highlighter } from '@/components/common';
 import type { ColumnsType } from 'antd/es/table';
 import { useListFilterStore } from '@/stores/useListFilterStore';
+import { axiosInstance } from '@/api/axios-instance';
 
 const { Text } = Typography;
 
@@ -27,6 +28,7 @@ const RolloutList: React.FC<RolloutListProps> = ({ standalone = true }) => {
     const navigate = useNavigate();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
+    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     // List Filter Store Integration
@@ -179,7 +181,7 @@ const RolloutList: React.FC<RolloutListProps> = ({ standalone = true }) => {
             dataIndex: 'id',
             key: 'id',
             width: 60,
-            render: (id) => <Text style={{ fontSize: 'var(--ant-font-size-sm)' }}>{id}</Text>,
+            render: (id) => <Text style={{ fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)', color: '#666' }}>{id}</Text>,
         },
         {
             title: t('columns.name'),
@@ -188,7 +190,7 @@ const RolloutList: React.FC<RolloutListProps> = ({ standalone = true }) => {
             width: 200,
             sorter: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
             render: (value: string) => (
-                <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>
+                <Text strong ellipsis style={{ maxWidth: 180, fontSize: 'var(--ant-font-size-sm)', fontFamily: 'var(--font-mono)' }}>
                     <Highlighter text={value} search={globalSearch} />
                 </Text>
             ),
@@ -310,6 +312,76 @@ const RolloutList: React.FC<RolloutListProps> = ({ standalone = true }) => {
         />
     ), [rolloutsContent.length, totalCount, filters.length, dataUpdatedAt, isFetching]);
 
+    const selectionActions: ToolbarAction[] = useMemo(() => {
+        const actions: ToolbarAction[] = [
+            {
+                key: 'pause',
+                label: t('actions.pause'),
+                icon: <PauseCircleOutlined />,
+                onClick: () => {
+                    selectedRowKeys.forEach(key => {
+                        const rollout = rolloutsContent.find(r => r.id === key);
+                        if (rollout && rollout.status === 'running') {
+                            pauseMutation.mutate({ rolloutId: Number(key) });
+                        }
+                    });
+                    setSelectedRowKeys([]);
+                },
+                disabled: !rolloutsContent.some(r => selectedRowKeys.includes(r.id!) && r.status === 'running'),
+            },
+            {
+                key: 'resume',
+                label: t('actions.resume'),
+                icon: <PlayCircleOutlined />,
+                onClick: () => {
+                    selectedRowKeys.forEach(key => {
+                        const rollout = rolloutsContent.find(r => r.id === key);
+                        if (rollout && rollout.status === 'paused') {
+                            resumeMutation.mutate({ rolloutId: Number(key) });
+                        }
+                    });
+                    setSelectedRowKeys([]);
+                },
+                disabled: !rolloutsContent.some(r => selectedRowKeys.includes(r.id!) && r.status === 'paused'),
+            },
+        ];
+        if (isAdmin) {
+            actions.push({
+                key: 'delete',
+                label: t('common:actions.delete'),
+                icon: <DeleteOutlined />,
+                onClick: () => {
+                    Modal.confirm({
+                        title: t('detail.deleteRolloutConfirmTitle', { defaultValue: 'Delete Rollouts' }),
+                        content: t('detail.deleteRolloutConfirmDesc', { defaultValue: 'Are you sure you want to delete the selected rollouts?' }),
+                        okText: t('common:actions.delete'),
+                        okType: 'danger',
+                        cancelText: t('common:actions.cancel'),
+                        onOk: () => {
+                            selectedRowKeys.forEach(async (key) => {
+                                try {
+                                    await axiosInstance({
+                                        url: `/rest/v1/rollouts/${key}`,
+                                        method: 'DELETE'
+                                    });
+                                    if (key === selectedRowKeys[selectedRowKeys.length - 1]) {
+                                        message.success(t('detail.messages.deleteSuccess', { defaultValue: 'Rollouts deleted successfully' }));
+                                        refetch();
+                                        setSelectedRowKeys([]);
+                                    }
+                                } catch (error) {
+                                    message.error(t('detail.messages.deleteError', { defaultValue: 'Error deleting rollout' }));
+                                }
+                            });
+                        }
+                    });
+                },
+                danger: true,
+            });
+        }
+        return actions;
+    }, [isAdmin, t, selectedRowKeys, rolloutsContent, pauseMutation, resumeMutation, refetch]);
+
     return (
         <StandardListLayout
             standalone={standalone}
@@ -330,6 +402,13 @@ const RolloutList: React.FC<RolloutListProps> = ({ standalone = true }) => {
                     onSearchChange={setGlobalSearch}
                     searchPlaceholder={t('search.placeholder', { defaultValue: t('common:actions.search') })}
                     // Integrated Column Customization
+                    selection={{
+                        count: selectedRowKeys.length,
+                        actions: selectionActions,
+                        onClear: () => setSelectedRowKeys([]),
+                        label: t('common:filter.selected')
+                    }}
+                    // Integrated Column Customization
                     columns={columnOptions}
                     visibleColumns={visibleColumns}
                     onVisibilityChange={setVisibleColumns}
@@ -347,6 +426,8 @@ const RolloutList: React.FC<RolloutListProps> = ({ standalone = true }) => {
                     columns={displayColumns}
                     rowKey="id"
                     loading={isLoading || isFetching}
+                    selectedRowKeys={selectedRowKeys}
+                    onSelectionChange={setSelectedRowKeys}
                     pagination={false}
                     onChange={handleTableChange}
                     scroll={{ x: 800 }}

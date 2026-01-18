@@ -10,6 +10,13 @@ import { ColumnCustomizer, type ColumnOption } from './ColumnCustomizer';
 import { CloseOutlined } from '@ant-design/icons';
 import { Input } from 'antd';
 import { type ToolbarAction } from '../EnhancedTable/SelectionToolbar';
+import {
+    SelectionBarContainer as SelectionBar,
+    SelectionBarText as SelectionText,
+    SelectionBarDivider as SelectionDot,
+    SelectionActionButton as StyledActionButton,
+    SelectionCloseButton as CloseButton
+} from '../../shared/SelectionStyles';
 
 const Container = styled.div`
     display: flex;
@@ -46,6 +53,45 @@ const ChipsContainer = styled.div`
     align-items: center;
     gap: 6px;
 `;
+
+const AddFilterButton = styled(Button)`
+    &.ant-btn {
+        border-radius: 6px;
+        border-style: dashed;
+        border-color: var(--ant-color-primary);
+        color: var(--ant-color-primary);
+        font-weight: 500;
+        font-size: 13px;
+        height: 32px;
+        padding: 4px 12px;
+        transition: all 0.2s ease;
+
+        &:hover {
+            border-style: solid;
+            background: rgba(var(--color-primary-rgb), 0.08);
+            transform: translateY(-1px);
+        }
+    }
+`;
+
+const SearchInput = styled(Input)`
+    &.ant-input-affine-wrapper {
+        width: 260px;
+        height: 32px;
+        border-radius: 6px;
+        background: var(--bg-container);
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease;
+        font-size: 13px;
+
+        &:hover, &:focus-within {
+            border-color: var(--ant-color-primary);
+            box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.1);
+        }
+    }
+`;
+
+
 
 export interface FilterValue {
     id: string;
@@ -115,7 +161,6 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     hideSearchInput = false,
 }) => {
     const { t } = useTranslation('common');
-    const { t: tActions } = useTranslation('common'); // Or just use t since it's already common
     const [conditionOpen, setConditionOpen] = useState(false);
 
     const operatorLabels: Record<string, string> = React.useMemo(() => ({
@@ -155,15 +200,9 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
         };
 
         const nextFilters = [...filters, newFilter];
-
-        if (buildQuery) {
-            // Skip confirmation and apply immediately
-            onFiltersChange(nextFilters);
-        } else {
-            onFiltersChange(nextFilters);
-        }
+        onFiltersChange(nextFilters);
         setConditionOpen(false);
-    }, [fields, filters, onFiltersChange, operatorLabels, t, buildQuery]);
+    }, [fields, filters, onFiltersChange, operatorLabels, t]);
 
     const handleRemoveFilter = useCallback((id: string) => {
         const nextFilters = filters.filter(f => f.id !== id);
@@ -191,20 +230,13 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                         onOpenChange={setConditionOpen}
                         placement="bottomLeft"
                     >
-                        <Button
+                        <AddFilterButton
                             icon={<PlusOutlined />}
-                            size="middle"
+                            size="small"
                             type="default"
-                            style={{
-                                borderRadius: '8px',
-                                borderStyle: 'dashed',
-                                borderColor: 'var(--ant-color-primary)',
-                                color: 'var(--ant-color-primary)',
-                                fontWeight: 500,
-                            }}
                         >
                             {t('filter.addFilter')}
-                        </Button>
+                        </AddFilterButton>
                     </Popover>
 
                     {onApplySavedFilter && (
@@ -216,24 +248,18 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
 
 
                     {!hideSearchInput && (
-                        <Input
+                        <SearchInput
                             placeholder={searchPlaceholder || t('actions.search')}
-                            prefix={<SearchOutlined style={{ color: 'var(--ant-color-text-description)' }} />}
-                            size="middle"
+                            prefix={<SearchOutlined style={{ color: 'var(--text-tertiary)' }} />}
+                            size="small"
                             allowClear
                             value={searchValue}
                             onChange={(e) => onSearchChange?.(e.target.value)}
-                            style={{
-                                width: 320,
-                                borderRadius: 8,
-                                background: 'var(--bg-container)',
-                                border: '1px solid var(--border-color)',
-                            }}
                         />
                     )}
 
                     {!hideSearchInput && filters.length > 0 && (
-                        <Divider type="vertical" style={{ height: 20 }} />
+                        <Divider type="vertical" style={{ height: 16 }} />
                     )}
 
                     {filters.length > 0 && (
@@ -274,11 +300,11 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                     )}
                     {onRefresh && (
                         <Button
-                            icon={<ReloadOutlined />}
+                            icon={<ReloadOutlined style={{ fontSize: 13 }} />}
                             onClick={onRefresh}
                             loading={loading}
-                            size="middle"
-                            style={{ borderRadius: 8 }}
+                            size="small"
+                            style={{ borderRadius: 6, height: 32, width: 32 }}
                         />
                     )}
                     {onAdd && canAdd && (
@@ -286,7 +312,15 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                             type="primary"
                             icon={<PlusOutlined />}
                             onClick={onAdd}
-                            size="middle"
+                            size="small"
+                            style={{
+                                boxShadow: 'var(--shadow-sm)',
+                                fontWeight: 600,
+                                borderRadius: 6,
+                                height: 28,
+                                padding: '0 10px',
+                                fontSize: '13px'
+                            }}
                         >
                             {addLabel || t('actions.add')}
                         </Button>
@@ -294,59 +328,35 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                 </ActionsSection>
             </HeaderRow>
             {selection && selection.count > 0 && (
-                <>
-                    <Divider style={{ margin: '12px 0 8px' }} />
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '10px 16px',
-                        background: 'rgba(var(--ant-color-primary-rgb), 0.05)',
-                        borderRadius: '10px',
-                        border: '1px solid rgba(var(--ant-color-primary-rgb), 0.2)',
-                        animation: 'fadeInUp 0.3s ease-out'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                            <span style={{
-                                fontWeight: 700,
-                                color: 'var(--ant-color-primary)',
-                                fontSize: 'var(--ant-font-size)',
-                                letterSpacing: '-0.01em'
-                            }}>
-                                {selection.count} {selection.label || t('filter.selected')}
-                            </span>
-                            <Divider type="vertical" style={{ height: 20, borderColor: 'rgba(var(--ant-color-primary-rgb), 0.2)' }} />
-                            <Space size="middle">
-                                {selection.actions.map(action => (
-                                    <Button
-                                        key={action.key}
-                                        size="middle"
-                                        type={action.danger ? 'primary' : 'default'}
-                                        danger={action.danger}
-                                        icon={action.icon}
-                                        onClick={action.onClick}
-                                        disabled={action.disabled}
-                                        style={{
-                                            borderRadius: '8px',
-                                            fontSize: 'var(--ant-font-size-sm)',
-                                            fontWeight: 600,
-                                            boxShadow: action.danger ? 'var(--shadow-sm)' : 'none'
-                                        }}
-                                    >
-                                        {action.label}
-                                    </Button>
-                                ))}
-                            </Space>
-                        </div>
-                        <Button
-                            type="text"
-                            size="middle"
-                            icon={<CloseOutlined />}
-                            onClick={selection.onClear}
-                            style={{ color: 'var(--ant-color-text-secondary)' }}
-                        />
+                <SelectionBar>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <SelectionText>
+                            {selection.count} {selection.label || t('filter.selected')}
+                        </SelectionText>
+                        <SelectionDot type="vertical" />
+                        <Space size="middle">
+                            {selection.actions.map(action => (
+                                <StyledActionButton
+                                    key={action.key}
+                                    size="middle"
+                                    type={action.danger ? 'primary' : 'default'}
+                                    danger={action.danger}
+                                    icon={action.icon}
+                                    onClick={action.onClick}
+                                    disabled={action.disabled}
+                                >
+                                    {action.label}
+                                </StyledActionButton>
+                            ))}
+                        </Space>
                     </div>
-                </>
+                    <CloseButton
+                        type="text"
+                        size="middle"
+                        icon={<CloseOutlined />}
+                        onClick={selection.onClear}
+                    />
+                </SelectionBar>
             )}
         </Container>
     );

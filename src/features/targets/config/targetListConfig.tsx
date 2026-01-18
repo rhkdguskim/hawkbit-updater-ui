@@ -36,7 +36,7 @@ export const COLUMN_CONFIG: ColumnConfig[] = [
     { key: 'ipAddress', defaultVisible: true, sortable: false, filterable: true },
     { key: 'targetType', defaultVisible: true, sortable: false, filterable: true },
     { key: 'tags', defaultVisible: true, sortable: false, filterable: true },
-    { key: 'status', defaultVisible: true, sortable: false, filterable: false },
+    { key: 'status', defaultVisible: true, sortable: false, filterable: true },
     { key: 'updateStatus', defaultVisible: true, sortable: false, filterable: true },
     { key: 'installedDS', defaultVisible: true, sortable: false, filterable: false },
     { key: 'lastControllerRequestAt', defaultVisible: true, sortable: true, filterable: false },
@@ -341,6 +341,7 @@ export const FILTER_FIELD_CONFIG: FilterFieldConfig[] = [
     { key: 'tag', type: 'select', fiqlField: 'tag' },
     { key: 'updateStatus', type: 'select' },
     { key: 'autoConfirmActive', type: 'select' },
+    { key: 'status', type: 'select' },
     { key: 'createdAt', type: 'dateRange' },
     { key: 'lastModifiedAt', type: 'dateRange' },
 ];

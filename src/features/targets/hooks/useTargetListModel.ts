@@ -26,6 +26,7 @@ import type { FilterValue, FilterField } from '@/components/patterns';
 import type { AssignPayload } from '../components';
 import Papa from 'papaparse';
 import dayjs from 'dayjs';
+import { isTargetOnline } from '@/entities/target/model';
 
 export const useTargetListModel = () => {
     const navigate = useNavigate();
@@ -106,7 +107,7 @@ export const useTargetListModel = () => {
             key: 'targetType',
             label: t('table.targetType'),
             type: 'select',
-            options: availableTypes.map(tp => ({ value: String(tp.name), label: tp.name || '' })),
+            options: availableTypes.map(tp => ({ value: String(tp.id), label: tp.name || String(tp.id) })),
         },
         {
             key: 'tag',
@@ -134,12 +135,23 @@ export const useTargetListModel = () => {
                 { value: 'false', label: t('autoConfirm.disabled') },
             ],
         },
+        {
+            key: 'status',
+            label: t('table.status'),
+            type: 'select',
+            options: [
+                { value: 'online', label: t('status.online', { defaultValue: 'Online' }) },
+                { value: 'offline', label: t('status.offline', { defaultValue: 'Offline' }) },
+            ],
+        },
     ], [t, availableTypes, availableTags]);
 
     const buildFinalQuery = useCallback((targetFilters: FilterValue[] = filters): string => {
-        const fiql = buildQueryFromFilterValues(targetFilters, {
+        // Exclude client-side only filters like 'status' from the server-side FIQL query
+        const serverFilters = targetFilters.filter(f => f.field !== 'status');
+
+        const fiql = buildQueryFromFilterValues(serverFilters, {
             fieldMap: {
-                targetType: 'targetType.name',
                 tag: 'tag',
             },
             rawFields: ['query'],
@@ -224,8 +236,18 @@ export const useTargetListModel = () => {
     );
 
     const targetsContent = useMemo(() => {
-        return infiniteData?.pages.flatMap((page: PagedListMgmtTarget) => page.content || []) || [];
-    }, [infiniteData]);
+        let content = infiniteData?.pages.flatMap((page: PagedListMgmtTarget) => page.content || []) || [];
+
+        // Client-side filtering for status since server-side might not support it well
+        const statusFilter = filters.find(f => f.field === 'status')?.value;
+        if (statusFilter === 'online') {
+            content = content.filter(t => isTargetOnline(t));
+        } else if (statusFilter === 'offline') {
+            content = content.filter(t => !isTargetOnline(t));
+        }
+
+        return content;
+    }, [infiniteData, filters]);
 
     const totalTargets = useMemo(() => {
         return infiniteData?.pages[0]?.total || 0;

@@ -10,7 +10,8 @@ import {
     CloseOutlined,
     RocketOutlined,
 } from '@ant-design/icons';
-import { ListCard, IconBadge } from '../DashboardStyles';
+import { ListCard } from '../DashboardStyles';
+import { WidgetContainer, HeaderRow, ActivityCard, IconBadge } from './WidgetStyles';
 import { useCancelAction, useGetActionStatusList } from '@/api/generated/targets/targets';
 // useGetAction1 removed - no longer needed after N+1 optimization
 import { useQueryClient } from '@tanstack/react-query';
@@ -29,34 +30,7 @@ dayjs.extend(relativeTime);
 const { Text } = Typography;
 
 
-const ActivityItem = styled.div`
-    display: flex;
-    flex-direction: column;
-    padding: 12px;
-    cursor: pointer;
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 100%);
-    border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.03);
-    transition: all 0.2s ease;
-    animation: fadeIn 0.5s ease-out;
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    &:hover {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.7) 100%);
-    }
-
-    [data-theme='dark'] &,
-    .dark-mode & {
-        background: linear-gradient(135deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.6) 100%);
-        border: 1px solid rgba(255, 255, 255, 0.03);
-    }
-`;
 
 
 const RolloutInfo = styled.div`
@@ -270,7 +244,8 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
             mouseEnterDelay={0.3}
             overlayStyle={{ padding: 0 }}
         >
-            <ActivityItem
+            <ActivityCard
+                $status={['error', 'failed'].includes(currentAction.status?.toLowerCase() || '') ? 'error' : currentAction.status?.toLowerCase() === 'canceling' ? 'warning' : 'info'}
                 onClick={() => handleItemClick(item)}
                 onKeyDown={handleKeyDown}
                 onMouseEnter={handleMouseEnter}
@@ -287,7 +262,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                                 width: 28,
                                 height: 28,
                                 borderRadius: 6,
-                                background: 'rgba(var(--ant-blue-rgb), 0.15)',
+                                background: 'rgba(var(--color-primary-rgb), 0.12)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -308,15 +283,10 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                             )}
                         </div>
                         <Flex vertical gap={0}>
-                            <Flex align="center" gap={4}>
+                            <Flex align="center" gap={4} wrap="wrap">
                                 <Text strong style={{ fontSize: 'var(--ant-font-size-sm)' }}>
                                     {item.target.name || item.target.controllerId}
                                 </Text>
-                                {item.target.ipAddress && (
-                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
-                                        ({item.target.ipAddress})
-                                    </Text>
-                                )}
                             </Flex>
                             <Space size={4} wrap>
                                 <Tag
@@ -331,11 +301,6 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                                 >
                                     {t(`common:status.${currentAction.status?.toLowerCase() || 'running'}`)}
                                 </Tag>
-                                {statusHistory[0] && (
-                                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', marginTop: 2 }} ellipsis={{ tooltip: true }}>
-                                        {statusHistory[0].messages?.[0] ? translateStatusMessage(statusHistory[0].messages[0], t) : getStatusLabel(statusHistory[0].type, t)}
-                                    </Text>
-                                )}
                             </Space>
                         </Flex>
                     </Flex>
@@ -381,7 +346,7 @@ const InProgressActionItem: React.FC<InProgressActionItemProps> = ({
                         </Button>
                     </Tooltip>
                 </ActionButtons>
-            </ActivityItem>
+            </ActivityCard>
         </Popover>
     );
 };

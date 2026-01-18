@@ -2,79 +2,67 @@
 import styled, { keyframes, css } from 'styled-components';
 import { Card, Typography } from 'antd';
 
-// Animations - 미니멀하고 부드럽게
-export const fadeInUp = keyframes`
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-`;
+import { fadeInUp, pulse, shimmer, IconBadge as SharedIconBadge } from './CommonStyles';
 
-export const pulse = keyframes`
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
-`;
+export { fadeInUp, pulse, shimmer };
 
-export const shimmer = keyframes`
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-`;
-
-// Color Theme Definitions - 심플하고 차분한 스타일
+// Color Theme Definitions - Semantic based
 export const OVERVIEW_THEMES = {
     targets: {
-        gradient: 'var(--ant-color-success)',
-        accentLight: 'rgba(16, 185, 129, 0.08)',
-        accentBorder: 'rgba(16, 185, 129, 0.15)',
+        gradient: 'var(--gradient-success)',
+        accentLight: 'var(--surface-targets)',
+        accentBorder: 'rgba(var(--color-success-rgb), 0.2)',
         iconBg: 'var(--ant-color-success)',
         color: 'var(--ant-color-success)',
     },
     distributions: {
-        gradient: 'var(--ant-color-primary)',
-        accentLight: 'rgba(59, 130, 246, 0.08)',
-        accentBorder: 'rgba(59, 130, 246, 0.15)',
+        gradient: 'var(--gradient-primary)',
+        accentLight: 'var(--surface-distributions)',
+        accentBorder: 'rgba(var(--color-primary-rgb), 0.2)',
         iconBg: 'var(--ant-color-primary)',
         color: 'var(--ant-color-primary)',
     },
     actions: {
-        gradient: '#8b5cf6',
-        accentLight: 'rgba(139, 92, 246, 0.08)',
-        accentBorder: 'rgba(139, 92, 246, 0.15)',
-        iconBg: '#8b5cf6',
-        color: '#8b5cf6',
+        gradient: 'var(--gradient-info)',
+        accentLight: 'var(--surface-actions)',
+        accentBorder: 'rgba(var(--color-info-rgb), 0.2)',
+        iconBg: 'var(--ant-color-info)',
+        color: 'var(--ant-color-info)',
     },
     rollouts: {
-        gradient: 'var(--ant-color-warning)',
-        accentLight: 'rgba(245, 158, 11, 0.08)',
-        accentBorder: 'rgba(245, 158, 11, 0.15)',
+        gradient: 'var(--gradient-warning)',
+        accentLight: 'var(--surface-rollouts)',
+        accentBorder: 'rgba(var(--color-warning-rgb), 0.2)',
         iconBg: 'var(--ant-color-warning)',
         color: 'var(--ant-color-warning)',
     },
     connectivity: {
-        gradient: 'var(--ant-color-success)',
-        accentLight: 'rgba(16, 185, 129, 0.08)',
-        accentBorder: 'rgba(16, 185, 129, 0.15)',
+        gradient: 'var(--gradient-success)',
+        accentLight: 'var(--surface-targets)',
+        accentBorder: 'rgba(var(--color-success-rgb), 0.2)',
         iconBg: 'var(--ant-color-success)',
         color: 'var(--ant-color-success)',
     },
     deployment: {
-        gradient: 'var(--ant-color-primary)',
-        accentLight: 'rgba(59, 130, 246, 0.08)',
-        accentBorder: 'rgba(59, 130, 246, 0.15)',
+        gradient: 'var(--gradient-primary)',
+        accentLight: 'var(--surface-distributions)',
+        accentBorder: 'rgba(var(--color-primary-rgb), 0.2)',
         iconBg: 'var(--ant-color-primary)',
         color: 'var(--ant-color-primary)',
     },
     fragmentation: {
-        gradient: '#ec4899',
-        accentLight: 'rgba(236, 72, 153, 0.08)',
-        accentBorder: 'rgba(236, 72, 153, 0.15)',
-        iconBg: '#ec4899',
-        color: '#ec4899',
+        gradient: 'var(--gradient-error)',
+        accentLight: 'rgba(var(--color-error-rgb), 0.12)',
+        accentBorder: 'rgba(var(--color-error-rgb), 0.2)',
+        iconBg: 'var(--ant-color-error)',
+        color: 'var(--ant-color-error)',
     },
     activity: {
-        gradient: '#06b6d4',
-        accentLight: 'rgba(6, 182, 212, 0.08)',
-        accentBorder: 'rgba(6, 182, 212, 0.15)',
-        iconBg: '#06b6d4',
-        color: '#06b6d4',
+        gradient: 'var(--gradient-info)',
+        accentLight: 'rgba(var(--color-info-rgb), 0.12)',
+        accentBorder: 'rgba(var(--color-info-rgb), 0.2)',
+        iconBg: 'var(--ant-color-info)',
+        color: 'var(--ant-color-info)',
     },
 };
 
@@ -86,29 +74,29 @@ export const OverviewPageContainer = styled.div`
     min-height: 0;
     height: 100%;
     overflow: hidden;
-    padding: 16px;
+    padding: 8px;
     animation: ${fadeInUp} 0.25s ease-out;
 `;
 
 export const OverviewScrollContent = styled.div`
     flex: 1;
-    overflow-y: auto;
+    overflow-y: overlay;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
     min-height: 0;
-    padding-right: 4px;
+    padding-right: 2px;
 `;
 
 export const OverviewPageHeader = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 0 16px 0;
+    padding: 0 0 12px 0;
     flex-shrink: 0;
     border-bottom: 1px solid var(--ant-color-border-secondary);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 `;
 
 export const HeaderContent = styled.div`
@@ -128,29 +116,29 @@ export const GradientTitle = styled(Typography.Title) <{ $theme?: keyof typeof O
 
 export const TopRow = styled.div`
     display: flex;
-    gap: 16px;
-    min-height: 200px;
+    gap: 10px;
+    min-height: 140px;
     flex-shrink: 0;
 `;
 
 export const BottomRow = styled.div`
     display: flex;
-    gap: 16px;
-    min-height: 280px;
+    gap: 10px;
+    min-height: 200px;
     flex: 1;
 `;
 
 export const KPIGridContainer = styled.div`
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    flex: 0 0 280px;
+    gap: 10px;
+    flex: 0 0 240px;
     height: 100%;
 `;
 
 export const ChartsContainer = styled.div`
     display: flex;
-    gap: 16px;
+    gap: 10px;
     flex: 1;
     min-width: 0;
 `;
@@ -158,7 +146,7 @@ export const ChartsContainer = styled.div`
 // Card Components - 심플하고 깔끔한 스타일
 export const OverviewStatsCard = styled(Card) <{ $accentColor?: string; $delay?: number; $pulse?: boolean }>`
     border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border-radius: 12px;
     background: var(--bg-container);
     box-shadow: var(--shadow-sm);
     transition: all var(--transition-normal) var(--transition-gentle);
@@ -181,7 +169,7 @@ export const OverviewStatsCard = styled(Card) <{ $accentColor?: string; $delay?:
     }
 
     &:hover {
-        transform: translateY(-6px);
+        transform: translateY(-4px);
         box-shadow: var(--shadow-xl);
         border-color: var(--ant-color-primary-border);
         
@@ -191,13 +179,13 @@ export const OverviewStatsCard = styled(Card) <{ $accentColor?: string; $delay?:
     }
 
     .ant-card-body {
-        padding: 24px 20px;
+        padding: 12px 16px;
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 8px;
+        gap: 4px;
     }
 `;
 
@@ -242,7 +230,7 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
 
     .ant-card-body {
         flex: 1;
-        padding: 12px 16px;
+        padding: 10px 14px;
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -252,35 +240,11 @@ export const OverviewChartCard = styled(Card) <{ $delay?: number; $theme?: keyof
 
 export const OverviewListCard = styled(OverviewChartCard)``;
 
-export const IconBadge = styled.div<{ $theme?: keyof typeof OVERVIEW_THEMES; $color?: string }>`
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: ${props => {
-        const theme = props.$theme ? OVERVIEW_THEMES[props.$theme] : null;
-        return theme?.accentLight || 'rgba(59, 130, 246, 0.08)';
-    }};
-    color: ${props => {
-        if (props.$color) return props.$color;
-        const theme = props.$theme ? OVERVIEW_THEMES[props.$theme] : null;
-        return theme?.color || 'var(--ant-color-primary)';
-    }};
-    font-size: 1.25rem;
-    flex-shrink: 0;
-
-    .anticon,
-    svg {
-        color: inherit;
-        display: block;
-    }
-`;
+export const IconBadge = styled(SharedIconBadge)``;
 
 export const BigNumber = styled.div<{ $color?: string }>`
     font-family: var(--font-mono);
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
     line-height: 1;
     margin-bottom: 2px;
@@ -313,9 +277,9 @@ export const ChartLegendItem = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
+    padding: 6px 10px;
     background: var(--ant-color-fill-quaternary);
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all var(--transition-fast) var(--transition-gentle);
     border: 1px solid transparent;
@@ -348,34 +312,40 @@ export const StatusBadge = styled.div<{ $status?: string }>`
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.05em;
     
     ${props => {
         const status = props.$status?.toLowerCase();
         if (status === 'online' || status === 'in_sync' || status === 'finished' || status === 'complete') return css`
-            background: rgba(16, 185, 129, 0.1);
+            background: rgba(var(--color-success-rgb), 0.12);
             color: var(--ant-color-success);
+            border: 1px solid rgba(var(--color-success-rgb), 0.2);
         `;
         if (status === 'running' || status === 'pending') return css`
-            background: rgba(99, 102, 241, 0.1);
-            color: #6366f1;
+            background: rgba(var(--color-primary-rgb), 0.12);
+            color: var(--ant-color-primary);
+            border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+            animation: ${pulse} 2s infinite;
         `;
         if (status === 'offline' || status === 'incomplete' || status === 'paused') return css`
-            background: rgba(245, 158, 11, 0.1);
+            background: rgba(var(--color-warning-rgb), 0.12);
             color: var(--ant-color-warning);
+            border: 1px solid rgba(var(--color-warning-rgb), 0.2);
         `;
         if (status === 'error' || status === 'failed') return css`
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(var(--color-error-rgb), 0.12);
             color: var(--ant-color-error);
+            border: 1px solid rgba(var(--color-error-rgb), 0.2);
         `;
         return css`
             background: var(--ant-color-fill-secondary);
-            color: var(--ant-color-text-secondary);
+            color: var(--text-tertiary);
+            border: 1px solid var(--border-secondary);
         `;
     }}
 `;
@@ -404,31 +374,31 @@ export const ProgressBar = styled.div<{ $progress: number; $color?: string }>`
 export const COLORS = {
     // 상태 색상 - 차분하고 명확한
     inSync: 'var(--ant-color-success)',
-    pending: '#6366f1',
+    pending: 'var(--ant-color-primary)',
     error: 'var(--ant-color-error)',
-    unknown: '#71717a',
+    unknown: 'var(--text-tertiary)',
     // 연결 상태
     online: 'var(--ant-color-success)',
     offline: 'var(--ant-color-warning)',
     // 일반
     success: 'var(--ant-color-success)',
-    running: '#6366f1',
+    running: 'var(--ant-color-primary)',
     finished: 'var(--ant-color-success)',
-    canceled: '#71717a',
+    canceled: 'var(--text-tertiary)',
     // 테마
     targets: 'var(--ant-color-success)',
     distributions: 'var(--ant-color-primary)',
-    actions: '#8b5cf6',
+    actions: 'var(--ant-color-info)',
     rollouts: 'var(--ant-color-warning)',
     // 차트 팔레트 - 차분하고 조화로운
     chartPalette: [
-        'var(--ant-color-primary)', // Blue
-        'var(--ant-color-success)', // Emerald
-        '#8b5cf6', // Violet
-        'var(--ant-color-warning)', // Amber
-        '#06b6d4', // Cyan
-        '#ec4899', // Pink
-        '#6366f1', // Indigo
-        '#14b8a6', // Teal
+        'var(--ant-color-primary)',
+        'var(--ant-color-success)',
+        'var(--ant-color-info)',
+        'var(--ant-color-warning)',
+        'var(--ant-color-error)',
+        'var(--ant-color-cyan)',
+        'var(--ant-color-purple)',
+        'var(--ant-color-pink)',
     ],
 };

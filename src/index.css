@@ -19,46 +19,74 @@
     --error-color: var(--ant-color-error);
     --info-color: var(--ant-color-info);
 
-    /* Semantic Colors */
-    --bg-page: var(--ant-color-bg-layout, #fafbfc);
+    /* Semantic Colors - RGB for Alpha support */
+    --color-primary-rgb: 37, 99, 235;
+    --color-success-rgb: 5, 150, 105;
+    --color-warning-rgb: 234, 88, 12;
+    --color-error-rgb: 220, 38, 38;
+    --color-info-rgb: 8, 145, 178;
+
+    /* Semantic Colors - Gradients */
+    --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --gradient-warning: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+    --gradient-error: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+    --gradient-info: linear-gradient(135deg, #22d3ee 0%, #0891b2 100%);
+
+    /* Semantic Colors - Branded Surfaces */
+    --surface-targets: rgba(var(--color-success-rgb), 0.08);
+    --surface-distributions: rgba(var(--color-primary-rgb), 0.08);
+    --surface-actions: rgba(139, 92, 246, 0.08);
+    --surface-rollouts: rgba(var(--color-warning-rgb), 0.08);
+
+    /* Semantic Colors - Branded Borders */
+    --border-targets: rgba(var(--color-success-rgb), 0.15);
+    --border-distributions: rgba(var(--color-primary-rgb), 0.15);
+    --border-actions: rgba(139, 92, 246, 0.15);
+    --border-rollouts: rgba(var(--color-warning-rgb), 0.15);
+
+    /* Semantic Colors - Branded Highlights */
+    --accent-targets: var(--success-color);
+    --accent-distributions: var(--primary-color);
+    --accent-actions: #8b5cf6;
+    --accent-rollouts: var(--warning-color);
+
+    /* Text & Borders */
+    --bg-page: var(--ant-color-bg-layout, #f8fafc);
     --bg-container: var(--ant-color-bg-container, #ffffff);
     --bg-elevated: var(--ant-color-bg-elevated, #ffffff);
-    --text-main: var(--ant-color-text, #1f2937);
-    --text-secondary: var(--ant-color-text-secondary, #4b5563);
-    --border-color: var(--ant-color-border, #e5e7eb);
+    --text-main: var(--ant-color-text, #0f172a);
+    --text-title: #0f172a;
+    --text-secondary: var(--ant-color-text-secondary, #475569);
+    --text-tertiary: #94a3b8;
+    --border-color: var(--ant-color-border, #e2e8f0);
+    --border-secondary: #f1f5f9;
 
-    /* Ant Design Fallbacks */
-    --ant-primary-color: #0891b2;
-    --ant-color-primary: #0891b2;
-    --ant-color-primary-rgb: 8, 145, 178;
-    --ant-color-primary-hover: #0e7490;
-
-    /* Typography */
-    --font-sans: 'Pretendard Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace;
-
-    /* Animation */
+    /* Animation & Transitions */
     --transition-fast: 0.15s;
-    --transition-normal: 0.3s;
-    --transition-gentle: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.25s;
+    --transition-slow: 0.4s;
+    --transition-gentle: cubic-bezier(0.16, 1, 0.3, 1);
 
-    /* Light Theme Shadows - 정교화 */
+    /* Shadows */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-    --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 
-    /* Light Theme Glass Effect */
-    --glass-bg: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    /* Glass Effect */
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.04);
+    --glass-blur: blur(12px) saturate(180%);
 
-    /* Gradient */
-    --gradient-primary: linear-gradient(135deg, var(--ant-color-primary) 0%, #2563eb 100%);
-    --gradient-sidebar: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    /* Gradient Layouts */
+    --gradient-sidebar: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    --gradient-surface: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(248, 250, 252, 1) 100%);
 
-    /* RGB for primary color (assuming default blue if not set) */
-    --primary-rgb: 22, 119, 255;
+    --ant-primary-color: #2563eb;
+    --ant-color-primary: #2563eb;
+    --ant-color-primary-rgb: 37, 99, 235;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -83,25 +111,52 @@ body:not([data-theme='dark']) {
    Deep Dark Industrial (딥 다크 인더스트리얼)
    ───────────────────────────────────────────────────────────────────────────── */
 [data-theme='dark'] {
-    /* Deep Dark Color Palette */
-    --deep-bg: #0a0a0b;
-    --deep-surface: #141417;
-    --deep-elevated: #1c1c21;
+    /* Deep Slate-Navy Color Palette */
+    --deep-bg: #020617;
+    --deep-surface: #0f172a;
+    --deep-elevated: #1e293b;
 
-    /* Accent Colors - 차분한 블루 계열 */
+    /* Semantic Colors - RGB for Dark (slightly brightened for dark bg) */
+    --color-primary-rgb: 59, 130, 246;
+    --color-success-rgb: 16, 185, 129;
+    --color-warning-rgb: 251, 146, 60;
+    --color-error-rgb: 248, 113, 113;
+    --color-info-rgb: 34, 211, 238;
+
+    /* Semantic Gradients - Dark Specific */
+    --gradient-primary: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    --gradient-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
+
+    /* Branded Surfaces - Dark Variant */
+    --surface-targets: rgba(var(--color-success-rgb), 0.12);
+    --surface-distributions: rgba(var(--color-primary-rgb), 0.12);
+    --surface-actions: rgba(129, 140, 248, 0.12);
+    --surface-rollouts: rgba(var(--color-warning-rgb), 0.12);
+
+    /* Text & Borders - Dark Variant */
+    --text-main: #f1f5f9;
+    --text-title: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --border-color: #1e293b;
+    --border-secondary: #0f172a;
+
+    /* Accent Colors - Vibrant but Professional */
     --accent-blue: #3b82f6;
     --accent-blue-rgb: 59, 130, 246;
 
-    /* Shadows - 레이어드 섀도우 (더 깊고 부드럽게) */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
-    --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.7), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 12px 24px -6px rgba(0, 0, 0, 0.8), 0 8px 16px -8px rgba(0, 0, 0, 0.7);
-    --shadow-xl: 0 20px 40px -10px rgba(0, 0, 0, 0.9), 0 12px 20px -12px rgba(0, 0, 0, 0.8);
+    /* Shadows - Layered with subtle tint */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.6), 0 2px 6px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 24px -6px rgba(0, 0, 0, 0.7), 0 8px 16px -8px rgba(0, 0, 0, 0.6);
+    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 12px 20px -12px rgba(0, 0, 0, 0.7);
 
-    /* Glass Effect - 강화 */
-    --glass-bg: rgba(20, 20, 23, 0.8);
+    /* Glass Effect - Enhanced */
+    --glass-bg: rgba(15, 23, 42, 0.7);
     --glass-border: rgba(255, 255, 255, 0.08);
-    --gradient-sidebar: linear-gradient(180deg, #09090b 0%, #0f0f12 100%);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    --gradient-sidebar: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+    --gradient-surface: linear-gradient(180deg, rgba(15, 23, 42, 1) 0%, rgba(2, 6, 23, 1) 100%);
 
     /* Ant Design Fallbacks for Dark */
     --ant-color-primary: #3b82f6;
@@ -163,20 +218,24 @@ pre,
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid transparent;
+    background-clip: content-box;
 }
 
 [data-theme='dark'] ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 [data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -185,27 +244,23 @@ pre,
 
 /* Cards */
 .ant-card {
-    transition: all var(--transition-normal) var(--transition-gentle);
+    transition: transform var(--transition-normal) var(--transition-gentle),
+        box-shadow var(--transition-normal) var(--transition-gentle),
+        border-color var(--transition-normal) var(--transition-gentle);
     border: 1px solid var(--border-color);
     background: var(--bg-container);
-    border-radius: 12px !important;
+    border-radius: 16px !important;
     overflow: hidden;
 }
 
-.ant-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-}
+/* .ant-card:hover { } */
 
 [data-theme='dark'] .ant-card {
     background: var(--deep-surface);
-    border-color: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.04);
 }
 
-[data-theme='dark'] .ant-card:hover {
-    box-shadow: var(--shadow-xl);
-    border-color: rgba(255, 255, 255, 0.12);
-}
+/* [data-theme='dark'] .ant-card:hover { } */
 
 /* Card Header Accent */
 .ant-card-head {
@@ -257,10 +312,14 @@ pre,
 
 /* Buttons */
 .ant-btn {
-    font-weight: 500;
-    box-shadow: none;
-    transition: all var(--transition-fast) var(--transition-gentle);
-    border-radius: 8px !important;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal) var(--transition-gentle);
+    border-radius: 10px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .ant-btn:active {
@@ -268,24 +327,49 @@ pre,
 }
 
 .ant-btn-primary {
-    background: var(--gradient-primary);
-    background-color: var(--ant-color-primary, #0891b2) !important;
-    border: none;
+    background: var(--gradient-primary) !important;
+    border: none !important;
     color: white !important;
-    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2) !important;
-    text-shadow: none;
+    box-shadow: 0 4px 14px rgba(var(--ant-color-primary-rgb), 0.3) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.ant-btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+}
+
+.ant-btn-primary:hover::after {
+    left: 100%;
 }
 
 .ant-btn-primary:hover {
-    background: var(--gradient-primary);
-    background-color: var(--ant-color-primary-hover, #0e7490) !important;
-    box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.3) !important;
-    transform: translateY(-1px);
-    color: white !important;
+    box-shadow: 0 6px 20px rgba(var(--ant-color-primary-rgb), 0.4) !important;
+    transform: translateY(-2px);
+    filter: brightness(1.1);
 }
 
-[data-theme='dark'] .ant-btn-primary:hover {
-    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4) !important;
+[data-theme='dark'] .ant-btn-primary {
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
+}
+
+[data-theme='dark'] .ant-btn-default {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+}
+
+[data-theme='dark'] .ant-btn-default:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
 }
 
 /* Dashboard Clickable Elements */
@@ -300,7 +384,8 @@ pre,
 }
 
 [data-theme='dark'] .dashboard-clickable:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(4px);
 }
 
 /* Status Indicators */
@@ -340,36 +425,50 @@ pre,
 
 /* Sidebar */
 .ant-layout-sider {
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid var(--border-color);
+    background: var(--gradient-sidebar) !important;
 }
 
 [data-theme='dark'] .ant-layout-sider {
-    background: var(--gradient-sidebar);
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Glassmorphism Header */
+.ant-layout-header {
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    background: var(--glass-bg) !important;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+[data-theme='dark'] .ant-layout-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 /* Modal & Drawer */
 .ant-modal-content,
 .ant-drawer-content {
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-xl) !important;
 }
 
 [data-theme='dark'] .ant-modal-content {
+    background: rgba(15, 23, 42, 0.9) !important;
     border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
 }
 
 /* Tooltip */
 .ant-tooltip-inner {
-    border-radius: 6px;
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
     font-family: var(--font-mono);
     font-size: 0.75rem;
-    padding: 6px 10px;
-}
-
-[data-theme='dark'] .ant-tooltip-inner {
-    background: #27272a;
+    padding: 8px 12px;
+    background: rgba(15, 23, 42, 0.9) !important;
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -441,7 +540,7 @@ pre,
 [data-theme='dark'] .ant-tag {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #e4e4e7;
+    color: #f4f4f5;
 }
 
 [data-theme='dark'] .ant-tag-success,
@@ -478,7 +577,7 @@ pre,
 }
 
 [data-theme='dark'] .ant-descriptions-item-label {
-    color: #a1a1aa !important;
+    color: #d4d4d8 !important;
     font-weight: 500;
     text-transform: uppercase;
     font-size: 0.75rem;
@@ -486,7 +585,7 @@ pre,
 }
 
 [data-theme='dark'] .ant-descriptions-item-content {
-    color: #e4e4e7;
+    color: #f4f4f5;
     font-family: var(--font-mono);
 }
 
@@ -498,12 +597,12 @@ pre,
 
 /* Tabs */
 [data-theme='dark'] .ant-tabs-tab {
-    color: #71717a !important;
+    color: #a1a1aa !important;
     transition: all 0.2s ease;
 }
 
 [data-theme='dark'] .ant-tabs-tab:hover {
-    color: #a1a1aa !important;
+    color: #d4d4d8 !important;
 }
 
 [data-theme='dark'] .ant-tabs-tab-active .ant-tabs-tab-btn {
@@ -521,15 +620,16 @@ pre,
 }
 
 [data-theme='dark'] .ant-breadcrumb-link {
-    color: #52525b !important;
+    color: #a1a1aa !important;
+    /* Brightened from Zinc-500 (#71717a) */
 }
 
 [data-theme='dark'] .ant-breadcrumb-link:hover {
-    color: #a1a1aa !important;
+    color: #f4f4f5 !important;
 }
 
 [data-theme='dark'] .ant-breadcrumb li:last-child .ant-breadcrumb-link {
-    color: #e4e4e7 !important;
+    color: #f4f4f5 !important;
 }
 
 [data-theme='dark'] .ant-breadcrumb-separator {
@@ -538,7 +638,7 @@ pre,
 
 /* Page Titles */
 [data-theme='dark'] .ant-typography.ant-typography-secondary {
-    color: #71717a !important;
+    color: #a1a1aa !important;
 }
 
 [data-theme='dark'] h1.ant-typography,
@@ -552,21 +652,21 @@ pre,
 [data-theme='dark'] .ant-input,
 [data-theme='dark'] .ant-input-affix-wrapper,
 [data-theme='dark'] .ant-select-selector {
-    background: #0f0f11 !important;
-    border-color: #27272a !important;
+    background: #020617 !important;
+    border-color: #1e293b !important;
 }
 
 [data-theme='dark'] .ant-input:hover,
 [data-theme='dark'] .ant-input-affix-wrapper:hover,
 [data-theme='dark'] .ant-select-selector:hover {
-    border-color: #3f3f46 !important;
+    border-color: #334155 !important;
 }
 
 [data-theme='dark'] .ant-input:focus,
 [data-theme='dark'] .ant-input-affix-wrapper-focused,
 [data-theme='dark'] .ant-select-focused .ant-select-selector {
     border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
 }
 
 /* Progress Bars */
@@ -629,13 +729,14 @@ pre,
 
 /* Dropdown Menu */
 [data-theme='dark'] .ant-dropdown-menu {
-    background: #1c1c21;
+    background: #0f172a;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(16px);
 }
 
 [data-theme='dark'] .ant-dropdown-menu-item:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 /* List Items */

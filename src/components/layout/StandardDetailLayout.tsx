@@ -59,7 +59,9 @@ const ContentWrapper = styled.div<{ $fullHeight?: boolean }>`
     min-height: 0;
     
     ${props => props.$fullHeight && css`
-        height: 100%;
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: var(--ant-margin-lg);
         
         .ant-tabs, .ant-tabs-content {
             height: 100%;

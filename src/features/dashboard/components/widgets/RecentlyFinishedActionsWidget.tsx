@@ -20,7 +20,7 @@ import { useGetAction1 } from '@/api/generated/actions/actions';
 import { useGetActionStatusList } from '@/api/generated/targets/targets';
 import { getStatusLabel, translateStatusMessage } from '@/utils/statusUtils';
 import { isActionErrored } from '@/entities';
-import { WidgetContainer, HeaderRow } from './WidgetStyles';
+import { WidgetContainer, HeaderRow, ActivityCard } from './WidgetStyles';
 
 dayjs.extend(relativeTime);
 
@@ -41,31 +41,7 @@ const ScrollableContent = styled.div`
     min-height: 0;
 `;
 
-const ActionCard = styled.div<{ $status: 'success' | 'error' | 'canceled' }>`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px 12px;
-    margin-bottom: 4px;
-    border-radius: 8px;
-    background: ${({ $status }) =>
-        $status === 'error' ? 'rgba(var(--ant-red-rgb), 0.06)' :
-            $status === 'canceled' ? 'rgba(var(--ant-orange-rgb), 0.06)' :
-                'rgba(var(--ant-green-rgb), 0.06)'
-    };
-    border: 1px solid ${({ $status }) =>
-        $status === 'error' ? 'rgba(var(--ant-red-rgb), 0.15)' :
-            $status === 'canceled' ? 'rgba(var(--ant-orange-rgb), 0.15)' :
-                'rgba(var(--ant-green-rgb), 0.15)'
-    };
-    cursor: pointer;
-    transition: all 0.2s ease;
-    
-    &:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-`;
+
 
 const TargetInfo = styled(Flex)`
     flex: 1;
@@ -180,7 +156,7 @@ const FinishedActionItem: React.FC<FinishedActionItemProps> = ({ item }) => {
 
     return (
         <Popover content={historyContent} trigger="hover" placement="left">
-            <ActionCard
+            <ActivityCard
                 $status={cardStatus}
                 onClick={handleClick}
                 onKeyDown={handleKeyDown}
@@ -188,6 +164,7 @@ const FinishedActionItem: React.FC<FinishedActionItemProps> = ({ item }) => {
                 tabIndex={0}
                 aria-label={item.target.name || item.target.controllerId || ''}
                 className="dashboard-clickable"
+                style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
             >
                 <TargetInfo align="center" gap={12}>
                     <AimOutlined style={{
@@ -197,15 +174,10 @@ const FinishedActionItem: React.FC<FinishedActionItemProps> = ({ item }) => {
                                 'var(--ant-color-warning)'
                     }} />
                     <Flex vertical gap={2} style={{ minWidth: 0, flex: 1 }}>
-                        <Flex align="center" gap={8}>
+                        <Flex align="center" gap={8} wrap="wrap">
                             <Text strong style={{ fontSize: 'var(--ant-font-size)' }} ellipsis>
                                 {item.target.name || item.target.controllerId || '-'}
                             </Text>
-                            {item.target.ipAddress && (
-                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
-                                    ({item.target.ipAddress})
-                                </Text>
-                            )}
                             <Tag color={getStatusColor()} icon={getStatusIcon()} style={{ margin: 0, fontSize: 'var(--ant-font-size-sm)' }}>
                                 {t(`common:status.${status}`, status)}
                             </Tag>
@@ -219,11 +191,6 @@ const FinishedActionItem: React.FC<FinishedActionItemProps> = ({ item }) => {
                                     </Text>
                                 </Space>
                             )}
-                            {statusHistory[0]?.messages?.[0] && (
-                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }} ellipsis>
-                                    {translateStatusMessage(statusHistory[0].messages[0], t)}
-                                </Text>
-                            )}
                         </Flex>
                     </Flex>
                 </TargetInfo>
@@ -232,11 +199,8 @@ const FinishedActionItem: React.FC<FinishedActionItemProps> = ({ item }) => {
                         <ClockCircleOutlined style={{ marginRight: 4, fontSize: 'var(--ant-font-size-sm)' }} />
                         {dayjs(currentAction.lastModifiedAt).fromNow()}
                     </Text>
-                    <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>
-                        {dayjs(currentAction.lastModifiedAt).format('HH:mm:ss')}
-                    </Text>
                 </TimeInfo>
-            </ActionCard>
+            </ActivityCard>
         </Popover>
     );
 };

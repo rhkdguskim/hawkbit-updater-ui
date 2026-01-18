@@ -2,11 +2,11 @@ import { PageLayout, PageHeader, FullHeightSectionCard, SectionCard } from '@/co
 import styled from 'styled-components';
 
 const FilterWrapper = styled(SectionCard)`
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     flex: none;
     
     .ant-card-body {
-        padding: 12px 16px;
+        padding: 8px 12px;
     }
 `;
 

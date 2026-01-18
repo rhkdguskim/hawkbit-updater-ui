@@ -27,7 +27,7 @@ const StyledLayout = styled.div<{ $padding: string; $gap: string; $fullWidth?: b
   flex: 1;
   min-height: 0;
   width: 100%;
-  max-width: ${props => props.$fullWidth ? '100%' : 'var(--page-max-width, 1440px)'};
+  max-width: ${props => props.$fullWidth ? '100%' : 'var(--page-max-width, 100%)'};
   margin: 0 auto;
   padding: ${props => props.$padding};
   gap: ${props => props.$gap};
@@ -70,8 +70,8 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
 
   return (
     <StyledLayout
-      $padding={padding ?? `${token.marginLG}px ${token.padding}px ${token.marginLG}px`}
-      $gap={gap ?? `${token.marginXS}px`}
+      $padding={padding ?? `12px 20px 12px`}
+      $gap={gap ?? `8px`}
       $fullWidth={fullWidth}
       $fullHeight={fullHeight}
     >
@@ -110,7 +110,7 @@ export const SectionCard = styled(Card)`
     }
     
     .ant-card-head {
-        padding: 16px 24px;
+        padding: 8px 16px;
         min-height: 48px;
         border-bottom: 1px solid var(--border-color);
     }
@@ -122,7 +122,7 @@ export const SectionCard = styled(Card)`
     }
     
     .ant-card-body {
-        padding: 24px;
+        padding: 12px 16px;
     }
 `;
 

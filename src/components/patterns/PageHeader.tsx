@@ -7,17 +7,17 @@ const HeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 8px 4px 16px;
+  padding: 4px 0 12px;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 16px;
   border-bottom: 1px solid var(--border-color);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 `;
 
 const TitleSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-xs, 8px);
+  gap: 4px;
 `;
 
 const TitleRow = styled.div`
@@ -30,10 +30,10 @@ const TitleRow = styled.div`
 const HeaderTitle = styled(Title)`
     && {
         margin: 0;
-        font-size: 28px !important;
-        font-weight: 700;
-        letter-spacing: -0.03em;
-        color: var(--ant-color-text);
+        font-size: 24px !important;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--text-main);
     }
 `;
 
@@ -47,8 +47,8 @@ const BackButton = styled(Button)`
 
 const SubtitleText = styled(Text)`
     && {
-        font-size: 14px;
-        font-weight: 500;
+        font-size: 13px;
+        font-weight: 400;
         color: var(--ant-color-text-secondary);
     }
 `;
@@ -140,7 +140,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                 )}
             </TitleSection>
             {actions && (
-                <Actions size="middle" align="center">
+                <Actions size="small" align="center">
                     {actions}
                 </Actions>
             )}

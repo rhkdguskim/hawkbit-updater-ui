@@ -79,8 +79,8 @@ const TrendBadge = styled.div<{ $isPositive?: boolean; $isNeutral?: boolean }>`
         props.$isNeutral
             ? 'var(--ant-color-fill-secondary)'
             : props.$isPositive
-                ? 'rgba(var(--ant-color-success-rgb), 0.15)'
-                : 'rgba(var(--ant-color-error-rgb), 0.15)'
+                ? 'rgba(var(--color-success-rgb), 0.15)'
+                : 'rgba(var(--color-error-rgb), 0.15)'
     };
     color: ${props =>
         props.$isNeutral
@@ -151,7 +151,7 @@ const variantColors: Record<StatusVariant, string> = {
     default: 'var(--gradient-primary)',
     success: 'var(--gradient-success)',
     warning: 'var(--gradient-warning)',
-    danger: 'var(--gradient-danger)',
+    danger: 'var(--gradient-error)',
     info: 'var(--gradient-info)',
 };
 

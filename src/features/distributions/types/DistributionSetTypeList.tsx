@@ -231,28 +231,34 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
         />
     );
 
-    const listContent = (
+    return (
         <>
-            {!standalone && <div style={{ marginBottom: 16 }}>{searchBar}</div>}
-            <DataView
-                loading={isLoading}
-                error={null}
-                isEmpty={!isLoading && typesContent.length === 0}
-                emptyText={t('common:messages.noData')}
+            <StandardListLayout
+                title={t('typeManagement.dsTypeTitle')}
+                description={t('typeManagement.dsTypeDescription', { defaultValue: 'Manage distribution set types' })}
+                standalone={standalone}
+                searchBar={searchBar}
             >
-                <EnhancedTable<MgmtDistributionSetType>
-                    columns={displayColumns}
-                    dataSource={typesContent}
-                    rowKey="id"
-                    pagination={false}
-                    loading={isLoading || isFetching}
-                    onChange={handleTableChange}
-                    scroll={{ x: 800 }}
-                    onFetchNextPage={fetchNextPage}
-                    hasNextPage={hasNextPage}
-                    isFetchingNextPage={isFetchingNextPage}
-                />
-            </DataView>
+                <DataView
+                    loading={isLoading}
+                    error={null}
+                    isEmpty={!isLoading && typesContent.length === 0}
+                    emptyText={t('common:messages.noData')}
+                >
+                    <EnhancedTable<MgmtDistributionSetType>
+                        columns={displayColumns}
+                        dataSource={typesContent}
+                        rowKey="id"
+                        pagination={false}
+                        loading={isLoading || isFetching}
+                        onChange={handleTableChange}
+                        scroll={{ x: 800 }}
+                        onFetchNextPage={fetchNextPage}
+                        hasNextPage={hasNextPage}
+                        isFetchingNextPage={isFetchingNextPage}
+                    />
+                </DataView>
+            </StandardListLayout>
 
             <DistributionSetTypeDialog
                 open={dialogOpen}
@@ -261,20 +267,6 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
                 onSuccess={handleDialogSuccess}
             />
         </>
-    );
-
-    if (!standalone) {
-        return listContent;
-    }
-
-    return (
-        <StandardListLayout
-            title={t('typeManagement.dsTypeTitle')}
-            description={t('typeManagement.dsTypeDescription', { defaultValue: 'Manage distribution set types' })}
-            searchBar={searchBar}
-        >
-            {listContent}
-        </StandardListLayout>
     );
 };
 

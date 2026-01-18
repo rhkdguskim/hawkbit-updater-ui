@@ -12,36 +12,36 @@ import { darkColors } from './constants';
  */
 export const darkTheme: ThemeConfig = {
     token: {
-        // 딥 다크 컬러 팔레트 - 차분하고 세련된
-        colorPrimary: darkColors.colorPrimary,    // #3b82f6 Blue
-        colorSuccess: darkColors.colorSuccess,    // #10b981 Emerald
-        colorWarning: darkColors.colorWarning,    // #f59e0b Amber
-        colorError: darkColors.colorError,        // #ef4444 Red
-        colorInfo: darkColors.colorInfo,          // #6366f1 Indigo
-        colorTextHeading: '#f1f5f9',              // Slate-100
+        // 딥 다크 컬러 팔레트 - 현대적이고 세련된 블루톤 베이스
+        colorPrimary: darkColors.colorPrimary,
+        colorSuccess: darkColors.colorSuccess,
+        colorWarning: darkColors.colorWarning,
+        colorError: darkColors.colorError,
+        colorInfo: darkColors.colorInfo,
+        colorTextHeading: '#f8fafc',
 
-        // 순수 딥 다크 배경 - 단색 기반
-        colorBgBase: '#0a0a0b',       // 거의 순수 블랙 (약간 따뜻한 톤)
-        colorBgLayout: '#0a0a0b',     // 메인 레이아웃
-        colorBgContainer: '#141417',  // 카드/컨테이너 배경
-        colorBgElevated: '#1c1c21',   // 드롭다운/모달
-        colorBgSpotlight: '#27272a',  // 툴팁
+        // 현대적인 딥 슬레이트 네이비 배경
+        colorBgBase: '#020617',       // Slate-950 (매우 깊은 네이비)
+        colorBgLayout: '#020617',
+        colorBgContainer: '#0f172a',  // Slate-900 (컨테이너 배경)
+        colorBgElevated: '#1e293b',   // Slate-800 (드롭다운/모달)
+        colorBgSpotlight: '#334155',  // Slate-700
 
-        // 타이포그래피 - 부드러운 콘트라스트
-        colorText: '#e4e4e7',         // Zinc-200
-        colorTextSecondary: '#a1a1aa', // Zinc-400
-        colorTextTertiary: '#71717a',  // Zinc-500
-        colorTextQuaternary: '#52525b', // Zinc-600
+        // 타이포그래피 - 선명하고 편안한 콘트라스트
+        colorText: '#f1f5f9',         // Slate-100
+        colorTextSecondary: '#94a3b8', // Slate-400
+        colorTextTertiary: '#64748b',  // Slate-500
+        colorTextQuaternary: '#475569', // Slate-600
 
-        // 보더 - 미묘한 구분선
-        colorBorder: '#27272a',       // Zinc-800
-        colorBorderSecondary: '#18181b', // Zinc-900
+        // 보더 - 은은한 레이어 구분
+        colorBorder: '#1e293b',       // Slate-800
+        colorBorderSecondary: '#0f172a', // Slate-900
 
-        // 디자인 토큰 - 정밀 기기 스타일
-        borderRadius: 6,
-        borderRadiusLG: 8,
-        borderRadiusSM: 4,
-        borderRadiusXS: 2,
+        // 디자인 토큰 - 정밀 기기 스타일 + 모던한 라운딩
+        borderRadius: 10,
+        borderRadiusLG: 16,
+        borderRadiusSM: 6,
+        borderRadiusXS: 4,
 
         // 타이포그래피
         fontFamily: "'Pretendard Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif",
@@ -54,7 +54,7 @@ export const darkTheme: ThemeConfig = {
         marginXS: 8,
         marginSM: 12,
         margin: 16,
-        marginMD: 16,
+        marginMD: 20,
         marginLG: 24,
         marginXL: 32,
 
@@ -63,24 +63,24 @@ export const darkTheme: ThemeConfig = {
         motionDurationMid: '0.2s',
         motionDurationSlow: '0.3s',
 
-        // 그림자 - 깊이감 있는 순수 그림자 (글로우 없음)
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px -1px rgba(0, 0, 0, 0.5)',
-        boxShadowSecondary: '0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.5)',
+        // 그림자 - 깊이감 있고 세련된 (약간의 네이비 틴트)
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3)',
+        boxShadowSecondary: '0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2)',
     },
     algorithm: theme.darkAlgorithm,
     components: {
         Layout: {
-            siderBg: '#0f0f11',
-            headerBg: '#141417',
-            bodyBg: '#0a0a0b',
+            siderBg: '#020617',
+            headerBg: 'rgba(15, 23, 42, 0.8)', // 글래스모피즘 기반
+            bodyBg: '#020617',
             headerPadding: '0 24px',
         },
         Menu: {
             darkItemBg: 'transparent',
             darkSubMenuItemBg: 'transparent',
             darkItemSelectedBg: 'rgba(59, 130, 246, 0.15)',
-            darkItemHoverBg: 'rgba(59, 130, 246, 0.08)',
-            itemBorderRadius: 6,
+            darkItemHoverBg: 'rgba(255, 255, 255, 0.05)',
+            itemBorderRadius: 10,
             itemMarginInline: 8,
             itemPaddingInline: 16,
             iconSize: 18,
@@ -88,74 +88,80 @@ export const darkTheme: ThemeConfig = {
             itemSelectedColor: '#60a5fa',
         },
         Card: {
-            colorBgContainer: '#141417',
-            borderRadiusLG: 8,
-            boxShadowTertiary: '0 1px 3px 0 rgba(0, 0, 0, 0.4)',
-            paddingLG: 20,
-            headerFontSize: 15,
-            actionsBg: '#1c1c21',
+            colorBgContainer: '#0f172a',
+            borderRadiusLG: 16,
+            boxShadowTertiary: '0 4px 12px rgba(0, 0, 0, 0.2)',
+            paddingLG: 24,
+            headerFontSize: 16,
+            fontWeightStrong: 600,
+            actionsBg: '#1e293b',
         },
         Table: {
-            headerBg: '#18181b',
-            headerColor: '#a1a1aa',
-            rowHoverBg: '#1c1c21',
-            borderColor: '#27272a',
-            headerBorderRadius: 6,
-            padding: 12,
+            headerBg: '#1e293b',
+            headerColor: '#94a3b8',
+            rowHoverBg: 'rgba(255, 255, 255, 0.02)',
+            borderColor: '#1e293b',
+            headerBorderRadius: 10,
+            cellPaddingBlock: 14,
         },
         Button: {
-            borderRadius: 6,
-            borderRadiusLG: 8,
-            borderRadiusSM: 4,
+            borderRadius: 10,
+            borderRadiusLG: 12,
+            borderRadiusSM: 8,
             paddingInline: 16,
             paddingInlineLG: 24,
             fontWeight: 600,
-            primaryShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.3)',
+            primaryShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+            controlHeight: 40,
         },
         Input: {
-            borderRadius: 6,
-            paddingInline: 12,
-            activeShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
-            colorBgContainer: '#0f0f11',
-            colorBorder: '#27272a',
+            borderRadius: 10,
+            paddingInline: 14,
+            activeShadow: '0 0 0 4px rgba(59, 130, 246, 0.15)',
+            colorBgContainer: '#020617',
+            colorBorder: '#1e293b',
             hoverBorderColor: '#3b82f6',
+            controlHeight: 40,
         },
         Select: {
-            borderRadius: 6,
+            borderRadius: 10,
             optionSelectedBg: 'rgba(59, 130, 246, 0.15)',
+            controlHeight: 40,
         },
         Tag: {
-            borderRadiusSM: 4,
+            borderRadiusSM: 6,
+            fontWeightStrong: 600,
         },
         Badge: {
             dotSize: 8,
         },
         Tabs: {
-            cardBg: '#0f0f11',
+            cardBg: '#0f172a',
             itemActiveColor: '#60a5fa',
             itemHoverColor: '#93c5fd',
             inkBarColor: '#3b82f6',
             horizontalItemPadding: '12px 16px',
         },
         Modal: {
-            contentBg: '#141417',
-            headerBg: '#141417',
-            borderRadiusLG: 12,
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+            contentBg: '#0f172a',
+            headerBg: '#0f172a',
+            borderRadiusLG: 24,
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
         },
         Drawer: {
-            colorBgElevated: '#141417',
-            borderRadiusLG: 12,
+            colorBgElevated: '#0f172a',
+            borderRadiusLG: 24,
         },
         Statistic: {
-            contentFontSize: 24,
+            contentFontSize: 28,
+            titleFontSize: 14,
         },
         Tooltip: {
-            colorBgSpotlight: '#27272a',
-            borderRadius: 6,
+            colorBgSpotlight: '#334155',
+            borderRadius: 8,
         },
         Alert: {
-            borderRadiusLG: 6,
+            borderRadiusLG: 10,
         },
         Progress: {
             defaultColor: '#3b82f6',

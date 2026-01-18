@@ -254,28 +254,34 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
         />
     );
 
-    const listContent = (
+    return (
         <>
-            {!standalone && <div style={{ marginBottom: 16 }}>{searchBar}</div>}
-            <DataView
-                loading={isLoading}
-                error={null}
-                isEmpty={tagsContent.length === 0}
-                emptyText={t('common:messages.noData')}
+            <StandardListLayout
+                title={t('tagManagement.title')}
+                description={t('tagManagement.description', { defaultValue: 'Manage distribution set tags' })}
+                standalone={standalone}
+                searchBar={searchBar}
             >
-                <EnhancedTable<MgmtTag>
-                    columns={displayColumns}
-                    dataSource={tagsContent}
-                    rowKey="id"
-                    pagination={false}
-                    loading={isLoading || isFetching}
-                    onChange={handleTableChange}
-                    scroll={{ x: 700 }}
-                    onFetchNextPage={fetchNextPage}
-                    hasNextPage={hasNextPage}
-                    isFetchingNextPage={isFetchingNextPage}
-                />
-            </DataView>
+                <DataView
+                    loading={isLoading}
+                    error={null}
+                    isEmpty={tagsContent.length === 0}
+                    emptyText={t('common:messages.noData')}
+                >
+                    <EnhancedTable<MgmtTag>
+                        columns={displayColumns}
+                        dataSource={tagsContent}
+                        rowKey="id"
+                        pagination={false}
+                        loading={isLoading || isFetching}
+                        onChange={handleTableChange}
+                        scroll={{ x: 700 }}
+                        onFetchNextPage={fetchNextPage}
+                        hasNextPage={hasNextPage}
+                        isFetchingNextPage={isFetchingNextPage}
+                    />
+                </DataView>
+            </StandardListLayout>
 
             <TagFormModal
                 open={dialogOpen}
@@ -297,24 +303,6 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
                 }}
             />
         </>
-    );
-
-    if (!standalone) {
-        return (
-            <div style={{ marginTop: 16 }}>
-                {listContent}
-            </div>
-        );
-    }
-
-    return (
-        <StandardListLayout
-            title={t('tagManagement.title')}
-            description={t('tagManagement.description', { defaultValue: 'Manage distribution set tags' })}
-            searchBar={searchBar}
-        >
-            {listContent}
-        </StandardListLayout>
     );
 };
 

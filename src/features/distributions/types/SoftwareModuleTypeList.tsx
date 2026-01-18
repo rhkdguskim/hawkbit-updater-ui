@@ -241,28 +241,34 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
         />
     );
 
-    const listContent = (
+    return (
         <>
-            {!standalone && <div style={{ marginBottom: 16 }}>{searchBar}</div>}
-            <DataView
-                loading={isLoading}
-                error={null}
-                isEmpty={!isLoading && typesContent.length === 0}
-                emptyText={t('common:messages.noData')}
+            <StandardListLayout
+                title={t('typeManagement.smTypeTitle')}
+                description={t('typeManagement.smTypeDescription', { defaultValue: 'Manage software module types' })}
+                standalone={standalone}
+                searchBar={searchBar}
             >
-                <EnhancedTable<MgmtSoftwareModuleType>
-                    columns={displayColumns}
-                    dataSource={typesContent}
-                    rowKey="id"
-                    pagination={false}
-                    loading={isLoading || isFetching}
-                    onChange={handleTableChange}
-                    scroll={{ x: 900 }}
-                    onFetchNextPage={fetchNextPage}
-                    hasNextPage={hasNextPage}
-                    isFetchingNextPage={isFetchingNextPage}
-                />
-            </DataView>
+                <DataView
+                    loading={isLoading}
+                    error={null}
+                    isEmpty={!isLoading && typesContent.length === 0}
+                    emptyText={t('common:messages.noData')}
+                >
+                    <EnhancedTable<MgmtSoftwareModuleType>
+                        columns={displayColumns}
+                        dataSource={typesContent}
+                        rowKey="id"
+                        pagination={false}
+                        loading={isLoading || isFetching}
+                        onChange={handleTableChange}
+                        scroll={{ x: 900 }}
+                        onFetchNextPage={fetchNextPage}
+                        hasNextPage={hasNextPage}
+                        isFetchingNextPage={isFetchingNextPage}
+                    />
+                </DataView>
+            </StandardListLayout>
 
             <SoftwareModuleTypeDialog
                 open={dialogOpen}
@@ -271,20 +277,6 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
                 onSuccess={handleDialogSuccess}
             />
         </>
-    );
-
-    if (!standalone) {
-        return listContent;
-    }
-
-    return (
-        <StandardListLayout
-            title={t('typeManagement.smTypeTitle')}
-            description={t('typeManagement.smTypeDescription', { defaultValue: 'Manage software module types' })}
-            searchBar={searchBar}
-        >
-            {listContent}
-        </StandardListLayout>
     );
 };
 

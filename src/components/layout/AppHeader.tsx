@@ -24,24 +24,26 @@ import { UISettingsModal } from '@/components/modals';
 const { Header } = Layout;
 const { Text } = Typography;
 
-const StyledHeader = styled(Header) <{ $bg: string }>`
-    padding: 0 24px;
-    height: 64px;
-    background: ${(props) => props.$bg};
+const StyledHeader = styled(Header)`
+    padding: 0 16px;
+    height: 52px;
+    background: var(--glass-bg);
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--border-color);
-    backdrop-filter: blur(20px);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: var(--glass-shadow);
 `;
 
 const HeaderLeft = styled.div`
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: 20px;
     flex: 1;
     min-width: 0;
 `;
@@ -55,43 +57,53 @@ const HeaderRight = styled.div`
 const LogoContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     cursor: pointer;
+    transition: all 0.2s ease;
+  
+  &:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+  }
   
   .logo-icon {
-    width: 26px;
-    height: 26px;
-    background: var(--ant-color-primary);
+    width: 28px;
+    height: 28px;
+    background: var(--gradient-primary);
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 14px;
-    box-shadow: 0 2px 8px var(--ant-color-primary-hover, rgba(99, 102, 241, 0.3));
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
   }
   
   .logo-text {
     font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    color: var(--text-main);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-title);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
   }
 
   .version-badge {
-    font-size: 0.65rem;
-    font-weight: 500;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: var(--ant-color-primary-bg);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(var(--color-primary-rgb), 0.1);
     color: var(--ant-color-primary);
-    border: 1px solid var(--ant-color-primary-border);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   }
 
   .custom-logo {
-    height: 32px;
+    height: 36px;
     width: auto;
-    max-width: 150px;
+    max-width: 160px;
     object-fit: contain;
   }
 `;
@@ -100,7 +112,9 @@ const StyledMenu = styled(Menu)`
     flex: 1;
     border-bottom: none !important;
     background: transparent !important;
-    margin-left: 24px;
+    margin-left: 12px;
+    font-weight: 500;
+    font-size: 13px;
     
     .ant-menu-item, .ant-menu-submenu {
         top: 0 !important;
@@ -108,6 +122,8 @@ const StyledMenu = styled(Menu)`
         
         &::after {
             bottom: -1px !important;
+            border-bottom-width: 3px !important;
+            border-radius: 3px 3px 0 0;
         }
     }
 `;
@@ -116,28 +132,28 @@ const SettingsGroup = styled.div`
     display: flex;
     align-items: center;
     gap: 4px;
-    padding: 4px;
-    background: var(--ant-color-primary-bg, rgba(99, 102, 241, 0.06));
-    border-radius: 10px;
+    padding: 2px;
+    background: var(--ant-color-primary-bg, rgba(99, 102, 241, 0.04));
+    border-radius: 8px;
 `;
 
 const HeaderDivider = styled(Divider)`
     && {
-        height: var(--ant-control-height, 32px);
-        margin: 0 var(--ant-margin-xxs, 4px);
+        height: 24px;
+        margin: 0 8px;
     }
 `;
 
 const UserSection = styled.div`
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 4px 8px 4px 12px;
-    background: var(--ant-color-primary-bg, rgba(99, 102, 241, 0.06));
-    border-radius: 10px;
+    gap: 8px;
+    padding: 2px 8px 2px 10px;
+    background: var(--ant-color-primary-bg, rgba(99, 102, 241, 0.04));
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    height: 40px;
+    height: 32px;
     
     &:hover {
         background: var(--ant-color-primary-bg-hover, rgba(99, 102, 241, 0.1));
@@ -264,7 +280,7 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
     ];
 
     return (
-        <StyledHeader $bg={colorBgContainer}>
+        <StyledHeader>
             <HeaderLeft>
                 <LogoContainer onClick={() => navigate('/')}>
                     {customLogo ? (
@@ -274,7 +290,7 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
                             <MdRocketLaunch />
                         </div>
                     )}
-                    <span className="logo-text">{t('common:app.title', { defaultValue: import.meta.env.VITE_LOGIN_TITLE || 'Updater UI' })}</span>
+                    <span className="logo-text">{import.meta.env.VITE_LOGIN_TITLE || 'Updater UI'}</span>
                 </LogoContainer>
 
                 <StyledMenu

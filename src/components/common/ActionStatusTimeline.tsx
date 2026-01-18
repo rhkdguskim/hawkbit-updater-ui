@@ -9,6 +9,7 @@ import {
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { IconBadge } from '../shared/CommonStyles';
 import type { MgmtActionStatus } from '@/api/generated/model';
 import { getStatusLabel, translateStatusMessage } from '@/utils/statusUtils';
 
@@ -68,23 +69,7 @@ const StepTime = styled(Text)`
     color: var(--ant-color-text-quaternary);
 `;
 
-const ColoredDot = styled.span<{ $tone: string; $color: string }>`
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: ${props =>
-        props.$tone === 'error' ? 'rgba(var(--ant-color-error-rgb), 0.12)' :
-            props.$tone === 'success' ? 'rgba(var(--ant-color-success-rgb), 0.12)' :
-                props.$tone === 'processing' ? 'rgba(var(--ant-color-info-rgb), 0.12)' :
-                    props.$tone === 'warning' ? 'rgba(var(--ant-color-warning-rgb), 0.12)' :
-                        'var(--ant-color-fill-tertiary)'};
-    color: ${props => props.$color};
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    box-shadow: var(--shadow-xs);
-`;
+
 
 const StatusCodeTag = styled(Tag)`
     && {
@@ -148,8 +133,15 @@ export const ActionStatusTimeline: React.FC<ActionStatusTimelineProps> = ({ stat
                         tone === 'processing' ? <SyncOutlined spin /> : <ClockCircleOutlined />;
 
                 return {
-                    color: tone,
-                    dot: <ColoredDot $tone={tone} $color={color}>{icon}</ColoredDot>,
+                    dot: (
+                        <IconBadge
+                            $status={tone === 'processing' ? 'info' : (tone as any)}
+                            $size={24}
+                            style={{ boxShadow: 'var(--shadow-sm)' }}
+                        >
+                            {icon}
+                        </IconBadge>
+                    ),
                     children: (
                         <StepContent>
                             <StepHeader>

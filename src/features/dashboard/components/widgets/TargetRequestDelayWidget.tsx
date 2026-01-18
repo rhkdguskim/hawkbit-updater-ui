@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Flex, Typography, Skeleton, List } from 'antd';
 import { FieldTimeOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { ChartCard, IconBadge } from '../DashboardStyles';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -33,6 +34,7 @@ interface TargetRequestDelayWidgetProps {
     isLoading: boolean;
     averageDelay: number;
     topDelayedTargets: Array<{
+        controllerId: string;
         name: string;
         delay: number;
         lastRequestAt: number;
@@ -45,6 +47,7 @@ export const TargetRequestDelayWidget: React.FC<TargetRequestDelayWidgetProps> =
     topDelayedTargets,
 }) => {
     const { t } = useTranslation(['dashboard', 'common']);
+    const navigate = useNavigate();
 
     const formatDuration = (ms: number) => {
         if (ms < 1000) return t('common:duration.ms', { count: ms });
@@ -112,7 +115,10 @@ export const TargetRequestDelayWidget: React.FC<TargetRequestDelayWidgetProps> =
 
                                         return (
                                             <List.Item style={{ padding: '2px 0', border: 'none' }}>
-                                                <DelayItem $color={delayColor}>
+                                                <DelayItem
+                                                    $color={delayColor}
+                                                    onClick={() => navigate(`/targets/${item.controllerId}`)}
+                                                >
                                                     <Flex align="center" gap={8} style={{ flex: 1, minWidth: 0 }}>
                                                         <div style={{
                                                             width: 5,

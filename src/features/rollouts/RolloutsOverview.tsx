@@ -724,7 +724,7 @@ const RolloutsOverview: React.FC<RolloutsOverviewProps> = ({ standalone = true }
     if (!standalone) return content;
 
     return (
-        <PageLayout>
+        <PageLayout fullHeight={true}>
             {header}
             {content}
         </PageLayout>
