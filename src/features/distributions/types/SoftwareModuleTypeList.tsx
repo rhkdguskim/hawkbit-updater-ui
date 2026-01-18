@@ -17,6 +17,7 @@ import { SmallText } from '@/components/shared/Typography';
 import { useListFilterStore } from '@/stores/useListFilterStore';
 import { useServerTable } from '@/hooks/useServerTable';
 import { ListSummary } from '@/components/common';
+import { buildQueryFromFilterValues, buildWildcardSearch } from '@/utils/fiql';
 
 interface SoftwareModuleTypeListProps {
     standalone?: boolean;
@@ -48,7 +49,25 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
         sort,
         handleTableChange,
         resetPagination,
+        globalSearch,
+        setGlobalSearch,
+        debouncedGlobalSearch,
     } = useServerTable<MgmtSoftwareModuleType>({ syncToUrl: standalone });
+
+    const buildFinalQuery = useCallback(() => {
+        const fiql = buildQueryFromFilterValues(filters);
+
+        if (debouncedGlobalSearch) {
+            const searchFields = ['name', 'key', 'description'];
+            const searchQuery = searchFields
+                .map(field => buildWildcardSearch(field, debouncedGlobalSearch))
+                .join(',');
+
+            return fiql ? `(${fiql});(${searchQuery})` : `(${searchQuery})`;
+        }
+
+        return fiql;
+    }, [filters, debouncedGlobalSearch]);
 
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [editingType, setEditingType] = React.useState<MgmtSoftwareModuleType | null>(null);
@@ -66,6 +85,7 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
         {
             limit: pagination.pageSize,
             sort: sort || undefined,
+            q: buildFinalQuery() || undefined,
         },
         {
             query: {
@@ -237,6 +257,8 @@ const SoftwareModuleTypeList: React.FC<SoftwareModuleTypeListProps> = ({ standal
             columns={columnOptions}
             visibleColumns={visibleColumns}
             onVisibilityChange={setVisibleColumns}
+            searchValue={globalSearch}
+            onSearchChange={setGlobalSearch}
             searchPlaceholder={t('list.searchPlaceholder', { defaultValue: t('common:actions.search') })}
         />
     );

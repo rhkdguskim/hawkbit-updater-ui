@@ -10,7 +10,7 @@ import { DataView, EnhancedTable, FilterBuilder, type FilterValue, type FilterFi
 import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import { useServerTable } from '@/hooks/useServerTable';
 import dayjs from 'dayjs';
-import { buildQueryFromFilterValues } from '@/utils/fiql';
+import { buildQueryFromFilterValues, buildWildcardSearch } from '@/utils/fiql';
 import RolloutCreateModal from './RolloutCreateModal';
 import { StatusTag, ListSummary, Highlighter } from '@/components/common';
 import type { ColumnsType } from 'antd/es/table';
@@ -119,12 +119,16 @@ const RolloutList: React.FC<RolloutListProps> = ({ standalone = true }) => {
 
     // Build RSQL query from filters
     const buildFinalQuery = useCallback(() => {
-        const fiql = buildQueryFromFilterValues(filters);
+        const fiql = buildQueryFromFilterValues(filters, {
+            fieldMap: {
+                status: 'status',
+            }
+        });
 
         if (debouncedGlobalSearch) {
             const searchFields = ['name', 'description'];
             const searchQuery = searchFields
-                .map(field => `${field}==*${debouncedGlobalSearch}*`)
+                .map(field => buildWildcardSearch(field, debouncedGlobalSearch))
                 .join(',');
 
             return fiql ? `(${fiql});(${searchQuery})` : `(${searchQuery})`;

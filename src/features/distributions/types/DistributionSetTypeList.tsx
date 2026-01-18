@@ -16,6 +16,7 @@ import { createActionsColumn, createIdColumn, createDescriptionColumn, createCol
 import { useListFilterStore } from '@/stores/useListFilterStore';
 import { useServerTable } from '@/hooks/useServerTable';
 import { ListSummary } from '@/components/common';
+import { buildQueryFromFilterValues, buildWildcardSearch } from '@/utils/fiql';
 
 interface DistributionSetTypeListProps {
     standalone?: boolean;
@@ -47,7 +48,25 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
         sort,
         handleTableChange,
         resetPagination,
+        globalSearch,
+        setGlobalSearch,
+        debouncedGlobalSearch,
     } = useServerTable<MgmtDistributionSetType>({ syncToUrl: standalone });
+
+    const buildFinalQuery = useCallback(() => {
+        const fiql = buildQueryFromFilterValues(filters);
+
+        if (debouncedGlobalSearch) {
+            const searchFields = ['name', 'key', 'description'];
+            const searchQuery = searchFields
+                .map(field => buildWildcardSearch(field, debouncedGlobalSearch))
+                .join(',');
+
+            return fiql ? `(${fiql});(${searchQuery})` : `(${searchQuery})`;
+        }
+
+        return fiql;
+    }, [filters, debouncedGlobalSearch]);
 
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [editingType, setEditingType] = React.useState<MgmtDistributionSetType | null>(null);
@@ -65,6 +84,7 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
         {
             limit: pagination.pageSize,
             sort: sort || undefined,
+            q: buildFinalQuery() || undefined,
         },
         {
             query: {
@@ -227,6 +247,8 @@ const DistributionSetTypeList: React.FC<DistributionSetTypeListProps> = ({ stand
             columns={columnOptions}
             visibleColumns={visibleColumns}
             onVisibilityChange={setVisibleColumns}
+            searchValue={globalSearch}
+            onSearchChange={setGlobalSearch}
             searchPlaceholder={t('list.searchPlaceholder', { defaultValue: t('common:actions.search') })}
         />
     );

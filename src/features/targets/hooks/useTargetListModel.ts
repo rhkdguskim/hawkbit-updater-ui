@@ -107,7 +107,7 @@ export const useTargetListModel = () => {
             key: 'targetType',
             label: t('table.targetType'),
             type: 'select',
-            options: availableTypes.map(tp => ({ value: String(tp.id), label: tp.name || String(tp.id) })),
+            options: availableTypes.map(tp => ({ value: tp.name, label: tp.name || String(tp.id) })),
         },
         {
             key: 'tag',
@@ -152,13 +152,17 @@ export const useTargetListModel = () => {
 
         const fiql = buildQueryFromFilterValues(serverFilters, {
             fieldMap: {
-                tag: 'tag',
+                tag: 'tag.name',
+                targetType: 'targettype.name',
+                controllerId: 'controllerid',
+                ipAddress: 'ipaddress',
+                updateStatus: 'updatestatus',
             },
             rawFields: ['query'],
         });
 
         if (debouncedGlobalSearch) {
-            const searchFields = ['name', 'controllerId', 'ipAddress', 'description'];
+            const searchFields = ['name', 'controllerid', 'ipaddress', 'description'];
             const searchQuery = searchFields
                 .map(field => buildWildcardSearch(field, debouncedGlobalSearch))
                 .join(',');

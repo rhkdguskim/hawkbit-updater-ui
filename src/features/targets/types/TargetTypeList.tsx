@@ -24,6 +24,7 @@ import TargetTypeDialog from './TargetTypeDialog';
 import { useListFilterStore } from '@/stores/useListFilterStore';
 import { useServerTable } from '@/hooks/useServerTable';
 import { ListSummary } from '@/components/common';
+import { buildQueryFromFilterValues, buildWildcardSearch } from '@/utils/fiql';
 
 interface TargetTypeListProps {
     standalone?: boolean;
@@ -56,7 +57,25 @@ const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) =>
         sort,
         handleTableChange,
         resetPagination,
+        globalSearch,
+        setGlobalSearch,
+        debouncedGlobalSearch,
     } = useServerTable<MgmtTargetType>({ syncToUrl: standalone });
+
+    const buildFinalQuery = useCallback(() => {
+        const fiql = buildQueryFromFilterValues(filters);
+
+        if (debouncedGlobalSearch) {
+            const searchFields = ['name', 'key', 'description'];
+            const searchQuery = searchFields
+                .map(field => buildWildcardSearch(field, debouncedGlobalSearch))
+                .join(',');
+
+            return fiql ? `(${fiql});(${searchQuery})` : `(${searchQuery})`;
+        }
+
+        return fiql;
+    }, [filters, debouncedGlobalSearch]);
 
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [editingType, setEditingType] = React.useState<MgmtTargetType | null>(null);
@@ -74,6 +93,7 @@ const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) =>
         {
             limit: pagination.pageSize,
             sort: sort || undefined,
+            q: buildFinalQuery() || undefined,
         },
         {
             query: {
@@ -308,6 +328,8 @@ const TargetTypeList: React.FC<TargetTypeListProps> = ({ standalone = true }) =>
             columns={columnOptions}
             visibleColumns={visibleColumns}
             onVisibilityChange={setVisibleColumns}
+            searchValue={globalSearch}
+            onSearchChange={setGlobalSearch}
             searchPlaceholder={t('list.searchPlaceholder', { defaultValue: t('common:actions.search') })}
         />
     );
