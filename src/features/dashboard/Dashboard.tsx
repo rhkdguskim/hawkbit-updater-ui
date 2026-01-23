@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Tabs, theme } from 'antd';
 import { isActive } from '@/entities';
 
 import { MinimalOpsDashboard } from './components/layouts/MinimalOpsDashboard';
@@ -25,10 +26,14 @@ import { HighErrorTargetsWidget } from './components/widgets/HighErrorTargetsWid
 import { RolloutQueueChart } from './components/widgets/RolloutQueueChart';
 import RolloutCreateModal from '@/features/rollouts/RolloutCreateModal';
 
+const { useToken } = theme;
+
 const Dashboard: React.FC = () => {
     const { t } = useTranslation('dashboard');
     const metrics = useDashboardMetrics();
     const navigate = useNavigate();
+    const { token } = useToken();
+    const [activeTab, setActiveTab] = useState('overview');
     const [isFailureModalVisible, setIsFailureModalVisible] = useState(false);
     const [isCreateRolloutVisible, setIsCreateRolloutVisible] = useState(false);
     const [actionRequiredType, setActionRequiredType] = useState<'DELAYED' | 'APPROVAL_PENDING' | null>(null);
@@ -37,210 +42,256 @@ const Dashboard: React.FC = () => {
         setActionRequiredType(type);
     };
 
+    const tabItems = [
+        {
+            key: 'overview',
+            label: t('tabs.overview', 'Overview'),
+            children: (
+                <MinimalOpsDashboard
+                    header={null}
+                    topRow={[
+                        {
+                            node: (
+                                <HealthSummaryWidget
+                                    isLoading={metrics.isLoading}
+                                    totalTargets={metrics.totalDevices}
+                                    updatingCount={metrics.activeActionsCount}
+                                    pausedRollouts={metrics.pausedRolloutCount}
+                                    errorRollouts={metrics.errorRolloutCount}
+                                    errorActions1h={metrics.errorActions1hCount}
+                                    onAnalysisClick={() => setIsFailureModalVisible(true)}
+                                />
+                            )
+                        },
+                        {
+                            node: (
+                                <KPIHealthSummary
+                                    isLoading={metrics.isLoading}
+                                    onlineRate={metrics.onlineRate}
+                                    deploymentRate={metrics.deploymentRate}
+                                    errorRate={metrics.errorRate}
+                                    pendingCount={metrics.pendingCount}
+                                    runningRolloutCount={metrics.runningRolloutCount}
+                                    securityCoverage={metrics.securityCoverage}
+                                />
+                            )
+                        },
+                        {
+                            node: (
+                                <ActionRequiredWidget
+                                    isLoading={metrics.isLoading}
+                                    delayedActionsCount={metrics.delayedActionsCount}
+                                    pendingApprovalsCount={metrics.pendingApprovalRolloutCount}
+                                    onActionClick={onActionRequiredClick}
+                                />
+                            )
+                        },
+                        {
+                            node: (
+                                <DistributionSummaryWidget
+                                    isLoading={metrics.isLoading}
+                                    distributionSetsCount={metrics.distributionSetsCount}
+                                    softwareModulesCount={metrics.softwareModulesCount}
+                                    recentSets={metrics.recentDistributionSets}
+                                />
+                            )
+                        },
+                    ]}
+                    opsLeft={[
+                        {
+                            flex: 1,
+                            node: (
+                                <ActiveRolloutsWidget
+                                    isLoading={metrics.isLoading}
+                                    activeRollouts={metrics.activeRollouts}
+                                    isAdmin={true}
+                                    onCreateClick={() => setIsCreateRolloutVisible(true)}
+                                />
+                            ),
+                        },
+                        {
+                            flex: 1.4,
+                            node: (
+                                <InProgressUpdatesWidget
+                                    isLoading={metrics.isLoading}
+                                    data={metrics.recentActivities}
+                                />
+                            ),
+                        },
+                    ]}
+                    opsRight={[
+                        {
+                            flex: 1.6,
+                            node: (
+                                <RecentlyFinishedActionsWidget
+                                    isLoading={metrics.isLoading}
+                                    recentlyFinishedItems={metrics.recentlyFinishedItems}
+                                    maxItems={8}
+                                />
+                            ),
+                        },
+                        {
+                            flex: 0.6,
+                            node: (
+                                <HighErrorTargetsWidget
+                                    isLoading={metrics.isLoading}
+                                    data={metrics.highErrorTargets}
+                                />
+                            ),
+                        },
+                    ]}
+                />
+            )
+        },
+        {
+            key: 'connectivity',
+            label: t('tabs.connectivity', 'Connectivity'),
+            children: (
+                <MinimalOpsDashboard
+                    header={null}
+                    topRow={[]}
+                    opsLeft={[]}
+                    opsRight={[]}
+                    signals={[
+                        {
+                            node: (
+                                <ConnectivityChart
+                                    isLoading={metrics.isLoading}
+                                    onlineCount={metrics.onlineCount}
+                                    offlineCount={metrics.offlineCount}
+                                />
+                            )
+                        },
+                        {
+                            node: (
+                                <RolloutQueueChart
+                                    isLoading={metrics.isLoading}
+                                    pendingApprovalCount={metrics.pendingApprovalRolloutCount}
+                                    pausedCount={metrics.pausedRolloutCount}
+                                    scheduledReadyCount={metrics.readyRolloutCount + metrics.scheduledRolloutCount}
+                                />
+                            )
+                        },
+                        {
+                            node: (
+                                <FragmentationChart
+                                    isLoading={metrics.isLoading}
+                                    stats={metrics.fragmentationStats}
+                                />
+                            )
+                        },
+                        {
+                            node: (
+                                <TargetRequestDelayWidget
+                                    isLoading={metrics.isLoading}
+                                    averageDelay={metrics.averageDelay}
+                                    topDelayedTargets={metrics.topDelayedTargets}
+                                />
+                            )
+                        },
+                    ]}
+                />
+            )
+        },
+        {
+            key: 'trends',
+            label: t('tabs.trends', 'Trends & Activity'),
+            children: (
+                <MinimalOpsDashboard
+                    header={null}
+                    topRow={[]}
+                    opsLeft={[]}
+                    opsRight={[]}
+                    signals={[]}
+                    trendLeft={(
+                        <StatusTrendChart
+                            isLoading={metrics.isLoading}
+                            actions={metrics.actions}
+                            rollouts={metrics.rollouts}
+                            referenceTimeMs={metrics.stableNowMs}
+                        />
+                    )}
+                    trendRight={[
+                        {
+                            flex: 0.7,
+                            node: (
+                                <DeploymentVelocityWidget
+                                    isLoading={metrics.isLoading}
+                                    data={metrics.velocityData.trend}
+                                    currentVelocity={metrics.velocityData.currentVelocity}
+                                />
+                            )
+                        },
+                        {
+                            flex: 1.3,
+                            node: (
+                                <ActionActivityWidget
+                                    isLoading={metrics.isLoading}
+                                    runningActions={metrics.actions.filter(a => isActive(a))}
+                                    recentFinishedActions={metrics.actions.filter(a => ['finished', 'canceled', 'error'].includes(a.status?.toLowerCase() || ''))}
+                                />
+                            )
+                        },
+                    ]}
+                />
+            )
+        }
+    ];
+
     return (
-        <>
-            <MinimalOpsDashboard
-                header={(
-                    <DashboardHeader
-                        lastUpdated={metrics.lastUpdated}
-                        isActivePolling={metrics.isActivePolling}
-                        isLoading={metrics.isLoading}
-                        onRefresh={metrics.refetch}
-                        stats={[
-                            {
-                                key: 'totalDevices',
-                                label: t('quick.totalDevices'),
-                                value: metrics.totalDevices.toLocaleString(),
-                                onClick: () => navigate('/targets/list'),
-                            },
-                            {
-                                key: 'online',
-                                label: t('quick.online'),
-                                value: metrics.onlineCount.toLocaleString(),
-                                tone: 'good',
-                            },
-                            {
-                                key: 'activeActions',
-                                label: t('quick.activeActions'),
-                                value: metrics.activeActionsCount.toLocaleString(),
-                                tone: 'info',
-                                onClick: () => navigate('/actions'),
-                            },
-                            {
-                                key: 'pendingApprovals',
-                                label: t('quick.pendingApprovals'),
-                                value: metrics.pendingApprovalRolloutCount.toLocaleString(),
-                                tone: metrics.pendingApprovalRolloutCount > 0 ? 'warn' : 'neutral',
-                                onClick: () => navigate('/rollouts/list?status=waiting_for_approval'),
-                            },
-                            {
-                                key: 'activeRollouts',
-                                label: t('quick.activeRollouts'),
-                                value: metrics.activeRolloutCount.toLocaleString(),
-                                onClick: () => navigate('/rollouts/list?status=running'),
-                            },
-                        ]}
-                    />
-                )}
-                topRow={[
+        <div style={{ padding: '0 24px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <DashboardHeader
+                lastUpdated={metrics.lastUpdated}
+                isActivePolling={metrics.isActivePolling}
+                isLoading={metrics.isLoading}
+                onRefresh={metrics.refetch}
+                stats={[
                     {
-                        node: (
-                            <HealthSummaryWidget
-                                isLoading={metrics.isLoading}
-                                totalTargets={metrics.totalDevices}
-                                updatingCount={metrics.activeActionsCount}
-                                pausedRollouts={metrics.pausedRolloutCount}
-                                errorRollouts={metrics.errorRolloutCount}
-                                errorActions1h={metrics.errorActions1hCount}
-                                onAnalysisClick={() => setIsFailureModalVisible(true)}
-                            />
-                        )
+                        key: 'totalDevices',
+                        label: t('quick.totalDevices'),
+                        value: metrics.totalDevices.toLocaleString(),
+                        onClick: () => navigate('/targets/list'),
                     },
                     {
-                        node: (
-                            <KPIHealthSummary
-                                isLoading={metrics.isLoading}
-                                onlineRate={metrics.onlineRate}
-                                deploymentRate={metrics.deploymentRate}
-                                errorRate={metrics.errorRate}
-                                pendingCount={metrics.pendingCount}
-                                runningRolloutCount={metrics.runningRolloutCount}
-                                securityCoverage={metrics.securityCoverage}
-                            />
-                        )
+                        key: 'online',
+                        label: t('quick.online'),
+                        value: metrics.onlineCount.toLocaleString(),
+                        tone: 'good',
                     },
                     {
-                        node: (
-                            <ActionRequiredWidget
-                                isLoading={metrics.isLoading}
-                                delayedActionsCount={metrics.delayedActionsCount}
-                                pendingApprovalsCount={metrics.pendingApprovalRolloutCount}
-                                onActionClick={onActionRequiredClick}
-                            />
-                        )
+                        key: 'activeActions',
+                        label: t('quick.activeActions'),
+                        value: metrics.activeActionsCount.toLocaleString(),
+                        tone: 'info',
+                        onClick: () => navigate('/actions'),
                     },
                     {
-                        node: (
-                            <DistributionSummaryWidget
-                                isLoading={metrics.isLoading}
-                                distributionSetsCount={metrics.distributionSetsCount}
-                                softwareModulesCount={metrics.softwareModulesCount}
-                                recentSets={metrics.recentDistributionSets}
-                            />
-                        )
+                        key: 'pendingApprovals',
+                        label: t('quick.pendingApprovals'),
+                        value: metrics.pendingApprovalRolloutCount.toLocaleString(),
+                        tone: metrics.pendingApprovalRolloutCount > 0 ? 'warn' : 'neutral',
+                        onClick: () => navigate('/rollouts/list?status=waiting_for_approval'),
+                    },
+                    {
+                        key: 'activeRollouts',
+                        label: t('quick.activeRollouts'),
+                        value: metrics.activeRolloutCount.toLocaleString(),
+                        onClick: () => navigate('/rollouts/list?status=running'),
                     },
                 ]}
-                opsLeft={[
-                    {
-                        flex: 1,
-                        node: (
-                            <ActiveRolloutsWidget
-                                isLoading={metrics.isLoading}
-                                activeRollouts={metrics.activeRollouts}
-                                isAdmin={true}
-                                onCreateClick={() => setIsCreateRolloutVisible(true)}
-                            />
-                        ),
-                    },
-                    {
-                        flex: 1.4,
-                        node: (
-                            <InProgressUpdatesWidget
-                                isLoading={metrics.isLoading}
-                                data={metrics.recentActivities}
-                            />
-                        ),
-                    },
-                ]}
-                opsRight={[
-                    {
-                        flex: 1.6,
-                        node: (
-                            <RecentlyFinishedActionsWidget
-                                isLoading={metrics.isLoading}
-                                recentlyFinishedItems={metrics.recentlyFinishedItems}
-                                maxItems={8}
-                            />
-                        ),
-                    },
-                    {
-                        flex: 0.6,
-                        node: (
-                            <HighErrorTargetsWidget
-                                isLoading={metrics.isLoading}
-                                data={metrics.highErrorTargets}
-                            />
-                        ),
-                    },
-                ]}
-                signals={[
-                    {
-                        node: (
-                            <ConnectivityChart
-                                isLoading={metrics.isLoading}
-                                onlineCount={metrics.onlineCount}
-                                offlineCount={metrics.offlineCount}
-                            />
-                        )
-                    },
-                    {
-                        node: (
-                            <RolloutQueueChart
-                                isLoading={metrics.isLoading}
-                                pendingApprovalCount={metrics.pendingApprovalRolloutCount}
-                                pausedCount={metrics.pausedRolloutCount}
-                                scheduledReadyCount={metrics.readyRolloutCount + metrics.scheduledRolloutCount}
-                            />
-                        )
-                    },
-                    {
-                        node: (
-                            <FragmentationChart
-                                isLoading={metrics.isLoading}
-                                stats={metrics.fragmentationStats}
-                            />
-                        )
-                    },
-                    {
-                        node: (
-                            <TargetRequestDelayWidget
-                                isLoading={metrics.isLoading}
-                                averageDelay={metrics.averageDelay}
-                                topDelayedTargets={metrics.topDelayedTargets}
-                            />
-                        )
-                    },
-                ]}
-                trendLeft={(
-                    <StatusTrendChart
-                        isLoading={metrics.isLoading}
-                        actions={metrics.actions}
-                        rollouts={metrics.rollouts}
-                        referenceTimeMs={metrics.stableNowMs}
-                    />
-                )}
-                trendRight={[
-                    {
-                        flex: 0.7,
-                        node: (
-                            <DeploymentVelocityWidget
-                                isLoading={metrics.isLoading}
-                                data={metrics.velocityData.trend}
-                                currentVelocity={metrics.velocityData.currentVelocity}
-                            />
-                        )
-                    },
-                    {
-                        flex: 1.3,
-                        node: (
-                            <ActionActivityWidget
-                                isLoading={metrics.isLoading}
-                                runningActions={metrics.actions.filter(a => isActive(a))}
-                                recentFinishedActions={metrics.actions.filter(a => ['finished', 'canceled', 'error'].includes(a.status?.toLowerCase() || ''))}
-                            />
-                        )
-                    },
-                ]}
+            />
+
+            <Tabs
+                activeKey={activeTab}
+                onChange={setActiveTab}
+                items={tabItems}
+                type="line"
+                size="large"
+                tabBarStyle={{
+                    marginBottom: 16,
+                    borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                    padding: '0 4px'
+                }}
             />
 
             {/* Modals */}
@@ -264,7 +315,7 @@ const Dashboard: React.FC = () => {
                     metrics.refetch();
                 }}
             />
-        </>
+        </div>
     );
 };
 

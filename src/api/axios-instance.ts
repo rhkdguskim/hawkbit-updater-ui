@@ -1,9 +1,11 @@
-import axios, { type AxiosRequestConfig } from 'axios';
-import { message } from 'antd';
+import axios, { type AxiosRequestConfig, type AxiosError } from 'axios';
 import i18n from '@/i18n';
+import { API_CONFIG } from '@/constants/config';
+import type { HawkBitErrorData } from '@/utils/typeGuards';
 
 export const AXIOS_INSTANCE = axios.create({
     baseURL: import.meta.env.API_URL || '',
+    timeout: API_CONFIG.TIMEOUT,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -35,99 +37,113 @@ export const axiosInstance = <T>(
 };
 
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useNotificationStore } from '@/stores/useNotificationStore';
 
-// Request Interceptor
-AXIOS_INSTANCE.interceptors.request.use(
-    (config) => {
-        const token = useAuthStore.getState().token;
-        if (token) {
-            config.headers.Authorization = `Basic ${token}`;
+/**
+ * Helper function to get translated error message
+ */
+const getTranslatedErrorMessage = (error: AxiosError<HawkBitErrorData>): string => {
+    const { response } = error;
+
+    if (!response) {
+        // Network or timeout errors
+        if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+            return i18n.t('common:apiErrors.TIMEOUT');
         }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+        return i18n.t('common:apiErrors.NETWORK_ERROR', { defaultValue: 'Network request failed' });
+    }
 
-AXIOS_INSTANCE.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        // Ignore cancelled requests
-        if (axios.isCancel(error)) {
-            return Promise.reject(error);
+    const { status, data } = response;
+    const errorCode = data?.errorCode;
+    const errorMsg = data?.message;
+
+    // Try to translate HawkBit error code
+    if (errorCode) {
+        const normalizedCode = errorCode.toUpperCase().replace(/\./g, '_');
+        const translationKey = `common:apiErrors.${normalizedCode}`;
+
+        if (i18n.exists(translationKey)) {
+            return i18n.t(translationKey);
         }
 
-        const { response } = error;
+        if (errorMsg) {
+            return errorMsg;
+        }
+    }
 
-        if (response) {
-            const { status, data } = response;
+    // Fallback to generic HTTP status message
+    if (status) {
+        const genericKey = `common:apiErrors.generic.${status}`;
+        if (i18n.exists(genericKey)) {
+            return i18n.t(genericKey);
+        }
+    }
 
-            // Handle Authentication Errors
-            if (status === 401) {
-                useAuthStore.getState().logout();
-                message.error(i18n.t('common:apiErrors.UNAUTHORIZED_ACCESS'));
+    // Last resort
+    return errorMsg || i18n.t('common:apiErrors.generic.unknown');
+};
+
+/**
+ * Setup axios interceptors
+ * Separated for better testability and dependency injection
+ */
+export const setupInterceptors = () => {
+    // Request Interceptor - Add authentication token
+    AXIOS_INSTANCE.interceptors.request.use(
+        (config) => {
+            const token = useAuthStore.getState().token;
+            if (token) {
+                config.headers.Authorization = `Basic ${token}`;
+            }
+            return config;
+        },
+        (error) => Promise.reject(error)
+    );
+
+    // Response Interceptor - Handle errors
+    AXIOS_INSTANCE.interceptors.response.use(
+        (response) => response,
+        (error: AxiosError<HawkBitErrorData>) => {
+            // Ignore cancelled requests
+            if (axios.isCancel(error)) {
                 return Promise.reject(error);
             }
 
-            // Handle API Errors based on ExceptionInfo
-            const errorCode = data?.errorCode;
-            const errorMsg = data?.message;
+            // Handle 401 - Unauthorized
+            if (error.response?.status === 401) {
+                useAuthStore.getState().logout();
+                const message = i18n.t('common:apiErrors.UNAUTHORIZED_ACCESS');
+                error.message = message;
 
-            let displayMessage = '';
+                useNotificationStore.getState().addNotification({
+                    type: 'error',
+                    title: i18n.t('common:notifications.errorTitle', 'API Error'),
+                    message
+                });
 
-            if (errorCode) {
-                // Normalize error code: hawkbit.server.error -> HAWKBIT_SERVER_ERROR
-                const normalizedCode = errorCode.toUpperCase().replace(/\./g, '_');
-
-                // 1. Try to translate normalized code
-                const translationKey = `common:apiErrors.${normalizedCode}`;
-
-                if (i18n.exists(translationKey)) {
-                    displayMessage = i18n.t(translationKey);
-                } else if (errorMsg) {
-                    // 2. Fallback to server message
-                    displayMessage = errorMsg;
-                } else {
-                    // 3. Last resort if we have an errorCode but no text
-                    displayMessage = i18n.t('common:apiErrors.generic.unknown');
-                }
-            } else if (status) {
-                // 3. Fallback to generic HTTP status messages
-                const genericKey = `common:apiErrors.generic.${status}`;
-                if (i18n.exists(genericKey)) {
-                    displayMessage = i18n.t(genericKey);
-                } else {
-                    displayMessage = i18n.t('common:apiErrors.generic.unknown');
-                }
-            } else {
-                displayMessage = i18n.t('common:apiErrors.generic.unknown');
+                return Promise.reject(error);
             }
 
-            // Avoid showing "undefined" or empty messages
-            if (displayMessage) {
-                // Overwrite the error message so downstream components display the localized text
-                error.message = displayMessage;
+            // Get translated error message
+            const displayMessage = getTranslatedErrorMessage(error);
+            error.message = displayMessage;
 
-                // Only show global error message if not explicitly skipped
-                if (!error.config?.skipGlobalError) {
-                    message.error(displayMessage);
-                }
-            }
-        } else if (error.request) {
-            // Network or Timeout errors
-            const timeoutMsg = i18n.t('common:apiErrors.TIMEOUT');
-            error.message = timeoutMsg;
-            if (!error.config?.skipGlobalError) {
-                message.error(timeoutMsg);
-            }
-        } else {
-            const unknownMsg = i18n.t('common:apiErrors.generic.unknown');
-            error.message = unknownMsg;
-            if (!error.config?.skipGlobalError) {
-                message.error(unknownMsg);
-            }
+            // Add to notification store
+            const notificationTitle = error.response
+                ? i18n.t('common:notifications.errorTitle', 'API Error')
+                : i18n.t('common:notifications.networkError', 'Network Error');
+
+            useNotificationStore.getState().addNotification({
+                type: 'error',
+                title: notificationTitle,
+                message: displayMessage
+            });
+
+            return Promise.reject(error);
         }
+    );
+};
 
-        return Promise.reject(error);
-    }
-);
+// Initialize interceptors
+setupInterceptors();
 

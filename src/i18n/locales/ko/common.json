@@ -365,5 +365,15 @@
             "onlyImages": "이미지 파일만 업로드할 수 있습니다!",
             "sizeLimit": "이미지는 2MB보다 작아야 합니다!"
         }
+    },
+    "notifications": {
+        "title": "알림",
+        "empty": "알림이 없습니다",
+        "markAllRead": "모두 읽음으로 표시",
+        "clearAll": "모두 지우기",
+        "errorTitle": "오류",
+        "networkError": "네트워크 오류",
+        "rolloutFailed": "롤아웃 실패",
+        "rolloutFailedDesc": "롤아웃 \"{{name}}\" 실패."
     }
 }

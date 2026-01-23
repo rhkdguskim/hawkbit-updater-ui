@@ -94,69 +94,77 @@ interface DashboardItem {
 }
 
 interface MinimalOpsDashboardProps {
-    header: React.ReactNode;
-    topRow: DashboardItem[];
-    opsLeft: DashboardItem[];
-    opsRight: DashboardItem[];
-    signals: DashboardItem[];
-    trendLeft: React.ReactNode;
-    trendRight: DashboardItem[];
+    header?: React.ReactNode;
+    topRow?: DashboardItem[];
+    opsLeft?: DashboardItem[];
+    opsRight?: DashboardItem[];
+    signals?: DashboardItem[];
+    trendLeft?: React.ReactNode;
+    trendRight?: DashboardItem[];
 }
 
 export const MinimalOpsDashboard: React.FC<MinimalOpsDashboardProps> = ({
     header,
-    topRow,
-    opsLeft,
-    opsRight,
-    signals,
+    topRow = [],
+    opsLeft = [],
+    opsRight = [],
+    signals = [],
     trendLeft,
-    trendRight,
+    trendRight = [],
 }) => {
     return (
-        <PageLayout fullWidth fullHeight padding="8px 12px 10px" gap="8px">
+        <PageLayout fullWidth fullHeight padding="0" gap="8px">
             <DashboardSurface>
                 {header}
                 <DashboardScrollContent>
-                    <TopRow>
-                        {topRow.map((item, index) => (
-                            <StackItem key={`top-${index}`} $flex={item.flex}>
-                                {item.node}
-                            </StackItem>
-                        ))}
-                    </TopRow>
-                    <OpsRow>
-                        <OpsStack>
-                            {opsLeft.map((item, index) => (
-                                <StackItem key={`ops-left-${index}`} $flex={item.flex}>
+                    {topRow.length > 0 && (
+                        <TopRow>
+                            {topRow.map((item, index) => (
+                                <StackItem key={`top-${index}`} $flex={item.flex}>
                                     {item.node}
                                 </StackItem>
                             ))}
-                        </OpsStack>
-                        <OpsStack>
-                            {opsRight.map((item, index) => (
-                                <StackItem key={`ops-right-${index}`} $flex={item.flex}>
+                        </TopRow>
+                    )}
+                    {(opsLeft.length > 0 || opsRight.length > 0) && (
+                        <OpsRow>
+                            <OpsStack>
+                                {opsLeft.map((item, index) => (
+                                    <StackItem key={`ops-left-${index}`} $flex={item.flex}>
+                                        {item.node}
+                                    </StackItem>
+                                ))}
+                            </OpsStack>
+                            <OpsStack>
+                                {opsRight.map((item, index) => (
+                                    <StackItem key={`ops-right-${index}`} $flex={item.flex}>
+                                        {item.node}
+                                    </StackItem>
+                                ))}
+                            </OpsStack>
+                        </OpsRow>
+                    )}
+                    {signals.length > 0 && (
+                        <SignalsRow>
+                            {signals.map((item, index) => (
+                                <StackItem key={`signal-${index}`} $flex={item.flex}>
                                     {item.node}
                                 </StackItem>
                             ))}
-                        </OpsStack>
-                    </OpsRow>
-                    <SignalsRow>
-                        {signals.map((item, index) => (
-                            <StackItem key={`signal-${index}`} $flex={item.flex}>
-                                {item.node}
-                            </StackItem>
-                        ))}
-                    </SignalsRow>
-                    <TrendRow>
-                        <StackItem>{trendLeft}</StackItem>
-                        <OpsStack>
-                            {trendRight.map((item, index) => (
-                                <StackItem key={`trend-right-${index}`} $flex={item.flex}>
-                                    {item.node}
-                                </StackItem>
-                            ))}
-                        </OpsStack>
-                    </TrendRow>
+                        </SignalsRow>
+                    )}
+                    {(trendLeft || trendRight.length > 0) && (
+                        <TrendRow>
+                            {trendLeft && <StackItem>{trendLeft}</StackItem>}
+                            <OpsStack>
+                                {trendRight.map((item, index) => (
+                                    <StackItem key={`trend-right-${index}`} $flex={item.flex}>
+                                        {item.node}
+                                    </StackItem>
+                                ))}
+                            </OpsStack>
+                        </TrendRow>
+                    )}
                 </DashboardScrollContent>
             </DashboardSurface>
         </PageLayout>

@@ -7,6 +7,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ROUTES } from './routes';
 import RouteLoader from '@/components/common/RouteLoader';
 
@@ -29,27 +30,29 @@ const GlobalLoadingFallback: React.FC = () => (
 
 const AppRouter: React.FC = () => {
     return (
-        <React.Suspense fallback={<GlobalLoadingFallback />}>
-            <Routes>
-                <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+        <ErrorBoundary>
+            <React.Suspense fallback={<GlobalLoadingFallback />}>
+                <Routes>
+                    <Route path={ROUTES.LOGIN} element={<LoginPage />} />
 
-                {/* Protected Routes */}
-                <Route element={<AuthGuard />}>
-                    <Route path="/" element={<MainLayout />}>
-                        <Route index element={<Dashboard />} />
-                        <Route path="targets/*" element={<Targets />} />
-                        <Route path="distributions/*" element={<Distributions />} />
-                        <Route path="actions/*" element={<Actions />} />
-                        <Route path="rollouts/*" element={<Rollouts />} />
+                    {/* Protected Routes */}
+                    <Route element={<AuthGuard />}>
+                        <Route path="/" element={<MainLayout />}>
+                            <Route index element={<Dashboard />} />
+                            <Route path="targets/*" element={<Targets />} />
+                            <Route path="distributions/*" element={<Distributions />} />
+                            <Route path="actions/*" element={<Actions />} />
+                            <Route path="rollouts/*" element={<Rollouts />} />
 
-                        <Route path="system/config" element={<Configuration />} />
-                        <Route path="system/types" element={<TypeManagement />} />
+                            <Route path="system/config" element={<Configuration />} />
+                            <Route path="system/types" element={<TypeManagement />} />
+                        </Route>
                     </Route>
-                </Route>
 
-                <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-        </React.Suspense>
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+            </React.Suspense>
+        </ErrorBoundary>
     );
 };
 

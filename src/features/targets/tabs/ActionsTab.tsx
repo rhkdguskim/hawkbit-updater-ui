@@ -213,7 +213,22 @@ const ActionsTab: React.FC<ActionsTabProps> = ({
     ];
 
     if (loading) {
-        return <Skeleton active paragraph={{ rows: 8 }} />;
+        return (
+            <div style={{ padding: '4px 0' }}>
+                <div style={{ marginBottom: 16, borderBottom: '1px solid var(--ant-color-border-secondary)', paddingBottom: 12, display: 'flex', gap: 24 }}>
+                    {[1, 2, 3, 4, 5, 6].map(i => (
+                        <Skeleton.Input active size="small" key={i} style={{ width: 80 }} />
+                    ))}
+                </div>
+                {[1, 2, 3, 4, 5].map(i => (
+                    <div key={i} style={{ padding: '16px 0', borderBottom: '1px solid var(--ant-color-border-secondary)', display: 'flex', gap: 24 }}>
+                        {[1, 2, 3, 4, 5, 6].map(j => (
+                            <Skeleton.Input active size="small" key={j} style={{ width: j === 1 ? 40 : 100 }} />
+                        ))}
+                    </div>
+                ))}
+            </div>
+        );
     }
 
     if (!data?.content?.length) {

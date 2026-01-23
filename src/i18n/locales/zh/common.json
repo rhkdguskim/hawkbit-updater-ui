@@ -348,5 +348,15 @@
             "onlyImages": "您只能上传图片文件！",
             "sizeLimit": "图片必须小于 2MB！"
         }
+    },
+    "notifications": {
+        "title": "通知",
+        "empty": "无通知",
+        "markAllRead": "全部标记为已读",
+        "clearAll": "全部清除",
+        "errorTitle": "错误",
+        "networkError": "网络错误",
+        "rolloutFailed": "发布失败",
+        "rolloutFailedDesc": "发布 \"{{name}}\" 失败。"
     }
 }

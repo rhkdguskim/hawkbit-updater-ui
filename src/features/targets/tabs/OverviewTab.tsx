@@ -66,7 +66,31 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
     const unassignTypeMutation = useUnassignTargetType();
 
     if (loading) {
-        return <Skeleton active paragraph={{ rows: 6 }} />;
+        return (
+            <>
+                <StatsRow gutter={[16, 16]}>
+                    {[1, 2, 3, 4].map(i => (
+                        <Col xs={12} sm={6} key={i}>
+                            <StyledCard>
+                                <Skeleton active paragraph={{ rows: 1 }} title={false} />
+                                <Skeleton.Button active block size="large" style={{ height: 40, marginTop: 8 }} />
+                            </StyledCard>
+                        </Col>
+                    ))}
+                </StatsRow>
+                <Descriptions
+                    bordered
+                    column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}
+                    size="middle"
+                >
+                    {[1, 2, 3, 4, 5, 6].map(i => (
+                        <Descriptions.Item label={<Skeleton.Input active size="small" />} key={i}>
+                            <Skeleton active paragraph={{ rows: 1 }} title={false} />
+                        </Descriptions.Item>
+                    ))}
+                </Descriptions>
+            </>
+        );
     }
 
     if (!target) {

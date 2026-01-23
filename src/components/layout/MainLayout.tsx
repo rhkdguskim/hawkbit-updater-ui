@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 import AppHeader from './AppHeader';
 import styled, { keyframes } from 'styled-components';
 import RouteLoader from '../common/RouteLoader';
+import { NotificationMonitor } from '../common/NotificationMonitor';
 
 const { Content, Footer } = Layout;
 
@@ -82,11 +83,45 @@ const StyledContent = styled(Content) <{ $bg: string; $radius: number }>`
   background: transparent;
   border-radius: ${(props) => props.$radius}px;
   transition: all 0.3s ease;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
   z-index: 1;
+  padding: 24px;
   animation: fadeInUp 0.4s ease-out;
-  
+
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--ant-color-border-secondary);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--ant-color-border);
+    }
+  }
+
+  /* Responsive padding */
+  @media (max-width: 1024px) {
+    padding: 20px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
+
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -135,6 +170,7 @@ const MainLayout: React.FC = () => {
     <StyledLayout>
       <ContentLayout>
         <AppHeader />
+        <NotificationMonitor />
         <StyledContent
           $bg={colorBgLayout}
           $radius={borderRadiusLG}

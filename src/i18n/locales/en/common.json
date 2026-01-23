@@ -363,5 +363,15 @@
             "onlyImages": "You can only upload image files!",
             "sizeLimit": "Image must be smaller than 2MB!"
         }
+    },
+    "notifications": {
+        "title": "Notifications",
+        "empty": "No notifications",
+        "markAllRead": "Mark all as read",
+        "clearAll": "Clear all",
+        "errorTitle": "Error",
+        "networkError": "Network Error",
+        "rolloutFailed": "Rollout Failed",
+        "rolloutFailedDesc": "Rollout \"{{name}}\" has failed."
     }
 }

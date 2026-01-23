@@ -1,6 +1,6 @@
 import React from 'react';
-import { Layout, theme, Avatar, Typography, Dropdown, Divider, Badge, Menu, type MenuProps } from 'antd';
-import { UserOutlined, LogoutOutlined, SettingOutlined, EditOutlined } from '@ant-design/icons';
+import { Layout, theme, Avatar, Typography, Dropdown, Divider, Badge, Menu, type MenuProps, Popover, Button } from 'antd';
+import { UserOutlined, LogoutOutlined, SettingOutlined, EditOutlined, BellOutlined } from '@ant-design/icons';
 import {
     MdDashboard,
     MdDevices,
@@ -20,6 +20,8 @@ import { LanguageSwitcher, ThemeSwitcher } from '@/components/common';
 import { AppSearchBar } from './AppSearchBar';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { UISettingsModal } from '@/components/modals';
+import { useNotificationStore } from '@/stores/useNotificationStore';
+import { NotificationPopover } from '@/components/common/NotificationPopover';
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -208,6 +210,7 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
     const navigate = useNavigate();
     const { customLogo } = useThemeStore();
     const [uiSettingsOpen, setUiSettingsOpen] = React.useState(false);
+    const { unreadCount } = useNotificationStore();
 
     const handleLogout = () => {
         logout();
@@ -306,6 +309,23 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
             </div>
 
             <HeaderRight>
+                <div style={{ marginRight: 8 }}>
+                    <Popover
+                        content={<NotificationPopover />}
+                        trigger="click"
+                        placement="bottomRight"
+                        arrow={false}
+                        overlayInnerStyle={{ padding: 0 }}
+                    >
+                        <Badge count={unreadCount()} size="small" offset={[-4, 4]}>
+                            <Button
+                                type="text"
+                                icon={<BellOutlined style={{ fontSize: 18 }} />}
+                                style={{ color: 'var(--ant-color-text-secondary)' }}
+                            />
+                        </Badge>
+                    </Popover>
+                </div>
 
                 <SettingsGroup>
                     <ThemeSwitcher />
