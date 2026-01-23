@@ -96,12 +96,14 @@ const ActionList: React.FC<ActionListProps> = ({ standalone = true }) => {
 
     // Build RSQL query from filters
     const buildFinalQuery = useCallback(() => {
-        const fiql = buildQueryFromFilterValues(filters);
+        const fiql = buildQueryFromFilterValues(filters, {
+            fieldMap: {
+                status: 'status',
+                type: 'type',
+            }
+        });
 
         if (debouncedGlobalSearch) {
-            // Search in status, type, and if possible target controllerId (though nested search support varies)
-            // We search type and status as starting point.
-            // Note: Searching Enums via text might be limited, but useful.
             const searchFields = ['status', 'type'];
             const searchQuery = searchFields
                 .map(field => buildWildcardSearch(field, debouncedGlobalSearch))

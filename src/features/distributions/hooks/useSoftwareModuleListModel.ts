@@ -69,7 +69,12 @@ export const useSoftwareModuleListModel = () => {
      * Build RSQL query from filters.
      */
     const buildFinalQuery = useCallback(() => {
-        const fiql = buildQueryFromFilterValues(filters);
+        const fiql = buildQueryFromFilterValues(filters, {
+            fieldMap: {
+                typeName: 'type.key',
+                tag: 'tag.name',
+            },
+        });
 
         if (debouncedGlobalSearch) {
             const searchFields = ['name', 'version', 'description', 'vendor'];

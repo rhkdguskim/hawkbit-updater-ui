@@ -20,6 +20,7 @@ import { useListFilterStore } from '@/stores/useListFilterStore';
 import { useServerTable } from '@/hooks/useServerTable';
 import { ListSummary } from '@/components/common';
 import { useQueryClient } from '@tanstack/react-query';
+import { buildQueryFromFilterValues, buildWildcardSearch } from '@/utils/fiql';
 
 interface DistributionSetTagListProps {
     standalone?: boolean;
@@ -52,7 +53,25 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
         sort,
         handleTableChange,
         resetPagination,
+        globalSearch,
+        setGlobalSearch,
+        debouncedGlobalSearch,
     } = useServerTable<MgmtTag>({ syncToUrl: standalone });
+
+    const buildFinalQuery = useCallback(() => {
+        const fiql = buildQueryFromFilterValues(filters);
+
+        if (debouncedGlobalSearch) {
+            const searchFields = ['name', 'description'];
+            const searchQuery = searchFields
+                .map(field => buildWildcardSearch(field, debouncedGlobalSearch))
+                .join(',');
+
+            return fiql ? `(${fiql});(${searchQuery})` : `(${searchQuery})`;
+        }
+
+        return fiql;
+    }, [filters, debouncedGlobalSearch]);
 
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [editingTag, setEditingTag] = React.useState<MgmtTag | null>(null);
@@ -69,6 +88,7 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
     } = useGetDistributionSetTagsInfinite({
         limit: pagination.pageSize,
         sort: sort || undefined,
+        q: buildFinalQuery() || undefined,
     }, {
         query: {
             getNextPageParam: (lastPage: PagedListMgmtTag, allPages: PagedListMgmtTag[]) => {
@@ -250,6 +270,8 @@ const DistributionSetTagList: React.FC<DistributionSetTagListProps> = ({ standal
             columns={columnOptions}
             visibleColumns={visibleColumns}
             onVisibilityChange={setVisibleColumns}
+            searchValue={globalSearch}
+            onSearchChange={setGlobalSearch}
             searchPlaceholder={t('list.searchPlaceholder', { defaultValue: t('common:actions.search') })}
         />
     );
