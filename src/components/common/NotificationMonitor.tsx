@@ -8,12 +8,13 @@ export const NotificationMonitor: React.FC = () => {
     const { t } = useTranslation(['common']);
     const { lastCheckTimestamp, updateLastCheck, addNotification } = useNotificationStore();
 
-    // Query for recently failed rollouts
-    // Note: We don't use sort parameter as it may not be supported by the API
-    // Instead, we rely on the API's default ordering or sort client-side if needed
+    // Query for recently failed/stopped rollouts
+    // Note: HawkBit API uses 'stopped' for failed rollouts, not 'error'
+    // Valid status values: creating, waiting_for_approval, approval_denied, ready, paused,
+    //                      starting, stopped, stopping, running, finished, deleting, deleted
     const { data } = useGetRollouts(
         {
-            q: 'status==error',
+            q: 'status==stopped',
             limit: 10, // Fetch more to ensure we catch recent failures, sort client-side
         },
         {
