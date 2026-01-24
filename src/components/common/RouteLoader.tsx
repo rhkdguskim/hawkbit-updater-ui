@@ -60,8 +60,13 @@ const RouteLoader: React.FC<RouteLoaderProps> = ({ fullScreen = false, tip }) =>
     }, []);
 
     return (
-        <LoaderContainer $fullScreen={fullScreen}>
-            <StyledSpin size="large" />
+        <LoaderContainer 
+            $fullScreen={fullScreen}
+            role="status"
+            aria-live="polite"
+            aria-label={t('accessibility.loading')}
+        >
+            <StyledSpin size="large" aria-hidden="true" />
             {displayTip && <LoadingText>{displayTip}</LoadingText>}
         </LoaderContainer>
     );

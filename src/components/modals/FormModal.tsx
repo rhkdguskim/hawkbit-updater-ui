@@ -85,8 +85,15 @@ export function FormModal<T extends object>({
         try {
             const values = await form.validateFields();
             await onSubmit(values);
-        } catch {
-            // Validation errors are handled by Form
+        } catch (error) {
+            // Show validation feedback to user
+            if (error && typeof error === 'object' && 'errorFields' in error) {
+                // Scroll to first error field for better UX
+                const firstErrorField = (error as { errorFields: Array<{ name: string[] }> }).errorFields[0];
+                if (firstErrorField) {
+                    form.scrollToField(firstErrorField.name);
+                }
+            }
         }
     };
 

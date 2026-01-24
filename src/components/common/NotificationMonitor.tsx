@@ -13,7 +13,7 @@ export const NotificationMonitor: React.FC = () => {
     const { data } = useGetRollouts(
         {
             q: 'status==error',
-            sort: 'createdAt:DESC',
+            sort: 'lastModifiedAt:DESC',
             limit: 5, // Check last 5 to be safe, though 1 is usually enough if polled frequently
         },
         {

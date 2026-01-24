@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(npm run lint:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(git pull:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: comprehensive refactoring and dashboard UI/UX improvements\n\nPhase 1: Core Infrastructure Refactoring\n- Add type guard utilities to replace 209+ type assertions across codebase\n- Implement error class hierarchy for better error handling\n- Create unified notification system with i18n support\n- Centralize configuration constants (polling intervals, size limits, etc.)\n- Refactor axios-instance with improved error handling and interceptors\n- Add ErrorBoundary component for graceful error recovery\n- Implement reusable modal state management hook\n- Extract target-related logic into dedicated query and mutation hooks\n\nPhase 2: Dashboard & UI/UX Enhancements\n- Create comprehensive animation system with accessibility support (prefers-reduced-motion)\n- Build enhanced widget styling system with 3 variants (default, highlight, glass)\n- Implement 5 reusable widget components (BaseWidget, MetricCard, StatusCard, QuickActionCard, EmptyState)\n- Add skeleton loading components for better perceived performance\n- Design responsive dashboard layout with 5 sections (header, KPI, operations, trends, signals)\n- Create 10 consistent page layout components (PageContainer, PageGrid, ResponsiveRow, etc.)\n- Fix MainLayout overflow issue causing component clipping\n- Add custom scrollbar styling across layouts\n\nInfrastructure Improvements\n- Add NotificationMonitor for real-time error tracking\n- Implement NotificationPopover with badge and list views\n- Create notification store with Zustand for state management\n- Update all translations for Korean, English, and Chinese (400+ keys each)\n\nBug Fixes\n- Fix TypeScript erasableSyntaxOnly errors in error classes\n- Resolve RuleSet type incompatibility in styled-components\n- Add proper optional chaining for undefined error responses\n- Remove unused imports and clean up linter warnings\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

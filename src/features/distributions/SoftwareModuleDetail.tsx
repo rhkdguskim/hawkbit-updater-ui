@@ -35,7 +35,8 @@ const SoftwareModuleDetail: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const softwareModuleId = parseInt(id || '0', 10);
+    const softwareModuleId = parseInt(id || '', 10);
+    const isValidId = !isNaN(softwareModuleId) && softwareModuleId > 0;
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
     const [activeTab, setActiveTab] = useState('overview');
@@ -63,10 +64,18 @@ const SoftwareModuleDetail: React.FC = () => {
     };
 
     // Fetch Module Details
-    const { data: moduleData, isLoading: isModuleLoading } = useGetSoftwareModule(softwareModuleId);
+    const { data: moduleData, isLoading: isModuleLoading, error: moduleError } = useGetSoftwareModule(softwareModuleId, {
+        query: { enabled: isValidId },
+    });
 
     // Fetch Artifacts
-    const { data: artifactsData, isLoading: isArtifactsLoading, refetch: refetchArtifacts } = useGetArtifacts(softwareModuleId);
+    const { data: artifactsData, isLoading: isArtifactsLoading, refetch: refetchArtifacts } = useGetArtifacts(
+        softwareModuleId,
+        {},
+        {
+            query: { enabled: isValidId },
+        }
+    );
 
     // Upload Artifact
     const uploadMutation = useUploadArtifact({
@@ -323,6 +332,40 @@ const SoftwareModuleDetail: React.FC = () => {
     const titleExtra = moduleData?.version ? (
         <Tag color="blue">{moduleData.version}</Tag>
     ) : undefined;
+
+    // Handle invalid ID
+    if (!isValidId) {
+        return (
+            <StandardDetailLayout
+                fullHeight={true}
+                breadcrumbs={[
+                    { label: t('modules.title'), path: '/distributions/modules' },
+                    { label: t('detail.notFound') },
+                ]}
+                title={t('detail.notFound')}
+                description={t('detail.invalidId')}
+                backLabel={t('common:actions.back')}
+                onBack={() => navigate('/distributions/modules')}
+            />
+        );
+    }
+
+    // Handle error from API
+    if (moduleError) {
+        return (
+            <StandardDetailLayout
+                fullHeight={true}
+                breadcrumbs={[
+                    { label: t('modules.title'), path: '/distributions/modules' },
+                    { label: t('detail.notFound') },
+                ]}
+                title={t('detail.notFound')}
+                description={t('detail.notFoundDescription')}
+                backLabel={t('common:actions.back')}
+                onBack={() => navigate('/distributions/modules')}
+            />
+        );
+    }
 
     const tabItems = [
         { key: 'overview', label: t('detail.overview'), children: overviewTab },

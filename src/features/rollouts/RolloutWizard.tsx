@@ -31,7 +31,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import { useApprovalPolicyStore } from '@/stores/useApprovalPolicyStore';
 
 dayjs.extend(isBetween);
-import { useCreate, useStart, getRollouts } from '@/api/generated/rollouts/rollouts';
+import { useCreate, useStart, getRollouts, getGetRolloutsQueryKey } from '@/api/generated/rollouts/rollouts';
 import { useGetDistributionSets, useGetAssignedSoftwareModules } from '@/api/generated/distribution-sets/distribution-sets';
 import { useGetDistributionSetTypes } from '@/api/generated/distribution-set-types/distribution-set-types';
 import { useGetArtifacts } from '@/api/generated/software-modules/software-modules';
@@ -326,7 +326,7 @@ export const RolloutWizard: React.FC<RolloutWizardProps> = ({ isModal, onClose, 
         mutation: {
             onSuccess: async (data) => {
                 message.success(t('wizard.messages.createSuccess'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetRolloutsQueryKey() });
 
                 if (data.id) {
                     const rolloutId = data.id;

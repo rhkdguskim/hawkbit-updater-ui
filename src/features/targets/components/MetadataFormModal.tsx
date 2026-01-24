@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input } from 'antd';
+import { useTranslation } from 'react-i18next';
 import type { MgmtMetadata } from '@/api/generated/model';
 
 interface MetadataFormModalProps {
@@ -19,6 +20,7 @@ const MetadataFormModal: React.FC<MetadataFormModalProps> = ({
     onSubmit,
     onCancel,
 }) => {
+    const { t } = useTranslation(['targets', 'common']);
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -38,19 +40,27 @@ const MetadataFormModal: React.FC<MetadataFormModalProps> = ({
         try {
             const values = await form.validateFields();
             onSubmit(values);
-        } catch {
-            // Validation error
+        } catch (error) {
+            // Scroll to first error field
+            if (error && typeof error === 'object' && 'errorFields' in error) {
+                const firstErrorField = (error as { errorFields: Array<{ name: string[] }> }).errorFields[0];
+                if (firstErrorField) {
+                    form.scrollToField(firstErrorField.name);
+                }
+            }
         }
     };
 
     return (
         <Modal
-            title={mode === 'create' ? 'Add Metadata' : 'Edit Metadata'}
+            title={mode === 'create' ? t('metadata.addTitle') : t('metadata.editTitle')}
             open={open}
             onOk={handleOk}
             onCancel={onCancel}
             confirmLoading={loading}
             destroyOnHidden
+            okText={mode === 'create' ? t('common:actions.create') : t('common:actions.save')}
+            cancelText={t('common:actions.cancel')}
         >
             <Form
                 form={form}
@@ -58,25 +68,25 @@ const MetadataFormModal: React.FC<MetadataFormModalProps> = ({
             >
                 <Form.Item
                     name="key"
-                    label="Key"
+                    label={t('metadata.keyLabel')}
                     rules={[
-                        { required: true, message: 'Please enter metadata key' },
-                        { pattern: /^[a-zA-Z0-9._-]+$/, message: 'Key must be alphanumeric with dots, underscores, or hyphens' },
+                        { required: true, message: t('metadata.keyRequired') },
+                        { pattern: /^[a-zA-Z0-9._-]+$/, message: t('metadata.keyPattern') },
                     ]}
                 >
                     <Input
-                        placeholder="e.g., config.version"
+                        placeholder={t('metadata.keyPlaceholder')}
                         disabled={mode === 'edit'}
                     />
                 </Form.Item>
 
                 <Form.Item
                     name="value"
-                    label="Value"
-                    rules={[{ required: true, message: 'Please enter metadata value' }]}
+                    label={t('metadata.valueLabel')}
+                    rules={[{ required: true, message: t('metadata.valueRequired') }]}
                 >
                     <Input.TextArea
-                        placeholder="Enter value"
+                        placeholder={t('metadata.valuePlaceholder')}
                         rows={3}
                     />
                 </Form.Item>

@@ -1,8 +1,9 @@
 import React, { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Button, Result } from 'antd';
 import { ReloadOutlined, HomeOutlined } from '@ant-design/icons';
+import { withTranslation, type WithTranslation } from 'react-i18next';
 
-interface Props {
+interface Props extends WithTranslation {
   children: ReactNode;
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
@@ -18,7 +19,7 @@ interface State {
 /**
  * Error Boundary component to catch and handle React errors
  */
-export class ErrorBoundary extends Component<Props, State> {
+class ErrorBoundaryClass extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -87,6 +88,8 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   render(): ReactNode {
+    const { t } = this.props;
+
     if (this.state.hasError) {
       // Use custom fallback if provided
       if (this.props.fallback) {
@@ -96,6 +99,8 @@ export class ErrorBoundary extends Component<Props, State> {
       // Default error UI
       return (
         <div
+          role="alert"
+          aria-live="assertive"
           style={{
             display: 'flex',
             justifyContent: 'center',
@@ -106,16 +111,16 @@ export class ErrorBoundary extends Component<Props, State> {
         >
           <Result
             status="error"
-            title="Something went wrong"
+            title={t('common:errors.somethingWentWrong')}
             subTitle={
               <>
-                <p>We're sorry, but something unexpected happened.</p>
+                <p>{t('common:errors.unexpectedError')}</p>
                 {import.meta.env.DEV && this.state.error && (
                   <div
                     style={{
                       marginTop: '16px',
                       padding: '12px',
-                      background: '#f5f5f5',
+                      background: 'var(--ant-color-bg-container-disabled, #f5f5f5)',
                       borderRadius: '4px',
                       textAlign: 'left',
                       fontSize: '12px',
@@ -124,12 +129,12 @@ export class ErrorBoundary extends Component<Props, State> {
                       overflow: 'auto',
                     }}
                   >
-                    <strong>Error:</strong> {this.state.error.message}
+                    <strong>{t('common:errors.errorLabel')}:</strong> {this.state.error.message}
                     {this.state.errorInfo && (
                       <>
                         <br />
                         <br />
-                        <strong>Stack Trace:</strong>
+                        <strong>{t('common:errors.stackTrace')}:</strong>
                         <pre
                           style={{
                             margin: '8px 0 0 0',
@@ -152,14 +157,14 @@ export class ErrorBoundary extends Component<Props, State> {
                 icon={<ReloadOutlined />}
                 onClick={this.handleReload}
               >
-                Reload Page
+                {t('common:actions.refresh')}
               </Button>,
               <Button
                 key="home"
                 icon={<HomeOutlined />}
                 onClick={this.handleGoHome}
               >
-                Go Home
+                {t('common:nav.home')}
               </Button>,
             ]}
           />
@@ -170,3 +175,5 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
+
+export const ErrorBoundary = withTranslation(['common'])(ErrorBoundaryClass);

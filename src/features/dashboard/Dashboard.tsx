@@ -239,7 +239,15 @@ const Dashboard: React.FC = () => {
     ];
 
     return (
-        <div style={{ padding: '0 24px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ 
+            padding: '0 24px 32px', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: 20,
+            maxWidth: '1920px',
+            margin: '0 auto',
+            width: '100%'
+        }}>
             <DashboardHeader
                 lastUpdated={metrics.lastUpdated}
                 isActivePolling={metrics.isActivePolling}
@@ -288,10 +296,12 @@ const Dashboard: React.FC = () => {
                 type="line"
                 size="large"
                 tabBarStyle={{
-                    marginBottom: 16,
+                    marginBottom: 20,
                     borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                    padding: '0 4px'
+                    padding: '0 8px',
+                    background: 'transparent',
                 }}
+                tabBarGutter={32}
             />
 
             {/* Modals */}

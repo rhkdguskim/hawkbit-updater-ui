@@ -41,51 +41,67 @@ export const DashboardSurface = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
     min-height: 100%;
     flex: 1;
     isolation: isolate;
 
-    /* 카드 스타일 통일 */
+    /* Modern card styles */
     .ant-card {
         border: 1px solid var(--ant-color-border);
-        box-shadow: var(--shadow-sm);
-        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+        border-radius: 16px;
         display: flex;
         flex-direction: column;
         min-height: 0;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
     }
 
     .ant-card:hover {
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: var(--ant-color-primary-border-hover);
+    }
+
+    .ant-card-head {
+        border-bottom: 1px solid var(--ant-color-border-secondary);
+        padding: 16px 20px;
+        min-height: auto;
+    }
+
+    .ant-card-head-title {
+        padding: 0;
     }
 
     .ant-card-body {
         min-height: 0;
         overflow: visible;
+        padding: 20px;
     }
 
     [data-theme='dark'] & .ant-card,
     .dark-mode & .ant-card {
-        background-color: var(--ant-color-bg-container);
-        border-color: var(--glass-border);
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+        border-color: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(10px);
     }
 
     [data-theme='dark'] & .ant-card:hover,
     .dark-mode & .ant-card:hover {
-        box-shadow: var(--shadow-xl);
+        box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.4), 0 8px 20px -10px rgba(0, 0, 0, 0.3);
         border-color: var(--ant-color-primary-border);
     }
 
     .dashboard-clickable {
         cursor: pointer;
-        transition: all 0.15s ease;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .dashboard-clickable:focus-visible {
         outline: 2px solid var(--ant-color-primary);
-        outline-offset: 2px;
+        outline-offset: 3px;
+        border-radius: 8px;
     }
 
     .dashboard-clickable[data-disabled='true'] {
@@ -94,13 +110,13 @@ export const DashboardSurface = styled.div`
     }
 
     .dashboard-clickable:active {
-        transform: scale(0.99);
+        transform: scale(0.98);
     }
 `;
 
 export const DashboardScrollContent = styled(BaseScrollContent)`
-    gap: 20px;
-    padding: 4px 8px 20px;
+    gap: 24px;
+    padding: 8px 12px 24px;
 `;
 
 // Dashboard Specific Layouts

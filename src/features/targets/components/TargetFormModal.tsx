@@ -38,8 +38,14 @@ const TargetFormModal: React.FC<TargetFormModalProps> = ({
         try {
             const values = await form.validateFields();
             onSubmit(values);
-        } catch {
-            // Validation error
+        } catch (error) {
+            // Show validation feedback - scroll to first error field
+            if (error && typeof error === 'object' && 'errorFields' in error) {
+                const firstErrorField = (error as { errorFields: Array<{ name: string[] }> }).errorFields[0];
+                if (firstErrorField) {
+                    form.scrollToField(firstErrorField.name);
+                }
+            }
         }
     };
 

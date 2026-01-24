@@ -339,6 +339,7 @@ const InfiniteSearchResults = ({
     isEnabled,
     categoryColor
 }: any) => {
+    const { t } = useTranslation('common');
     const {
         data,
         fetchNextPage,
@@ -379,7 +380,7 @@ const InfiniteSearchResults = ({
         return (
             <EmptyState>
                 <EmptyIcon><MdSearch /></EmptyIcon>
-                <Text type="secondary">No results found</Text>
+                <Text type="secondary">{t('search.noResults')}</Text>
             </EmptyState>
         );
     }
@@ -389,7 +390,7 @@ const InfiniteSearchResults = ({
             <CategoryHeader>
                 <CategoryTitle>
                     <Badge count={total} style={{ backgroundColor: categoryColor?.icon || 'var(--ant-color-primary)' }} />
-                    <span>RESULTS</span>
+                    <span>{t('search.results')}</span>
                 </CategoryTitle>
             </CategoryHeader>
             {items.map((item: any, index: number) => (
@@ -405,7 +406,7 @@ const InfiniteSearchResults = ({
                     </ResultInfo>
                     <ResultMeta>
                         <Tag style={{ marginRight: 0, borderRadius: 6 }}>
-                            {item.status || item.type || item.targetType?.name || 'N/A'}
+                            {item.status || item.type || item.targetType?.name || t('common:labels.notAvailable')}
                         </Tag>
                     </ResultMeta>
                 </ResultCard>
@@ -593,7 +594,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
                             <Title level={5} style={{ marginBottom: 8, color: 'var(--ant-color-text-secondary)' }}>
                                 {t('search.noResults', { defaultValue: 'No results found' })}
                             </Title>
-                            <Text type="secondary">Try different keywords</Text>
+                            <Text type="secondary">{t('search.tryDifferentKeywords', { defaultValue: 'Try different keywords' })}</Text>
                         </EmptyState>
                     ) : (
                         <>

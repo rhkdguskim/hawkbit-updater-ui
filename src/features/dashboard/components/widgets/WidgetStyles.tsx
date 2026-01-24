@@ -6,7 +6,7 @@ const { Text } = Typography;
 
 export const WidgetContainer = styled.div`
     background: var(--ant-color-bg-container);
-    border-radius: var(--ant-border-radius-lg, 16px);
+    border-radius: 16px;
     padding: 20px;
     border: 1px solid var(--ant-color-border-secondary);
     display: flex;
@@ -15,20 +15,53 @@ export const WidgetContainer = styled.div`
     height: 100%;
     min-height: 200px;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--ant-box-shadow-tertiary);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+    position: relative;
+
+    /* Subtle gradient overlay for depth */
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 80px;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 0%, transparent 100%);
+        pointer-events: none;
+        border-radius: 16px 16px 0 0;
+        opacity: 0.5;
+    }
 
     &:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--ant-box-shadow-secondary);
-        border-color: var(--ant-color-border);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: var(--ant-color-primary-border-hover);
+    }
+
+    [data-theme='dark'] &,
+    .dark-mode & {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+        border-color: rgba(255, 255, 255, 0.06);
+        
+        &::before {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+        }
+
+        &:hover {
+            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
+            border-color: var(--ant-color-primary-border);
+        }
     }
 `;
 
 export const HeaderRow = styled(Flex)`
     border-bottom: 1px solid var(--ant-color-border-secondary);
-    padding-bottom: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 4px;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
 `;
 
 export const IconBadge = styled(SharedIconBadge) <{ $status?: 'normal' | 'warning' | 'critical' }>`
@@ -38,11 +71,25 @@ export const IconBadge = styled(SharedIconBadge) <{ $status?: 'normal' | 'warnin
 `;
 
 export const MetricCard = styled.div`
-    background: var(--ant-color-bg-layout);
-    border-radius: 10px;
-    padding: 12px 16px;
+    background: linear-gradient(135deg, var(--ant-color-fill-quaternary) 0%, var(--ant-color-bg-layout) 100%);
+    border-radius: 12px;
+    padding: 14px 18px;
     flex: 1;
     border: 1px solid var(--ant-color-border-secondary);
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 1;
+
+    &:hover {
+        background: var(--ant-color-fill-tertiary);
+        border-color: var(--ant-color-border);
+    }
+
+    [data-theme='dark'] &,
+    .dark-mode & {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+        border-color: rgba(255, 255, 255, 0.06);
+    }
 `;
 
 export const MetricLabel = styled(Text)`
@@ -57,9 +104,10 @@ export const MetricLabel = styled(Text)`
 
 export const MetricValue = styled.div<{ $status?: 'normal' | 'warning' | 'critical' }>`
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 700;
-    margin-top: 4px;
+    margin-top: 6px;
+    letter-spacing: -0.02em;
     color: ${({ $status }) =>
         $status === 'critical' ? 'var(--ant-color-error)' :
             $status === 'warning' ? 'var(--ant-color-warning)' :
@@ -67,7 +115,8 @@ export const MetricValue = styled.div<{ $status?: 'normal' | 'warning' | 'critic
     };
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    line-height: 1.1;
 `;
 
 export const ThresholdText = styled(Text)`
@@ -146,8 +195,8 @@ export const LegendDot = styled.div<{ $color: string }>`
 export const ActivityCard = styled.div<{ $status?: 'success' | 'error' | 'warning' | 'info' | 'default' | 'canceled' }>`
     display: flex;
     flex-direction: column;
-    padding: 12px;
-    border-radius: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
     background: var(--ant-color-fill-quaternary);
     border: 1px solid var(--border-secondary);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -159,32 +208,48 @@ export const ActivityCard = styled.div<{ $status?: 'success' | 'error' | 'warnin
         background: var(--ant-color-fill-tertiary);
         border-color: var(--ant-color-primary-border);
         transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        box-shadow: 0 6px 20px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--ant-color-primary);
+        outline-offset: 2px;
     }
 
     ${({ $status }) => {
         if ($status === 'error') return css`
-            background: rgba(var(--color-error-rgb), 0.05);
+            background: linear-gradient(135deg, rgba(var(--color-error-rgb), 0.06) 0%, rgba(var(--color-error-rgb), 0.02) 100%);
             border-left: 4px solid var(--ant-color-error);
-            &:hover { background: rgba(var(--color-error-rgb), 0.08); }
+            &:hover { background: linear-gradient(135deg, rgba(var(--color-error-rgb), 0.1) 0%, rgba(var(--color-error-rgb), 0.04) 100%); }
         `;
         if ($status === 'warning' || $status === 'canceled') return css`
-            background: rgba(var(--color-warning-rgb), 0.05);
+            background: linear-gradient(135deg, rgba(var(--color-warning-rgb), 0.06) 0%, rgba(var(--color-warning-rgb), 0.02) 100%);
             border-left: 4px solid var(--ant-color-warning);
-            &:hover { background: rgba(var(--color-warning-rgb), 0.08); }
+            &:hover { background: linear-gradient(135deg, rgba(var(--color-warning-rgb), 0.1) 0%, rgba(var(--color-warning-rgb), 0.04) 100%); }
         `;
         if ($status === 'success') return css`
-            background: rgba(var(--color-success-rgb), 0.05);
+            background: linear-gradient(135deg, rgba(var(--color-success-rgb), 0.06) 0%, rgba(var(--color-success-rgb), 0.02) 100%);
             border-left: 4px solid var(--ant-color-success);
-            &:hover { background: rgba(var(--color-success-rgb), 0.08); }
+            &:hover { background: linear-gradient(135deg, rgba(var(--color-success-rgb), 0.1) 0%, rgba(var(--color-success-rgb), 0.04) 100%); }
         `;
         if ($status === 'info') return css`
-            background: rgba(var(--color-primary-rgb), 0.05);
+            background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.06) 0%, rgba(var(--color-primary-rgb), 0.02) 100%);
             border-left: 4px solid var(--ant-color-primary);
-            &:hover { background: rgba(var(--color-primary-rgb), 0.08); }
+            &:hover { background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.1) 0%, rgba(var(--color-primary-rgb), 0.04) 100%); }
         `;
         return css`
             border-left: 4px solid transparent;
         `;
     }}
+
+    [data-theme='dark'] &,
+    .dark-mode & {
+        background: rgba(255, 255, 255, 0.02);
+        border-color: rgba(255, 255, 255, 0.06);
+        
+        &:hover {
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+    }
 `;

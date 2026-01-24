@@ -75,17 +75,17 @@ const AutoConfirmTab: React.FC<AutoConfirmTabProps> = ({
                     </Tag>
                 </Descriptions.Item>
                 {data.initiator && (
-                    <Descriptions.Item label="Activated By">
+                    <Descriptions.Item label={t('autoConfirm.activatedBy')}>
                         <Text>{data.initiator}</Text>
                     </Descriptions.Item>
                 )}
                 {data.remark && (
-                    <Descriptions.Item label="Remark">
+                    <Descriptions.Item label={t('autoConfirm.remark')}>
                         <Text>{data.remark}</Text>
                     </Descriptions.Item>
                 )}
                 {data.activatedAt && (
-                    <Descriptions.Item label="Activated At">
+                    <Descriptions.Item label={t('autoConfirm.activatedAt')}>
                         {dayjs(data.activatedAt).format('YYYY-MM-DD HH:mm:ss')}
                     </Descriptions.Item>
                 )}

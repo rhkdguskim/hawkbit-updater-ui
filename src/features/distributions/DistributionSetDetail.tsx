@@ -38,20 +38,29 @@ const DistributionSetDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const distributionSetId = parseInt(id || '0', 10);
+    const distributionSetId = parseInt(id || '', 10);
+    const isValidId = !isNaN(distributionSetId) && distributionSetId > 0;
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
     const [activeTab, setActiveTab] = useState('overview');
     const [isAssignModalVisible, setIsAssignModalVisible] = useState(false);
 
     // Fetch Distribution Set Details
-    const { data: setData, isLoading: isSetLoading } = useGetDistributionSet(distributionSetId);
+    const { data: setData, isLoading: isSetLoading, error: setError } = useGetDistributionSet(distributionSetId, {
+        query: { enabled: isValidId },
+    });
 
     // Fetch Assigned Modules
     const {
         data: assignedModulesData,
         isLoading: isModulesLoading,
-    } = useGetAssignedSoftwareModules(distributionSetId);
+    } = useGetAssignedSoftwareModules(
+        distributionSetId,
+        {},
+        {
+            query: { enabled: isValidId },
+        }
+    );
 
     // Assign Mutation
     const assignMutation = useAssignSoftwareModules({
@@ -244,6 +253,40 @@ const DistributionSetDetail: React.FC = () => {
             </Button>
         </>
     ) : undefined;
+
+    // Handle invalid ID
+    if (!isValidId) {
+        return (
+            <StandardDetailLayout
+                fullHeight={true}
+                breadcrumbs={[
+                    { label: t('sets.title'), path: '/distributions/sets' },
+                    { label: t('detail.notFound') },
+                ]}
+                title={t('detail.notFound')}
+                description={t('detail.invalidId')}
+                backLabel={t('sets.title')}
+                onBack={() => navigate('/distributions/sets')}
+            />
+        );
+    }
+
+    // Handle error from API
+    if (setError) {
+        return (
+            <StandardDetailLayout
+                fullHeight={true}
+                breadcrumbs={[
+                    { label: t('sets.title'), path: '/distributions/sets' },
+                    { label: t('detail.notFound') },
+                ]}
+                title={t('detail.notFound')}
+                description={t('detail.notFoundDescription')}
+                backLabel={t('sets.title')}
+                onBack={() => navigate('/distributions/sets')}
+            />
+        );
+    }
 
     const tabItems = [
         { key: 'overview', label: t('detail.overview'), children: overviewTab },

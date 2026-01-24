@@ -37,6 +37,9 @@ import {
     useDeleteMetadata,
     getGetTargetQueryKey,
     getGetMetadataQueryKey,
+    getGetAssignedDistributionSetQueryKey,
+    getGetInstalledDistributionSetQueryKey,
+    getGetAutoConfirmStatusQueryKey,
 } from '@/api/generated/targets/targets';
 import { useGetDistributionSets } from '@/api/generated/distribution-sets/distribution-sets';
 import type { MgmtDistributionSetAssignment, MgmtDistributionSetAssignments, MgmtMetadata } from '@/api/generated/model';
@@ -189,7 +192,9 @@ const TargetDetail: React.FC = () => {
             onSuccess: () => {
                 message.success(t('messages.assignSuccess'));
                 setAssignModalOpen(false);
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetTargetQueryKey(targetId) });
+                queryClient.invalidateQueries({ queryKey: getGetAssignedDistributionSetQueryKey(targetId) });
+                queryClient.invalidateQueries({ queryKey: getGetInstalledDistributionSetQueryKey(targetId) });
             },
             onError: (error) => {
                 message.error((error as Error).message || t('common:messages.error'));
@@ -201,7 +206,7 @@ const TargetDetail: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('messages.autoConfirmActivated'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetAutoConfirmStatusQueryKey(targetId) });
             },
             onError: (error) => {
                 message.error((error as Error).message || t('common:messages.error'));
@@ -213,7 +218,7 @@ const TargetDetail: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('messages.autoConfirmDeactivated'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetAutoConfirmStatusQueryKey(targetId) });
             },
             onError: (error) => {
                 message.error((error as Error).message || t('common:messages.error'));

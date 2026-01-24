@@ -160,7 +160,10 @@
         "activate": "Activate AutoConfirm",
         "deactivate": "Deactivate AutoConfirm",
         "activatedSuccess": "AutoConfirm activated.",
-        "deactivatedSuccess": "AutoConfirm deactivated."
+        "deactivatedSuccess": "AutoConfirm deactivated.",
+        "activatedBy": "Activated By",
+        "remark": "Remark",
+        "activatedAt": "Activated At"
     },
     "overview": {
         "title": "Device Monitoring",
@@ -271,7 +274,9 @@
         "noAssigned": "No assigned distribution set",
         "noConfigured": "No distribution sets configured",
         "yes": "Yes",
-        "no": "No"
+        "no": "No",
+        "version": "Version",
+        "moduleCount": "{{count}} module(s)"
     },
     "metadata": {
         "key": "Key",
@@ -279,10 +284,19 @@
         "noMetadata": "No metadata found",
         "add": "Add Metadata",
         "edit": "Edit Metadata",
+        "addTitle": "Add Metadata",
+        "editTitle": "Edit Metadata",
         "deleteTitle": "Delete Metadata",
         "deleteConfirm": "Are you sure you want to delete the metadata entry '{{key}}'?",
         "deleteDesc": "This action cannot be undone.",
-        "emptyText": "No metadata. Click 'Add Metadata' to create."
+        "emptyText": "No metadata. Click 'Add Metadata' to create.",
+        "keyLabel": "Key",
+        "valueLabel": "Value",
+        "keyRequired": "Please enter metadata key",
+        "keyPattern": "Key must be alphanumeric with dots, underscores, or hyphens",
+        "valueRequired": "Please enter metadata value",
+        "keyPlaceholder": "e.g., config.version",
+        "valuePlaceholder": "Enter value"
     },
     "tags": {
         "noTags": "No tags assigned to this target"

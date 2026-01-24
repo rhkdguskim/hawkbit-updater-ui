@@ -285,11 +285,22 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
     return (
         <StyledHeader>
             <HeaderLeft>
-                <LogoContainer onClick={() => navigate('/')}>
+                <LogoContainer 
+                    onClick={() => navigate('/')}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            navigate('/');
+                        }
+                    }}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={t('common:accessibility.navigateHome')}
+                >
                     {customLogo ? (
-                        <img src={customLogo} alt="Logo" className="custom-logo" />
+                        <img src={customLogo} alt={t('common:appName')} className="custom-logo" />
                     ) : (
-                        <div className="logo-icon">
+                        <div className="logo-icon" aria-hidden="true">
                             <MdRocketLaunch />
                         </div>
                     )}

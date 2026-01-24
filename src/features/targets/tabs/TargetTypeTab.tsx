@@ -90,7 +90,7 @@ const TargetTypeTab: React.FC<TargetTypeTabProps> = ({
                             </Space>
 
                             <Descriptions column={1} bordered size="small">
-                                <Descriptions.Item label="ID">
+                                <Descriptions.Item label={t('table.id')}>
                                     {currentTypeId}
                                 </Descriptions.Item>
                                 <Descriptions.Item label={t('table.name')}>

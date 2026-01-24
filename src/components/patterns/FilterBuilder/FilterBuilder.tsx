@@ -215,7 +215,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
 
 
     return (
-        <Container>
+        <Container role="search" aria-label={t('accessibility.filterSearch')}>
             <HeaderRow>
                 <FiltersSection>
                     <Popover

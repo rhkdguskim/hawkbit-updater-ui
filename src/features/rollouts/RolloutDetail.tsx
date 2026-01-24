@@ -33,6 +33,8 @@ import {
     useDeny,
     useRetryRollout,
     useDelete,
+    getGetRolloutQueryKey,
+    getGetRolloutGroupsQueryKey,
 } from '@/api/generated/rollouts/rollouts';
 import type { MgmtRolloutGroup } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -59,12 +61,13 @@ const RolloutDetail: React.FC = () => {
     const [actionModalOpen, setActionModalOpen] = useState(false);
     const [currentAction, setCurrentAction] = useState<RolloutActionType | null>(null);
 
-    const rolloutIdNum = parseInt(rolloutId || '0', 10);
+    const rolloutIdNum = parseInt(rolloutId || '', 10);
+    const isValidId = !isNaN(rolloutIdNum) && rolloutIdNum > 0;
 
     // Fetch rollout details with real-time polling
     const { data: rolloutData, isLoading, error } = useGetRollout(rolloutIdNum, {
         query: {
-            enabled: !!rolloutIdNum,
+            enabled: isValidId,
             refetchInterval: (query) => {
                 const status = query.state.data?.status?.toLowerCase();
                 // Poll every 2 seconds when status is dynamic (creating, starting, running)
@@ -84,7 +87,7 @@ const RolloutDetail: React.FC = () => {
         { limit: 100 },
         {
             query: {
-                enabled: !!rolloutIdNum,
+                enabled: isValidId,
                 refetchInterval: rolloutData?.status && ['creating', 'starting', 'running', 'paused', 'waiting_for_approval'].includes(rolloutData.status.toLowerCase())
                     ? 2000
                     : 10000,
@@ -98,7 +101,8 @@ const RolloutDetail: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('detail.messages.startSuccess'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetRolloutQueryKey(rolloutIdNum) });
+                queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
                 message.error((err as Error).message || t('detail.messages.startError'));
@@ -110,7 +114,8 @@ const RolloutDetail: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('detail.messages.pauseSuccess'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetRolloutQueryKey(rolloutIdNum) });
+                queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
                 message.error((err as Error).message || t('detail.messages.pauseError'));
@@ -122,7 +127,8 @@ const RolloutDetail: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('detail.messages.resumeSuccess'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetRolloutQueryKey(rolloutIdNum) });
+                queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
                 message.error((err as Error).message || t('detail.messages.resumeError'));
@@ -134,7 +140,8 @@ const RolloutDetail: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('detail.messages.approveSuccess'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetRolloutQueryKey(rolloutIdNum) });
+                queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
                 message.error((err as Error).message || t('detail.messages.approveError'));
@@ -146,7 +153,8 @@ const RolloutDetail: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('detail.messages.denySuccess'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetRolloutQueryKey(rolloutIdNum) });
+                queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
                 message.error((err as Error).message || t('detail.messages.denyError'));
@@ -206,7 +214,8 @@ const RolloutDetail: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('detail.messages.retrySuccess'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetRolloutQueryKey(rolloutIdNum) });
+                queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
                 message.error((err as Error).message || t('detail.messages.retryError'));
@@ -238,6 +247,24 @@ const RolloutDetail: React.FC = () => {
             deleteMutation.mutate({ rolloutId: rolloutIdNum });
         }
     };
+
+    // Handle invalid ID
+    if (!isValidId) {
+        return (
+            <PageLayout>
+                <Alert
+                    type="error"
+                    message={t('detail.notFound')}
+                    description={t('detail.invalidId')}
+                    action={
+                        <Button onClick={() => navigate('/rollouts')}>
+                            {t('detail.backToRollouts')}
+                        </Button>
+                    }
+                />
+            </PageLayout>
+        );
+    }
 
     if (error || (!isLoading && !rolloutData)) {
         return (

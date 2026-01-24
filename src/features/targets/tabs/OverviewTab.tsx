@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import styled from 'styled-components';
 import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
-import { useAssignTargetType, useUnassignTargetType } from '@/api/generated/targets/targets';
+import { useAssignTargetType, useUnassignTargetType, getGetTargetQueryKey } from '@/api/generated/targets/targets';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/useAuthStore';
 
@@ -116,7 +116,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 });
                 message.success(t('messages.targetTypeAssigned'));
             }
-            queryClient.invalidateQueries();
+            queryClient.invalidateQueries({ queryKey: getGetTargetQueryKey(target.controllerId) });
         } catch (error) {
             message.error((error as Error).message || t('common:messages.error'));
         } finally {

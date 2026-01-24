@@ -153,6 +153,14 @@ const TargetList: React.FC = () => {
                     locale={{ emptyText: t('noTargets') }}
                     onRow={(record) => ({
                         onDoubleClick: () => handleViewDetail(record),
+                        onKeyDown: (e: React.KeyboardEvent) => {
+                            if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+                                handleViewDetail(record);
+                            }
+                        },
+                        tabIndex: 0,
+                        role: 'row',
+                        'aria-label': `${t('common:table.target')}: ${record.name || record.controllerId}`,
                     })}
                     onFetchNextPage={model.fetchNextPage}
                     hasNextPage={model.hasNextPage}

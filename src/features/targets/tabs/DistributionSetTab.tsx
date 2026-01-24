@@ -90,7 +90,7 @@ const DSCard: React.FC<{ ds: MgmtDistributionSet | null | undefined; title: stri
                 <Descriptions.Item label={t('table.name')}>
                     <Text strong>{ds.name}</Text>
                 </Descriptions.Item>
-                <Descriptions.Item label="Version">
+                <Descriptions.Item label={t('ds.version')}>
                     <Tag color="cyan">v{ds.version}</Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label={t('form.description')} span={2}>
@@ -108,7 +108,7 @@ const DSCard: React.FC<{ ds: MgmtDistributionSet | null | undefined; title: stri
                     {ds.createdAt ? dayjs(ds.createdAt).format('YYYY-MM-DD HH:mm') : '-'}
                 </Descriptions.Item>
                 <Descriptions.Item label={t('ds.modules')}>
-                    {ds.modules?.length || 0} module(s)
+                    {t('ds.moduleCount', { count: ds.modules?.length || 0 })}
                 </Descriptions.Item>
             </Descriptions>
 

@@ -375,5 +375,29 @@
         "networkError": "네트워크 오류",
         "rolloutFailed": "롤아웃 실패",
         "rolloutFailedDesc": "롤아웃 \"{{name}}\" 실패."
+    },
+    "errors": {
+        "somethingWentWrong": "문제가 발생했습니다",
+        "unexpectedError": "죄송합니다. 예기치 않은 오류가 발생했습니다.",
+        "loadFailed": "리소스 로드 실패",
+        "stackTrace": "스택 추적",
+        "errorLabel": "오류",
+        "validationFailed": "양식을 확인하고 오류를 수정해주세요.",
+        "networkError": "네트워크 오류. 연결을 확인해주세요.",
+        "serverError": "서버 오류. 잠시 후 다시 시도해주세요.",
+        "authFailed": "인증 실패. 자격 증명을 확인해주세요."
+    },
+    "accessibility": {
+        "dataTable": "데이터 테이블",
+        "selectionStatus": "선택 상태",
+        "filterSearch": "필터 및 검색",
+        "loading": "콘텐츠 로딩 중",
+        "navigateHome": "홈으로 이동"
+    },
+    "selection": {
+        "allPageSelected": "이 페이지의 모든 {{count}}개 항목이 선택되었습니다.",
+        "selectAllMatching": "이 필터와 일치하는 모든 {{count}}개 항목 선택",
+        "allMatchingSelected": "이 필터와 일치하는 모든 {{count}}개 항목이 선택되었습니다.",
+        "clearSelection": "선택 해제"
     }
 }

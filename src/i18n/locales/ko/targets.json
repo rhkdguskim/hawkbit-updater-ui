@@ -294,10 +294,19 @@
         "noMetadata": "메타데이터가 없습니다",
         "add": "메타데이터 추가",
         "edit": "메타데이터 수정",
+        "addTitle": "메타데이터 추가",
+        "editTitle": "메타데이터 수정",
         "deleteTitle": "메타데이터 삭제",
         "deleteConfirm": "메타데이터 '{{key}}'를 삭제하시겠습니까?",
         "deleteDesc": "이 작업은 되돌릴 수 없습니다.",
-        "emptyText": "메타데이터가 없습니다. '메타데이터 추가'를 클릭하여 생성하세요."
+        "emptyText": "메타데이터가 없습니다. '메타데이터 추가'를 클릭하여 생성하세요.",
+        "keyLabel": "키",
+        "valueLabel": "값",
+        "keyRequired": "메타데이터 키를 입력하세요",
+        "keyPattern": "키는 영문, 숫자, 점, 밑줄, 하이픈만 허용됩니다",
+        "valueRequired": "메타데이터 값을 입력하세요",
+        "keyPlaceholder": "예: config.version",
+        "valuePlaceholder": "값을 입력하세요"
     },
     "tags": {
         "noTags": "이 타겟에 할당된 태그가 없습니다"

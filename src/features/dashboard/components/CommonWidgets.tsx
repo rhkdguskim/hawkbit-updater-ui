@@ -122,10 +122,18 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   onClick,
   tooltip,
 }) => {
-  const CardComponent = onClick ? 'button' : 'div';
   const cardProps = onClick
     ? {
         onClick,
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+          }
+        },
+        tabIndex: 0,
+        role: 'button' as const,
+        'aria-label': `${title}: ${value}${label ? ` ${label}` : ''}`,
         style: {
           cursor: 'pointer',
           border: 'none',
@@ -136,6 +144,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         },
       }
     : {};
+  const CardComponent = onClick ? 'div' : 'div';
 
   return (
     <CardComponent {...cardProps}>
@@ -284,8 +293,22 @@ export const QuickActionCard: React.FC<QuickActionCardProps> = ({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      action.onClick();
+    }
+  };
+
   return (
-    <WidgetCard style={{ cursor: 'pointer' }} onClick={action.onClick}>
+    <WidgetCard 
+      style={{ cursor: 'pointer' }} 
+      onClick={action.onClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-label={`${title}: ${description}. ${action.label}`}
+    >
       <div style={{ display: 'flex', alignItems: 'start', gap: '16px' }}>
         <div
           style={{

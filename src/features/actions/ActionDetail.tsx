@@ -16,12 +16,13 @@ import {
     CheckCircleOutlined,
     CloseCircleOutlined,
 } from '@ant-design/icons';
-import { useGetAction1 } from '@/api/generated/actions/actions';
+import { useGetAction1, getGetAction1QueryKey } from '@/api/generated/actions/actions';
 import {
     useGetActionStatusList,
     useCancelAction,
     useUpdateAction,
     useUpdateActionConfirmation,
+    getGetActionStatusListQueryKey,
 } from '@/api/generated/targets/targets';
 import type { MgmtActionStatus } from '@/api/generated/model';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -63,7 +64,8 @@ const ActionDetail: React.FC = () => {
         return t(`actions:forceTypes.${key}`, { defaultValue: forceType.toUpperCase() });
     };
 
-    const actionIdNum = parseInt(actionId || '0', 10);
+    const actionIdNum = parseInt(actionId || '', 10);
+    const isValidId = !isNaN(actionIdNum) && actionIdNum > 0;
 
     // Fetch action details
     // Auto-refresh for running actions
@@ -71,7 +73,7 @@ const ActionDetail: React.FC = () => {
 
     const { data: actionData, isLoading, error } = useGetAction1(actionIdNum, {
         query: {
-            enabled: !!actionIdNum,
+            enabled: isValidId,
             refetchInterval: (query) => {
                 const status = query.state.data?.status?.toLowerCase();
                 // Poll every 3 seconds when status is dynamic (running, pending, canceling)
@@ -98,7 +100,7 @@ const ActionDetail: React.FC = () => {
         { limit: 100 },
         {
             query: {
-                enabled: !!targetId && !!actionIdNum,
+                enabled: isValidId && !!targetId,
                 refetchInterval: (query) => {
                     const latestType = query.state.data?.content?.[0]?.type;
                     if (latestType !== 'finished' && latestType !== 'error' && latestType !== 'canceled') {
@@ -116,7 +118,8 @@ const ActionDetail: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('actions:detail.messages.cancelSuccess'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetAction1QueryKey(actionIdNum) });
+                queryClient.invalidateQueries({ queryKey: getGetActionStatusListQueryKey(targetId, actionIdNum) });
             },
             // onError handled by global interceptor
         },
@@ -126,7 +129,8 @@ const ActionDetail: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('actions:detail.messages.forceSuccess'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetAction1QueryKey(actionIdNum) });
+                queryClient.invalidateQueries({ queryKey: getGetActionStatusListQueryKey(targetId, actionIdNum) });
             },
             // onError handled by global interceptor
         },
@@ -136,7 +140,8 @@ const ActionDetail: React.FC = () => {
         mutation: {
             onSuccess: () => {
                 message.success(t('actions:detail.messages.confirmSuccess'));
-                queryClient.invalidateQueries();
+                queryClient.invalidateQueries({ queryKey: getGetAction1QueryKey(actionIdNum) });
+                queryClient.invalidateQueries({ queryKey: getGetActionStatusListQueryKey(targetId, actionIdNum) });
             },
             // onError handled by global interceptor
         },
@@ -177,6 +182,24 @@ const ActionDetail: React.FC = () => {
             });
         }
     };
+
+    // Handle invalid ID
+    if (!isValidId) {
+        return (
+            <PageLayout>
+                <Alert
+                    type="error"
+                    message={t('detail.notFound')}
+                    description={t('detail.invalidId')}
+                    action={
+                        <Button onClick={() => navigate('/actions')}>
+                            {t('detail.backToActions')}
+                        </Button>
+                    }
+                />
+            </PageLayout>
+        );
+    }
 
     if (error || (!isLoading && !actionData)) {
         return (

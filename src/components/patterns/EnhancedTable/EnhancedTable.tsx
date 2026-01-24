@@ -5,6 +5,15 @@ import type { TableProps } from 'antd';
 import styled from 'styled-components';
 import type { ToolbarAction } from './SelectionToolbar';
 
+// Constants for magic numbers
+const INFINITE_SCROLL_THRESHOLD = 50;
+const HEADER_HEIGHT = 35;
+const PAGINATION_HEIGHT = 48;
+const FOOTER_HEIGHT = 55;
+const MIN_TABLE_HEIGHT = 100;
+const CONTAINER_PADDING = 8;
+const END_MESSAGE_COOLDOWN_MS = 2000;
+
 const TableContainer = styled.div`
     flex: 1;
     min-height: 0;
@@ -31,9 +40,9 @@ const TableContainer = styled.div`
             background-color: var(--ant-color-primary-bg, #e6f4ff) !important;
         }
 
-        /* Show checkbox on hover */
+        /* Show checkbox on hover - using 0.5 for better accessibility */
         .ant-table-selection-column .ant-checkbox-wrapper {
-            opacity: 0.3;
+            opacity: 0.5;
             transition: opacity 0.15s ease;
         }
 
@@ -200,8 +209,8 @@ export function EnhancedTable<T extends object>({
             const target = e.target as HTMLElement;
             const scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
 
-            // Trigger fetch when 50px from bottom
-            if (scrollBottom < 50) {
+            // Trigger fetch when near bottom
+            if (scrollBottom < INFINITE_SCROLL_THRESHOLD) {
                 if (onFetchNextPage && hasNextPage && !isFetchingNextPage) {
                     onFetchNextPage();
                 } else if (!hasNextPage && !isFetchingNextPage && (tableProps.dataSource?.length ?? 0) > 0) {
@@ -212,7 +221,7 @@ export function EnhancedTable<T extends object>({
                         // specific debounce time to prevent spamming
                         setTimeout(() => {
                             endMessageCooldownRef.current = false;
-                        }, 2000);
+                        }, END_MESSAGE_COOLDOWN_MS);
                     }
                 }
             }
@@ -228,18 +237,14 @@ export function EnhancedTable<T extends object>({
         const calculateScrollHeight = () => {
             if (containerRef.current) {
                 const containerHeight = containerRef.current.offsetHeight;
-                // Approximate heights of elements within TableContainer:
-                // SelectionToolbar: ~44px
-                // Table Header: ~35px (small size)
-                // Pagination: ~48px (including margins)
-                const paginationHeight = tableProps.pagination !== false ? 48 : 0;
-                const headerHeight = 35;
+                // Calculate available space for table body
+                const paginationHeight = tableProps.pagination !== false ? PAGINATION_HEIGHT : 0;
                 const showFooter = isFetchingNextPage;
-                const footerHeight = showFooter ? 55 : 0;
+                const footerHeight = showFooter ? FOOTER_HEIGHT : 0;
 
                 // Subtract heights of other elements to find available space for table body
-                const calculatedHeight = containerHeight - paginationHeight - headerHeight - footerHeight - 8;
-                setScrollY(calculatedHeight > 100 ? calculatedHeight : undefined);
+                const calculatedHeight = containerHeight - paginationHeight - HEADER_HEIGHT - footerHeight - CONTAINER_PADDING;
+                setScrollY(calculatedHeight > MIN_TABLE_HEIGHT ? calculatedHeight : undefined);
             }
         };
 
@@ -285,34 +290,58 @@ export function EnhancedTable<T extends object>({
     };
 
     return (
-        <TableContainer ref={containerRef}>
+        <TableContainer 
+            ref={containerRef}
+            role="region"
+            aria-label={t('accessibility.dataTable')}
+        >
             <Spin spinning={!!isLoading} size="large" wrapperClassName="h-full flex flex-col">
                 {selectedRowKeys.length > 0 && totalItems !== undefined && totalItems > selectedRowKeys.length && !isAllMatchingSelected && onSelectAllMatching && (
-                    <div style={{
-                        padding: '8px 16px',
-                        background: 'var(--ant-color-primary-bg)',
-                        borderBottom: '1px solid var(--ant-color-primary-border)',
-                        textAlign: 'center',
-                        fontSize: '13px',
-                        animation: 'fadeIn 0.2s ease-out'
-                    }}>
-                        All <strong>{selectedRowKeys.length}</strong> items on this page are selected.{' '}
-                        <a onClick={(e) => { e.preventDefault(); onSelectAllMatching(); }} style={{ fontWeight: 600, textDecoration: 'underline' }}>
-                            Select all {totalItems} items matching this filter
+                    <div 
+                        role="status"
+                        aria-live="polite"
+                        style={{
+                            padding: '8px 16px',
+                            background: 'var(--ant-color-primary-bg)',
+                            borderBottom: '1px solid var(--ant-color-primary-border)',
+                            textAlign: 'center',
+                            fontSize: '13px',
+                            animation: 'fadeIn 0.2s ease-out'
+                        }}
+                    >
+                        {t('selection.allPageSelected', { count: selectedRowKeys.length })}{' '}
+                        <a 
+                            href="#"
+                            onClick={(e) => { e.preventDefault(); onSelectAllMatching(); }} 
+                            style={{ fontWeight: 600, textDecoration: 'underline' }}
+                            role="button"
+                            aria-label={t('selection.selectAllMatching', { count: totalItems })}
+                        >
+                            {t('selection.selectAllMatching', { count: totalItems })}
                         </a>
                     </div>
                 )}
                 {isAllMatchingSelected && (
-                    <div style={{
-                        padding: '8px 16px',
-                        background: 'var(--ant-color-info-bg)',
-                        borderBottom: '1px solid var(--ant-color-info-border)',
-                        textAlign: 'center',
-                        fontSize: '13px',
-                    }}>
-                        All <strong>{totalItems}</strong> items matching this filter are selected.{' '}
-                        <a onClick={(e) => { e.preventDefault(); onSelectionChange?.([], []); }} style={{ fontWeight: 600 }}>
-                            Clear selection
+                    <div 
+                        role="status"
+                        aria-live="polite"
+                        style={{
+                            padding: '8px 16px',
+                            background: 'var(--ant-color-info-bg)',
+                            borderBottom: '1px solid var(--ant-color-info-border)',
+                            textAlign: 'center',
+                            fontSize: '13px',
+                        }}
+                    >
+                        {t('selection.allMatchingSelected', { count: totalItems })}{' '}
+                        <a 
+                            href="#"
+                            onClick={(e) => { e.preventDefault(); onSelectionChange?.([], []); }} 
+                            style={{ fontWeight: 600 }}
+                            role="button"
+                            aria-label={t('selection.clearSelection')}
+                        >
+                            {t('selection.clearSelection')}
                         </a>
                     </div>
                 )}

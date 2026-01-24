@@ -71,9 +71,24 @@ const LoginPage: React.FC = () => {
             message.success(t('messages.loginSuccess'));
             navigate('/');
         } catch (error: unknown) {
-            // Check if it's an axios error with response
-            if (axios.isAxiosError(error) && error.response?.status === 401) {
-                message.error(t('messages.loginFailed'));
+            // Provide specific error messages for different failure scenarios
+            if (axios.isAxiosError(error)) {
+                if (!error.response) {
+                    // Network error - no response received
+                    message.error(t('messages.networkError'));
+                } else if (error.response.status === 401) {
+                    // Authentication failed
+                    message.error(t('messages.loginFailed'));
+                } else if (error.response.status === 403) {
+                    // Forbidden - account may be locked
+                    message.error(t('messages.accountLocked'));
+                } else if (error.response.status >= 500) {
+                    // Server error
+                    message.error(t('messages.serverError'));
+                } else {
+                    // Other errors
+                    message.error(t('messages.serverError'));
+                }
             } else {
                 message.error(t('messages.serverError'));
             }
