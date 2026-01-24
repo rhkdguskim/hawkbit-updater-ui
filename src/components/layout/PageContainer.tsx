@@ -35,21 +35,26 @@ export const PageHeader = styled.header`
 `;
 
 export const PageTitle = styled.h1`
-  font-size: 24px;
-  font-weight: 700;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
   margin: 0;
   color: var(--ant-color-text);
 
   @media (max-width: 768px) {
-    font-size: 20px;
+    font-size: var(--font-size-xl);
   }
 `;
 
 export const PageDescription = styled.p`
-  font-size: 14px;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
   color: var(--ant-color-text-secondary);
   margin: 0;
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
 `;
 
 /**

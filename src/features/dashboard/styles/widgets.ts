@@ -86,8 +86,10 @@ export const WidgetHeader = styled.div<{ $withActions?: boolean }>`
 
 export const WidgetTitle = styled.h3<{ $size?: 'small' | 'medium' | 'large' }>`
   margin: 0;
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
   color: var(--ant-color-text);
+  line-height: var(--line-height-tight);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -96,15 +98,15 @@ export const WidgetTitle = styled.h3<{ $size?: 'small' | 'medium' | 'large' }>`
     switch ($size) {
       case 'small':
         return css`
-          font-size: 14px;
+          font-size: var(--font-size-sm);
         `;
       case 'large':
         return css`
-          font-size: 18px;
+          font-size: var(--font-size-lg);
         `;
       default:
         return css`
-          font-size: 16px;
+          font-size: var(--font-size-base);
         `;
     }
   }}
@@ -112,9 +114,11 @@ export const WidgetTitle = styled.h3<{ $size?: 'small' | 'medium' | 'large' }>`
 
 export const WidgetSubtitle = styled.p`
   margin: 0;
-  font-size: 13px;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
   color: var(--ant-color-text-secondary);
-  line-height: 1.4;
+  line-height: var(--line-height-snug);
 `;
 
 export const WidgetActions = styled.div`
@@ -144,34 +148,39 @@ export const WidgetMetric = styled.div<{ $emphasis?: boolean }>`
 `;
 
 export const MetricValue = styled.span<{ $size?: 'small' | 'medium' | 'large'; $color?: string }>`
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-bold);
   font-feature-settings: 'tnum';
   font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-tight);
   color: ${({ $color }) => $color || 'var(--ant-color-text)'};
 
   ${({ $size = 'medium' }) => {
     switch ($size) {
       case 'small':
         return css`
-          font-size: 18px;
+          font-size: var(--font-size-lg);
         `;
       case 'large':
         return css`
-          font-size: 32px;
+          font-size: var(--font-size-4xl);
         `;
       default:
         return css`
-          font-size: 24px;
+          font-size: var(--font-size-2xl);
         `;
     }
   }}
 `;
 
 export const MetricLabel = styled.span`
-  font-size: 13px;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
   color: var(--ant-color-text-secondary);
+  line-height: var(--line-height-normal);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--letter-spacing-wider);
 `;
 
 export const WidgetBadge = styled.span<{ $type?: 'success' | 'warning' | 'error' | 'info' | 'default' }>`
@@ -180,8 +189,10 @@ export const WidgetBadge = styled.span<{ $type?: 'success' | 'warning' | 'error'
   gap: 6px;
   padding: 4px 10px;
   border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
   white-space: nowrap;
 
   ${({ $type = 'default' }) => {
@@ -290,11 +301,11 @@ export const CompactWidget = styled(WidgetCard)`
   padding: 16px;
 
   ${WidgetTitle} {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
   }
 
   ${MetricValue} {
-    font-size: 20px;
+    font-size: var(--font-size-xl);
   }
 `;
 

@@ -12,6 +12,40 @@
    Root Variables
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
+    /* Typography - Font Families */
+    --font-sans: 'Pretendard Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Droid Sans Mono', 'Source Code Pro', monospace;
+
+    /* Typography - Font Sizes */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --font-size-2xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 1.875rem;  /* 30px */
+    --font-size-4xl: 2rem;      /* 32px */
+
+    /* Typography - Font Weights */
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* Typography - Line Heights */
+    --line-height-tight: 1.25;
+    --line-height-snug: 1.375;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.625;
+    --line-height-loose: 2;
+
+    /* Typography - Letter Spacing */
+    --letter-spacing-tight: -0.02em;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 0.025em;
+    --letter-spacing-wider: 0.05em;
+
     /* Theme-aware Colors */
     --primary-color: var(--ant-color-primary);
     --success-color: var(--ant-color-success);
@@ -95,8 +129,13 @@
    ───────────────────────────────────────────────────────────────────────────── */
 body {
     font-family: var(--font-sans);
-    line-height: 1.5;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-normal);
+    letter-spacing: var(--letter-spacing-normal);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     background-color: var(--bg-page);
     color: var(--text-main);
 }
@@ -168,6 +207,9 @@ body:not([data-theme='dark']) {
 /* Dark Theme Background - 순수 딥 다크 */
 [data-theme='dark'] body {
     background-color: var(--deep-bg);
+    /* Improve font rendering in dark mode */
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
 }
 
 [data-theme='dark'] #root {
@@ -191,8 +233,35 @@ h4,
 h5,
 h6 {
     font-family: var(--font-sans);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--text-title);
+}
+
+h1 {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+}
+
+h2 {
+    font-size: var(--font-size-2xl);
+}
+
+h3 {
+    font-size: var(--font-size-xl);
+}
+
+h4 {
+    font-size: var(--font-size-lg);
+}
+
+h5 {
+    font-size: var(--font-size-base);
+}
+
+h6 {
+    font-size: var(--font-size-sm);
 }
 
 code,
@@ -202,7 +271,8 @@ pre,
 .data-ip,
 .data-version {
     font-family: var(--font-mono);
-    font-size: 0.9em;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -280,10 +350,11 @@ pre,
 
 .ant-table-thead>tr>th {
     background: var(--bg-elevated) !important;
+    font-family: var(--font-sans);
     text-transform: uppercase;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-wider);
     border-bottom: 1px solid var(--border-color) !important;
 }
 
@@ -312,7 +383,10 @@ pre,
 
 /* Buttons */
 .ant-btn {
-    font-weight: 600;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-snug);
     box-shadow: var(--shadow-sm);
     transition: all var(--transition-normal) var(--transition-gentle);
     border-radius: 10px !important;
@@ -395,10 +469,12 @@ pre,
     gap: 6px;
     padding: 2px 8px;
     border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
     text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: var(--letter-spacing-wide);
 }
 
 .status-online::before {
@@ -466,7 +542,9 @@ pre,
     backdrop-filter: blur(8px);
     border-radius: 8px;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-snug);
     padding: 8px 12px;
     background: rgba(15, 23, 42, 0.9) !important;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -520,10 +598,123 @@ pre,
 /* ─────────────────────────────────────────────────────────────────────────────
    Utility Classes
    ───────────────────────────────────────────────────────────────────────────── */
+
+/* Font Family Utilities */
+.font-sans {
+    font-family: var(--font-sans);
+}
+
+.font-mono,
 .text-mono {
     font-family: var(--font-mono);
 }
 
+/* Font Size Utilities */
+.text-xs {
+    font-size: var(--font-size-xs);
+}
+
+.text-sm {
+    font-size: var(--font-size-sm);
+}
+
+.text-base {
+    font-size: var(--font-size-base);
+}
+
+.text-lg {
+    font-size: var(--font-size-lg);
+}
+
+.text-xl {
+    font-size: var(--font-size-xl);
+}
+
+.text-2xl {
+    font-size: var(--font-size-2xl);
+}
+
+.text-3xl {
+    font-size: var(--font-size-3xl);
+}
+
+.text-4xl {
+    font-size: var(--font-size-4xl);
+}
+
+/* Font Weight Utilities */
+.font-light {
+    font-weight: var(--font-weight-light);
+}
+
+.font-normal {
+    font-weight: var(--font-weight-normal);
+}
+
+.font-medium {
+    font-weight: var(--font-weight-medium);
+}
+
+.font-semibold {
+    font-weight: var(--font-weight-semibold);
+}
+
+.font-bold {
+    font-weight: var(--font-weight-bold);
+}
+
+/* Line Height Utilities */
+.leading-tight {
+    line-height: var(--line-height-tight);
+}
+
+.leading-snug {
+    line-height: var(--line-height-snug);
+}
+
+.leading-normal {
+    line-height: var(--line-height-normal);
+}
+
+.leading-relaxed {
+    line-height: var(--line-height-relaxed);
+}
+
+.leading-loose {
+    line-height: var(--line-height-loose);
+}
+
+/* Letter Spacing Utilities */
+.tracking-tight {
+    letter-spacing: var(--letter-spacing-tight);
+}
+
+.tracking-normal {
+    letter-spacing: var(--letter-spacing-normal);
+}
+
+.tracking-wide {
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.tracking-wider {
+    letter-spacing: var(--letter-spacing-wider);
+}
+
+/* Text Transform Utilities */
+.uppercase {
+    text-transform: uppercase;
+}
+
+.lowercase {
+    text-transform: lowercase;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+/* Border Utilities */
 .border-b {
     border-bottom: 1px solid var(--border-color);
 }
@@ -578,15 +769,18 @@ pre,
 
 [data-theme='dark'] .ant-descriptions-item-label {
     color: #d4d4d8 !important;
-    font-weight: 500;
+    font-family: var(--font-sans);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-xs);
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--letter-spacing-wider);
 }
 
 [data-theme='dark'] .ant-descriptions-item-content {
     color: #f4f4f5;
     font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
 }
 
 [data-theme='dark'] .ant-descriptions-bordered .ant-descriptions-item-label,
@@ -616,7 +810,8 @@ pre,
 /* Breadcrumbs */
 [data-theme='dark'] .ant-breadcrumb {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
 }
 
 [data-theme='dark'] .ant-breadcrumb-link {
@@ -678,9 +873,9 @@ pre,
     background: #10b981;
 }
 
-/* Empty State */
+/* Empty State - improved contrast for accessibility */
 [data-theme='dark'] .ant-empty-description {
-    color: #52525b;
+    color: #a1a1aa;
 }
 
 /* Divider */
@@ -712,13 +907,17 @@ pre,
 /* Statistic */
 [data-theme='dark'] .ant-statistic-title {
     color: #71717a;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
     text-transform: uppercase;
-    font-size: 0.7rem;
-    letter-spacing: 0.05em;
+    letter-spacing: var(--letter-spacing-wider);
 }
 
 [data-theme='dark'] .ant-statistic-content {
     font-family: var(--font-mono);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
     color: #f4f4f5;
 }
 

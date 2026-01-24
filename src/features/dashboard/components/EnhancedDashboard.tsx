@@ -207,8 +207,11 @@ export const DashboardSection = styled.section`
 `;
 
 export const SectionTitle = styled.h2`
-  font-size: 18px;
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
   color: var(--ant-color-text);
   margin: 0;
   padding: 12px 0;
