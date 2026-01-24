@@ -397,7 +397,7 @@ const SoftwareModuleDetail: React.FC = () => {
                 onCancel={() => setIsVerificationModalOpen(false)}
                 footer={null}
                 width={600}
-                destroyOnClose
+                destroyOnHidden
             >
                 {selectedArtifact && (
                     <ArtifactVerificationCard

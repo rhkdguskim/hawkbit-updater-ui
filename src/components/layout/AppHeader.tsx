@@ -326,7 +326,7 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
                         trigger="click"
                         placement="bottomRight"
                         arrow={false}
-                        overlayInnerStyle={{ padding: 0 }}
+                        styles={{ container: { padding: 0 } }}
                     >
                         <Badge count={unreadCount()} size="small" offset={[-4, 4]}>
                             <Button

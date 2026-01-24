@@ -185,7 +185,7 @@ const RolloutTemplateModal: React.FC<RolloutTemplateModalProps> = ({
             onCancel={onClose}
             footer={null}
             width={800}
-            destroyOnClose
+            destroyOnHidden
         >
             {isCreating ? (
                 <div>

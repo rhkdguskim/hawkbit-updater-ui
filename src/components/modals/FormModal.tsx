@@ -30,7 +30,7 @@ export interface FormModalProps<T> {
     /** Form instance to use externally */
     form?: FormInstance<T>;
     /** Whether to destroy form on close */
-    destroyOnClose?: boolean;
+    destroyOnHidden?: boolean;
     /** Disable submit button */
     disableSubmit?: boolean;
 }
@@ -64,7 +64,7 @@ export function FormModal<T extends object>({
     cancelText,
     width = 520,
     form: externalForm,
-    destroyOnClose = true,
+    destroyOnHidden = true,
     disableSubmit = false,
 }: FormModalProps<T>) {
     const { t } = useTranslation(['common']);
@@ -112,7 +112,7 @@ export function FormModal<T extends object>({
             onCancel={handleCancel}
             width={width}
             centered
-            destroyOnClose={destroyOnClose}
+            destroyOnHidden={destroyOnHidden}
             closable={!loading}
             maskClosable={!loading}
             footer={

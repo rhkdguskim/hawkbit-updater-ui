@@ -244,7 +244,7 @@ export const RecentlyFinishedActionsWidget: React.FC<RecentlyFinishedActionsWidg
                     type="link"
                     size="small"
                     icon={<ArrowRightOutlined />}
-                    iconPosition="end"
+                    iconPlacement="end"
                     onClick={() => navigate('/actions')}
                 >
                     {t('common:labels.viewAll')}

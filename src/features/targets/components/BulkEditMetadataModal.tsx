@@ -439,7 +439,7 @@ const BulkEditMetadataModal: React.FC<BulkEditMetadataModalProps> = ({
                     </>
                 )
             ]}
-            destroyOnClose
+            destroyOnHidden
         >
             <Steps
                 current={currentStep}

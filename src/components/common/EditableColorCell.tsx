@@ -69,7 +69,7 @@ export const EditableColorCell: React.FC<EditableColorCellProps> = ({
             open={open}
             onOpenChange={setOpen}
             placement="bottomLeft"
-            overlayInnerStyle={{ padding: 0 }}
+            styles={{ container: { padding: 0 } }}
         >
             <CellWrapper $editable={true}>
                 <ColorSwatch color={value} />

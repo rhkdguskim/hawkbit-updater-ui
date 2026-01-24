@@ -759,7 +759,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
             width={680}
             closable={false}
             centered
-            destroyOnClose
+            destroyOnHidden
         >
             <SearchHeader>
                 <SearchInput

@@ -186,7 +186,7 @@ const BulkAssignTypeModal: React.FC<BulkAssignTypeModalProps> = ({
                     form.resetFields();
                 }}
                 confirmLoading={createTypeMutation.isPending}
-                destroyOnClose
+                destroyOnHidden
                 cancelText={t('common:actions.cancel')}
             >
                 <Form form={form} layout="vertical">

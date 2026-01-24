@@ -34,7 +34,7 @@ const RolloutCreateModal: React.FC<RolloutCreateModalProps> = ({
             onCancel={onClose}
             footer={null}
             width={1100}
-            destroyOnClose
+            destroyOnHidden
         >
             <RolloutWizard
                 isModal={true}
