@@ -9,12 +9,12 @@ export const NotificationMonitor: React.FC = () => {
     const { lastCheckTimestamp, updateLastCheck, addNotification } = useNotificationStore();
 
     // Query for recently failed rollouts
-    // We sort by lastModifiedAt descending to get the most recent failures
+    // Note: We don't use sort parameter as it may not be supported by the API
+    // Instead, we rely on the API's default ordering or sort client-side if needed
     const { data } = useGetRollouts(
         {
             q: 'status==error',
-            sort: 'lastModifiedAt:DESC',
-            limit: 5, // Check last 5 to be safe, though 1 is usually enough if polled frequently
+            limit: 10, // Fetch more to ensure we catch recent failures, sort client-side
         },
         {
             query: {
@@ -27,10 +27,15 @@ export const NotificationMonitor: React.FC = () => {
     useEffect(() => {
         if (!data?.content || data.content.length === 0) return;
 
+        // Sort by lastModifiedAt descending (most recent first) on client side
+        const sortedRollouts = [...data.content].sort((a, b) =>
+            (b.lastModifiedAt || 0) - (a.lastModifiedAt || 0)
+        );
+
         let maxTimestamp = lastCheckTimestamp;
         let hasNewFailures = false;
 
-        data.content.forEach((rollout) => {
+        sortedRollouts.forEach((rollout) => {
             const modifiedTime = rollout.lastModifiedAt ? new Date(rollout.lastModifiedAt).getTime() : 0;
 
             // If this failure happened after our last check
