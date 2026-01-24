@@ -9,6 +9,11 @@
         "live": "실시간",
         "idle": "대기"
     },
+    "tabs": {
+        "overview": "개요",
+        "connectivity": "연결 상태",
+        "trends": "추세 및 활동"
+    },
     "overview": {
         "title": "개요",
         "totalTargets": "전체 디바이스",

@@ -9,6 +9,11 @@
         "live": "Live",
         "idle": "Idle"
     },
+    "tabs": {
+        "overview": "Overview",
+        "connectivity": "Connectivity",
+        "trends": "Trends & Activity"
+    },
     "overview": {
         "title": "Overview",
         "totalTargets": "Total Devices",

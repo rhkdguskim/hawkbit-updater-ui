@@ -9,6 +9,11 @@
         "live": "实时",
         "idle": "待机"
     },
+    "tabs": {
+        "overview": "概览",
+        "connectivity": "连接状态",
+        "trends": "趋势与活动"
+    },
     "overview": {
         "title": "概览",
         "totalTargets": "总设备数",

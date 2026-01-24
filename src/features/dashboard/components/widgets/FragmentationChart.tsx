@@ -41,8 +41,8 @@ export const FragmentationChart: React.FC<FragmentationChartProps> = ({ isLoadin
                         <AppstoreOutlined />
                     </IconBadge>
                     <Flex vertical gap={0}>
-                        <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('chart.fragmentation', 'Firmware Status')}</span>
-                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{total} devices</Text>
+                        <span style={{ fontSize: 'var(--ant-font-size)', fontWeight: 600 }}>{t('chart.fragmentation')}</span>
+                        <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)' }}>{total} {t('kpi.devices')}</Text>
                     </Flex>
                 </Flex>
             }
