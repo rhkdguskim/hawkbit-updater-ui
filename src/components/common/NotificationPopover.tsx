@@ -12,10 +12,14 @@ import {
 import { useNotificationStore, type Notification } from '@/stores/useNotificationStore';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
-import { enUS, ko, zhCN } from 'date-fns/locale';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/zh-cn';
 
 const { Text, Title } = Typography;
+
+dayjs.extend(relativeTime);
 
 const PopoverContainer = styled.div`
     width: 360px;
@@ -142,9 +146,9 @@ export const NotificationPopover: React.FC = () => {
 
     const getLocale = () => {
         switch (i18n.language) {
-            case 'ko': return ko;
-            case 'zh': return zhCN;
-            default: return enUS;
+            case 'ko': return 'ko';
+            case 'zh': return 'zh-cn';
+            default: return 'en';
         }
     };
 
@@ -206,10 +210,7 @@ export const NotificationPopover: React.FC = () => {
                                 <ItemHeader>
                                     <Text strong style={{ fontSize: 13 }}>{item.title}</Text>
                                     <TimeText>
-                                        {formatDistanceToNow(item.timestamp, {
-                                            addSuffix: true,
-                                            locale: getLocale()
-                                        })}
+                                        {dayjs(item.timestamp).locale(getLocale()).fromNow()}
                                     </TimeText>
                                 </ItemHeader>
                                 {item.message && (

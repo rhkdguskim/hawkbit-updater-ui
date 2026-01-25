@@ -59,51 +59,52 @@ const HeaderRight = styled.div`
 const LogoContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 4px 8px;
+    border-radius: 8px;
   
   &:hover {
-    opacity: 0.8;
-    transform: translateY(-1px);
+    background: rgba(var(--color-primary-rgb), 0.06);
   }
   
   .logo-icon {
-    width: 28px;
-    height: 28px;
-    background: var(--gradient-primary);
-    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--ant-color-primary) 0%, var(--ant-color-primary-active) 100%);
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 16px;
-    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
+    font-size: 18px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.25);
   }
   
   .logo-text {
-    font-size: 1.1rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: var(--text-title);
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--ant-color-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .version-badge {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 6px;
-    background: rgba(var(--color-primary-rgb), 0.1);
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--ant-color-primary-bg);
     color: var(--ant-color-primary);
-    border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+    border: 1px solid var(--ant-color-primary-border);
   }
 
   .custom-logo {
-    height: 36px;
+    height: 32px;
     width: auto;
     max-width: 160px;
     object-fit: contain;
@@ -222,8 +223,7 @@ const AppHeader: React.FC<AppHeaderProps> = () => {
         if (path === '/') return ['/'];
         if (path.startsWith('/targets')) return ['targets-menu'];
         if (path.startsWith('/distributions')) return ['distributions-menu'];
-        if (path.startsWith('/actions')) return ['/rollouts-menu'];
-        if (path.startsWith('/rollouts')) return ['/rollouts-menu'];
+        if (path.startsWith('/rollouts')) return ['rollouts-menu'];
         return [];
     };
 

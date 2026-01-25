@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import { isTargetOnline } from '@/entities';
-import DeviceCardGrid from '@/features/dashboard/components/DeviceCardGrid';
+import DeviceCardGrid from '@/components/patterns/DeviceCardGrid';
 import {
     OverviewScrollContent,
     TopRow,

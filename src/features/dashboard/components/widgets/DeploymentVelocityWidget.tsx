@@ -11,7 +11,7 @@ import {
 import { Flex, Typography, Skeleton, Tag } from 'antd';
 import { ThunderboltOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { ChartCard, IconBadge } from '../DashboardStyles';
+import { ChartCard, IconBadge } from '@/components/patterns/DashboardStyles';
 
 const { Text } = Typography;
 

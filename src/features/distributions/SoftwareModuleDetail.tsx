@@ -20,6 +20,7 @@ import type { RcFile } from 'antd/es/upload';
 import { StandardModal } from '@/components/patterns';
 import { StandardDetailLayout } from '@/components/layout';
 import styled from 'styled-components';
+import { useNotification } from '@/hooks/useNotification';
 
 import { formatBytes } from '@/utils/formatUtils';
 
@@ -35,6 +36,7 @@ const SoftwareModuleDetail: React.FC = () => {
     const { t } = useTranslation(['distributions', 'common']);
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const notify = useNotification();
     const softwareModuleId = parseInt(id || '', 10);
     const isValidId = !isNaN(softwareModuleId) && softwareModuleId > 0;
     const { role } = useAuthStore();
@@ -84,8 +86,8 @@ const SoftwareModuleDetail: React.FC = () => {
                 message.success(t('detail.uploadArtifactSuccess'));
                 refetchArtifacts();
             },
-            onError: () => {
-                message.error(t('detail.uploadArtifactError'));
+            onError: (error) => {
+                notify.apiError(error);
             },
         },
     });
@@ -97,8 +99,8 @@ const SoftwareModuleDetail: React.FC = () => {
                 message.success(t('detail.deleteArtifactSuccess'));
                 refetchArtifacts();
             },
-            onError: () => {
-                message.error(t('detail.deleteArtifactError'));
+            onError: (error) => {
+                notify.apiError(error);
             },
         },
     });

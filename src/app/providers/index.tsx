@@ -8,7 +8,7 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { App as AntdApp } from 'antd';
 import { QueryProvider } from './QueryProvider';
-import { ThemeProvider } from './ThemeProvider';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 
 interface AppProvidersProps {
     children: React.ReactNode;

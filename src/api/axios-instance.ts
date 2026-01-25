@@ -4,7 +4,7 @@ import { API_CONFIG } from '@/constants/config';
 import type { HawkBitErrorData } from '@/utils/typeGuards';
 
 export const AXIOS_INSTANCE = axios.create({
-    baseURL: import.meta.env.API_URL || '',
+    baseURL: import.meta.env.VITE_API_BASE_URL || '',
     timeout: API_CONFIG.TIMEOUT,
     headers: {
         'Content-Type': 'application/json',

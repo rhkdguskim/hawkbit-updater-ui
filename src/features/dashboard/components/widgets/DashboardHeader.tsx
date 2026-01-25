@@ -3,7 +3,7 @@ import { Typography, Button, Flex } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/patterns';
-import { LiveIndicator } from '../DashboardStyles';
+import { LiveIndicator } from '@/components/patterns/DashboardStyles';
 
 const { Title, Text } = Typography;
 

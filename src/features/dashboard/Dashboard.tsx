@@ -24,7 +24,7 @@ import { DeploymentVelocityWidget } from './components/widgets/DeploymentVelocit
 import { DistributionSummaryWidget } from './components/widgets/DistributionSummaryWidget';
 import { HighErrorTargetsWidget } from './components/widgets/HighErrorTargetsWidget';
 import { RolloutQueueChart } from './components/widgets/RolloutQueueChart';
-import RolloutCreateModal from '@/features/rollouts/RolloutCreateModal';
+import RolloutCreateModal from '@/components/modals/RolloutCreateModal';
 
 const { useToken } = theme;
 

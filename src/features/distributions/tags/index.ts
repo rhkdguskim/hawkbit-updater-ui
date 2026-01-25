@@ -1,1 +1,1 @@
-export { default as DistributionSetTagList } from './DistributionSetTagList';
+export { default as DistributionSetTagList } from '@/components/type-management/DistributionSetTagList';

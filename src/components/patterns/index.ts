@@ -6,3 +6,4 @@ export * from './FormSection';
 export * from './EnhancedTable';
 export * from './FilterBuilder';
 export * from './StandardModal';
+export * from './MetadataTab/GenericMetadataTab';

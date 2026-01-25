@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { FilterValue } from '@/components/patterns';
+import { STORAGE_KEYS } from '@/constants/config';
 
 interface PageFilterState {
     filters: FilterValue[];
@@ -93,7 +94,7 @@ export const useListFilterStore = create<ListFilterState>()(
             })),
         }),
         {
-            name: 'updater-list-filters-storage',
+            name: STORAGE_KEYS.LIST_FILTERS,
             storage: createJSONStorage(() => localStorage),
         }
     )

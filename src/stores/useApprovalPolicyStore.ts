@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { STORAGE_KEYS } from '@/constants/config';
 
 export type ApprovalRuleCondition =
     | { threshold: number }
@@ -66,7 +67,7 @@ export const useApprovalPolicyStore = create<ApprovalPolicyState>()(
                 })),
         }),
         {
-            name: 'approval-policy-storage',
+            name: STORAGE_KEYS.APPROVAL_POLICY,
         }
     )
 );

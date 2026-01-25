@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import RolloutWizard from './RolloutWizard';
+import RolloutWizard from '@/features/rollouts/RolloutWizard';
 import styled from 'styled-components';
 import { StandardModal } from '@/components/patterns';
 

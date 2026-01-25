@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { STORAGE_KEYS } from '@/constants/config';
 
 export interface Notification {
     id: string;
@@ -58,7 +59,7 @@ export const useNotificationStore = create<NotificationState>()(
             unreadCount: () => get().notifications.filter(n => !n.read).length
         }),
         {
-            name: 'notification-storage',
+            name: STORAGE_KEYS.NOTIFICATIONS,
         }
     )
 );

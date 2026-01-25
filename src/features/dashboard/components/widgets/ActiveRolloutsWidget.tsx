@@ -16,7 +16,7 @@ import {
     CloseCircleFilled,
 } from '@ant-design/icons';
 import { AirportSlideList } from '@/components/common';
-import { ListCard, IconBadge } from '../DashboardStyles';
+import { ListCard, IconBadge } from '@/components/patterns/DashboardStyles';
 import { useResume, usePause, useStart } from '@/api/generated/rollouts/rollouts';
 import { useQueryClient } from '@tanstack/react-query';
 import type { MgmtRolloutResponseBody } from '@/api/generated/model';

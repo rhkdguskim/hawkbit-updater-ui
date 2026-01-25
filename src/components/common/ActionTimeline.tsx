@@ -116,12 +116,22 @@ interface ActionTimelineProps {
     action: MgmtAction;
 }
 
+type ActionWithMessages = MgmtAction & { messages?: string[] };
+
+const getActionMessages = (candidate: MgmtAction): string[] | undefined => {
+    if ('messages' in candidate) {
+        const messages = (candidate as ActionWithMessages).messages;
+        return Array.isArray(messages) ? messages : undefined;
+    }
+    return undefined;
+};
+
 export const ActionTimeline: React.FC<ActionTimelineProps> = ({ action }) => {
     const { t } = useTranslation('dashboard');
     const status = action.status?.toLowerCase() || '';
 
     // Extract messages (often not in type definition but present in API response)
-    const messages = (action as Record<string, unknown>).messages as string[] | undefined;
+    const messages = getActionMessages(action);
     const lastMessage = messages && messages.length > 0 ? messages[messages.length - 1] : undefined;
     const detail = lastMessage || action.detailStatus || '';
 
@@ -129,7 +139,7 @@ export const ActionTimeline: React.FC<ActionTimelineProps> = ({ action }) => {
     type State = 'pending' | 'scheduled' | 'running' | 'finished' | 'error';
     let state: State = 'pending';
 
-    if (isActionErrored(action as any) || isActionCanceled(action as any)) {
+    if (isActionErrored(action) || isActionCanceled(action)) {
         state = 'error';
     } else if (['finished', 'success', 'completed'].includes(status)) {
         state = 'finished';

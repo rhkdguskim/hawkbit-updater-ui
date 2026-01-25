@@ -11,7 +11,7 @@ import { StandardListLayout } from '@/components/layout/StandardListLayout';
 import { useServerTable } from '@/hooks/useServerTable';
 import dayjs from 'dayjs';
 import { buildQueryFromFilterValues, buildWildcardSearch } from '@/utils/fiql';
-import RolloutCreateModal from './RolloutCreateModal';
+import RolloutCreateModal from '@/components/modals/RolloutCreateModal';
 import { StatusTag, ListSummary, Highlighter } from '@/components/common';
 import type { ColumnsType } from 'antd/es/table';
 import { useListFilterStore } from '@/stores/useListFilterStore';

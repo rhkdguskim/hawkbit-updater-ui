@@ -9,7 +9,7 @@ import {
     IntegratedTopRow,
     IntegratedChartsGrid,
     IntegratedBottomRow
-} from '../DashboardStyles';
+} from '@/components/patterns/DashboardStyles';
 
 const HeaderRow = styled.div`
     flex-shrink: 0;

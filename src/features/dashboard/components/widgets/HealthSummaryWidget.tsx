@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { Flex, Typography, Tooltip, Skeleton, theme } from 'antd';
+import type { GlobalToken } from 'antd';
 import {
     CheckCircleFilled,
     WarningFilled,
@@ -14,7 +15,6 @@ import EmergencyStopButton from '@/components/shared/EmergencyStopButton';
 const { Text } = Typography;
 const { useToken } = theme;
 
-// Health status types
 export type HealthStatus = 'SAFE' | 'WARNING' | 'CRITICAL';
 
 interface HealthData {
@@ -33,7 +33,7 @@ const pulse = keyframes`
     100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 `;
 
-const Container = styled.div<{ $status: HealthStatus; $token: any }>`
+const Container = styled.div<{ $status: HealthStatus; $token: GlobalToken }>`
     background: ${props => props.$token.colorBgContainer};
     border: 1px solid ${props => {
         if (props.$status === 'CRITICAL') return props.$token.colorError;
@@ -67,7 +67,7 @@ const Container = styled.div<{ $status: HealthStatus; $token: any }>`
     }
 `;
 
-const StatusBadge = styled.div<{ $status: HealthStatus; $token: any }>`
+const StatusBadge = styled.div<{ $status: HealthStatus; $token: GlobalToken }>`
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -113,7 +113,7 @@ const MetricLabel = styled(Text)`
     font-weight: 600;
 `;
 
-const MetricValue = styled.span<{ $token: any }>`
+const MetricValue = styled.span<{ $token: GlobalToken }>`
     font-family: var(--font-mono);
     font-size: 1.5rem;
     font-weight: 700;
@@ -121,7 +121,7 @@ const MetricValue = styled.span<{ $token: any }>`
     line-height: 1.2;
 `;
 
-const ReasonsList = styled.div<{ $status: HealthStatus; $token: any }>`
+const ReasonsList = styled.div<{ $status: HealthStatus; $token: GlobalToken }>`
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -136,7 +136,7 @@ const ReasonsList = styled.div<{ $status: HealthStatus; $token: any }>`
     font-size: 12px;
 `;
 
-const ReasonItem = styled.div<{ $token: any; $type?: 'error' | 'warning' | 'info' }>`
+const ReasonItem = styled.div<{ $token: GlobalToken; $type?: 'error' | 'warning' | 'info' }>`
     display: flex;
     align-items: center;
     gap: 8px;
@@ -149,7 +149,7 @@ const ReasonItem = styled.div<{ $token: any; $type?: 'error' | 'warning' | 'info
     font-family: var(--font-mono);
 `;
 
-const ViewAnalysisButton = styled.div<{ $status: HealthStatus; $token: any }>`
+const ViewAnalysisButton = styled.div<{ $status: HealthStatus; $token: GlobalToken }>`
     margin-top: auto;
     display: flex;
     align-items: center;

@@ -27,6 +27,7 @@ export const ROUTES = {
 
     // System
     SYSTEM_CONFIG: '/system/config',
+    SYSTEM_TYPES: '/system/types',
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;

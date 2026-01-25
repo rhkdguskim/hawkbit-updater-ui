@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { STORAGE_KEYS } from '@/constants/config';
 
 type Role = 'Admin' | 'Operator';
 
@@ -44,7 +45,7 @@ export const useAuthStore = create<AuthState>()(
                 }),
         }),
         {
-            name: 'updater-auth-storage',
+            name: STORAGE_KEYS.AUTH,
             storage: createJSONStorage(() => localStorage),
         }
     )

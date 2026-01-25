@@ -19,9 +19,9 @@ import DistributionBulkAssign from './DistributionBulkAssign';
 
 // Lazy load potentially heavy components
 const DistributionsOverview = React.lazy(() => import('./DistributionsOverview'));
-const DistributionSetTagList = React.lazy(() => import('./tags/DistributionSetTagList'));
-const DistributionSetTypeList = React.lazy(() => import('./types/DistributionSetTypeList'));
-const SoftwareModuleTypeList = React.lazy(() => import('./types/SoftwareModuleTypeList'));
+const DistributionSetTagList = React.lazy(() => import('@/components/type-management/DistributionSetTagList'));
+const DistributionSetTypeList = React.lazy(() => import('@/components/type-management/DistributionSetTypeList'));
+const SoftwareModuleTypeList = React.lazy(() => import('@/components/type-management/SoftwareModuleTypeList'));
 
 const Distributions: React.FC = () => {
     const { t } = useTranslation('distributions');

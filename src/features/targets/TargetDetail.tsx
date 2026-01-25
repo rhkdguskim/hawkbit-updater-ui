@@ -47,6 +47,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { StandardDetailLayout } from '@/components/layout';
+import { useNotification } from '@/hooks/useNotification';
 
 const TargetDetail: React.FC = () => {
     const { id: targetId, tab: tabParam } = useParams<{ id: string; tab?: string }>();
@@ -55,6 +56,7 @@ const TargetDetail: React.FC = () => {
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
     const { t } = useTranslation(['targets', 'common']);
+    const notify = useNotification();
 
     const baseTabs = ['overview', 'actions', 'attributes', 'distribution', 'metadata', 'tags'];
     const availableTabs = baseTabs;
@@ -170,7 +172,7 @@ const TargetDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetTargetQueryKey(targetId) });
             },
             onError: (error) => {
-                message.error((error as Error).message || t('common:messages.error'));
+                notify.apiError(error);
             },
         },
     });
@@ -182,7 +184,7 @@ const TargetDetail: React.FC = () => {
                 navigate('/targets');
             },
             onError: (error) => {
-                message.error((error as Error).message || t('messages.deleteFailed'));
+                notify.apiError(error);
             },
         },
     });
@@ -197,7 +199,7 @@ const TargetDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetInstalledDistributionSetQueryKey(targetId) });
             },
             onError: (error) => {
-                message.error((error as Error).message || t('common:messages.error'));
+                notify.apiError(error);
             },
         },
     });
@@ -209,7 +211,7 @@ const TargetDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetAutoConfirmStatusQueryKey(targetId) });
             },
             onError: (error) => {
-                message.error((error as Error).message || t('common:messages.error'));
+                notify.apiError(error);
             },
         },
     });
@@ -221,7 +223,7 @@ const TargetDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetAutoConfirmStatusQueryKey(targetId) });
             },
             onError: (error) => {
-                message.error((error as Error).message || t('common:messages.error'));
+                notify.apiError(error);
             },
         },
     });
@@ -235,7 +237,7 @@ const TargetDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetMetadataQueryKey(targetId) });
             },
             onError: (error) => {
-                message.error((error as Error).message || t('common:messages.error'));
+                notify.apiError(error);
             },
         },
     });
@@ -249,7 +251,7 @@ const TargetDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetMetadataQueryKey(targetId) });
             },
             onError: (error) => {
-                message.error((error as Error).message || t('common:messages.error'));
+                notify.apiError(error);
             },
         },
     });

@@ -20,7 +20,7 @@ import { isTargetOnline } from '@/entities';
 import { useGetTargets } from '@/api/generated/targets/targets';
 import { useGetActions } from '@/api/generated/actions/actions';
 import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
-import DeviceCardGrid from '@/features/dashboard/components/DeviceCardGrid';
+import DeviceCardGrid from '@/components/patterns/DeviceCardGrid';
 import { PageLayout, PageHeader } from '@/components/patterns';
 import {
     OverviewScrollContent,

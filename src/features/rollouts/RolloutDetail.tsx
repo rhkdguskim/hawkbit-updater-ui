@@ -46,6 +46,7 @@ import { StandardDetailLayout } from '@/components/layout';
 import { StatusTag } from '@/components/common';
 import { PageLayout, SectionCard } from '@/components/patterns';
 import RolloutActionConfirmModal, { type RolloutActionType } from './components/RolloutActionConfirmModal';
+import { useNotification } from '@/hooks/useNotification';
 
 const { Text } = Typography;
 
@@ -56,6 +57,7 @@ const RolloutDetail: React.FC = () => {
     const queryClient = useQueryClient();
     const { role } = useAuthStore();
     const isAdmin = role === 'Admin';
+    const notify = useNotification();
 
     // Modal state for action confirmation
     const [actionModalOpen, setActionModalOpen] = useState(false);
@@ -105,7 +107,7 @@ const RolloutDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
-                message.error((err as Error).message || t('detail.messages.startError'));
+                notify.apiError(err);
             },
         },
     });
@@ -118,7 +120,7 @@ const RolloutDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
-                message.error((err as Error).message || t('detail.messages.pauseError'));
+                notify.apiError(err);
             },
         },
     });
@@ -131,7 +133,7 @@ const RolloutDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
-                message.error((err as Error).message || t('detail.messages.resumeError'));
+                notify.apiError(err);
             },
         },
     });
@@ -144,7 +146,7 @@ const RolloutDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
-                message.error((err as Error).message || t('detail.messages.approveError'));
+                notify.apiError(err);
             },
         },
     });
@@ -157,7 +159,7 @@ const RolloutDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
-                message.error((err as Error).message || t('detail.messages.denyError'));
+                notify.apiError(err);
             },
         },
     });
@@ -218,7 +220,7 @@ const RolloutDetail: React.FC = () => {
                 queryClient.invalidateQueries({ queryKey: getGetRolloutGroupsQueryKey(rolloutIdNum) });
             },
             onError: (err) => {
-                message.error((err as Error).message || t('detail.messages.retryError'));
+                notify.apiError(err);
             },
         },
     });
@@ -231,7 +233,7 @@ const RolloutDetail: React.FC = () => {
                 navigate('/rollouts');
             },
             onError: (err) => {
-                message.error((err as Error).message || t('detail.messages.deleteError'));
+                notify.apiError(err);
             },
         },
     });

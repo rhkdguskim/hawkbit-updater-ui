@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Flex, Typography, Skeleton, Tag, Button, Tooltip, Empty, message, Space, theme } from 'antd';
+import type { GlobalToken } from 'antd';
 import {
     SyncOutlined,
     ClockCircleOutlined,
@@ -10,10 +11,11 @@ import {
     CloseOutlined,
     RocketOutlined,
 } from '@ant-design/icons';
-import { ListCard } from '../DashboardStyles';
+import { ListCard } from '@/components/patterns/DashboardStyles';
 import { useCancelAction, useGetActionStatusList } from '@/api/generated/targets/targets';
 import { useQueryClient } from '@tanstack/react-query';
 import type { MgmtTarget, MgmtAction, MgmtActionStatus } from '@/api/generated/model';
+import type { UseMutationResult } from '@tanstack/react-query';
 import { Popover, List } from 'antd';
 import { useLanguageStore } from '@/stores/useLanguageStore';
 import dayjs from 'dayjs';
@@ -28,7 +30,7 @@ dayjs.extend(relativeTime);
 const { Text } = Typography;
 const { useToken } = theme;
 
-const ActivityCard = styled.div<{ $status: 'info' | 'warning' | 'error'; $token: any }>`
+const ActivityCard = styled.div<{ $status: 'info' | 'warning' | 'error'; $token: GlobalToken }>`
     padding: 12px;
     background: ${props => props.$token.colorBgContainer};
     border-radius: ${props => props.$token.borderRadius}px;
@@ -62,7 +64,7 @@ const ActivityCard = styled.div<{ $status: 'info' | 'warning' | 'error'; $token:
     }
 `;
 
-const IconBadge = styled.div<{ $theme: string; $token: any }>`
+const IconBadge = styled.div<{ $theme: string; $token: GlobalToken }>`
     width: 32px;
     height: 32px;
     border-radius: ${props => props.$token.borderRadiusSM}px;
@@ -74,7 +76,7 @@ const IconBadge = styled.div<{ $theme: string; $token: any }>`
     font-size: 16px;
 `;
 
-const RolloutInfo = styled.div<{ $token: any }>`
+const RolloutInfo = styled.div<{ $token: GlobalToken }>`
     display: flex;
     align-items: center;
     gap: 6px;
@@ -87,7 +89,7 @@ const RolloutInfo = styled.div<{ $token: any }>`
     font-family: var(--font-mono);
 `;
 
-const ActionButtons = styled.div<{ $token: any }>`
+const ActionButtons = styled.div<{ $token: GlobalToken }>`
     display: flex;
     gap: 6px;
     margin-top: 8px;
@@ -130,7 +132,7 @@ interface InProgressActionItemProps {
     currentTime: number | null;
     onRetry?: (targetId: string | number, actionId: number) => Promise<void>;
     handleItemClick: (item: InProgressItem) => void;
-    cancelActionMutation: any;
+    cancelActionMutation: ReturnType<typeof useCancelAction>;
 }
 
 const InProgressActionItem: React.FC<InProgressActionItemProps> = ({

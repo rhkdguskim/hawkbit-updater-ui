@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { STORAGE_KEYS } from '@/constants/config';
 
 interface DashboardState {
     isFocusMode: boolean;
@@ -15,7 +16,7 @@ export const useDashboardStore = create<DashboardState>()(
             setFocusMode: (value) => set({ isFocusMode: value }),
         }),
         {
-            name: 'dashboard-storage',
+            name: STORAGE_KEYS.DASHBOARD,
         }
     )
 );

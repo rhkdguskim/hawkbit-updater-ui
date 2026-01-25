@@ -2,7 +2,7 @@ import React from 'react';
 import { Flex, Skeleton, Typography, Tag } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { HeartOutlined } from '@ant-design/icons';
-import { ChartCard, IconBadge, ProgressBar } from '../DashboardStyles';
+import { ChartCard, IconBadge, ProgressBar } from '@/components/patterns/DashboardStyles';
 
 const { Text } = Typography;
 

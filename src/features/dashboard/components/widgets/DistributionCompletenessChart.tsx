@@ -1,7 +1,8 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
+import type { Props as LegendProps } from 'recharts/types/component/DefaultLegendContent';
 import { Typography, Flex, Empty, Spin } from 'antd';
-import { ChartCard } from '../DashboardStyles';
+import { ChartCard } from '@/components/patterns/DashboardStyles';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
@@ -14,11 +15,11 @@ interface DistributionCompletenessChartProps {
 export const DistributionCompletenessChart: React.FC<DistributionCompletenessChartProps> = ({ isLoading, data }) => {
     const { t } = useTranslation(['dashboard', 'common', 'distributions']);
 
-    const renderCustomLegend = (props: any) => {
+    const renderCustomLegend = (props: LegendProps) => {
         const { payload } = props;
         return (
             <Flex vertical gap={4} style={{ marginTop: 8 }}>
-                {payload.map((entry: any, index: number) => (
+                {payload?.map((entry, index) => (
                     <Flex key={`item-${index}`} align="center" justify="space-between" gap={8}>
                         <Flex align="center" gap={6}>
                             <div style={{ width: 10, height: 10, borderRadius: 2, background: entry.color }} />

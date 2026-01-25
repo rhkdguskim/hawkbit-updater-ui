@@ -1,5 +1,15 @@
 import styled, { keyframes, css } from 'styled-components';
 
+export interface OverviewTheme {
+    gradient?: string;
+    accentLight?: string;
+    accentBorder?: string;
+    iconBg?: string;
+    color?: string;
+}
+
+export type OverviewThemeKey = 'targets' | 'distributions' | 'actions' | 'rollouts' | 'connectivity' | 'deployment' | 'fragmentation' | 'activity';
+
 // --- Animations ---
 export const fadeInUp = keyframes`
     from { opacity: 0; transform: translateY(8px); }
@@ -30,7 +40,7 @@ export const IconBadge = styled.div<{
     $status?: 'normal' | 'warning' | 'critical' | 'success' | 'error' | 'info';
     $color?: string;
     $size?: number;
-    $theme?: any; // For OVERVIEW_THEMES compatibility
+    $theme?: OverviewTheme | OverviewThemeKey;
 }>`
     width: ${props => props.$size || 40}px;
     height: ${props => props.$size || 40}px;
@@ -44,7 +54,8 @@ export const IconBadge = styled.div<{
 
     background: ${({ $status, $color, $theme }) => {
         if ($color) return `${$color}15`;
-        if ($theme?.accentLight) return $theme.accentLight;
+        const theme = typeof $theme === 'object' ? $theme : undefined;
+        if (theme?.accentLight) return theme.accentLight;
         if ($status === 'critical' || $status === 'error') return 'rgba(var(--color-error-rgb), 0.12)';
         if ($status === 'warning') return 'rgba(var(--color-warning-rgb), 0.12)';
         if ($status === 'normal' || $status === 'success') return 'rgba(var(--color-success-rgb), 0.12)';
@@ -54,7 +65,8 @@ export const IconBadge = styled.div<{
 
     color: ${({ $status, $color, $theme }) => {
         if ($color) return $color;
-        if ($theme?.color) return $theme.color;
+        const theme = typeof $theme === 'object' ? $theme : undefined;
+        if (theme?.color) return theme.color;
         if ($status === 'critical' || $status === 'error') return 'var(--ant-color-error)';
         if ($status === 'warning') return 'var(--ant-color-warning)';
         if ($status === 'normal' || $status === 'success') return 'var(--ant-color-success)';

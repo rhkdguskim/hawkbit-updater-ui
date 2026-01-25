@@ -3,7 +3,7 @@ import { Skeleton, Flex, Typography } from 'antd';
 import { UserAddOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ChartCard, IconBadge } from '../DashboardStyles';
+import { ChartCard, IconBadge } from '@/components/patterns/DashboardStyles';
 
 const { Text } = Typography;
 

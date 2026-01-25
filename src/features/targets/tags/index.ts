@@ -1,1 +1,1 @@
-export { default as TargetTagList } from './TargetTagList';
+export { default as TargetTagList } from '@/components/type-management/TargetTagList';

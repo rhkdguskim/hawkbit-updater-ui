@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import i18n from '@/i18n';
+import { STORAGE_KEYS } from '@/constants/config';
 
 export type Language = 'ko' | 'en' | 'zh';
 
@@ -19,7 +20,7 @@ export const useLanguageStore = create<LanguageState>()(
             },
         }),
         {
-            name: 'updater-language-storage',
+            name: STORAGE_KEYS.LANGUAGE,
             storage: createJSONStorage(() => localStorage),
             onRehydrateStorage: () => (state) => {
                 // Sync i18n with persisted language on rehydration

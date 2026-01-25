@@ -179,6 +179,21 @@ export const STORAGE_KEYS = {
 
   /** Column settings storage key */
   COLUMNS: 'updater-columns-storage',
+
+  /** List filters storage key */
+  LIST_FILTERS: 'updater-list-filters-storage',
+
+  /** Notifications storage key */
+  NOTIFICATIONS: 'notification-storage',
+
+  /** Dashboard storage key */
+  DASHBOARD: 'dashboard-storage',
+
+  /** Rollout templates storage key */
+  ROLLOUT_TEMPLATES: 'rollout-templates-storage',
+
+  /** Approval policy storage key */
+  APPROVAL_POLICY: 'approval-policy-storage',
 } as const;
 
 /**

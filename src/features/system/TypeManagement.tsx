@@ -3,11 +3,11 @@ import { Breadcrumb, Menu, theme, Card } from 'antd';
 import { AppstoreOutlined, BlockOutlined, UserOutlined, TagOutlined } from '@ant-design/icons';
 import { Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import TargetTypeList from '@/features/targets/types/TargetTypeList';
-import DistributionSetTypeList from '@/features/distributions/types/DistributionSetTypeList';
-import SoftwareModuleTypeList from '@/features/distributions/types/SoftwareModuleTypeList';
-import TargetTagList from '@/features/targets/tags/TargetTagList';
-import DistributionSetTagList from '@/features/distributions/tags/DistributionSetTagList';
+import TargetTypeList from '@/components/type-management/TargetTypeList';
+import DistributionSetTypeList from '@/components/type-management/DistributionSetTypeList';
+import SoftwareModuleTypeList from '@/components/type-management/SoftwareModuleTypeList';
+import TargetTagList from '@/components/type-management/TargetTagList';
+import DistributionSetTagList from '@/components/type-management/DistributionSetTagList';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { PageHeader, PageLayout, FullHeightSectionCard } from '@/components/patterns';
 

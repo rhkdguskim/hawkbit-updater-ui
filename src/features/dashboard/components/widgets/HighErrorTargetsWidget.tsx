@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography, List, Flex, Empty, Spin, Tag, Tooltip } from 'antd';
 import { WarningOutlined, ArrowRightOutlined } from '@ant-design/icons';
-import { ListCard } from '../DashboardStyles';
+import { ListCard } from '@/components/patterns/DashboardStyles';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 

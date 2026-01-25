@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { PageLayout } from '@/components/patterns';
-import { DashboardScrollContent, DashboardSurface } from '../DashboardStyles';
+import { DashboardScrollContent, DashboardSurface } from '@/components/patterns/DashboardStyles';
 
 /* ============================================================================
    SECTION COMPONENTS - 기능별 영역 구분

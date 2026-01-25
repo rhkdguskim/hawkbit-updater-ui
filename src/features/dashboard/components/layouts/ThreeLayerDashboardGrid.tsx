@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { PageLayout } from '@/components/patterns';
-import { DashboardScrollContent, DashboardSurface, fadeInUp } from '../DashboardStyles';
+import { DashboardScrollContent, DashboardSurface, fadeInUp } from '@/components/patterns/DashboardStyles';
 import { useTranslation } from 'react-i18next';
 
 const HeaderRow = styled.div`

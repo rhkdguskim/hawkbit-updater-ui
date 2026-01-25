@@ -4,7 +4,7 @@ import { Flex, Typography, Skeleton, List } from 'antd';
 import { FieldTimeOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { ChartCard, IconBadge } from '../DashboardStyles';
+import { ChartCard, IconBadge } from '@/components/patterns/DashboardStyles';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 

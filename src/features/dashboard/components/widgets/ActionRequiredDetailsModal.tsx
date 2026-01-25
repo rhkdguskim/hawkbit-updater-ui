@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import { StandardModal } from '@/components/patterns';
 import { List, Typography, Flex, Button, Card, Tag } from 'antd';
 import { useTranslation } from 'react-i18next';
+import type { MgmtAction, MgmtRolloutResponseBody } from '@/api/generated/model';
 
 const { Text } = Typography;
 
@@ -36,8 +37,8 @@ interface ActionRequiredDetailsModalProps {
     visible: boolean;
     onClose: () => void;
     type: 'DELAYED' | 'APPROVAL_PENDING' | null;
-    delayedActions: any[];
-    pendingApprovals: any[];
+    delayedActions: MgmtAction[];
+    pendingApprovals: MgmtRolloutResponseBody[];
 }
 
 export const ActionRequiredDetailsModal: React.FC<ActionRequiredDetailsModalProps> = ({
@@ -55,7 +56,7 @@ export const ActionRequiredDetailsModal: React.FC<ActionRequiredDetailsModalProp
         ? t('actionRequired.delayedActions', 'Delayed Actions')
         : t('actionRequired.pendingApprovals', 'Pending Approvals');
 
-    const renderActionItem = (action: any) => {
+    const renderActionItem = (action: MgmtAction) => {
         const targetId = action._links?.target?.href?.split('/').pop() || action.id;
         const time = action.lastModifiedAt || action.createdAt || 0;
 
@@ -96,7 +97,7 @@ export const ActionRequiredDetailsModal: React.FC<ActionRequiredDetailsModalProp
         );
     };
 
-    const renderRolloutItem = (rollout: any) => {
+    const renderRolloutItem = (rollout: MgmtRolloutResponseBody) => {
         return (
             <ItemCard size="small">
                 <Flex justify="space-between" align="center">
@@ -168,7 +169,9 @@ export const ActionRequiredDetailsModal: React.FC<ActionRequiredDetailsModalProp
         >
             <List
                 dataSource={items}
-                renderItem={(item) => type === 'DELAYED' ? renderActionItem(item) : renderRolloutItem(item)}
+                renderItem={(item) => type === 'DELAYED' 
+                    ? renderActionItem(item as MgmtAction) 
+                    : renderRolloutItem(item as MgmtRolloutResponseBody)}
                 locale={{ emptyText: t('common:messages.noData') }}
             />
         </StandardModal>

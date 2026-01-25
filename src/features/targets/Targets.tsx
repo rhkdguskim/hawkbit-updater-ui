@@ -13,8 +13,8 @@ import { SidebarLayout } from '@/components/layout';
 const TargetList = React.lazy(() => import('./TargetList'));
 const TargetDetail = React.lazy(() => import('./TargetDetail'));
 const TargetsOverview = React.lazy(() => import('./TargetsOverview'));
-const TargetTagList = React.lazy(() => import('./tags/TargetTagList'));
-const TargetTypeList = React.lazy(() => import('./types/TargetTypeList'));
+const TargetTagList = React.lazy(() => import('@/components/type-management/TargetTagList'));
+const TargetTypeList = React.lazy(() => import('@/components/type-management/TargetTypeList'));
 
 const Targets: React.FC = () => {
     const { t } = useTranslation('targets');

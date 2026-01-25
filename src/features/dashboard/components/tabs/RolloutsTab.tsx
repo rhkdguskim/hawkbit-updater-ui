@@ -30,7 +30,7 @@ import {
     ActivityItem,
     COLORS,
 } from '@/components/shared/OverviewStyles';
-import RolloutCreateModal from '@/features/rollouts/RolloutCreateModal';
+import RolloutCreateModal from '@/components/modals/RolloutCreateModal';
 import styled from 'styled-components';
 import { useDashboardMetrics } from '../../hooks/useDashboardMetrics';
 

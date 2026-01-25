@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { STORAGE_KEYS } from '@/constants/config';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -57,7 +58,7 @@ export const useThemeStore = create<ThemeState>()(
             },
         }),
         {
-            name: 'updater-theme-storage',
+            name: STORAGE_KEYS.THEME,
             storage: createJSONStorage(() => localStorage),
         }
     )

@@ -8,6 +8,7 @@ import { useGetTargetTypes, useCreateTargetTypes, getGetTargetTypesQueryKey } fr
 import type { MgmtTargetType } from '@/api/generated/model';
 import styled from 'styled-components';
 import { StandardModal } from '@/components/patterns';
+import { useNotification } from '@/hooks/useNotification';
 
 const FullWidthStack = styled(Space)`
     && {
@@ -57,6 +58,7 @@ const BulkAssignTypeModal: React.FC<BulkAssignTypeModalProps> = ({
 }) => {
     const { t } = useTranslation(['targets', 'common']);
     const queryClient = useQueryClient();
+    const notify = useNotification();
     const [selectedTypeId, setSelectedTypeId] = useState<number | undefined>(undefined);
     const [assigning, setAssigning] = useState(false);
     const [createTypeModalOpen, setCreateTypeModalOpen] = useState(false);
@@ -79,7 +81,7 @@ const BulkAssignTypeModal: React.FC<BulkAssignTypeModalProps> = ({
                 message.success(t('messages.typeCreated', { defaultValue: 'Type created' }));
             },
             onError: (error) => {
-                message.error((error as Error).message || t('common:messages.error'));
+                notify.apiError(error);
             },
         },
     });
@@ -103,7 +105,7 @@ const BulkAssignTypeModal: React.FC<BulkAssignTypeModalProps> = ({
             queryClient.invalidateQueries({ queryKey: getGetTargetsQueryKey() });
             onSuccess();
         } catch (error) {
-            message.error((error as Error).message || t('common:messages.error'));
+            notify.apiError(error);
         } finally {
             setAssigning(false);
         }

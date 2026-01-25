@@ -26,6 +26,45 @@ import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import { useGetDistributionSetTypes } from '@/api/generated/distribution-set-types/distribution-set-types';
 import { useGetTypes as useGetSoftwareModuleTypes } from '@/api/generated/software-module-types/software-module-types';
 import { useNavigate } from 'react-router-dom';
+interface SearchableItem {
+    id?: number;
+    controllerId?: string;
+    name?: string;
+    description?: string;
+    version?: string;
+    status?: string;
+    type?: string;
+    targetType?: { name?: string };
+    colour?: string;
+    key?: string;
+}
+
+interface PagedListGeneric {
+    content: SearchableItem[];
+    total?: number;
+}
+
+interface CategoryColor {
+    bg: string;
+    icon: string;
+}
+
+interface InfiniteSearchResultsProps {
+    query: string;
+    useHook: (params: Record<string, unknown>, options: Record<string, unknown>) => {
+        data?: { pages: PagedListGeneric[] };
+        fetchNextPage: () => void;
+        hasNextPage?: boolean;
+        isFetchingNextPage: boolean;
+        isLoading: boolean;
+    };
+    handleNavigate: (path: string) => void;
+    pathPrefix: string;
+    icon: React.ReactNode;
+    searchQueryStr: string;
+    isEnabled: boolean;
+    categoryColor: CategoryColor;
+}
 
 const { Text, Title } = Typography;
 
@@ -328,8 +367,7 @@ const CATEGORY_COLORS = {
     smTypes: { bg: 'linear-gradient(135deg, #84cc16 0%, #65a30d 100%)', icon: '#84cc16' },
 };
 
-// Infinite search results component for specific tabs
-const InfiniteSearchResults = ({
+const InfiniteSearchResults: React.FC<InfiniteSearchResultsProps> = ({
     query,
     useHook,
     handleNavigate,
@@ -338,7 +376,7 @@ const InfiniteSearchResults = ({
     searchQueryStr,
     isEnabled,
     categoryColor
-}: any) => {
+}) => {
     const { t } = useTranslation('common');
     const {
         data,
@@ -353,8 +391,8 @@ const InfiniteSearchResults = ({
                 enabled: !!query && isEnabled,
                 staleTime: 0,
                 initialPageParam: 0,
-                getNextPageParam: (lastPage: any, allPages: any[]) => {
-                    const fetchedCount = allPages.flatMap((p: any) => p.content).length;
+                getNextPageParam: (lastPage: PagedListGeneric, allPages: PagedListGeneric[]) => {
+                    const fetchedCount = allPages.flatMap((p) => p.content).length;
                     const total = lastPage.total || 0;
                     return fetchedCount < total ? fetchedCount : undefined;
                 }
@@ -362,7 +400,7 @@ const InfiniteSearchResults = ({
         }
     );
 
-    const items = data?.pages.flatMap((page: any) => page.content) || [];
+    const items = data?.pages.flatMap((page) => page.content) || [];
     const total = data?.pages[0]?.total || 0;
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -389,17 +427,17 @@ const InfiniteSearchResults = ({
         <ScrollableContent onScroll={handleScroll}>
             <CategoryHeader>
                 <CategoryTitle>
-                    <Badge count={total} style={{ backgroundColor: categoryColor?.icon || 'var(--ant-color-primary)' }} />
+                    <Badge count={total} style={{ backgroundColor: categoryColor.icon }} />
                     <span>{t('search.results')}</span>
                 </CategoryTitle>
             </CategoryHeader>
-            {items.map((item: any, index: number) => (
+            {items.map((item, index) => (
                 <ResultCard
                     key={item.id || item.controllerId || index}
                     $isClickable
                     onClick={() => handleNavigate(`${pathPrefix}/${item.controllerId || item.id}`)}
                 >
-                    <IconWrapper $bgColor={categoryColor?.bg} $iconColor="white">{icon}</IconWrapper>
+                    <IconWrapper $bgColor={categoryColor.bg} $iconColor="white">{icon}</IconWrapper>
                     <ResultInfo>
                         <ResultTitle>{item.name || item.controllerId}</ResultTitle>
                         <ResultSubtitle>{item.description || item.version || item.controllerId}</ResultSubtitle>

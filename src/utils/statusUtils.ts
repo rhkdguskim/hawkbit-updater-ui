@@ -79,7 +79,7 @@ export const getStatusLabel = (
  */
 export const translateStatusMessage = (
     message: string,
-    t: (key: string, options?: any) => string
+    t: (key: string, options?: Record<string, unknown>) => string
 ): string => {
     const trimmed = message.trim();
 

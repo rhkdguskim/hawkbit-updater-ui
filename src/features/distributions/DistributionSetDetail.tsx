@@ -27,6 +27,7 @@ import type { MgmtSoftwareModuleAssignment, MgmtSoftwareModule, MgmtDistribution
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { StandardDetailLayout } from '@/components/layout';
+import { useNotification } from '@/hooks/useNotification';
 import styled from 'styled-components';
 
 const FullWidthSpace = styled(Space)`
@@ -38,6 +39,7 @@ const DistributionSetDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const notify = useNotification();
     const distributionSetId = parseInt(id || '', 10);
     const isValidId = !isNaN(distributionSetId) && distributionSetId > 0;
     const { role } = useAuthStore();
@@ -76,7 +78,7 @@ const DistributionSetDetail: React.FC = () => {
                 });
             },
             onError: (error) => {
-                message.error((error as Error).message || t('detail.assignError'));
+                notify.apiError(error);
             },
         },
     });
@@ -94,7 +96,7 @@ const DistributionSetDetail: React.FC = () => {
                 navigate('/distributions/sets');
             },
             onError: (error) => {
-                message.error((error as Error).message || t('common:messages.error'));
+                notify.apiError(error);
             }
         }
     });

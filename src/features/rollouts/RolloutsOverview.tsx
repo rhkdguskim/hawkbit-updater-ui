@@ -40,7 +40,7 @@ import {
     ActivityItem,
     COLORS,
 } from '@/components/shared/OverviewStyles';
-import RolloutCreateModal from './RolloutCreateModal';
+import RolloutCreateModal from '@/components/modals/RolloutCreateModal';
 import styled from 'styled-components';
 
 dayjs.extend(relativeTime);

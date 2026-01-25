@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { STORAGE_KEYS } from '@/constants/config';
 
 export interface RolloutTemplate {
     id: string;
@@ -136,7 +137,7 @@ export const useRolloutTemplateStore = create<RolloutTemplateState>()(
             },
         }),
         {
-            name: 'rollout-templates-storage',
+            name: STORAGE_KEYS.ROLLOUT_TEMPLATES,
             version: 1,
         }
     )
