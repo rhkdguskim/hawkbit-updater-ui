@@ -23,12 +23,6 @@ import {
     CloseOutlined,
     InfoCircleOutlined,
     CheckCircleOutlined,
-    SyncOutlined,
-    SafetyCertificateOutlined,
-    RocketOutlined,
-    DatabaseOutlined,
-    CloudDownloadOutlined,
-    LinkOutlined,
     SettingOutlined,
     HomeOutlined,
     EyeOutlined,
@@ -39,8 +33,7 @@ import {
     useUpdateTenantConfiguration,
 } from '@/api/generated/system-configuration/system-configuration';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { Navigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
@@ -60,113 +53,20 @@ import {
     EmptyValue,
     NoItemsMessage,
     GROUP_THEMES,
+    StatusIndicator,
 } from './ConfigurationStyles';
-import type { GroupThemeKey } from './ConfigurationStyles';
 import { PageHeader, PageLayout } from '@/components/patterns';
-
 import ApprovalPolicyCard from './components/ApprovalPolicyCard';
-import { StatusIndicator } from './ConfigurationStyles';
+import {
+    CONFIG_GROUPS,
+    ACTION_STATUS_OPTIONS,
+    extractValue,
+    isValidTimeFormat,
+    type ConfigItem,
+    type ConfigGroup,
+} from './configGroups';
 
 const { Text } = Typography;
-
-// Configuration group definitions
-interface ConfigItem {
-    key: string;
-    type: 'boolean' | 'string' | 'number' | 'time' | 'array';
-    descKey: string;
-}
-
-interface ConfigGroup {
-    titleKey: string;
-    descKey: string;
-    icon: React.ReactNode;
-    themeKey: GroupThemeKey;
-    items: ConfigItem[];
-}
-
-const CONFIG_GROUPS: ConfigGroup[] = [
-    {
-        titleKey: 'groups.pollingConnection',
-        descKey: 'groups.pollingConnectionDesc',
-        icon: <SyncOutlined />,
-        themeKey: 'polling',
-        items: [
-            { key: 'pollingTime', type: 'time', descKey: 'descriptions.pollingTime' },
-            { key: 'pollingOverdueTime', type: 'time', descKey: 'descriptions.pollingOverdueTime' },
-            { key: 'minPollingTime', type: 'time', descKey: 'descriptions.minPollingTime' },
-            { key: 'maintenanceWindowPollCount', type: 'number', descKey: 'descriptions.maintenanceWindowPollCount' },
-        ],
-    },
-    {
-        titleKey: 'groups.authSecurity',
-        descKey: 'groups.authSecurityDesc',
-        icon: <SafetyCertificateOutlined />,
-        themeKey: 'auth',
-        items: [
-            { key: 'authentication.targettoken.enabled', type: 'boolean', descKey: 'descriptions.authTargetToken' },
-            { key: 'authentication.gatewaytoken.enabled', type: 'boolean', descKey: 'descriptions.authGatewayToken' },
-            { key: 'authentication.gatewaytoken.key', type: 'string', descKey: 'descriptions.authGatewayTokenKey' },
-            { key: 'authentication.header.enabled', type: 'boolean', descKey: 'descriptions.authHeader' },
-            { key: 'authentication.header.authority', type: 'string', descKey: 'descriptions.authHeaderAuthority' },
-        ],
-    },
-    {
-        titleKey: 'groups.rolloutPolicy',
-        descKey: 'groups.rolloutPolicyDesc',
-        icon: <RocketOutlined />,
-        themeKey: 'rollout',
-        items: [
-            { key: 'rollout.approval.enabled', type: 'boolean', descKey: 'descriptions.rolloutApproval' },
-            { key: 'user.confirmation.flow.enabled', type: 'boolean', descKey: 'descriptions.userConfirmationFlow' },
-        ],
-    },
-    {
-        titleKey: 'groups.repoMaintenance',
-        descKey: 'groups.repoMaintenanceDesc',
-        icon: <DatabaseOutlined />,
-        themeKey: 'repo',
-        items: [
-            { key: 'repository.actions.autoclose.enabled', type: 'boolean', descKey: 'descriptions.actionsAutoclose' },
-            { key: 'action.cleanup.enabled', type: 'boolean', descKey: 'descriptions.actionCleanupEnabled' },
-            { key: 'action.cleanup.actionExpiry', type: 'number', descKey: 'descriptions.actionCleanupExpiry' },
-            { key: 'action.cleanup.actionStatus', type: 'array', descKey: 'descriptions.actionCleanupStatus' },
-            { key: 'implicit.lock.enabled', type: 'boolean', descKey: 'descriptions.implicitLock' },
-        ],
-    },
-    {
-        titleKey: 'groups.downloadSettings',
-        descKey: 'groups.downloadSettingsDesc',
-        icon: <CloudDownloadOutlined />,
-        themeKey: 'download',
-        items: [
-            { key: 'anonymous.download.enabled', type: 'boolean', descKey: 'descriptions.anonymousDownload' },
-        ],
-    },
-    {
-        titleKey: 'groups.assignmentSettings',
-        descKey: 'groups.assignmentSettingsDesc',
-        icon: <LinkOutlined />,
-        themeKey: 'assignment',
-        items: [
-            { key: 'multi.assignments.enabled', type: 'boolean', descKey: 'descriptions.multiAssignments' },
-            { key: 'batch.assignments.enabled', type: 'boolean', descKey: 'descriptions.batchAssignments' },
-        ],
-    },
-];
-
-// Helper to extract value from API response
-const extractValue = (configValue: unknown): unknown => {
-    if (configValue && typeof configValue === 'object' && 'value' in configValue) {
-        return (configValue as { value?: unknown }).value;
-    }
-    return configValue;
-};
-
-// Validate time format HH:mm:ss
-const isValidTimeFormat = (value: string): boolean => {
-    const timeRegex = /^([0-9]{2}):([0-5][0-9]):([0-5][0-9])$/;
-    return timeRegex.test(value);
-};
 
 const Configuration: React.FC = () => {
     const { t } = useTranslation('system');
@@ -181,7 +81,6 @@ const Configuration: React.FC = () => {
     const [editedValues, setEditedValues] = useState<Record<string, unknown>>({});
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-    // Derived initial values from API data
     const initialConfigValues = useMemo(() => {
         if (!data) return {} as Record<string, unknown>;
         const vals: Record<string, unknown> = {};
@@ -191,7 +90,6 @@ const Configuration: React.FC = () => {
         return vals;
     }, [data]);
 
-    // Calculate dynamic groups for unknown keys
     const allGroups = useMemo(() => {
         if (!data) return CONFIG_GROUPS;
 
@@ -212,18 +110,13 @@ const Configuration: React.FC = () => {
                     : typeof value === 'number' ? 'number'
                         : Array.isArray(value) ? 'array'
                             : 'string';
-                return {
-                    key,
-                    type,
-                    descKey: key
-                } as ConfigItem;
+                return { key, type, descKey: key } as ConfigItem;
             })
         };
 
         return [...CONFIG_GROUPS, unknownGroup];
     }, [data]);
 
-    // Admin only access
     if (!isAdmin) {
         return <Navigate to="/" replace />;
     }
@@ -239,12 +132,7 @@ const Configuration: React.FC = () => {
     if (error) {
         return (
             <div style={{ padding: 24 }}>
-                <Alert
-                    type="error"
-                    message={t('errors.loadFailed')}
-                    description={t('errors.loadFailedDesc')}
-                    showIcon
-                />
+                <Alert type="error" message={t('errors.loadFailed')} description={t('errors.loadFailedDesc')} showIcon />
             </div>
         );
     }
@@ -252,7 +140,6 @@ const Configuration: React.FC = () => {
     const handleValueChange = (key: string, value: unknown, type: string) => {
         setEditedValues((prev) => ({ ...prev, [key]: value }));
 
-        // Validate
         const errors = { ...validationErrors };
         if (type === 'time' && typeof value === 'string') {
             if (value && !isValidTimeFormat(value)) {
@@ -273,13 +160,11 @@ const Configuration: React.FC = () => {
     };
 
     const handleSave = async () => {
-        // Check for validation errors
         if (Object.keys(validationErrors).length > 0) {
             messageApi.error(t('validation.invalidNumber'));
             return;
         }
 
-        // Prepare update payload - only include changed values
         if (Object.keys(editedValues).length === 0) {
             messageApi.info(t('messages.noChanges'));
             return;
@@ -297,7 +182,6 @@ const Configuration: React.FC = () => {
     };
 
     const handleCancel = () => {
-        // Reset dirty values
         setEditedValues({});
         setValidationErrors({});
         setIsEditMode(false);
@@ -308,22 +192,12 @@ const Configuration: React.FC = () => {
         const hasError = validationErrors[item.key];
         const themeColor = GROUP_THEMES.polling.color;
 
-        // Action status options for selection
-        const ACTION_STATUS_OPTIONS = [
-            { label: 'canceled', value: 'canceled' },
-            { label: 'error', value: 'error' },
-            { label: 'finished', value: 'finished' },
-            { label: 'warning', value: 'warning' },
-        ];
-
-        // Check for special fields
         const isActionStatusField = item.key === 'action.cleanup.actionStatus';
         const isExpiryField = item.key === 'action.cleanup.actionExpiry';
         const isSecurityTokenField = item.key === 'authentication.gatewaytoken.key';
         const isTimeField = item.type === 'time';
 
         if (isEditMode) {
-            // Special: Action Status - Multi-select
             if (isActionStatusField) {
                 return (
                     <Select
@@ -337,7 +211,6 @@ const Configuration: React.FC = () => {
                 );
             }
 
-            // Special: Expiry Time - Duration with unit (show as days)
             if (isExpiryField) {
                 const msValue = value as number || 0;
                 const daysValue = Math.floor(msValue / (1000 * 60 * 60 * 24));
@@ -346,10 +219,7 @@ const Configuration: React.FC = () => {
                         <InputNumber
                             value={daysValue}
                             min={0}
-                            onChange={(val) => {
-                                const newMs = (val || 0) * 1000 * 60 * 60 * 24;
-                                handleValueChange(item.key, newMs, item.type);
-                            }}
+                            onChange={(val) => handleValueChange(item.key, (val || 0) * 1000 * 60 * 60 * 24, item.type)}
                             style={{ width: 100 }}
                         />
                         <span style={{ color: '#666', fontSize: 'var(--ant-font-size)' }}>{t('units.days', 'days')}</span>
@@ -357,7 +227,6 @@ const Configuration: React.FC = () => {
                 );
             }
 
-            // Special: Security Token - Password with toggle
             if (isSecurityTokenField) {
                 return (
                     <Input.Password
@@ -370,16 +239,12 @@ const Configuration: React.FC = () => {
                 );
             }
 
-            // Time fields - TimePicker
             if (isTimeField) {
                 const timeValue = value ? dayjs(value as string, 'HH:mm:ss') : null;
                 return (
                     <TimePicker
                         value={timeValue}
-                        onChange={(time) => {
-                            const formatted = time ? time.format('HH:mm:ss') : '';
-                            handleValueChange(item.key, formatted, item.type);
-                        }}
+                        onChange={(time) => handleValueChange(item.key, time ? time.format('HH:mm:ss') : '', item.type)}
                         format="HH:mm:ss"
                         style={{ width: 150 }}
                     />
@@ -399,63 +264,35 @@ const Configuration: React.FC = () => {
                     );
                 case 'number':
                     return (
-                        <Form.Item
-                            validateStatus={hasError ? 'error' : undefined}
-                            help={hasError}
-                            style={{ margin: 0 }}
-                        >
-                            <InputNumber
-                                value={value as number}
-                                onChange={(val) => handleValueChange(item.key, val, item.type)}
-                                style={{ width: 150 }}
-                            />
+                        <Form.Item validateStatus={hasError ? 'error' : undefined} help={hasError} style={{ margin: 0 }}>
+                            <InputNumber value={value as number} onChange={(val) => handleValueChange(item.key, val, item.type)} style={{ width: 150 }} />
                         </Form.Item>
                     );
                 case 'array':
                     return (
                         <Input
                             value={Array.isArray(value) ? value.join(', ') : String(value || '')}
-                            onChange={(e) =>
-                                handleValueChange(
-                                    item.key,
-                                    e.target.value.split(',').map((v) => v.trim()),
-                                    item.type
-                                )
-                            }
+                            onChange={(e) => handleValueChange(item.key, e.target.value.split(',').map((v) => v.trim()), item.type)}
                             placeholder={t('placeholders.array')}
                             style={{ width: 200 }}
                         />
                     );
                 default:
-                    return (
-                        <Input
-                            value={String(value || '')}
-                            onChange={(e) => handleValueChange(item.key, e.target.value, item.type)}
-                            style={{ width: 200 }}
-                        />
-                    );
+                    return <Input value={String(value || '')} onChange={(e) => handleValueChange(item.key, e.target.value, item.type)} style={{ width: 200 }} />;
             }
         }
 
-        // Read-only mode
-        // Special display for expiry field (show as days)
         if (isExpiryField && typeof value === 'number') {
             const days = Math.floor(value / (1000 * 60 * 60 * 24));
             return <ValueDisplay style={{ borderColor: `${themeColor}30`, background: `${themeColor}10` }}>{days} {t('units.days', 'days')}</ValueDisplay>;
         }
 
-        // Special display for security token (masked)
         if (isSecurityTokenField && value) {
             return <ValueDisplay style={{ borderColor: `${themeColor}30`, background: `${themeColor}10` }}>{'•'.repeat(12)}</ValueDisplay>;
         }
 
         if (typeof value === 'boolean') {
-            return (
-                <BooleanTag $enabled={value}>
-                    {value && <CheckCircleOutlined />}
-                    {value ? t('values.enabled') : t('values.disabled')}
-                </BooleanTag>
-            );
+            return <BooleanTag $enabled={value}>{value && <CheckCircleOutlined />}{value ? t('values.enabled') : t('values.disabled')}</BooleanTag>;
         }
 
         if (value === null || value === undefined) {
@@ -464,11 +301,7 @@ const Configuration: React.FC = () => {
 
         if (Array.isArray(value)) {
             return value.length > 0 ? (
-                <ArrayValueContainer>
-                    {value.map((v, i) => (
-                        <ArrayTag key={i}>{String(v)}</ArrayTag>
-                    ))}
-                </ArrayValueContainer>
+                <ArrayValueContainer>{value.map((v, i) => <ArrayTag key={i}>{String(v)}</ArrayTag>)}</ArrayValueContainer>
             ) : (
                 <EmptyValue>-</EmptyValue>
             );
@@ -478,8 +311,7 @@ const Configuration: React.FC = () => {
     };
 
     const renderConfigItem = (item: ConfigItem, index: number) => {
-        const exists = item.key in (data || {});
-        if (!exists) return null;
+        if (!(item.key in (data || {}))) return null;
 
         return (
             <ConfigItemRow key={item.key} $delay={index}>
@@ -487,15 +319,12 @@ const Configuration: React.FC = () => {
                     <ConfigKeyText>{item.key}</ConfigKeyText>
                     <ConfigDescText>{t(item.descKey)}</ConfigDescText>
                 </ConfigItemLabel>
-                <ConfigItemValue>
-                    {renderValue(item)}
-                </ConfigItemValue>
+                <ConfigItemValue>{renderValue(item)}</ConfigItemValue>
             </ConfigItemRow>
         );
     };
 
     const renderGroup = (group: ConfigGroup, index: number) => {
-        // Check if any item in group exists in data
         const visibleItems = group.items.filter((item) => item.key in (data || {}));
         if (visibleItems.length === 0) return null;
 
@@ -506,9 +335,7 @@ const Configuration: React.FC = () => {
                 $delay={index}
                 title={
                     <Flex align="center" gap={12}>
-                        <GroupIconBadge $themeKey={group.themeKey}>
-                            {group.icon}
-                        </GroupIconBadge>
+                        <GroupIconBadge $themeKey={group.themeKey}>{group.icon}</GroupIconBadge>
                         <Flex vertical gap={0}>
                             <span>{t(group.titleKey)}</span>
                             <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontWeight: 400 }}>
@@ -521,11 +348,7 @@ const Configuration: React.FC = () => {
                     </Flex>
                 }
             >
-                {visibleItems.length > 0 ? (
-                    visibleItems.map((item, i) => renderConfigItem(item, i))
-                ) : (
-                    <NoItemsMessage>{t('common:messages.noData', 'No items')}</NoItemsMessage>
-                )}
+                {visibleItems.length > 0 ? visibleItems.map((item, i) => renderConfigItem(item, i)) : <NoItemsMessage>{t('common:messages.noData', 'No items')}</NoItemsMessage>}
             </ConfigGroupCard>
         );
     };
@@ -535,86 +358,47 @@ const Configuration: React.FC = () => {
             {contextHolder}
 
             <Breadcrumb>
-                <Breadcrumb.Item>
-                    <Link to="/">
-                        <HomeOutlined /> {t('common:nav.home')}
-                    </Link>
-                </Breadcrumb.Item>
-                <Breadcrumb.Item>
-                    <SettingOutlined /> {t('common:nav.system')}
-                </Breadcrumb.Item>
+                <Breadcrumb.Item><Link to="/"><HomeOutlined /> {t('common:nav.home')}</Link></Breadcrumb.Item>
+                <Breadcrumb.Item><SettingOutlined /> {t('common:nav.system')}</Breadcrumb.Item>
                 <Breadcrumb.Item>{t('pageTitle')}</Breadcrumb.Item>
             </Breadcrumb>
 
             <PageHeader
-                title={(
-                    <GradientTitle level={2}>
-                        {t('pageTitle')}
-                    </GradientTitle>
-                )}
+                title={<GradientTitle level={2}>{t('pageTitle')}</GradientTitle>}
                 subtitle={t('subtitle', 'Manage your tenant configuration')}
-                subtitleExtra={(
-                    <StatusIndicator $isEdit={isEditMode}>
-                        {isEditMode ? t('editMode') : t('readOnly')}
-                    </StatusIndicator>
-                )}
-                actions={(
+                subtitleExtra={<StatusIndicator $isEdit={isEditMode}>{isEditMode ? t('editMode') : t('readOnly')}</StatusIndicator>}
+                actions={
                     <Space>
                         {isEditMode ? (
                             <>
-                                <Button icon={<CloseOutlined />} onClick={handleCancel}>
-                                    {t('cancel')}
-                                </Button>
-                                <Button
-                                    type="primary"
-                                    icon={<SaveOutlined />}
-                                    onClick={handleSave}
-                                    loading={updateMutation.isPending}
-                                    disabled={Object.keys(validationErrors).length > 0}
-                                >
+                                <Button icon={<CloseOutlined />} onClick={handleCancel}>{t('cancel')}</Button>
+                                <Button type="primary" icon={<SaveOutlined />} onClick={handleSave} loading={updateMutation.isPending} disabled={Object.keys(validationErrors).length > 0}>
                                     {updateMutation.isPending ? t('saving') : t('save')}
                                 </Button>
                             </>
                         ) : (
                             <>
-                                <Button
-                                    icon={<ReloadOutlined />}
-                                    onClick={() => refetch()}
-                                    loading={isLoading}
-                                >
-                                    {t('refresh')}
-                                </Button>
-                                <Button
-                                    type="primary"
-                                    icon={<EditOutlined />}
-                                    onClick={() => setIsEditMode(true)}
-                                >
-                                    {t('edit')}
-                                </Button>
+                                <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>{t('refresh')}</Button>
+                                <Button type="primary" icon={<EditOutlined />} onClick={() => setIsEditMode(true)}>{t('edit')}</Button>
                             </>
                         )}
                     </Space>
-                )}
+                }
             />
 
             <ConfigGroupsContainer>
                 {allGroups.map((group, index) => renderGroup(group, index))}
                 <ApprovalPolicyCard isEditMode={isEditMode} />
 
-                {/* Version Info Card */}
                 <ConfigGroupCard
                     $themeKey="other"
                     $delay={allGroups.length + 1}
                     title={
                         <Flex align="center" gap={12}>
-                            <GroupIconBadge $themeKey="other">
-                                <InfoCircleOutlined />
-                            </GroupIconBadge>
+                            <GroupIconBadge $themeKey="other"><InfoCircleOutlined /></GroupIconBadge>
                             <Flex vertical gap={0}>
                                 <span>{t('groups.versionInfo', 'Version Info')}</span>
-                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontWeight: 400 }}>
-                                    {t('groups.versionInfoDesc', 'Application version and build information')}
-                                </Text>
+                                <Text type="secondary" style={{ fontSize: 'var(--ant-font-size-sm)', fontWeight: 400 }}>{t('groups.versionInfoDesc', 'Application version and build information')}</Text>
                             </Flex>
                         </Flex>
                     }
@@ -624,18 +408,14 @@ const Configuration: React.FC = () => {
                             <ConfigKeyText>version</ConfigKeyText>
                             <ConfigDescText>{t('descriptions.appVersion', 'Current application version')}</ConfigDescText>
                         </ConfigItemLabel>
-                        <ConfigItemValue>
-                            <ValueDisplay>v{__APP_VERSION__}</ValueDisplay>
-                        </ConfigItemValue>
+                        <ConfigItemValue><ValueDisplay>v{__APP_VERSION__}</ValueDisplay></ConfigItemValue>
                     </ConfigItemRow>
                     <ConfigItemRow $delay={1}>
                         <ConfigItemLabel>
                             <ConfigKeyText>buildTime</ConfigKeyText>
                             <ConfigDescText>{t('descriptions.buildTime', 'Build timestamp')}</ConfigDescText>
                         </ConfigItemLabel>
-                        <ConfigItemValue>
-                            <ValueDisplay>{new Date(__BUILD_TIME__).toLocaleString()}</ValueDisplay>
-                        </ConfigItemValue>
+                        <ConfigItemValue><ValueDisplay>{new Date(__BUILD_TIME__).toLocaleString()}</ValueDisplay></ConfigItemValue>
                     </ConfigItemRow>
                 </ConfigGroupCard>
             </ConfigGroupsContainer>

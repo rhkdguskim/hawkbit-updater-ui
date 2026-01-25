@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Typography, Spin, Empty, Tabs, List, Tag, Button, Input, Badge, Tooltip } from 'antd';
+import { Typography, Spin, Tabs, Tag, Badge } from 'antd';
 import {
     MdDevices,
     MdRocketLaunch,
@@ -13,8 +13,7 @@ import {
     MdMemory,
     MdApps,
 } from 'react-icons/md';
-import { SearchOutlined, TagsOutlined, AppstoreOutlined } from '@ant-design/icons';
-import styled, { keyframes } from 'styled-components';
+import { SearchOutlined, TagsOutlined } from '@ant-design/icons';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGetTargetsInfinite, useGetTargets } from '@/api/generated/targets/targets';
 import { useGetRolloutsInfinite, useGetRollouts } from '@/api/generated/rollouts/rollouts';
@@ -26,433 +25,35 @@ import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 import { useGetDistributionSetTypes } from '@/api/generated/distribution-set-types/distribution-set-types';
 import { useGetTypes as useGetSoftwareModuleTypes } from '@/api/generated/software-module-types/software-module-types';
 import { useNavigate } from 'react-router-dom';
-interface SearchableItem {
-    id?: number;
-    controllerId?: string;
-    name?: string;
-    description?: string;
-    version?: string;
-    status?: string;
-    type?: string;
-    targetType?: { name?: string };
-    colour?: string;
-    key?: string;
-}
-
-interface PagedListGeneric {
-    content: SearchableItem[];
-    total?: number;
-}
-
-interface CategoryColor {
-    bg: string;
-    icon: string;
-}
-
-interface InfiniteSearchResultsProps {
-    query: string;
-    useHook: (params: Record<string, unknown>, options: Record<string, unknown>) => {
-        data?: { pages: PagedListGeneric[] };
-        fetchNextPage: () => void;
-        hasNextPage?: boolean;
-        isFetchingNextPage: boolean;
-        isLoading: boolean;
-    };
-    handleNavigate: (path: string) => void;
-    pathPrefix: string;
-    icon: React.ReactNode;
-    searchQueryStr: string;
-    isEnabled: boolean;
-    categoryColor: CategoryColor;
-}
+import type { SearchableItem, GlobalSearchModalProps } from './components/SearchTypes';
+import { InfiniteSearchResults } from './components/InfiniteSearchResults';
+import {
+    StyledModal,
+    SearchHeader,
+    SearchInput,
+    ScrollableContent,
+    CategorySection,
+    CategoryHeader,
+    CategoryTitle,
+    CategoryIcon,
+    ResultCard,
+    IconWrapper,
+    ResultInfo,
+    ResultTitle,
+    ResultSubtitle,
+    ResultMeta,
+    ColorDot,
+    EmptyState,
+    EmptyIcon,
+    FooterBar,
+    ShortcutBadge,
+    LoadingWrapper,
+    ViewAllButton,
+    TabBadge,
+    CATEGORY_COLORS,
+} from './components/GlobalSearchStyles';
 
 const { Text, Title } = Typography;
-
-interface GlobalSearchModalProps {
-    open: boolean;
-    onClose: () => void;
-    initialQuery?: string;
-}
-
-// Animations
-const pulseGlow = keyframes`
-    0%, 100% { box-shadow: 0 0 0 0 var(--ant-color-primary-bg); }
-    50% { box-shadow: 0 0 20px 5px var(--ant-color-primary-bg); }
-`;
-
-const shimmer = keyframes`
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-`;
-
-const fadeIn = keyframes`
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
-`;
-
-// Styled Components
-const StyledModal = styled(Modal)`
-    .ant-modal-content {
-        padding: 0;
-        overflow: hidden;
-        border-radius: 16px;
-        background: var(--ant-color-bg-container);
-        backdrop-filter: blur(20px);
-        border: 1px solid var(--ant-color-border-secondary);
-    }
-    .ant-modal-body {
-        padding: 0;
-    }
-    .ant-tabs-nav {
-        margin-bottom: 0;
-        padding: 0 20px;
-        border-bottom: 1px solid var(--ant-color-border-secondary);
-        background: var(--ant-color-bg-layout);
-    }
-    .ant-tabs-tab {
-        padding: 12px 16px;
-        transition: all 0.2s ease;
-    }
-    .ant-tabs-tab:hover {
-        color: var(--ant-color-primary);
-    }
-    .ant-tabs-ink-bar {
-        background: linear-gradient(90deg, var(--ant-color-primary), var(--ant-color-primary-hover));
-        height: 3px;
-        border-radius: 3px 3px 0 0;
-    }
-`;
-
-const SearchHeader = styled.div`
-    padding: 20px 24px;
-    background: linear-gradient(135deg, var(--ant-color-bg-container) 0%, var(--ant-color-bg-layout) 100%);
-    border-bottom: 1px solid var(--ant-color-border-secondary);
-`;
-
-const SearchInput = styled(Input)`
-    font-size: var(--ant-font-size-xl);
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    
-    .ant-input {
-        font-size: var(--ant-font-size-xl);
-        background: transparent;
-    }
-    
-    .ant-input::placeholder {
-        color: var(--ant-color-text-description);
-    }
-`;
-
-const ScrollableContent = styled.div`
-    height: 55vh;
-    overflow-y: auto;
-    padding: 16px 20px 20px;
-    
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-    &::-webkit-scrollbar-thumb {
-        background: var(--ant-color-border-secondary);
-        border-radius: 3px;
-    }
-    &::-webkit-scrollbar-thumb:hover {
-        background: var(--ant-color-text-quaternary);
-    }
-`;
-
-const CategorySection = styled.div`
-    margin-bottom: 24px;
-    animation: ${fadeIn} 0.3s ease forwards;
-`;
-
-const CategoryHeader = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    padding: 0 4px;
-`;
-
-const CategoryTitle = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: var(--ant-font-size-sm);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--ant-color-text-secondary);
-`;
-
-const CategoryIcon = styled.div<{ $color?: string }>`
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    background: ${props => props.$color || 'var(--ant-color-primary-bg)'};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--ant-font-size-sm);
-    color: ${props => props.$color ? 'white' : 'var(--ant-color-primary)'};
-`;
-
-const ResultCard = styled.div<{ $isClickable?: boolean }>`
-    display: flex;
-    align-items: center;
-    padding: 12px 14px;
-    border-radius: 10px;
-    background: var(--ant-color-bg-container);
-    border: 1px solid var(--ant-color-border-secondary);
-    margin-bottom: 8px;
-    cursor: ${props => props.$isClickable ? 'pointer' : 'default'};
-    transition: all 0.2s ease;
-    
-    ${props => props.$isClickable && `
-        &:hover {
-            border-color: var(--ant-color-primary-border);
-            background: var(--ant-color-primary-bg);
-            transform: translateX(4px);
-        }
-    `}
-    
-    &:last-child {
-        margin-bottom: 0;
-    }
-`;
-
-const IconWrapper = styled.div<{ $bgColor?: string; $iconColor?: string }>`
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: ${props => props.$bgColor || 'linear-gradient(135deg, var(--ant-color-primary-bg) 0%, var(--ant-color-primary-bg-hover) 100%)'};
-    color: ${props => props.$iconColor || 'var(--ant-color-primary)'};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--ant-font-size-xl);
-    margin-right: 14px;
-    flex-shrink: 0;
-`;
-
-const ResultInfo = styled.div`
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-`;
-
-const ResultTitle = styled(Text)`
-    font-weight: 600;
-    font-size: var(--ant-font-size-sm);
-    color: var(--ant-color-text);
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-`;
-
-const ResultSubtitle = styled(Text)`
-    font-size: var(--ant-font-size-sm);
-    color: var(--ant-color-text-description);
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-`;
-
-const ResultMeta = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-    margin-left: 12px;
-`;
-
-const ColorDot = styled.div<{ $color?: string }>`
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    background: ${props => props.$color || 'var(--ant-color-text-quaternary)'};
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`;
-
-const EmptyState = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    text-align: center;
-`;
-
-const EmptyIcon = styled.div`
-    width: 80px;
-    height: 80px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, var(--ant-color-bg-layout) 0%, var(--ant-color-bg-container) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    color: var(--ant-color-text-quaternary);
-    margin-bottom: 20px;
-`;
-
-const FooterBar = styled.div`
-    padding: 10px 20px;
-    background: var(--ant-color-bg-layout);
-    border-top: 1px solid var(--ant-color-border-secondary);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: var(--ant-font-size-sm);
-    color: var(--ant-color-text-description);
-`;
-
-const ShortcutBadge = styled.span`
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 8px;
-    border-radius: 4px;
-    background: var(--ant-color-bg-container);
-    border: 1px solid var(--ant-color-border-secondary);
-    font-size: 10px;
-    font-weight: 500;
-    margin-left: 4px;
-`;
-
-const LoadingWrapper = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-`;
-
-const ViewAllButton = styled(Button)`
-    font-size: var(--ant-font-size-sm);
-    height: 28px;
-    padding: 0 12px;
-    border-radius: 6px;
-    
-    &:hover {
-        transform: translateX(2px);
-    }
-`;
-
-const TabBadge = styled(Badge)`
-    .ant-badge-count {
-        font-size: 10px;
-        min-width: 18px;
-        height: 18px;
-        line-height: 18px;
-        padding: 0 6px;
-        border-radius: 9px;
-    }
-`;
-
-// Category color configurations
-const CATEGORY_COLORS = {
-    targets: { bg: 'linear-gradient(135deg, var(--ant-color-primary) 0%, #1d4ed8 100%)', icon: 'var(--ant-color-primary)' },
-    rollouts: { bg: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)', icon: '#f97316' },
-    distSets: { bg: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)', icon: '#22c55e' },
-    modules: { bg: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)', icon: '#a855f7' },
-    targetTags: { bg: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)', icon: '#ec4899' },
-    dsTags: { bg: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)', icon: '#14b8a6' },
-    targetTypes: { bg: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', icon: '#6366f1' },
-    dsTypes: { bg: 'linear-gradient(135deg, var(--ant-color-warning) 0%, #d97706 100%)', icon: 'var(--ant-color-warning)' },
-    smTypes: { bg: 'linear-gradient(135deg, #84cc16 0%, #65a30d 100%)', icon: '#84cc16' },
-};
-
-const InfiniteSearchResults: React.FC<InfiniteSearchResultsProps> = ({
-    query,
-    useHook,
-    handleNavigate,
-    pathPrefix,
-    icon,
-    searchQueryStr,
-    isEnabled,
-    categoryColor
-}) => {
-    const { t } = useTranslation('common');
-    const {
-        data,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-        isLoading
-    } = useHook(
-        { q: searchQueryStr, limit: 20 },
-        {
-            query: {
-                enabled: !!query && isEnabled,
-                staleTime: 0,
-                initialPageParam: 0,
-                getNextPageParam: (lastPage: PagedListGeneric, allPages: PagedListGeneric[]) => {
-                    const fetchedCount = allPages.flatMap((p) => p.content).length;
-                    const total = lastPage.total || 0;
-                    return fetchedCount < total ? fetchedCount : undefined;
-                }
-            }
-        }
-    );
-
-    const items = data?.pages.flatMap((page) => page.content) || [];
-    const total = data?.pages[0]?.total || 0;
-
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
-        if (scrollHeight - scrollTop <= clientHeight + 50 && hasNextPage && !isFetchingNextPage) {
-            fetchNextPage();
-        }
-    };
-
-    if (isLoading) {
-        return <LoadingWrapper><Spin size="large" /></LoadingWrapper>;
-    }
-
-    if (items.length === 0) {
-        return (
-            <EmptyState>
-                <EmptyIcon><MdSearch /></EmptyIcon>
-                <Text type="secondary">{t('search.noResults')}</Text>
-            </EmptyState>
-        );
-    }
-
-    return (
-        <ScrollableContent onScroll={handleScroll}>
-            <CategoryHeader>
-                <CategoryTitle>
-                    <Badge count={total} style={{ backgroundColor: categoryColor.icon }} />
-                    <span>{t('search.results')}</span>
-                </CategoryTitle>
-            </CategoryHeader>
-            {items.map((item, index) => (
-                <ResultCard
-                    key={item.id || item.controllerId || index}
-                    $isClickable
-                    onClick={() => handleNavigate(`${pathPrefix}/${item.controllerId || item.id}`)}
-                >
-                    <IconWrapper $bgColor={categoryColor.bg} $iconColor="white">{icon}</IconWrapper>
-                    <ResultInfo>
-                        <ResultTitle>{item.name || item.controllerId}</ResultTitle>
-                        <ResultSubtitle>{item.description || item.version || item.controllerId}</ResultSubtitle>
-                    </ResultInfo>
-                    <ResultMeta>
-                        <Tag style={{ marginRight: 0, borderRadius: 6 }}>
-                            {item.status || item.type || item.targetType?.name || t('common:labels.notAvailable')}
-                        </Tag>
-                    </ResultMeta>
-                </ResultCard>
-            ))}
-            {isFetchingNextPage && <LoadingWrapper><Spin size="small" /></LoadingWrapper>}
-        </ScrollableContent>
-    );
-};
 
 const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, initialQuery = '' }) => {
     const { t } = useTranslation('common');
@@ -461,7 +62,6 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
     const debouncedQuery = useDebounce(query, 300);
     const [activeTab, setActiveTab] = useState('all');
 
-    // Sync state when open or initialQuery changes
     useEffect(() => {
         if (open) {
             setQuery(initialQuery);
@@ -469,7 +69,6 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
         }
     }, [open, initialQuery]);
 
-    // Construct RSQL queries
     const queries = useMemo(() => {
         if (!debouncedQuery) return { targets: '', rollouts: '', distSets: '', modules: '', tags: '', types: '' };
         const q = debouncedQuery.replace(/[*;=,()]/g, '');
@@ -483,7 +82,6 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
         };
     }, [debouncedQuery]);
 
-    // Main entity queries (limit 5 for summary)
     const { data: targetsData, isLoading: targetsLoading } = useGetTargets(
         { q: queries.targets, limit: 5 },
         { query: { enabled: !!debouncedQuery && activeTab === 'all', staleTime: 0 } }
@@ -500,8 +98,6 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
         { q: queries.modules, limit: 5 },
         { query: { enabled: !!debouncedQuery && activeTab === 'all', staleTime: 0 } }
     );
-
-    // Tag queries
     const { data: targetTagsData, isLoading: targetTagsLoading } = useGetTargetTags(
         { q: queries.tags, limit: 5 },
         { query: { enabled: !!debouncedQuery && activeTab === 'all', staleTime: 0 } }
@@ -510,8 +106,6 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
         { q: queries.tags, limit: 5 },
         { query: { enabled: !!debouncedQuery && activeTab === 'all', staleTime: 0 } }
     );
-
-    // Type queries
     const { data: targetTypesData, isLoading: targetTypesLoading } = useGetTargetTypes(
         { q: queries.types, limit: 5 },
         { query: { enabled: !!debouncedQuery && activeTab === 'all', staleTime: 0 } }
@@ -528,7 +122,6 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
     const isLoadingSummary = targetsLoading || rolloutsLoading || distSetsLoading || modulesLoading ||
         targetTagsLoading || dsTagsLoading || targetTypesLoading || dsTypesLoading || smTypesLoading;
 
-    // Counts
     const targetsCount = targetsData?.total || 0;
     const rolloutsCount = rolloutsData?.total || 0;
     const distSetsCount = distSetsData?.total || 0;
@@ -549,7 +142,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
     };
 
     const renderResultCard = (
-        item: any,
+        item: SearchableItem,
         pathPrefix: string,
         icon: React.ReactNode,
         categoryColor: { bg: string; icon: string },
@@ -575,7 +168,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
     const renderCategory = (
         title: string,
         count: number,
-        data: any[],
+        data: SearchableItem[],
         pathPrefix: string,
         icon: React.ReactNode,
         categoryColor: { bg: string; icon: string },
@@ -597,12 +190,11 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
                         </ViewAllButton>
                     )}
                 </CategoryHeader>
-                {data.map((item: any) => renderResultCard(item, pathPrefix, icon, categoryColor, showColor))}
+                {data.map((item) => renderResultCard(item, pathPrefix, icon, categoryColor, showColor))}
             </CategorySection>
         );
     };
 
-    // Tab items configuration
     const tabItems = [
         {
             key: 'all',
@@ -636,13 +228,11 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
                         </EmptyState>
                     ) : (
                         <>
-                            {/* Main Entities */}
                             {renderCategory(t('nav.targets'), targetsCount, targetsData?.content || [], '/targets', <MdDevices />, CATEGORY_COLORS.targets, 'targets')}
                             {renderCategory(t('nav.rollouts'), rolloutsCount, rolloutsData?.content || [], '/rollouts', <MdRocketLaunch />, CATEGORY_COLORS.rollouts, 'rollouts')}
                             {renderCategory(t('nav.distributionSets'), distSetsCount, distSetsData?.content || [], '/distributions/sets', <MdInventory />, CATEGORY_COLORS.distSets, 'distSets')}
                             {renderCategory(t('nav.softwareModules'), modulesCount, modulesData?.content || [], '/distributions/modules', <MdExtension />, CATEGORY_COLORS.modules, 'modules')}
 
-                            {/* Tags Section */}
                             {(targetTagsCount > 0 || dsTagsCount > 0) && (
                                 <>
                                     {renderCategory(t('nav.targetTags', { defaultValue: 'Target Tags' }), targetTagsCount, targetTagsData?.content || [], '/targets/tags', <MdLabel />, CATEGORY_COLORS.targetTags, undefined, true)}
@@ -650,7 +240,6 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
                                 </>
                             )}
 
-                            {/* Types Section */}
                             {(targetTypesCount > 0 || dsTypesCount > 0 || smTypesCount > 0) && (
                                 <>
                                     {renderCategory(t('nav.targetTypes', { defaultValue: 'Target Types' }), targetTypesCount, targetTypesData?.content || [], '/targets/types', <MdCategory />, CATEGORY_COLORS.targetTypes)}
@@ -774,11 +363,8 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose, in
                         </EmptyState>
                     ) : (
                         <>
-                            {/* Tags */}
                             {renderCategory(t('nav.targetTags', { defaultValue: 'Target Tags' }), targetTagsCount, targetTagsData?.content || [], '/targets/tags', <MdLabel />, CATEGORY_COLORS.targetTags, undefined, true)}
                             {renderCategory(t('nav.dsTags', { defaultValue: 'Distribution Set Tags' }), dsTagsCount, dsTagsData?.content || [], '/distributions/tags', <MdLabel />, CATEGORY_COLORS.dsTags, undefined, true)}
-
-                            {/* Types */}
                             {renderCategory(t('nav.targetTypes', { defaultValue: 'Target Types' }), targetTypesCount, targetTypesData?.content || [], '/targets/types', <MdCategory />, CATEGORY_COLORS.targetTypes)}
                             {renderCategory(t('nav.dsTypes', { defaultValue: 'Distribution Set Types' }), dsTypesCount, dsTypesData?.content || [], '/distributions/types', <MdMemory />, CATEGORY_COLORS.dsTypes)}
                             {renderCategory(t('nav.smTypes', { defaultValue: 'Software Module Types' }), smTypesCount, smTypesData?.content || [], '/system/types', <MdApps />, CATEGORY_COLORS.smTypes)}
