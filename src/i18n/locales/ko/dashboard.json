@@ -1,6 +1,6 @@
 {
     "title": "운영 대시보드",
-    "subtitle": "실시간 시스템 모니터링",
+    "subtitle": "실시간 배포 모니터링 및 장비 관리",
     "refresh": "새로고침",
     "pageTitle": "운영 인텔리전스 보드",
     "lastUpdated": "업데이트",
@@ -54,7 +54,19 @@
         "newTargets24h": "신규 타겟 (24h)",
         "neverConnected": "미접속 타겟",
         "canceledActions24h": "취소된 액션 (24h)",
-        "errorActions24h": "오류 액션 (24h)"
+        "errorActions24h": "오류 액션 (24h)",
+        "excellent": "우수",
+        "good": "좋음",
+        "poor": "나쁨",
+        "onTrack": "순조로움",
+        "inProgressStatus": "진행 중",
+        "behind": "지연",
+        "acceptable": "양호",
+        "highStatus": "높음",
+        "secure": "안전",
+        "moderate": "보통",
+        "atRisk": "위험",
+        "target": "목표"
     },
     "charts": {
         "deviceStatus": "장치 상태",
@@ -305,7 +317,12 @@
         "errorRolloutsReason": "{{count}}개 롤아웃 에러 상태",
         "highErrorRateReason": "에러율 {{rate}}%가 5% 임계치 초과",
         "moderateErrorRateReason": "에러율 {{rate}}%가 2% 임계치 초과",
-        "viewAnalysis": "분석 보기"
+        "viewAnalysis": "분석 보기",
+        "loadingText": "로딩 중...",
+        "registeredDevices": "등록된 기기",
+        "updatingTooltip": "현재 업데이트를 받고 있는 기기",
+        "errorRateTooltip": "최근 1시간 동안의 오류율",
+        "pausedRolloutsTooltip": "현재 일시정지된 롤아웃"
     },
     "activeRollouts": {
         "resume": "재개",
@@ -394,7 +411,10 @@
         "running": "진행 중",
         "error": "에러",
         "rolloutStart": "롤아웃 시작",
-        "rolloutPause": "롤아웃 일시정지"
+        "rolloutPause": "롤아웃 일시정지",
+        "totalActions": "총 액션",
+        "avgSuccessRate": "평균 성공률",
+        "avgSuccessRateTooltip": "선택한 기간의 모든 액션에 대한 평균 성공률"
     },
     "hygiene": {
         "title": "플릿 위생 상태",
@@ -404,5 +424,9 @@
         "neverConnected": "미접속 타겟",
         "criticalOffline": "업데이트 중 오프라인",
         "fleetCoverage": "플릿 커버리지: {{percentage}}%"
-    }
+    },
+    "enterFullscreen": "전체화면",
+    "exitFullscreen": "전체화면 종료",
+    "settings": "대시보드 설정",
+    "notifications": "알림"
 }

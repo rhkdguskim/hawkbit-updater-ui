@@ -14,6 +14,8 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(packageJson.version),
     __APP_NAME__: JSON.stringify(packageJson.name),
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    // Fix for sockjs-client and @stomp/stompjs
+    global: 'globalThis',
   },
   resolve: {
     alias: {
@@ -29,11 +31,16 @@ export default defineConfig({
         configure: (proxy) => {
           proxy.on('proxyRes', (proxyRes) => {
             if (proxyRes.statusCode === 401) {
-              // Remove WWW-Authenticate header to prevent browser popup
               delete proxyRes.headers['www-authenticate'];
             }
           });
         },
+      },
+      '/ws': {
+        target: 'http://localhost:9100',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
       },
     },
   },

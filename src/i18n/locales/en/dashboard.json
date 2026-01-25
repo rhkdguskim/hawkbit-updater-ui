@@ -1,6 +1,6 @@
 {
     "title": "Operations Dashboard",
-    "subtitle": "Real-time system monitoring",
+    "subtitle": "Real-time deployment monitoring and fleet management",
     "refresh": "Refresh",
     "pageTitle": "Dashboard Overview",
     "lastUpdated": "Updated",
@@ -54,7 +54,19 @@
         "newTargets24h": "New targets (24h)",
         "neverConnected": "Never connected",
         "canceledActions24h": "Canceled actions (24h)",
-        "errorActions24h": "Error actions (24h)"
+        "errorActions24h": "Error actions (24h)",
+        "excellent": "Excellent",
+        "good": "Good",
+        "poor": "Poor",
+        "onTrack": "On Track",
+        "inProgressStatus": "In Progress",
+        "behind": "Behind",
+        "acceptable": "Acceptable",
+        "highStatus": "High",
+        "secure": "Secure",
+        "moderate": "Moderate",
+        "atRisk": "At Risk",
+        "target": "Target"
     },
     "charts": {
         "deviceStatus": "Device Status",
@@ -303,7 +315,12 @@
         "errorRolloutsReason": "{{count}} rollout(s) in error state",
         "highErrorRateReason": "Error rate {{rate}}% exceeds 5% threshold",
         "moderateErrorRateReason": "Error rate {{rate}}% exceeds 2% threshold",
-        "viewAnalysis": "View Analysis"
+        "viewAnalysis": "View Analysis",
+        "loadingText": "Loading...",
+        "registeredDevices": "Registered devices",
+        "updatingTooltip": "Devices currently receiving updates",
+        "errorRateTooltip": "Error rate in the last hour",
+        "pausedRolloutsTooltip": "Rollouts currently paused"
     },
     "activeRollouts": {
         "resume": "Resume",
@@ -392,7 +409,10 @@
         "running": "Running",
         "error": "Error",
         "rolloutStart": "Rollout Start",
-        "rolloutPause": "Rollout Pause"
+        "rolloutPause": "Rollout Pause",
+        "totalActions": "Total Actions",
+        "avgSuccessRate": "Avg Success Rate",
+        "avgSuccessRateTooltip": "Average success rate across all actions in the selected time range"
     },
     "hygiene": {
         "title": "Fleet Hygiene",
@@ -402,5 +422,9 @@
         "neverConnected": "Never Connected",
         "criticalOffline": "Offline during updates",
         "fleetCoverage": "Fleet Coverage: {{percentage}}%"
-    }
+    },
+    "enterFullscreen": "Enter fullscreen",
+    "exitFullscreen": "Exit fullscreen",
+    "settings": "Dashboard settings",
+    "notifications": "Notifications"
 }

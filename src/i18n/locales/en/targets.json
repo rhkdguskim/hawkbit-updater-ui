@@ -77,6 +77,8 @@
         "namePlaceholder": "Enter display name (optional)",
         "description": "Description",
         "descriptionPlaceholder": "Enter description (optional)",
+        "targetType": "Target Type",
+        "targetTypePlaceholder": "Select target type (optional)",
         "validation": {
             "controllerIdPattern": "Only alphanumeric characters, underscores, and hyphens allowed",
             "nameMaxLength": "Name cannot exceed 128 characters",

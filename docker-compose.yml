@@ -50,8 +50,11 @@ services:
       # Allow anonymous artifact download
       - HAWKBIT_SERVER_DOWNLOAD_ANONYMOUS_ENABLED=true
 
-      # Demo mode
-      - HAWKBIT_SERVER_DEMO_DATA_ENABLED=true
+      # Demo mode (disabled for fresh start)
+      - HAWKBIT_SERVER_DEMO_DATA_ENABLED=false
+      
+      # Flyway configuration (enable for MySQL schema initialization)
+      - SPRING_FLYWAY_ENABLED=true
 
       # Artifact Repository Configuration (Filesystem)
       # Disable MongoDB/JCR and enable Filesystem repository

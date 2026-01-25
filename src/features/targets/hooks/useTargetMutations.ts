@@ -104,10 +104,15 @@ export const useTargetMutations = ({
         }
     }, [deleteTargetMutation, targetToDelete]);
 
-    const handleCreateTarget = useCallback((values: { controllerId?: string; name?: string; description?: string }) => {
+    const handleCreateTarget = useCallback((values: { controllerId?: string; name?: string; description?: string; targetType?: number }) => {
         if (values.controllerId) {
             createTargetMutation.mutate({
-                data: [{ controllerId: values.controllerId, name: values.name || values.controllerId, description: values.description }],
+                data: [{ 
+                    controllerId: values.controllerId, 
+                    name: values.name || values.controllerId, 
+                    description: values.description,
+                    targetType: values.targetType,
+                }],
             });
         }
     }, [createTargetMutation]);

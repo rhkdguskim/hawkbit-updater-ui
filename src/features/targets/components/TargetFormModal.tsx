@@ -1,8 +1,9 @@
 import React from 'react';
-import { Form, Input, Alert } from 'antd';
-import type { MgmtTarget } from '@/api/generated/model';
+import { Form, Input, Alert, Select, Tag } from 'antd';
+import type { MgmtTarget, MgmtTargetType } from '@/api/generated/model';
 import styled from 'styled-components';
 import { StandardModal } from '@/components/patterns';
+import { useGetTargetTypes } from '@/api/generated/target-types/target-types';
 
 const InfoAlert = styled(Alert)`
     && {
@@ -16,7 +17,7 @@ interface TargetFormModalProps {
     mode: 'create' | 'edit';
     target?: MgmtTarget | null;
     loading: boolean;
-    onSubmit: (values: { controllerId?: string; name?: string; description?: string }) => void;
+    onSubmit: (values: { controllerId?: string; name?: string; description?: string; targetType?: number }) => void;
     onCancel: () => void;
 }
 
@@ -33,6 +34,8 @@ const TargetFormModal: React.FC<TargetFormModalProps> = ({
 }) => {
     const { t } = useTranslation(['targets', 'common']);
     const [form] = Form.useForm();
+    
+    const { data: typesData, isLoading: typesLoading } = useGetTargetTypes({ limit: 100 });
 
     const handleSubmit = async () => {
         try {
@@ -68,6 +71,7 @@ const TargetFormModal: React.FC<TargetFormModalProps> = ({
                         controllerId: target.controllerId,
                         name: target.name,
                         description: target.description,
+                        targetType: target.targetType,
                     });
                 }
             }}
@@ -82,6 +86,7 @@ const TargetFormModal: React.FC<TargetFormModalProps> = ({
                             controllerId: target.controllerId,
                             name: target.name,
                             description: target.description,
+                            targetType: target.targetType,
                         }
                         : {}
                 }
@@ -129,6 +134,21 @@ const TargetFormModal: React.FC<TargetFormModalProps> = ({
                         rows={3}
                         maxLength={512}
                         showCount
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    name="targetType"
+                    label={t('form.targetType')}
+                >
+                    <Select
+                        placeholder={t('form.targetTypePlaceholder')}
+                        loading={typesLoading}
+                        allowClear
+                        options={(typesData?.content as MgmtTargetType[] || []).map(type => ({
+                            value: type.id,
+                            label: <Tag color={type.colour || 'default'}>{type.name}</Tag>,
+                        }))}
                     />
                 </Form.Item>
             </Form>

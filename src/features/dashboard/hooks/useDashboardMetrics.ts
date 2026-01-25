@@ -10,6 +10,7 @@ import { useGetDistributionSets } from '@/api/generated/distribution-sets/distri
 import { useGetSoftwareModules } from '@/api/generated/software-modules/software-modules';
 import { isActionErrored, isActive } from '@/entities';
 import { usePageVisibility } from '@/hooks/usePageVisibility';
+import { useWebSocket } from '@/hooks/useWebSocket';
 import { useActionMetrics } from './useActionMetrics';
 import { useTargetMetrics } from './useTargetMetrics';
 import { useRolloutMetrics } from './useRolloutMetrics';
@@ -20,6 +21,7 @@ dayjs.extend(relativeTime);
 export const useDashboardMetrics = () => {
     const { t } = useTranslation(['dashboard', 'common', 'distributions']);
     const isVisible = usePageVisibility();
+    const { isConnected: isWebSocketConnected } = useWebSocket();
     const now = dayjs();
     const last24h = now.subtract(24, 'hour');
 
@@ -28,7 +30,7 @@ export const useDashboardMetrics = () => {
         {
             query: {
                 staleTime: 10000,
-                refetchInterval: isVisible ? 15000 : false,
+                refetchInterval: isWebSocketConnected ? false : (isVisible ? 15000 : false),
             },
             request: { skipGlobalError: true },
         }
@@ -38,7 +40,7 @@ export const useDashboardMetrics = () => {
         {
             query: {
                 staleTime: 5000,
-                refetchInterval: (query) => {
+                refetchInterval: isWebSocketConnected ? false : (query) => {
                     if (!isVisible) return false;
                     const hasActive = query.state.data?.content?.some(action => isActive(action));
                     return hasActive ? 3000 : 30000;
@@ -52,7 +54,7 @@ export const useDashboardMetrics = () => {
         {
             query: {
                 staleTime: 5000,
-                refetchInterval: (query) => {
+                refetchInterval: isWebSocketConnected ? false : (query) => {
                     if (!isVisible) return false;
                     const hasActive = query.state.data?.content?.some(rollout =>
                         ['running', 'starting', 'creating', 'paused', 'waiting_for_approval', 'scheduled', 'ready']

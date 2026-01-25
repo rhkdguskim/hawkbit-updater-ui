@@ -3,17 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Tabs, theme } from 'antd';
 import { isActive } from '@/entities';
+import { useWebSocketNotifications } from '@/hooks/useWebSocketNotifications';
 
 import { MinimalOpsDashboard } from './components/layouts/MinimalOpsDashboard';
 import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import { DashboardHeader } from './components/widgets/DashboardHeader';
-import { HealthSummaryWidget } from './components/widgets/HealthSummaryWidget';
+import { EnterpriseHealthSummary } from './components/widgets/EnterpriseHealthSummary';
 import { ActionRequiredWidget } from './components/widgets/ActionRequiredWidget';
 import { ActiveRolloutsWidget } from './components/widgets/ActiveRolloutsWidget';
 import { InProgressUpdatesWidget } from './components/widgets/InProgressUpdatesWidget';
 import { ActionActivityWidget } from './components/widgets/ActionActivityWidget';
-import { StatusTrendChart } from './components/widgets/StatusTrendChart';
-import { KPIHealthSummary } from './components/widgets/KPIHealthSummary';
+import { EnterpriseStatusTrendChart } from './components/widgets/EnterpriseStatusTrendChart';
+import { EnterpriseKPIHealthSummary } from './components/widgets/EnterpriseKPIHealthSummary';
 import { ActionRequiredDetailsModal } from './components/widgets/ActionRequiredDetailsModal';
 import { FailureAnalysisModal } from './components/widgets/FailureAnalysisModal';
 import { RecentlyFinishedActionsWidget } from './components/widgets/RecentlyFinishedActionsWidget';
@@ -25,6 +26,8 @@ import { DistributionSummaryWidget } from './components/widgets/DistributionSumm
 import { HighErrorTargetsWidget } from './components/widgets/HighErrorTargetsWidget';
 import { RolloutQueueChart } from './components/widgets/RolloutQueueChart';
 import RolloutCreateModal from '@/components/modals/RolloutCreateModal';
+import { DashboardErrorBoundary } from '@/components/error/DashboardErrorBoundary';
+import { LiveActivityFeed } from '@/components/shared/LiveActivityFeed';
 
 const { useToken } = theme;
 
@@ -37,6 +40,9 @@ const Dashboard: React.FC = () => {
     const [isFailureModalVisible, setIsFailureModalVisible] = useState(false);
     const [isCreateRolloutVisible, setIsCreateRolloutVisible] = useState(false);
     const [actionRequiredType, setActionRequiredType] = useState<'DELAYED' | 'APPROVAL_PENDING' | null>(null);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    useWebSocketNotifications();
 
     const onActionRequiredClick = (type: 'DELAYED' | 'APPROVAL_PENDING') => {
         setActionRequiredType(type);
@@ -52,28 +58,32 @@ const Dashboard: React.FC = () => {
                     topRow={[
                         {
                             node: (
-                                <HealthSummaryWidget
-                                    isLoading={metrics.isLoading}
-                                    totalTargets={metrics.totalDevices}
-                                    updatingCount={metrics.activeActionsCount}
-                                    pausedRollouts={metrics.pausedRolloutCount}
-                                    errorRollouts={metrics.errorRolloutCount}
-                                    errorActions1h={metrics.errorActions1hCount}
-                                    onAnalysisClick={() => setIsFailureModalVisible(true)}
-                                />
+                                <DashboardErrorBoundary widgetName="Health Summary">
+                                    <EnterpriseHealthSummary
+                                        isLoading={metrics.isLoading}
+                                        totalTargets={metrics.totalDevices}
+                                        updatingCount={metrics.activeActionsCount}
+                                        pausedRollouts={metrics.pausedRolloutCount}
+                                        errorRollouts={metrics.errorRolloutCount}
+                                        errorActions1h={metrics.errorActions1hCount}
+                                        onAnalysisClick={() => setIsFailureModalVisible(true)}
+                                    />
+                                </DashboardErrorBoundary>
                             )
                         },
                         {
                             node: (
-                                <KPIHealthSummary
-                                    isLoading={metrics.isLoading}
-                                    onlineRate={metrics.onlineRate}
-                                    deploymentRate={metrics.deploymentRate}
-                                    errorRate={metrics.errorRate}
-                                    pendingCount={metrics.pendingCount}
-                                    runningRolloutCount={metrics.runningRolloutCount}
-                                    securityCoverage={metrics.securityCoverage}
-                                />
+                                <DashboardErrorBoundary widgetName="KPI Health">
+                                    <EnterpriseKPIHealthSummary
+                                        isLoading={metrics.isLoading}
+                                        onlineRate={metrics.onlineRate}
+                                        deploymentRate={metrics.deploymentRate}
+                                        errorRate={metrics.errorRate}
+                                        pendingCount={metrics.pendingCount}
+                                        runningRolloutCount={metrics.runningRolloutCount}
+                                        securityCoverage={metrics.securityCoverage}
+                                    />
+                                </DashboardErrorBoundary>
                             )
                         },
                         {
@@ -121,7 +131,15 @@ const Dashboard: React.FC = () => {
                     ]}
                     opsRight={[
                         {
-                            flex: 1.6,
+                            flex: 1,
+                            node: (
+                                <DashboardErrorBoundary widgetName="Live Activity Feed">
+                                    <LiveActivityFeed maxItems={15} />
+                                </DashboardErrorBoundary>
+                            ),
+                        },
+                        {
+                            flex: 1.2,
                             node: (
                                 <RecentlyFinishedActionsWidget
                                     isLoading={metrics.isLoading}
@@ -204,12 +222,14 @@ const Dashboard: React.FC = () => {
                     opsRight={[]}
                     signals={[]}
                     trendLeft={(
-                        <StatusTrendChart
-                            isLoading={metrics.isLoading}
-                            actions={metrics.actions}
-                            rollouts={metrics.rollouts}
-                            referenceTimeMs={metrics.stableNowMs}
-                        />
+                        <DashboardErrorBoundary widgetName="Status Trend Chart">
+                            <EnterpriseStatusTrendChart
+                                isLoading={metrics.isLoading}
+                                actions={metrics.actions}
+                                rollouts={metrics.rollouts}
+                                referenceTimeMs={metrics.stableNowMs}
+                            />
+                        </DashboardErrorBoundary>
                     )}
                     trendRight={[
                         {
@@ -287,6 +307,10 @@ const Dashboard: React.FC = () => {
                         onClick: () => navigate('/rollouts/list?status=running'),
                     },
                 ]}
+                onFullscreenToggle={() => setIsFullscreen(!isFullscreen)}
+                isFullscreen={isFullscreen}
+                notificationCount={metrics.errorActions1hCount > 0 ? 1 : 0}
+                onSettingsClick={() => {/* Future: Open settings */}}
             />
 
             <Tabs

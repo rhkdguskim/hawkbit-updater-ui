@@ -4,7 +4,8 @@ import 'antd/dist/reset.css'
 import App from './app'
 import './index.css'
 
-// Set document title from environment variable
+(window as any).global = window;
+
 document.title = import.meta.env.VITE_APP_TITLE || 'Updater UI';
 
 createRoot(document.getElementById('root')!).render(

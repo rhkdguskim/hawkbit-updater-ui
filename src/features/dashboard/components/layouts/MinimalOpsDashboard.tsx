@@ -2,22 +2,22 @@ import React from 'react';
 import styled from 'styled-components';
 import { PageLayout } from '@/components/patterns';
 import { DashboardScrollContent, DashboardSurface } from '@/components/patterns/DashboardStyles';
+import { TYPOGRAPHY, SPACING, MEDIA_QUERIES, TRANSITIONS } from '@/theme/dashboard-design-system';
 
 /* ============================================================================
    SECTION COMPONENTS - 기능별 영역 구분
    ============================================================================ */
 
-/** Section Title - 영역 제목 */
 const SectionTitle = styled.h3`
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-size: ${TYPOGRAPHY.components.h3.fontSize};
+    font-weight: ${TYPOGRAPHY.components.h3.fontWeight};
+    text-transform: ${TYPOGRAPHY.components.h3.textTransform};
+    letter-spacing: ${TYPOGRAPHY.components.h3.letterSpacing};
     color: var(--ant-color-text-tertiary);
-    margin: 0 0 12px 4px;
+    margin: 0 0 ${SPACING[3]} ${SPACING[1]};
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: ${SPACING[2]};
 
     &::after {
         content: '';
@@ -27,44 +27,53 @@ const SectionTitle = styled.h3`
     }
 `;
 
-/** KPI Row - 4개의 주요 지표 카드 */
 const KPIRow = styled.section`
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
+    gap: ${SPACING[4]};
     align-items: stretch;
     flex-shrink: 0;
 
-    @media (max-width: 1400px) {
+    ${MEDIA_QUERIES.maxXl} {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    ${MEDIA_QUERIES.maxLg} {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    @media (max-width: 768px) {
+    ${MEDIA_QUERIES.maxMd} {
         grid-template-columns: 1fr;
+        gap: ${SPACING[3]};
     }
 `;
 
-/** Operations Row - 2컬럼 운영 현황 */
 const OpsRow = styled.section`
     display: grid;
     grid-template-columns: 1.4fr 1fr;
-    gap: 16px;
+    gap: ${SPACING[4]};
     align-items: stretch;
     min-height: 400px;
     flex-shrink: 0;
+    transition: ${TRANSITIONS.default};
 
-    @media (max-width: 1200px) {
+    ${MEDIA_QUERIES.maxLg} {
         grid-template-columns: 1fr;
         min-height: auto;
+        gap: ${SPACING[3]};
     }
 `;
 
 const OpsStack = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: ${SPACING[4]};
     min-width: 0;
     min-height: 100%;
+
+    ${MEDIA_QUERIES.maxLg} {
+        gap: ${SPACING[3]};
+    }
 `;
 
 const StackItem = styled.div<{ $flex?: number }>`
@@ -72,47 +81,57 @@ const StackItem = styled.div<{ $flex?: number }>`
     min-height: 180px;
     display: flex;
     flex-direction: column;
+    transition: ${TRANSITIONS.default};
     
     & > * {
         flex: 1;
         min-height: 0;
     }
+
+    ${MEDIA_QUERIES.maxMd} {
+        min-height: 160px;
+    }
 `;
 
-/** Signals Row - 4개의 신호/차트 위젯 */
 const SignalsRow = styled.section`
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
+    gap: ${SPACING[4]};
     align-items: stretch;
     grid-auto-rows: minmax(240px, auto);
     flex-shrink: 0;
 
-    @media (max-width: 1400px) {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    ${MEDIA_QUERIES.maxXl} {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    @media (max-width: 768px) {
+    ${MEDIA_QUERIES.maxLg} {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: minmax(220px, auto);
+    }
+
+    ${MEDIA_QUERIES.maxMd} {
         grid-template-columns: 1fr;
+        gap: ${SPACING[3]};
+        grid-auto-rows: minmax(200px, auto);
     }
 `;
 
-/** Trend Row - 2컬럼 트렌드 분석 */
 const TrendRow = styled.section`
     display: grid;
     grid-template-columns: 1.4fr 1fr;
-    gap: 16px;
+    gap: ${SPACING[4]};
     align-items: stretch;
     min-height: 380px;
     flex-shrink: 0;
 
-    @media (max-width: 1200px) {
+    ${MEDIA_QUERIES.maxLg} {
         grid-template-columns: 1fr;
         min-height: auto;
+        gap: ${SPACING[3]};
     }
 `;
 
-/** Section Wrapper - 영역 구분 컨테이너 */
 const Section = styled.div<{ $withTitle?: boolean }>`
     display: flex;
     flex-direction: column;

@@ -82,6 +82,8 @@
         "namePlaceholder": "표시 이름 입력 (선택)",
         "description": "설명",
         "descriptionPlaceholder": "설명 입력 (선택)",
+        "targetType": "타겟 유형",
+        "targetTypePlaceholder": "타겟 유형 선택 (선택)",
         "validation": {
             "controllerIdPattern": "영문, 숫자, 밑줄, 하이픈만 허용됩니다.",
             "nameMaxLength": "이름은 128자를 초과할 수 없습니다.",
