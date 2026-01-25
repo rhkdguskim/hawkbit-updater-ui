@@ -130,8 +130,8 @@ sequenceDiagram
 
 ### 2. Local Setup
 ```bash
-# Clone the project
-git clone https://github.com/rhkdguskim/hawkbit-updater-ui.git
+# Clone the project with submodules
+git clone --recurse-submodules https://github.com/rhkdguskim/hawkbit-updater-ui.git
 cd hawkbit-updater-ui
 
 # Install dependencies
@@ -140,6 +140,8 @@ npm install
 # Start the dev server
 npm run dev
 ```
+
+**Note**: This project includes a hawkBit fork as a git submodule in `external/hawkbit`. See [hawkBit Submodule Guide](docs/HAWKBIT_SUBMODULE.md) for details.
 
 ### 3. Environment Configuration
 Create a `.env` in the root (see `.env_template`):
@@ -166,16 +168,17 @@ docker run -p 80:80 -d hawkbit-updater-ui
 ```
 
 ### With Docker Compose
-```yaml
-version: '3.8'
-services:
-  updater-ui:
-    image: rhkdguskim/hawkbit-updater-ui
-    ports:
-      - "80:80"
-    environment:
-      - HAWKBIT_URL=http://hawkbit:8080
+```bash
+# Start all services (UI, hawkBit, MySQL, RabbitMQ)
+docker compose up --build
+
+# Access the services
+# - Updater UI: http://localhost:9100
+# - hawkBit Server: http://localhost:9100/hawkbit (via nginx proxy)
+# - RabbitMQ Management: http://localhost:15672
 ```
+
+**Important**: The docker-compose.yml builds hawkBit from the local submodule source instead of using pre-built images. First build may take 5-10 minutes.
 
 ---
 

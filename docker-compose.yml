@@ -24,10 +24,13 @@ services:
       - updater-network
 
   hawkbit:
-    platform: linux/amd64
-    image: hawkbit/hawkbit-update-server:latest-mysql
+    build:
+      context: ./external/hawkbit
+      dockerfile: Dockerfile
+    image: hawkbit-update-server:local
     container_name: hawkbit-server
     environment:
+      - SPRING_PROFILES_ACTIVE=mysql
       # MySQL Database Configuration
       - SPRING_DATASOURCE_URL=jdbc:mariadb://mysql:3306/hawkbit
       - SPRING_DATASOURCE_USERNAME=hawkbit

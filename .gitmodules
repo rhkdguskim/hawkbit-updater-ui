@@ -1,0 +1,3 @@
+[submodule "external/hawkbit"]
+	path = external/hawkbit
+	url = https://github.com/rhkdguskim/hawkbit.git

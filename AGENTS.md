@@ -9,6 +9,8 @@
 - `public/` contains static assets served as-is.
 - `docs/` contains product/feature documentation and PRD material.
 - `tools/ddi-simulator/` provides a device simulator used in local workflows.
+- `external/hawkbit/` contains the forked hawkBit repository as a git submodule.
+- `scripts/hawkbit-module-manager.sh` manages hawkBit Maven modules (enable/disable features).
 
 ## Build, Test, and Development Commands
 - `npm run dev` starts the Vite dev server with HMR.
@@ -16,7 +18,8 @@
 - `npm run preview` serves the production build locally.
 - `npm run lint` runs ESLint across the repo.
 - `npm run gen:api` regenerates API clients using `orval.config.ts`.
-- `docker-compose up` starts local backend services defined in `docker-compose.yml`.
+- `docker-compose up --build` builds hawkBit from submodule source and starts all services.
+- `./scripts/hawkbit-module-manager.sh` manages hawkBit Maven modules (see docs/HAWKBIT_SUBMODULE.md).
 
 ## Coding Style & Naming Conventions
 - TypeScript + React; keep files in `.ts`/`.tsx`.
