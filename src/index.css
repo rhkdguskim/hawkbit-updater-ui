@@ -121,15 +121,6 @@
     --ant-primary-color: #2563eb;
     --ant-color-primary: #2563eb;
     --ant-color-primary-rgb: 37, 99, 235;
-
-    /* Neobrutalism Design Tokens */
-    --neo-border: #000000;
-    --neo-shadow: #000000;
-    --neo-bg-accent: #FFE500;
-    --neo-bg-success: #00FF88;
-    --neo-bg-warning: #FF6B00;
-    --neo-bg-error: #FF0055;
-    --neo-bg-info: #0099FF;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -163,15 +154,6 @@ body:not([data-theme='dark']) {
     --deep-bg: #020617;
     --deep-surface: #0f172a;
     --deep-elevated: #1e293b;
-
-    /* Neobrutalism Dark Mode */
-    --neo-border: #FFFFFF;
-    --neo-shadow: rgba(255, 255, 255, 0.3);
-    --neo-bg-accent: #FFE500;
-    --neo-bg-success: #00FF88;
-    --neo-bg-warning: #FF6B00;
-    --neo-bg-error: #FF0055;
-    --neo-bg-info: #0099FF;
 
     /* Semantic Colors - RGB for Dark (slightly brightened for dark bg) */
     --color-primary-rgb: 59, 130, 246;
@@ -330,36 +312,25 @@ pre,
    Ant Design Component Overrides
    ───────────────────────────────────────────────────────────────────────────── */
 
-/* Cards - Neobrutalism Style */
+/* Cards */
 .ant-card {
-    border: 3px solid var(--neo-border) !important;
+    transition: transform var(--transition-normal) var(--transition-gentle),
+        box-shadow var(--transition-normal) var(--transition-gentle),
+        border-color var(--transition-normal) var(--transition-gentle);
+    border: 1px solid var(--border-color);
     background: var(--bg-container);
-    border-radius: 12px !important;
+    border-radius: 16px !important;
     overflow: hidden;
-    box-shadow: 6px 6px 0px var(--neo-shadow);
-    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translate(0, 0);
 }
 
-.ant-card:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 8px 8px 0px var(--neo-shadow);
-}
-
-.ant-card:active {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0px var(--neo-shadow);
-}
+/* .ant-card:hover { } */
 
 [data-theme='dark'] .ant-card {
     background: var(--deep-surface);
-    border-color: var(--neo-border);
-    box-shadow: 6px 6px 0px var(--neo-shadow);
+    border-color: rgba(255, 255, 255, 0.04);
 }
 
-[data-theme='dark'] .ant-card:hover {
-    box-shadow: 8px 8px 0px var(--neo-shadow);
-}
+/* [data-theme='dark'] .ant-card:hover { } */
 
 /* Card Header Accent */
 .ant-card-head {
@@ -410,64 +381,69 @@ pre,
     background: #18181b !important;
 }
 
-/* Buttons - Neobrutalism */
+/* Buttons */
 .ant-btn {
     font-family: var(--font-sans);
     font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-semibold);
     line-height: var(--line-height-snug);
-    border: 2px solid var(--neo-border) !important;
-    border-radius: 8px !important;
-    box-shadow: 4px 4px 0px var(--neo-shadow);
-    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal) var(--transition-gentle);
+    border-radius: 10px !important;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.ant-btn:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px var(--neo-shadow);
 }
 
 .ant-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0px var(--neo-shadow);
+    transform: scale(0.96);
 }
 
 .ant-btn-primary {
-    background: var(--primary-color) !important;
-    border-color: var(--neo-border) !important;
+    background: var(--gradient-primary) !important;
+    border: none !important;
     color: white !important;
+    box-shadow: 0 4px 14px rgba(var(--ant-color-primary-rgb), 0.3) !important;
+    position: relative;
+    overflow: hidden;
 }
 
-.ant-btn-default {
-    background: white !important;
-    border-color: var(--neo-border) !important;
-    color: var(--neo-border) !important;
+.ant-btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+}
+
+.ant-btn-primary:hover::after {
+    left: 100%;
+}
+
+.ant-btn-primary:hover {
+    box-shadow: 0 6px 20px rgba(var(--ant-color-primary-rgb), 0.4) !important;
+    transform: translateY(-2px);
+    filter: brightness(1.1);
 }
 
 [data-theme='dark'] .ant-btn-primary {
-    background: var(--primary-color) !important;
-    border-color: var(--neo-border) !important;
-    box-shadow: 4px 4px 0px var(--neo-shadow);
-}
-
-[data-theme='dark'] .ant-btn-primary:hover {
-    box-shadow: 6px 6px 0px var(--neo-shadow);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
 }
 
 [data-theme='dark'] .ant-btn-default {
-    background: var(--deep-surface) !important;
-    border-color: var(--neo-border) !important;
-    color: var(--neo-border) !important;
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
 }
 
 [data-theme='dark'] .ant-btn-default:hover {
-    background: var(--deep-elevated) !important;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
 }
 
 /* Dashboard Clickable Elements */
@@ -867,50 +843,25 @@ pre,
     color: #f4f4f5 !important;
 }
 
-/* Input & Select - Neobrutalism */
-.ant-input,
-.ant-input-affix-wrapper,
-.ant-select-selector {
-    border: 2px solid var(--neo-border) !important;
-    border-radius: 6px !important;
-    box-shadow: 3px 3px 0px var(--neo-shadow);
-    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.ant-input:hover,
-.ant-input-affix-wrapper:hover,
-.ant-select-selector:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: 4px 4px 0px var(--neo-shadow);
-}
-
-.ant-input:focus,
-.ant-input-affix-wrapper-focused,
-.ant-select-focused .ant-select-selector {
-    border-color: var(--primary-color) !important;
-    box-shadow: 4px 4px 0px var(--primary-color);
-    transform: translate(-1px, -1px);
-}
-
+/* Input & Select */
 [data-theme='dark'] .ant-input,
 [data-theme='dark'] .ant-input-affix-wrapper,
 [data-theme='dark'] .ant-select-selector {
-    background: var(--deep-surface) !important;
-    border-color: var(--neo-border) !important;
-    box-shadow: 3px 3px 0px var(--neo-shadow);
+    background: #020617 !important;
+    border-color: #1e293b !important;
 }
 
 [data-theme='dark'] .ant-input:hover,
 [data-theme='dark'] .ant-input-affix-wrapper:hover,
 [data-theme='dark'] .ant-select-selector:hover {
-    box-shadow: 4px 4px 0px var(--neo-shadow);
+    border-color: #334155 !important;
 }
 
 [data-theme='dark'] .ant-input:focus,
 [data-theme='dark'] .ant-input-affix-wrapper-focused,
 [data-theme='dark'] .ant-select-focused .ant-select-selector {
-    border-color: var(--primary-color) !important;
-    box-shadow: 4px 4px 0px var(--primary-color);
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
 }
 
 /* Progress Bars */
